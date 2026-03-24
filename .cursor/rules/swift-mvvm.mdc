@@ -1,0 +1,75 @@
+---
+description: Swift 6 MVVM 架構、Combine/Concurrency、Apple 規範、HIG 交互守則
+globs: **/*.swift
+alwaysApply: true
+---
+
+# Swift 專案規範
+
+## HIG 交互守則
+
+遵循 [Apple Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/)：
+
+- **觸控區域**：按鈕、連結等可點擊元素最小 44×44 pt
+- **即時回饋**：載入時顯示 `ProgressView`，操作成功/失敗給予清楚提示
+- **導覽一致性**：使用 `NavigationStack`、`TabView` 等系統導覽模式
+- **可存取性**：支援 Dynamic Type、VoiceOver（`.accessibilityLabel`、`.accessibilityHint`）
+- **平台適性**：依 iOS / iPadOS 調整版面與手勢
+- **避免阻斷**：非緊急操作用 `.confirmationDialog` 或 `.alert`，不強制 modal
+
+## 語言與架構
+
+- 使用 **Swift 6**，啟用完整並發檢查
+- 採用 **MVVM**：Model / ViewModel / View 職責分離
+- 資料流使用 **Combine**（`@Published`、`AnyPublisher`）或 **Swift Concurrency**（`async/await`、`AsyncStream`），擇一或混用需一致
+
+## Apple API 規範
+
+- 遵循 [Swift API Design Guidelines](https://swift.org/documentation/api-design-guidelines/)
+- 使用 `final class` 或 `struct` 依語意選擇
+- 明確標註 `@MainActor` 於 UI 相關型別
+- 善用 `Sendable` 標記可跨 Task 傳遞的型別
+
+## 註解規範
+
+- 僅使用 `// MARK: -` 做區段註解
+- 不使用 `///`、`/** */`、`// TODO` 等
+
+```swift
+// MARK: - Lifecycle
+
+// MARK: - Private Methods
+```
+
+## 工程檔
+
+- **勿修改** `.xcodeproj`、`project.pbxproj`、schemes 等工程設定檔
+- 開發者自行在 Xcode 中新增、加入檔案至 target
+
+## 檔案分組規範
+
+- 新增檔案時，必須使用 Xcode `Group` 進行分類，不可全部放在同一層
+- 優先依功能模組分組，例如：`Home`、`Search`、`MyList`、`Network`
+- 每個模組下建議至少區分 `View`、`ViewModel`、`Model`（依實際需求增減）
+- `Group` 命名需清楚反映職責，避免使用 `Misc`、`Temp` 等模糊名稱
+
+## MVVM 範例
+
+```swift
+@MainActor
+final class AnimeListViewModel: ObservableObject {
+    @Published var items: [Anime] = []
+    @Published var isLoading = false
+
+    func fetch() async {
+        isLoading = true
+        defer { isLoading = false }
+     
+    }
+}
+
+struct AnimeListView: View {
+    @StateObject private var viewModel = AnimeListViewModel()
+    // ...
+}
+```

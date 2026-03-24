@@ -11,7 +11,8 @@ import SwiftUI
 struct WYJikanAppApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainTabBarView()
+                .preferredColorScheme(.dark)
         }
     }
 }
