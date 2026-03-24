@@ -54,29 +54,6 @@ struct MainTabBarView: View {
     }
 }
 
-// MARK: - TabView 常用 Modifier 參考
-//
-// .tabViewStyle(...)
-//   - .automatic         預設，依平台自動
-//   - .sidebarAdaptable  支援 TabSection，iPad 側邊欄 / iPhone Tab Bar
-//   - .tabBarOnly        僅 Tab Bar
-//   - .grouped           分組 Tab Bar
-//   - .page              滑動分頁（無 Tab Bar）
-//   - .verticalPage      垂直滑動分頁
-//   - .carousel          輪播
-//
-// .tint(Color)                             選中圖示與強調色
-// .toolbarBackground(_, for: .tabBar)      Tab Bar 背景樣式
-// .toolbarBackground(.visible, for: .tabBar) 顯示 Tab Bar 背景
-// .toolbarColorScheme(nil, for: .tabBar)   nil = 跟隨系統；.dark / .light = 強制
-// .tabBarMinimizeBehavior(...)
-//   - .automatic         預設
-//   - .never             不縮小
-//   - .onScrollDown      向下滑動時縮小 (iPhone)
-//   - .onScrollUp        向上滑動時縮小 (iPhone)
-//
-// .tabViewCustomization($customization)     Tab 自訂（拖曳、隱藏）需 @AppStorage TabViewCustomization
-
 #Preview {
     MainTabBarView()
 }
