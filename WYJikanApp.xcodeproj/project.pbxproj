@@ -13,6 +13,11 @@
 		15DE55A02F723A9C00B292AD /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 15DE559F2F723A9C00B292AD /* SDWebImageSwiftUI */; };
 		15DE55A42F723C0000B292AD /* JikanAPIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15DE55A52F723C0000B292AD /* JikanAPIService.swift */; };
 		15DE55B72F723F2800B292AD /* APIConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15DE55B62F723F2800B292AD /* APIConfig.swift */; };
+		15FC4F3A2F73E7340054153E /* HeroBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F392F73E7340054153E /* HeroBannerView.swift */; };
+		15FC4F3C2F73E7520054153E /* HeroBannerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F3B2F73E7520054153E /* HeroBannerModel.swift */; };
+		15FC4F3E2F73E7620054153E /* HeroBannerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F3D2F73E7620054153E /* HeroBannerViewModel.swift */; };
+		15FC4F412F73EB7B0054153E /* MainHomeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F402F73EB7B0054153E /* MainHomeService.swift */; };
+		15FCF8882F73C28B0054153E /* MainHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FCF8872F73C28B0054153E /* MainHomeView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +27,11 @@
 		15DE55902F723A1700B292AD /* WYJikanApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WYJikanApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		15DE55A52F723C0000B292AD /* JikanAPIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JikanAPIService.swift; sourceTree = "<group>"; };
 		15DE55B62F723F2800B292AD /* APIConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIConfig.swift; sourceTree = "<group>"; };
+		15FC4F392F73E7340054153E /* HeroBannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroBannerView.swift; sourceTree = "<group>"; };
+		15FC4F3B2F73E7520054153E /* HeroBannerModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroBannerModel.swift; sourceTree = "<group>"; };
+		15FC4F3D2F73E7620054153E /* HeroBannerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroBannerViewModel.swift; sourceTree = "<group>"; };
+		15FC4F402F73EB7B0054153E /* MainHomeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainHomeService.swift; sourceTree = "<group>"; };
+		15FCF8872F73C28B0054153E /* MainHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainHomeView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -80,6 +90,7 @@
 		15DE55872F723A1700B292AD = {
 			isa = PBXGroup;
 			children = (
+				15FCF8832F73C25A0054153E /* MainHome */,
 				15750AFD2F7285340037E8A5 /* Placeholders */,
 				15134BB62F7269BD002DBB76 /* MainTabBar */,
 				15DE55A12F723B4C00B292AD /* Network */,
@@ -119,6 +130,66 @@
 				15DE55A52F723C0000B292AD /* JikanAPIService.swift */,
 			);
 			path = Service;
+			sourceTree = "<group>";
+		};
+		15FC4F342F73E6480054153E /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				15FC4F3B2F73E7520054153E /* HeroBannerModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		15FC4F352F73E64F0054153E /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				15FC4F3D2F73E7620054153E /* HeroBannerViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		15FC4F372F73E7090054153E /* MainView */ = {
+			isa = PBXGroup;
+			children = (
+				15FCF8872F73C28B0054153E /* MainHomeView.swift */,
+			);
+			path = MainView;
+			sourceTree = "<group>";
+		};
+		15FC4F382F73E71E0054153E /* Banner */ = {
+			isa = PBXGroup;
+			children = (
+				15FC4F392F73E7340054153E /* HeroBannerView.swift */,
+			);
+			path = Banner;
+			sourceTree = "<group>";
+		};
+		15FC4F3F2F73EAE20054153E /* Service */ = {
+			isa = PBXGroup;
+			children = (
+				15FC4F402F73EB7B0054153E /* MainHomeService.swift */,
+			);
+			path = Service;
+			sourceTree = "<group>";
+		};
+		15FCF8832F73C25A0054153E /* MainHome */ = {
+			isa = PBXGroup;
+			children = (
+				15FC4F3F2F73EAE20054153E /* Service */,
+				15FC4F352F73E64F0054153E /* ViewModel */,
+				15FC4F342F73E6480054153E /* Model */,
+				15FCF8842F73C2660054153E /* View */,
+			);
+			path = MainHome;
+			sourceTree = "<group>";
+		};
+		15FCF8842F73C2660054153E /* View */ = {
+			isa = PBXGroup;
+			children = (
+				15FC4F382F73E71E0054153E /* Banner */,
+				15FC4F372F73E7090054153E /* MainView */,
+			);
+			path = View;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -200,10 +271,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				15750AF32F7282C70037E8A5 /* MainTabBarView.swift in Sources */,
+				15FC4F3E2F73E7620054153E /* HeroBannerViewModel.swift in Sources */,
+				15FC4F3A2F73E7340054153E /* HeroBannerView.swift in Sources */,
 				15DE55A42F723C0000B292AD /* JikanAPIService.swift in Sources */,
 				15750AFF2F7285520037E8A5 /* PlaceholderView.swift in Sources */,
+				15FC4F412F73EB7B0054153E /* MainHomeService.swift in Sources */,
 				15DE55B72F723F2800B292AD /* APIConfig.swift in Sources */,
 				157561A72F728F8B0037E8A5 /* MainTabBarViewModel.swift in Sources */,
+				15FCF8882F73C28B0054153E /* MainHomeView.swift in Sources */,
+				15FC4F3C2F73E7520054153E /* HeroBannerModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

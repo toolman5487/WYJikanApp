@@ -12,7 +12,7 @@ struct MainTabBarView: View {
         TabView(selection: $viewModel.selectedTab) {
             TabSection("主頁") {
                 Tab(value: AppTab.home) {
-                    PlaceholderView()
+                    MainHomeView()
                 } label: {
                     Image(systemName: viewModel.selectedTab == .home ? "square.grid.3x3.fill" : "square.grid.3x3")
                         .accessibilityLabel("首頁")
