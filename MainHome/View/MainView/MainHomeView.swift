@@ -10,19 +10,22 @@ import SwiftUI
 struct MainHomeView: View {
     enum Section: Identifiable {
         case banner
-        case trending
+        case trendingAnime
+        case trendingManga
         
         var id: String {
             switch self {
             case .banner: return "banner"
-            case .trending: return "trending"
+            case .trendingAnime: return "trendingAnime"
+            case .trendingManga: return "trendingManga"
             }
         }
     }
     
     private let sections: [Section] = [
         .banner,
-        .trending
+        .trendingAnime,
+        .trendingManga
     ]
     
     var body: some View {
@@ -40,8 +43,10 @@ struct MainHomeView: View {
         switch section {
         case .banner:
             HeroBannerView()
-        case .trending:
+        case .trendingAnime:
             HomeTrendingAnimeView()
+        case .trendingManga:
+            HomeTrendingMangaView()
         }
     }
 }
