@@ -11,6 +11,8 @@ import SDWebImageSwiftUI
 struct TrendingAnimeImageView: View {
     let url: URL
 
+    private static let posterAspectRatio: CGFloat = 2.0 / 3.0
+
     @State private var didFail = false
 
     var body: some View {
@@ -19,8 +21,13 @@ struct TrendingAnimeImageView: View {
                 .resizable()
                 .scaledToFill()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .aspectRatio(Self.posterAspectRatio, contentMode: .fill)
+                .clipped()
         } placeholder: {
             Color(.systemBackground)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .aspectRatio(Self.posterAspectRatio, contentMode: .fill)
+                .clipped()
         }
         .onFailure { _ in
             didFail = true

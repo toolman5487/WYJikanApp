@@ -22,7 +22,7 @@ struct HomeTrendingAnimeView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("熱門排行")
+            Text("熱門動畫")
                 .font(.title3.weight(.semibold))
                 .foregroundStyle(ThemeColor.textPrimary)
 
