@@ -13,7 +13,7 @@ import UIKit
 // MARK: - Theme Color Roles
 
 enum ThemeColor {
-    static let sakuraHex = "#FF4FA3"
+    static let sakuraHex = "#FFB7C5"
 
     static let sakura: Color = Color(UIColor(hex: sakuraHex) ?? .systemPink)
     static let primary: Color = sakura
@@ -24,8 +24,8 @@ enum ThemeColor {
 
     static let textPrimary: Color = Color(.label)
     static let textSecondary: Color = Color(.secondaryLabel)
-    static let textTertiary: Color = Color(.systemPink).opacity(0.65)
-    static let textQuaternary: Color = Color(.systemPink).opacity(0.45)
+    static let textTertiary: Color = Color(.tertiaryLabel)
+    static let textQuaternary: Color = Color(.quaternaryLabel)
 
     static let separator: Color = Color(.separator)
 }

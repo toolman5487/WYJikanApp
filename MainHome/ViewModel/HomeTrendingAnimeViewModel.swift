@@ -12,7 +12,7 @@ import Foundation
 final class HomeTrendingAnimeViewModel: ObservableObject {
     private static let maxCards = 10
 
-    @Published private(set) var items: [HomeTrendingCardItem] = []
+    @Published private(set) var items: [HomeTrendingAnimeCardItem] = []
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var errorMessage: String?
 
@@ -37,7 +37,7 @@ final class HomeTrendingAnimeViewModel: ObservableObject {
             guard let self else { return }
             do {
                 let response = try await self.service.fetchTopAnime(limit: Self.maxCards)
-                let mapped: [HomeTrendingCardItem] = response.data.compactMap { dto -> HomeTrendingCardItem? in
+                let mapped: [HomeTrendingAnimeCardItem] = response.data.compactMap { dto -> HomeTrendingAnimeCardItem? in
                     guard let urlString =
                         dto.images?.webp?.largeImageUrl ??
                         dto.images?.jpg?.largeImageUrl ??
@@ -45,7 +45,7 @@ final class HomeTrendingAnimeViewModel: ObservableObject {
                         dto.images?.jpg?.imageUrl,
                         let url = URL(string: urlString) else { return nil }
 
-                    return HomeTrendingCardItem(
+                    return HomeTrendingAnimeCardItem(
                         id: dto.malId,
                         rank: dto.rank,
                         imageURL: url

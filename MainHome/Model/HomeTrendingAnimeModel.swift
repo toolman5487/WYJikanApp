@@ -9,11 +9,11 @@ import Foundation
 
 // MARK: - Response (Jikan /top/anime)
 
-struct HomeTrendingResponse: Codable {
-    let data: [HomeTrendingDTO]
+struct HomeTrendingAnimeResponse: Codable {
+    let data: [HomeTrendingAnimeDTO]
 }
 
-struct HomeTrendingDTO: Codable, Identifiable, Hashable {
+struct HomeTrendingAnimeDTO: Codable, Identifiable, Hashable {
     let malId: Int
     let rank: Int?
     let images: AnimeImagesDTO?
@@ -22,7 +22,7 @@ struct HomeTrendingDTO: Codable, Identifiable, Hashable {
 
 // MARK: - Presentation
 
-struct HomeTrendingCardItem: Identifiable, Hashable, Sendable {
+struct HomeTrendingAnimeCardItem: Identifiable, Hashable, Sendable {
     let id: Int
     let rank: Int?
     let imageURL: URL

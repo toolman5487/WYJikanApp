@@ -10,7 +10,7 @@ import SwiftUI
 struct TrendingAnimeCardView: View {
     private static let cornerRadius: CGFloat = 16
     
-    let item: HomeTrendingCardItem
+    let item: HomeTrendingAnimeCardItem
     
     var body: some View {
         ZStack(alignment: .bottomLeading) {

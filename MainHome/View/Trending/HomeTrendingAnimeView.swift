@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-struct HomeTrendingView: View {
-    @StateObject private var viewModel = HomeTrendingViewModel()
+struct HomeTrendingAnimeView: View {
+    @StateObject private var viewModel = HomeTrendingAnimeViewModel()
 
     private static let cardWidth: CGFloat = 160
     private static let posterAspectRatio: CGFloat = 2.0 / 3.0
@@ -60,5 +60,5 @@ struct HomeTrendingView: View {
 }
 
 #Preview {
-    HomeTrendingView()
+    HomeTrendingAnimeView()
 }

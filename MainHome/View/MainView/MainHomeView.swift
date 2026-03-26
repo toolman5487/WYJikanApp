@@ -41,7 +41,7 @@ struct MainHomeView: View {
         case .banner:
             HeroBannerView()
         case .trending:
-            HomeTrendingView()
+            HomeTrendingAnimeView()
         }
     }
 }
