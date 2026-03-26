@@ -9,6 +9,7 @@ import Foundation
 
 protocol MainHomeServicing {
     func fetchHeroBanner() async throws -> HeroBannerResponse
+    func fetchTopAnime(limit: Int) async throws -> HomeTrendingResponse
 }
 
 final class MainHomeService: MainHomeServicing {
@@ -21,6 +22,15 @@ final class MainHomeService: MainHomeServicing {
 
     func fetchHeroBanner() async throws -> HeroBannerResponse {
         try await apiService.fetch(endpoint: APIConfig.Seasons.now())
+    }
+
+    func fetchTopAnime(limit: Int) async throws -> HomeTrendingResponse {
+        try await apiService.fetch(
+            endpoint: APIConfig.Top.anime,
+            queryItems: [
+                URLQueryItem(name: "limit", value: String(limit))
+            ]
+        )
     }
 }
 

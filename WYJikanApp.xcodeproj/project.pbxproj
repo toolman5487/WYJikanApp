@@ -21,6 +21,13 @@
 		15FC4F472F74DF4D0054153E /* HeroBannerImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F462F74DF4D0054153E /* HeroBannerImageView.swift */; };
 		15FC4F4B2F74E52B0054153E /* BannerSkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F4A2F74E52B0054153E /* BannerSkeletonView.swift */; };
 		15FC4F4F2F74E6440054153E /* ShimmerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F4E2F74E6440054153E /* ShimmerView.swift */; };
+		15FC4F522F7507300054153E /* HomeTrendingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F512F7507300054153E /* HomeTrendingView.swift */; };
+		15FC4F542F75077C0054153E /* HomeTrendingModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F532F75077C0054153E /* HomeTrendingModel.swift */; };
+		15FC4F562F7507910054153E /* HomeTrendingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F552F7507910054153E /* HomeTrendingViewModel.swift */; };
+		15FC4F5A2F750B760054153E /* UIColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F592F750B760054153E /* UIColorExtension.swift */; };
+		15FC4F5F2F750C0B0054153E /* ThemeColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F5E2F750C0B0054153E /* ThemeColor.swift */; };
+		15FC4F612F7513FA0054153E /* TrendingAnimeImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F602F7513FA0054153E /* TrendingAnimeImageView.swift */; };
+		15FC4F632F7514A50054153E /* TrendingAnimeCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F622F7514A50054153E /* TrendingAnimeCardView.swift */; };
 		15FCF8882F73C28B0054153E /* MainHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FCF8872F73C28B0054153E /* MainHomeView.swift */; };
 /* End PBXBuildFile section */
 
@@ -39,6 +46,13 @@
 		15FC4F462F74DF4D0054153E /* HeroBannerImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroBannerImageView.swift; sourceTree = "<group>"; };
 		15FC4F4A2F74E52B0054153E /* BannerSkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BannerSkeletonView.swift; sourceTree = "<group>"; };
 		15FC4F4E2F74E6440054153E /* ShimmerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShimmerView.swift; sourceTree = "<group>"; };
+		15FC4F512F7507300054153E /* HomeTrendingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTrendingView.swift; sourceTree = "<group>"; };
+		15FC4F532F75077C0054153E /* HomeTrendingModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTrendingModel.swift; sourceTree = "<group>"; };
+		15FC4F552F7507910054153E /* HomeTrendingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTrendingViewModel.swift; sourceTree = "<group>"; };
+		15FC4F592F750B760054153E /* UIColorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColorExtension.swift; sourceTree = "<group>"; };
+		15FC4F5E2F750C0B0054153E /* ThemeColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeColor.swift; sourceTree = "<group>"; };
+		15FC4F602F7513FA0054153E /* TrendingAnimeImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendingAnimeImageView.swift; sourceTree = "<group>"; };
+		15FC4F622F7514A50054153E /* TrendingAnimeCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendingAnimeCardView.swift; sourceTree = "<group>"; };
 		15FCF8872F73C28B0054153E /* MainHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainHomeView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -98,6 +112,8 @@
 		15DE55872F723A1700B292AD = {
 			isa = PBXGroup;
 			children = (
+				15FC4F5C2F750BCD0054153E /* Config */,
+				15FC4F572F750B4C0054153E /* Extension */,
 				15FC4F482F74E4EB0054153E /* Components */,
 				15FCF8832F73C25A0054153E /* MainHome */,
 				15750AFD2F7285340037E8A5 /* Placeholders */,
@@ -145,6 +161,7 @@
 			isa = PBXGroup;
 			children = (
 				15FC4F3B2F73E7520054153E /* HeroBannerModel.swift */,
+				15FC4F532F75077C0054153E /* HomeTrendingModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -153,6 +170,7 @@
 			isa = PBXGroup;
 			children = (
 				15FC4F3D2F73E7620054153E /* HeroBannerViewModel.swift */,
+				15FC4F552F7507910054153E /* HomeTrendingViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -232,6 +250,48 @@
 			path = Shimmer;
 			sourceTree = "<group>";
 		};
+		15FC4F502F75070C0054153E /* Trending */ = {
+			isa = PBXGroup;
+			children = (
+				15FC4F622F7514A50054153E /* TrendingAnimeCardView.swift */,
+				15FC4F602F7513FA0054153E /* TrendingAnimeImageView.swift */,
+				15FC4F512F7507300054153E /* HomeTrendingView.swift */,
+			);
+			path = Trending;
+			sourceTree = "<group>";
+		};
+		15FC4F572F750B4C0054153E /* Extension */ = {
+			isa = PBXGroup;
+			children = (
+				15FC4F582F750B560054153E /* UIColor */,
+			);
+			path = Extension;
+			sourceTree = "<group>";
+		};
+		15FC4F582F750B560054153E /* UIColor */ = {
+			isa = PBXGroup;
+			children = (
+				15FC4F592F750B760054153E /* UIColorExtension.swift */,
+			);
+			path = UIColor;
+			sourceTree = "<group>";
+		};
+		15FC4F5C2F750BCD0054153E /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				15FC4F5D2F750BDD0054153E /* Theme */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+		15FC4F5D2F750BDD0054153E /* Theme */ = {
+			isa = PBXGroup;
+			children = (
+				15FC4F5E2F750C0B0054153E /* ThemeColor.swift */,
+			);
+			path = Theme;
+			sourceTree = "<group>";
+		};
 		15FCF8832F73C25A0054153E /* MainHome */ = {
 			isa = PBXGroup;
 			children = (
@@ -246,6 +306,7 @@
 		15FCF8842F73C2660054153E /* View */ = {
 			isa = PBXGroup;
 			children = (
+				15FC4F502F75070C0054153E /* Trending */,
 				15FC4F382F73E71E0054153E /* Banner */,
 				15FC4F372F73E7090054153E /* MainView */,
 			);
@@ -331,18 +392,25 @@
 			buildActionMask = 2147483647;
 			files = (
 				15750AF32F7282C70037E8A5 /* MainTabBarView.swift in Sources */,
+				15FC4F542F75077C0054153E /* HomeTrendingModel.swift in Sources */,
 				15FC4F3E2F73E7620054153E /* HeroBannerViewModel.swift in Sources */,
+				15FC4F522F7507300054153E /* HomeTrendingView.swift in Sources */,
+				15FC4F5F2F750C0B0054153E /* ThemeColor.swift in Sources */,
 				15FC4F3A2F73E7340054153E /* HeroBannerView.swift in Sources */,
+				15FC4F5A2F750B760054153E /* UIColorExtension.swift in Sources */,
 				15DE55A42F723C0000B292AD /* JikanAPIService.swift in Sources */,
 				15750AFF2F7285520037E8A5 /* PlaceholderView.swift in Sources */,
 				15FC4F412F73EB7B0054153E /* MainHomeService.swift in Sources */,
 				15FC4F452F74C7CF0054153E /* ErrorMessageView.swift in Sources */,
 				15DE55B72F723F2800B292AD /* APIConfig.swift in Sources */,
 				15FC4F472F74DF4D0054153E /* HeroBannerImageView.swift in Sources */,
+				15FC4F632F7514A50054153E /* TrendingAnimeCardView.swift in Sources */,
+				15FC4F562F7507910054153E /* HomeTrendingViewModel.swift in Sources */,
 				15FC4F4B2F74E52B0054153E /* BannerSkeletonView.swift in Sources */,
 				15FC4F4F2F74E6440054153E /* ShimmerView.swift in Sources */,
 				157561A72F728F8B0037E8A5 /* MainTabBarViewModel.swift in Sources */,
 				15FCF8882F73C28B0054153E /* MainHomeView.swift in Sources */,
+				15FC4F612F7513FA0054153E /* TrendingAnimeImageView.swift in Sources */,
 				15FC4F3C2F73E7520054153E /* HeroBannerModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -35,41 +35,49 @@ struct HeroBannerView: View {
             ErrorMessageView(message: errorMessage, height: nil)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else if viewModel.items.isEmpty {
-            ErrorMessageView(message: "Empty Data", height: nil)
+            ErrorMessageView(message: viewModel.emptyStateMessage, height: nil)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
-            let selectionBinding = Binding<Int>(
-                get: { viewModel.currentIndex },
-                set: { newValue in
-                    viewModel.setCurrentIndex(newValue)
-                }
-            )
-
             TabView(selection: selectionBinding) {
-                ForEach(viewModel.items.indices, id: \.self) { index in
-                    let item = viewModel.items[index]
-
-                    ZStack(alignment: .bottomLeading) {
-                        HeroBannerImageView(url: item.imageURL)
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .clipped()
-
-                        LinearGradient(
-                            colors: [
-                                .clear,
-                                Color.black.opacity(0.65)
-                            ],
-                            startPoint: .center,
-                            endPoint: .bottom
-                        )
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .tag(index)
+                ForEach(Array(viewModel.items.enumerated()), id: \.element.id) { index, item in
+                    HeroBannerSlideView(imageURL: item.imageURL)
+                        .tag(index)
                 }
             }
             .tabViewStyle(.page(indexDisplayMode: .automatic))
         }
+    }
+
+    private var selectionBinding: Binding<Int> {
+        Binding(
+            get: { viewModel.currentIndex },
+            set: { viewModel.setCurrentIndex($0) }
+        )
+    }
+}
+
+// MARK: - Slide
+
+private struct HeroBannerSlideView: View {
+    let imageURL: URL
+
+    var body: some View {
+        ZStack(alignment: .bottomLeading) {
+            HeroBannerImageView(url: imageURL)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .clipped()
+
+            LinearGradient(
+                colors: [
+                    .clear,
+                    Color.black.opacity(0.65)
+                ],
+                startPoint: .center,
+                endPoint: .bottom
+            )
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 

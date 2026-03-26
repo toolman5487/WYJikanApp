@@ -1,5 +1,5 @@
 //
-//  HeroBannerImageView.swift
+//  TrendingAnimeImageView.swift
 //  WYJikanApp
 //
 //  Created by Willy Hsu on 2026/3/26.
@@ -8,7 +8,7 @@
 import SwiftUI
 import SDWebImageSwiftUI
 
-struct HeroBannerImageView: View {
+struct TrendingAnimeImageView: View {
     let url: URL
 
     @State private var didFail = false
@@ -21,7 +21,6 @@ struct HeroBannerImageView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         } placeholder: {
             Color(.systemBackground)
-                .overlay(ProgressView())
         }
         .onFailure { _ in
             didFail = true
@@ -38,6 +37,3 @@ struct HeroBannerImageView: View {
     }
 }
 
-#Preview {
-    HeroBannerImageView(url: URL(string: "https://example.com/image.jpg")!)
-}

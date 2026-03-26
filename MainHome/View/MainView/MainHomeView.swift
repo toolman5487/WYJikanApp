@@ -10,16 +10,19 @@ import SwiftUI
 struct MainHomeView: View {
     enum Section: Identifiable {
         case banner
+        case trending
         
         var id: String {
             switch self {
             case .banner: return "banner"
+            case .trending: return "trending"
             }
         }
     }
     
     private let sections: [Section] = [
-        .banner
+        .banner,
+        .trending
     ]
     
     var body: some View {
@@ -37,6 +40,8 @@ struct MainHomeView: View {
         switch section {
         case .banner:
             HeroBannerView()
+        case .trending:
+            HomeTrendingView()
         }
     }
 }

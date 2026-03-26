@@ -5,44 +5,49 @@
 //  Created by Willy Hsu on 2026/3/25.
 //
 
-import Foundation
 import Combine
+import Foundation
 
 @MainActor
 final class HeroBannerViewModel: ObservableObject {
-    struct BannerItem: Identifiable, Hashable {
-        let id: Int
-        let imageURL: URL
-    }
+    
+    let emptyStateMessage: String
+    private static let maxBannerItems = 15
+    private static let autoScrollNanoseconds: UInt64 = 4_000_000_000
 
     @Published private(set) var items: [BannerItem] = []
     @Published private(set) var currentIndex: Int = 0
-    @Published private(set) var isLoading: Bool = false
+    @Published private(set) var isLoading = false
     @Published private(set) var errorMessage: String?
 
     private let service: MainHomeServicing
-    private var timerCancellable: AnyCancellable?
+    private var loadTask: Task<Void, Never>?
+    private var autoScrollTask: Task<Void, Never>?
 
-    init(service: MainHomeServicing = MainHomeService()) {
+    init(
+        service: MainHomeServicing = MainHomeService(),
+        emptyStateMessage: String = "Empty Data"
+    ) {
         self.service = service
+        self.emptyStateMessage = emptyStateMessage
     }
 
     func loadIfNeeded() {
         guard items.isEmpty, !isLoading else { return }
         load()
     }
-    
-    func setCurrentIndex(_ newValue: Int) {
-        currentIndex = newValue
+
+    func setCurrentIndex(_ index: Int) {
+        currentIndex = index
     }
 
     func load() {
+        loadTask?.cancel()
         isLoading = true
         errorMessage = nil
 
-        Task { [weak self] in
+        loadTask = Task { @MainActor [weak self] in
             guard let self else { return }
-
             do {
                 let response = try await self.service.fetchHeroBanner()
                 let mapped: [BannerItem] = response.data.compactMap { dto in
@@ -51,52 +56,44 @@ final class HeroBannerViewModel: ObservableObject {
                         dto.images?.jpg?.largeImageUrl ??
                         dto.images?.webp?.imageUrl ??
                         dto.images?.jpg?.imageUrl,
-                    let url = URL(string: urlString)
+                        let url = URL(string: urlString)
                     else { return nil }
 
                     return BannerItem(id: dto.malId, imageURL: url)
                 }
 
-                await MainActor.run {
-                    self.items = mapped
-                    self.currentIndex = 0
-                    self.isLoading = false
-                    self.startAutoScrollIfNeeded()
-                }
+                let capped = Array(mapped.prefix(Self.maxBannerItems))
+                self.items = capped
+                self.currentIndex = 0
+                self.isLoading = false
+                self.startAutoScrollIfNeeded()
             } catch {
-                await MainActor.run {
-                    self.errorMessage = error.localizedDescription
-                    self.items = []
-                    self.currentIndex = 0
-                    self.isLoading = false
-                    self.stopAutoScroll()
-                }
+                self.errorMessage = error.localizedDescription
+                self.items = []
+                self.currentIndex = 0
+                self.isLoading = false
+                self.stopAutoScroll()
             }
         }
     }
 
     func startAutoScrollIfNeeded() {
-        guard items.count > 1 else {
-            stopAutoScroll()
-            return
-        }
-
         stopAutoScroll()
+        guard items.count > 1 else { return }
 
-        timerCancellable = Timer
-            .publish(every: 4.0, tolerance: 0.2, on: .main, in: .common)
-            .autoconnect()
-            .sink { [weak self] _ in
-                guard let self else { return }
-                guard !self.items.isEmpty else { return }
-
-                let next = (self.currentIndex + 1) % self.items.count
-                self.currentIndex = next
+        autoScrollTask = Task { @MainActor [weak self] in
+            while !Task.isCancelled {
+                try? await Task.sleep(nanoseconds: Self.autoScrollNanoseconds)
+                guard let self, !Task.isCancelled else { return }
+                let count = self.items.count
+                guard count > 1 else { return }
+                self.currentIndex = (self.currentIndex + 1) % count
             }
+        }
     }
 
     func stopAutoScroll() {
-        timerCancellable?.cancel()
-        timerCancellable = nil
+        autoScrollTask?.cancel()
+        autoScrollTask = nil
     }
 }

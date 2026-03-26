@@ -7,6 +7,13 @@
 
 import Foundation
 
+// MARK: - Presentation
+
+struct BannerItem: Identifiable, Hashable, Sendable {
+    let id: Int
+    let imageURL: URL
+}
+
 // MARK: - Response
 
 struct HeroBannerResponse: Codable {

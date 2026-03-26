@@ -47,7 +47,7 @@ struct MainTabBarView: View {
                 }
             }
         }
-        .tint(.blue)
+        .tint(ThemeColor.sakura)
         .tabViewStyle(.sidebarAdaptable)
         .toolbarBackground(.visible, for: .tabBar)
         .tabBarMinimizeBehavior(.automatic)
