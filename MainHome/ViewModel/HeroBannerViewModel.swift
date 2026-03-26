@@ -13,7 +13,6 @@ final class HeroBannerViewModel: ObservableObject {
     struct BannerItem: Identifiable, Hashable {
         let id: Int
         let imageURL: URL
-        let title: String
     }
 
     @Published private(set) var items: [BannerItem] = []
@@ -32,7 +31,7 @@ final class HeroBannerViewModel: ObservableObject {
         guard items.isEmpty, !isLoading else { return }
         load()
     }
-
+    
     func setCurrentIndex(_ newValue: Int) {
         currentIndex = newValue
     }
@@ -48,15 +47,14 @@ final class HeroBannerViewModel: ObservableObject {
                 let response = try await self.service.fetchHeroBanner()
                 let mapped: [BannerItem] = response.data.compactMap { dto in
                     guard let urlString =
-                        dto.images?.webp?.largeImageURL ??
-                        dto.images?.jpg?.largeImageURL ??
-                        dto.images?.webp?.imageURL ??
-                        dto.images?.jpg?.imageURL,
+                        dto.images?.webp?.largeImageUrl ??
+                        dto.images?.jpg?.largeImageUrl ??
+                        dto.images?.webp?.imageUrl ??
+                        dto.images?.jpg?.imageUrl,
                     let url = URL(string: urlString)
                     else { return nil }
 
-                    let title = dto.titleEnglish ?? dto.title
-                    return BannerItem(id: dto.malID, imageURL: url, title: title)
+                    return BannerItem(id: dto.malId, imageURL: url)
                 }
 
                 await MainActor.run {

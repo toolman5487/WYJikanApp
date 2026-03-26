@@ -17,6 +17,10 @@
 		15FC4F3C2F73E7520054153E /* HeroBannerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F3B2F73E7520054153E /* HeroBannerModel.swift */; };
 		15FC4F3E2F73E7620054153E /* HeroBannerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F3D2F73E7620054153E /* HeroBannerViewModel.swift */; };
 		15FC4F412F73EB7B0054153E /* MainHomeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F402F73EB7B0054153E /* MainHomeService.swift */; };
+		15FC4F452F74C7CF0054153E /* ErrorMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F442F74C7CF0054153E /* ErrorMessageView.swift */; };
+		15FC4F472F74DF4D0054153E /* HeroBannerImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F462F74DF4D0054153E /* HeroBannerImageView.swift */; };
+		15FC4F4B2F74E52B0054153E /* BannerSkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F4A2F74E52B0054153E /* BannerSkeletonView.swift */; };
+		15FC4F4F2F74E6440054153E /* ShimmerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F4E2F74E6440054153E /* ShimmerView.swift */; };
 		15FCF8882F73C28B0054153E /* MainHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FCF8872F73C28B0054153E /* MainHomeView.swift */; };
 /* End PBXBuildFile section */
 
@@ -31,6 +35,10 @@
 		15FC4F3B2F73E7520054153E /* HeroBannerModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroBannerModel.swift; sourceTree = "<group>"; };
 		15FC4F3D2F73E7620054153E /* HeroBannerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroBannerViewModel.swift; sourceTree = "<group>"; };
 		15FC4F402F73EB7B0054153E /* MainHomeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainHomeService.swift; sourceTree = "<group>"; };
+		15FC4F442F74C7CF0054153E /* ErrorMessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorMessageView.swift; sourceTree = "<group>"; };
+		15FC4F462F74DF4D0054153E /* HeroBannerImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroBannerImageView.swift; sourceTree = "<group>"; };
+		15FC4F4A2F74E52B0054153E /* BannerSkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BannerSkeletonView.swift; sourceTree = "<group>"; };
+		15FC4F4E2F74E6440054153E /* ShimmerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShimmerView.swift; sourceTree = "<group>"; };
 		15FCF8872F73C28B0054153E /* MainHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainHomeView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -90,6 +98,7 @@
 		15DE55872F723A1700B292AD = {
 			isa = PBXGroup;
 			children = (
+				15FC4F482F74E4EB0054153E /* Components */,
 				15FCF8832F73C25A0054153E /* MainHome */,
 				15750AFD2F7285340037E8A5 /* Placeholders */,
 				15134BB62F7269BD002DBB76 /* MainTabBar */,
@@ -160,6 +169,7 @@
 			isa = PBXGroup;
 			children = (
 				15FC4F392F73E7340054153E /* HeroBannerView.swift */,
+				15FC4F462F74DF4D0054153E /* HeroBannerImageView.swift */,
 			);
 			path = Banner;
 			sourceTree = "<group>";
@@ -170,6 +180,56 @@
 				15FC4F402F73EB7B0054153E /* MainHomeService.swift */,
 			);
 			path = Service;
+			sourceTree = "<group>";
+		};
+		15FC4F422F74C79F0054153E /* ErrorMessage */ = {
+			isa = PBXGroup;
+			children = (
+				15FC4F432F74C7B40054153E /* View */,
+			);
+			path = ErrorMessage;
+			sourceTree = "<group>";
+		};
+		15FC4F432F74C7B40054153E /* View */ = {
+			isa = PBXGroup;
+			children = (
+				15FC4F442F74C7CF0054153E /* ErrorMessageView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		15FC4F482F74E4EB0054153E /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				15FC4F4D2F74E6390054153E /* Shimmer */,
+				15FC4F492F74E5130054153E /* Skeleton */,
+				15FC4F422F74C79F0054153E /* ErrorMessage */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		15FC4F492F74E5130054153E /* Skeleton */ = {
+			isa = PBXGroup;
+			children = (
+				15FC4F4C2F74E6150054153E /* Banner */,
+			);
+			path = Skeleton;
+			sourceTree = "<group>";
+		};
+		15FC4F4C2F74E6150054153E /* Banner */ = {
+			isa = PBXGroup;
+			children = (
+				15FC4F4A2F74E52B0054153E /* BannerSkeletonView.swift */,
+			);
+			path = Banner;
+			sourceTree = "<group>";
+		};
+		15FC4F4D2F74E6390054153E /* Shimmer */ = {
+			isa = PBXGroup;
+			children = (
+				15FC4F4E2F74E6440054153E /* ShimmerView.swift */,
+			);
+			path = Shimmer;
 			sourceTree = "<group>";
 		};
 		15FCF8832F73C25A0054153E /* MainHome */ = {
@@ -276,7 +336,11 @@
 				15DE55A42F723C0000B292AD /* JikanAPIService.swift in Sources */,
 				15750AFF2F7285520037E8A5 /* PlaceholderView.swift in Sources */,
 				15FC4F412F73EB7B0054153E /* MainHomeService.swift in Sources */,
+				15FC4F452F74C7CF0054153E /* ErrorMessageView.swift in Sources */,
 				15DE55B72F723F2800B292AD /* APIConfig.swift in Sources */,
+				15FC4F472F74DF4D0054153E /* HeroBannerImageView.swift in Sources */,
+				15FC4F4B2F74E52B0054153E /* BannerSkeletonView.swift in Sources */,
+				15FC4F4F2F74E6440054153E /* ShimmerView.swift in Sources */,
 				157561A72F728F8B0037E8A5 /* MainTabBarViewModel.swift in Sources */,
 				15FCF8882F73C28B0054153E /* MainHomeView.swift in Sources */,
 				15FC4F3C2F73E7520054153E /* HeroBannerModel.swift in Sources */,

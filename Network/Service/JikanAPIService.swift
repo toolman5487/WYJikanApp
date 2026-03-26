@@ -6,12 +6,27 @@
 
 import Foundation
 
-enum JikanAPIError: Error {
+enum JikanAPIError: LocalizedError {
     case invalidURL
     case noData
     case decodingError(Error)
     case networkError(Error)
     case serverError(statusCode: Int)
+
+    var errorDescription: String? {
+        switch self {
+        case .invalidURL:
+            return "The URL is invalid and the request could not be created."
+        case .noData:
+            return "The server returned no data."
+        case .decodingError(let error):
+            return "Failed to decode JSON: \(error.localizedDescription)"
+        case .networkError(let error):
+            return "Network error: \(error.localizedDescription)"
+        case .serverError(let statusCode):
+            return "Server error (HTTP \(statusCode))."
+        }
+    }
 }
 
 final class JikanAPIService {
@@ -57,12 +72,18 @@ final class JikanAPIService {
                 throw JikanAPIError.serverError(statusCode: httpResponse.statusCode)
             }
 
+            guard !data.isEmpty else {
+                throw JikanAPIError.noData
+            }
+
             do {
                 let decoded = try decoder.decode(T.self, from: data)
                 return decoded
             } catch {
                 throw JikanAPIError.decodingError(error)
             }
+        } catch let apiError as JikanAPIError {
+            throw apiError
         } catch {
             throw JikanAPIError.networkError(error)
         }
@@ -84,12 +105,19 @@ final class JikanAPIService {
                 throw JikanAPIError.serverError(statusCode: httpResponse.statusCode)
             }
 
+            guard !data.isEmpty else {
+                throw JikanAPIError.noData
+            }
+
             do {
                 let decoded = try decoder.decode(T.self, from: data)
                 return decoded
             } catch {
                 throw JikanAPIError.decodingError(error)
             }
+        } catch let apiError as JikanAPIError {
+            // 重要：不要把 serverError/decodingError 再包成 networkError
+            throw apiError
         } catch {
             throw JikanAPIError.networkError(error)
         }

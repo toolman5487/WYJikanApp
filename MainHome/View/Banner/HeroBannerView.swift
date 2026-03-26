@@ -10,85 +10,65 @@ import SwiftUI
 struct HeroBannerView: View {
     @StateObject private var viewModel = HeroBannerViewModel()
 
-    private let bannerHeight: CGFloat = 200
+    private static let posterAspectRatio: CGFloat = 2.0 / 3.0
 
     var body: some View {
         VStack(spacing: 0) {
-            if viewModel.isLoading {
-                ProgressView()
-                    .frame(height: bannerHeight)
-            } else if let errorMessage = viewModel.errorMessage {
-                VStack(spacing: 8) {
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .imageScale(.large)
-                    Text(errorMessage)
-                        .font(.subheadline)
-                        .multilineTextAlignment(.center)
-                        .foregroundStyle(.secondary)
-                }
-                .frame(height: bannerHeight)
-            } else if viewModel.items.isEmpty {
-                Text("沒有輪播資料")
-                    .foregroundStyle(.secondary)
-                    .frame(height: bannerHeight)
-            } else {
-                let selectionBinding = Binding<Int>(
-                    get: { viewModel.currentIndex },
-                    set: { newValue in
-                        viewModel.setCurrentIndex(newValue)
-                    }
-                )
-
-                TabView(selection: selectionBinding) {
-                    ForEach(Array(viewModel.items.enumerated()), id: \.element.id) { index, item in
-                        ZStack(alignment: .bottomLeading) {
-                            AsyncImage(url: item.imageURL) { phase in
-                                switch phase {
-                                case .empty:
-                                    Color(.systemBackground)
-                                        .overlay(ProgressView())
-                                case .success(let image):
-                                    image
-                                        .resizable()
-                                        .scaledToFill()
-                                case .failure:
-                                    Color(.systemBackground)
-                                        .overlay(Image(systemName: "photo").imageScale(.large))
-                                @unknown default:
-                                    Color(.systemBackground)
-                                }
-                            }
-                            .clipped()
-
-                            LinearGradient(
-                                colors: [
-                                    .clear,
-                                    Color.black.opacity(0.65)
-                                ],
-                                startPoint: .center,
-                                endPoint: .bottom
-                            )
-                            .frame(height: bannerHeight)
-
-                            Text(item.title)
-                                .font(.headline)
-                                .foregroundStyle(.white)
-                                .padding(12)
-                                .lineLimit(2)
-                        }
-                        .frame(height: bannerHeight)
-                        .tag(index)
-                    }
-                }
-                .tabViewStyle(.page(indexDisplayMode: .automatic))
-                .frame(height: bannerHeight)
-            }
+            content
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
+        .aspectRatio(Self.posterAspectRatio, contentMode: .fit)
+        .frame(maxWidth: .infinity)
         .onAppear {
             viewModel.loadIfNeeded()
         }
         .onDisappear {
             viewModel.stopAutoScroll()
+        }
+    }
+
+    @ViewBuilder
+    private var content: some View {
+        if viewModel.isLoading {
+            BannerSkeletonView()
+        } else if let errorMessage = viewModel.errorMessage {
+            ErrorMessageView(message: errorMessage, height: nil)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else if viewModel.items.isEmpty {
+            ErrorMessageView(message: "Empty Data", height: nil)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else {
+            let selectionBinding = Binding<Int>(
+                get: { viewModel.currentIndex },
+                set: { newValue in
+                    viewModel.setCurrentIndex(newValue)
+                }
+            )
+
+            TabView(selection: selectionBinding) {
+                ForEach(viewModel.items.indices, id: \.self) { index in
+                    let item = viewModel.items[index]
+
+                    ZStack(alignment: .bottomLeading) {
+                        HeroBannerImageView(url: item.imageURL)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .clipped()
+
+                        LinearGradient(
+                            colors: [
+                                .clear,
+                                Color.black.opacity(0.65)
+                            ],
+                            startPoint: .center,
+                            endPoint: .bottom
+                        )
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .tag(index)
+                }
+            }
+            .tabViewStyle(.page(indexDisplayMode: .automatic))
         }
     }
 }
