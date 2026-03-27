@@ -1,24 +1,33 @@
 //
-//  TrendingAnimeCardView.swift
+//  PosterCardView.swift
 //  WYJikanApp
 //
-//  Created by Willy Hsu on 2026/3/26.
+//  Created by Willy Hsu on 2026/3/27.
 //
 
 import SwiftUI
 
-struct TrendingAnimeCardView: View {
-    private static let cornerRadius: CGFloat = 16
-    private static let rankPadding: CGFloat = 6
-    
-    let item: HomeTrendingAnimeCardItem
-    
+struct PosterCardView<ImageContent: View>: View {
+    private static var cornerRadius: CGFloat { 16 }
+    private static var rankPadding: CGFloat { 6 }
+
+    let rank: Int?
+    private let imageContent: ImageContent
+
+    init(
+        rank: Int? = nil,
+        @ViewBuilder imageContent: () -> ImageContent
+    ) {
+        self.rank = rank
+        self.imageContent = imageContent()
+    }
+
     var body: some View {
         ZStack {
-            TrendingAnimeImageView(url: item.imageURL)
+            imageContent
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color.black.opacity(0.06))
-            
+
             LinearGradient(
                 colors: [
                     .clear,
@@ -32,7 +41,7 @@ struct TrendingAnimeCardView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .overlay(alignment: .bottomLeading) {
-            if let rank = item.rank {
+            if let rank {
                 Text("#\(rank)")
                     .font(.caption.weight(.bold))
                     .padding(8)
@@ -46,4 +55,3 @@ struct TrendingAnimeCardView: View {
         .clipShape(RoundedRectangle(cornerRadius: Self.cornerRadius, style: .continuous))
     }
 }
-

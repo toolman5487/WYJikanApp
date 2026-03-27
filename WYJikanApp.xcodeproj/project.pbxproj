@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1572FE052F762D7000756CBA /* HomeTodayAnimeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1572FE042F762D7000756CBA /* HomeTodayAnimeViewModel.swift */; };
+		1572FE072F762D7700756CBA /* HomeTodayAnimeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1572FE062F762D7700756CBA /* HomeTodayAnimeModel.swift */; };
+		1572FE0A2F762DE300756CBA /* HomeTodayAnimeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1572FE082F762DE300756CBA /* HomeTodayAnimeView.swift */; };
 		15750AF32F7282C70037E8A5 /* MainTabBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15750AF22F7282C70037E8A5 /* MainTabBarView.swift */; };
 		15750AFF2F7285520037E8A5 /* PlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15750AFE2F7285520037E8A5 /* PlaceholderView.swift */; };
 		157561A72F728F8B0037E8A5 /* MainTabBarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 157561A62F728F8B0037E8A5 /* MainTabBarViewModel.swift */; };
@@ -26,17 +29,19 @@
 		15FC4F562F7507910054153E /* HomeTrendingAnimeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F552F7507910054153E /* HomeTrendingAnimeViewModel.swift */; };
 		15FC4F5A2F750B760054153E /* UIColorExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F592F750B760054153E /* UIColorExtension.swift */; };
 		15FC4F5F2F750C0B0054153E /* ThemeColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F5E2F750C0B0054153E /* ThemeColor.swift */; };
-		15FC4F612F7513FA0054153E /* TrendingAnimeImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F602F7513FA0054153E /* TrendingAnimeImageView.swift */; };
-		15FC4F632F7514A50054153E /* TrendingAnimeCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F622F7514A50054153E /* TrendingAnimeCardView.swift */; };
 		15FC4F6E2F752C250054153E /* HomeTrendingMangaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F6D2F752C250054153E /* HomeTrendingMangaView.swift */; };
 		15FC4F722F752CAB0054153E /* HomeTrendingMangaModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F712F752CAB0054153E /* HomeTrendingMangaModel.swift */; };
 		15FC4F742F752CB60054153E /* HomeTrendingMangaViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F732F752CB60054153E /* HomeTrendingMangaViewModel.swift */; };
-		15FC4F762F7531C00054153E /* TrendingMangaCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F752F7531C00054153E /* TrendingMangaCardView.swift */; };
-		15FC4F782F75323B0054153E /* TrendingMangaImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F772F75323B0054153E /* TrendingMangaImageView.swift */; };
 		15FCF8882F73C28B0054153E /* MainHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FCF8872F73C28B0054153E /* MainHomeView.swift */; };
+		15FF295D2F76332700D3241C /* AnimeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FF295C2F76332700D3241C /* AnimeDetailView.swift */; };
+		15FF29602F76341D00D3241C /* RemotePosterImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FF295E2F76341D00D3241C /* RemotePosterImageView.swift */; };
+		15FF29642F76351700D3241C /* PosterCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FF29622F76351700D3241C /* PosterCardView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1572FE042F762D7000756CBA /* HomeTodayAnimeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeViewModel.swift; sourceTree = "<group>"; };
+		1572FE062F762D7700756CBA /* HomeTodayAnimeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeModel.swift; sourceTree = "<group>"; };
+		1572FE082F762DE300756CBA /* HomeTodayAnimeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeView.swift; sourceTree = "<group>"; };
 		15750AF22F7282C70037E8A5 /* MainTabBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarView.swift; sourceTree = "<group>"; };
 		15750AFE2F7285520037E8A5 /* PlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderView.swift; sourceTree = "<group>"; };
 		157561A62F728F8B0037E8A5 /* MainTabBarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarViewModel.swift; sourceTree = "<group>"; };
@@ -56,14 +61,13 @@
 		15FC4F552F7507910054153E /* HomeTrendingAnimeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTrendingAnimeViewModel.swift; sourceTree = "<group>"; };
 		15FC4F592F750B760054153E /* UIColorExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIColorExtension.swift; sourceTree = "<group>"; };
 		15FC4F5E2F750C0B0054153E /* ThemeColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeColor.swift; sourceTree = "<group>"; };
-		15FC4F602F7513FA0054153E /* TrendingAnimeImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendingAnimeImageView.swift; sourceTree = "<group>"; };
-		15FC4F622F7514A50054153E /* TrendingAnimeCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendingAnimeCardView.swift; sourceTree = "<group>"; };
 		15FC4F6D2F752C250054153E /* HomeTrendingMangaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTrendingMangaView.swift; sourceTree = "<group>"; };
 		15FC4F712F752CAB0054153E /* HomeTrendingMangaModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTrendingMangaModel.swift; sourceTree = "<group>"; };
 		15FC4F732F752CB60054153E /* HomeTrendingMangaViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTrendingMangaViewModel.swift; sourceTree = "<group>"; };
-		15FC4F752F7531C00054153E /* TrendingMangaCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendingMangaCardView.swift; sourceTree = "<group>"; };
-		15FC4F772F75323B0054153E /* TrendingMangaImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendingMangaImageView.swift; sourceTree = "<group>"; };
 		15FCF8872F73C28B0054153E /* MainHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainHomeView.swift; sourceTree = "<group>"; };
+		15FF295C2F76332700D3241C /* AnimeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeDetailView.swift; sourceTree = "<group>"; };
+		15FF295E2F76341D00D3241C /* RemotePosterImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemotePosterImageView.swift; sourceTree = "<group>"; };
+		15FF29622F76351700D3241C /* PosterCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PosterCardView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -95,6 +99,14 @@
 			path = MainTabBar;
 			sourceTree = "<group>";
 		};
+		1572FE0B2F762E7600756CBA /* TodayAnime */ = {
+			isa = PBXGroup;
+			children = (
+				1572FE082F762DE300756CBA /* HomeTodayAnimeView.swift */,
+			);
+			path = TodayAnime;
+			sourceTree = "<group>";
+		};
 		15750AF12F7282AE0037E8A5 /* View */ = {
 			isa = PBXGroup;
 			children = (
@@ -122,6 +134,7 @@
 		15DE55872F723A1700B292AD = {
 			isa = PBXGroup;
 			children = (
+				15FF29582F7632FE00D3241C /* AnimeDetail */,
 				15FC4F5C2F750BCD0054153E /* Config */,
 				15FC4F572F750B4C0054153E /* Extension */,
 				15FC4F482F74E4EB0054153E /* Components */,
@@ -170,6 +183,7 @@
 		15FC4F342F73E6480054153E /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				1572FE062F762D7700756CBA /* HomeTodayAnimeModel.swift */,
 				15FC4F3B2F73E7520054153E /* HeroBannerModel.swift */,
 				15FC4F532F75077C0054153E /* HomeTrendingAnimeModel.swift */,
 				15FC4F712F752CAB0054153E /* HomeTrendingMangaModel.swift */,
@@ -180,6 +194,7 @@
 		15FC4F352F73E64F0054153E /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
+				1572FE042F762D7000756CBA /* HomeTodayAnimeViewModel.swift */,
 				15FC4F3D2F73E7620054153E /* HeroBannerViewModel.swift */,
 				15FC4F552F7507910054153E /* HomeTrendingAnimeViewModel.swift */,
 				15FC4F732F752CB60054153E /* HomeTrendingMangaViewModel.swift */,
@@ -231,6 +246,7 @@
 		15FC4F482F74E4EB0054153E /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				15FF29652F76352D00D3241C /* MainHome */,
 				15FC4F4D2F74E6390054153E /* Shimmer */,
 				15FC4F492F74E5130054153E /* Skeleton */,
 				15FC4F422F74C79F0054153E /* ErrorMessage */,
@@ -265,8 +281,6 @@
 		15FC4F502F75070C0054153E /* TrendingAnime */ = {
 			isa = PBXGroup;
 			children = (
-				15FC4F622F7514A50054153E /* TrendingAnimeCardView.swift */,
-				15FC4F602F7513FA0054153E /* TrendingAnimeImageView.swift */,
 				15FC4F512F7507300054153E /* HomeTrendingAnimeView.swift */,
 			);
 			path = TrendingAnime;
@@ -307,8 +321,6 @@
 		15FC4F6C2F752BEE0054153E /* TrendingManga */ = {
 			isa = PBXGroup;
 			children = (
-				15FC4F772F75323B0054153E /* TrendingMangaImageView.swift */,
-				15FC4F752F7531C00054153E /* TrendingMangaCardView.swift */,
 				15FC4F6D2F752C250054153E /* HomeTrendingMangaView.swift */,
 			);
 			path = TrendingManga;
@@ -328,12 +340,70 @@
 		15FCF8842F73C2660054153E /* View */ = {
 			isa = PBXGroup;
 			children = (
+				1572FE0B2F762E7600756CBA /* TodayAnime */,
 				15FC4F6C2F752BEE0054153E /* TrendingManga */,
 				15FC4F502F75070C0054153E /* TrendingAnime */,
 				15FC4F382F73E71E0054153E /* Banner */,
 				15FC4F372F73E7090054153E /* MainView */,
 			);
 			path = View;
+			sourceTree = "<group>";
+		};
+		15FF29582F7632FE00D3241C /* AnimeDetail */ = {
+			isa = PBXGroup;
+			children = (
+				15FF295B2F76331300D3241C /* ViewModel */,
+				15FF295A2F76330E00D3241C /* Model */,
+				15FF29592F76330900D3241C /* View */,
+			);
+			path = AnimeDetail;
+			sourceTree = "<group>";
+		};
+		15FF29592F76330900D3241C /* View */ = {
+			isa = PBXGroup;
+			children = (
+				15FF295C2F76332700D3241C /* AnimeDetailView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		15FF295A2F76330E00D3241C /* Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		15FF295B2F76331300D3241C /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		15FF29612F76343F00D3241C /* PosterImage */ = {
+			isa = PBXGroup;
+			children = (
+				15FF295E2F76341D00D3241C /* RemotePosterImageView.swift */,
+			);
+			path = PosterImage;
+			sourceTree = "<group>";
+		};
+		15FF29632F76351700D3241C /* PosterCard */ = {
+			isa = PBXGroup;
+			children = (
+				15FF29622F76351700D3241C /* PosterCardView.swift */,
+			);
+			path = PosterCard;
+			sourceTree = "<group>";
+		};
+		15FF29652F76352D00D3241C /* MainHome */ = {
+			isa = PBXGroup;
+			children = (
+				15FF29632F76351700D3241C /* PosterCard */,
+				15FF29612F76343F00D3241C /* PosterImage */,
+			);
+			path = MainHome;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -418,26 +488,28 @@
 				15FC4F542F75077C0054153E /* HomeTrendingAnimeModel.swift in Sources */,
 				15FC4F742F752CB60054153E /* HomeTrendingMangaViewModel.swift in Sources */,
 				15FC4F3E2F73E7620054153E /* HeroBannerViewModel.swift in Sources */,
-				15FC4F782F75323B0054153E /* TrendingMangaImageView.swift in Sources */,
 				15FC4F522F7507300054153E /* HomeTrendingAnimeView.swift in Sources */,
+				1572FE052F762D7000756CBA /* HomeTodayAnimeViewModel.swift in Sources */,
 				15FC4F5F2F750C0B0054153E /* ThemeColor.swift in Sources */,
+				15FF29642F76351700D3241C /* PosterCardView.swift in Sources */,
 				15FC4F3A2F73E7340054153E /* HeroBannerView.swift in Sources */,
 				15FC4F5A2F750B760054153E /* UIColorExtension.swift in Sources */,
 				15DE55A42F723C0000B292AD /* JikanAPIService.swift in Sources */,
 				15750AFF2F7285520037E8A5 /* PlaceholderView.swift in Sources */,
+				1572FE0A2F762DE300756CBA /* HomeTodayAnimeView.swift in Sources */,
 				15FC4F412F73EB7B0054153E /* MainHomeService.swift in Sources */,
 				15FC4F452F74C7CF0054153E /* ErrorMessageView.swift in Sources */,
+				15FF295D2F76332700D3241C /* AnimeDetailView.swift in Sources */,
 				15DE55B72F723F2800B292AD /* APIConfig.swift in Sources */,
 				15FC4F6E2F752C250054153E /* HomeTrendingMangaView.swift in Sources */,
 				15FC4F472F74DF4D0054153E /* HeroBannerImageView.swift in Sources */,
-				15FC4F632F7514A50054153E /* TrendingAnimeCardView.swift in Sources */,
 				15FC4F562F7507910054153E /* HomeTrendingAnimeViewModel.swift in Sources */,
+				1572FE072F762D7700756CBA /* HomeTodayAnimeModel.swift in Sources */,
+				15FF29602F76341D00D3241C /* RemotePosterImageView.swift in Sources */,
 				15FC4F4B2F74E52B0054153E /* BannerSkeletonView.swift in Sources */,
 				15FC4F4F2F74E6440054153E /* ShimmerView.swift in Sources */,
 				157561A72F728F8B0037E8A5 /* MainTabBarViewModel.swift in Sources */,
 				15FCF8882F73C28B0054153E /* MainHomeView.swift in Sources */,
-				15FC4F612F7513FA0054153E /* TrendingAnimeImageView.swift in Sources */,
-				15FC4F762F7531C00054153E /* TrendingMangaCardView.swift in Sources */,
 				15FC4F3C2F73E7520054153E /* HeroBannerModel.swift in Sources */,
 				15FC4F722F752CAB0054153E /* HomeTrendingMangaModel.swift in Sources */,
 			);

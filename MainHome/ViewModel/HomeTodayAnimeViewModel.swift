@@ -1,5 +1,5 @@
 //
-//  HomeTrendingViewModel.swift
+//  HomeTodayAnimeViewModel.swift
 //  WYJikanApp
 //
 //  Created by Willy Hsu on 2026/3/26.
@@ -9,10 +9,10 @@ import Combine
 import Foundation
 
 @MainActor
-final class HomeTrendingAnimeViewModel: ObservableObject {
+final class HomeTodayAnimeViewModel: ObservableObject {
     private static let maxCards = 10
 
-    @Published private(set) var items: [HomeTrendingCardItem] = []
+    @Published private(set) var items: [HomeTodayAnimeCardItem] = []
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var errorMessage: String?
 
@@ -36,18 +36,17 @@ final class HomeTrendingAnimeViewModel: ObservableObject {
         loadTask = Task { [weak self] in
             guard let self else { return }
             do {
-                let response = try await self.service.fetchTopAnime(limit: Self.maxCards)
-                let mapped: [HomeTrendingCardItem] = response.data.compactMap { dto -> HomeTrendingCardItem? in
+                let response = try await self.service.fetchTodayAnime(limit: Self.maxCards)
+                let mapped: [HomeTodayAnimeCardItem] = response.data.compactMap { dto -> HomeTodayAnimeCardItem? in
                     guard let urlString =
-                        dto.images?.webp?.largeImageUrl ??
                         dto.images?.jpg?.largeImageUrl ??
-                        dto.images?.webp?.imageUrl ??
-                        dto.images?.jpg?.imageUrl,
+                        dto.images?.webp?.largeImageUrl ??
+                        dto.images?.jpg?.imageUrl ??
+                        dto.images?.webp?.imageUrl,
                         let url = URL(string: urlString) else { return nil }
 
-                    return HomeTrendingCardItem(
+                    return HomeTodayAnimeCardItem(
                         id: dto.malId,
-                        rank: dto.rank,
                         imageURL: url
                     )
                 }

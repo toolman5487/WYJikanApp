@@ -1,14 +1,14 @@
 //
-//  TrendingAnimeImageView.swift
+//  RemotePosterImageView.swift
 //  WYJikanApp
 //
-//  Created by Willy Hsu on 2026/3/26.
+//  Created by Willy Hsu on 2026/3/27.
 //
 
 import SwiftUI
 import SDWebImageSwiftUI
 
-struct TrendingAnimeImageView: View {
+struct RemotePosterImageView: View {
     let url: URL
 
     @State private var didFail = false
@@ -44,4 +44,3 @@ struct TrendingAnimeImageView: View {
         }
     }
 }
-

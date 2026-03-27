@@ -48,7 +48,9 @@ struct HomeTrendingMangaView: View {
                             .frame(width: Self.cardWidth)
                     } else {
                         ForEach(viewModel.items) { item in
-                            TrendingMangaCardView(item: item)
+                            PosterCardView(rank: item.rank) {
+                                RemotePosterImageView(url: item.imageURL)
+                            }
                                 .frame(width: Self.cardWidth, height: Self.cardHeight)
                         }
                     }

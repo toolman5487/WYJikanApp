@@ -60,6 +60,7 @@ enum APIConfig {
 
     enum Schedules {
         static let list = "/schedules"
+        static func day(_ day: String) -> String { "/schedules/\(day)" }
     }
 
     // MARK: - Random & Recommendations

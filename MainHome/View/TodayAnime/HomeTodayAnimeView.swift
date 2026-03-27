@@ -1,5 +1,5 @@
 //
-//  HomeTrendingView.swift
+//  HomeTodayAnimeView.swift
 //  WYJikanApp
 //
 //  Created by Willy Hsu on 2026/3/26.
@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-struct HomeTrendingAnimeView: View {
-    @StateObject private var viewModel = HomeTrendingAnimeViewModel()
+struct HomeTodayAnimeView: View {
+    @StateObject private var viewModel = HomeTodayAnimeViewModel()
 
     private static let cardHeight: CGFloat = 240
     private static let posterAspectRatio: CGFloat = 2.0 / 3.0
@@ -16,13 +16,14 @@ struct HomeTrendingAnimeView: View {
     private static let cardSpacing: CGFloat = 16
     private static let horizontalPadding: CGFloat = 16
     private static let skeletonCount: Int = 10
+
     private static var cardWidth: CGFloat {
         cardHeight * Self.posterAspectRatio
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("熱門動畫")
+            Text("當日動畫")
                 .font(.title3.weight(.semibold))
                 .foregroundStyle(ThemeColor.textPrimary)
 
@@ -42,10 +43,10 @@ struct HomeTrendingAnimeView: View {
                             .frame(width: Self.cardWidth)
                     } else {
                         ForEach(viewModel.items) { item in
-                            PosterCardView(rank: item.rank) {
+                            PosterCardView {
                                 RemotePosterImageView(url: item.imageURL)
                             }
-                                .frame(width: Self.cardWidth, height: Self.cardHeight)
+                            .frame(width: Self.cardWidth, height: Self.cardHeight)
                         }
                     }
                 }
@@ -62,5 +63,5 @@ struct HomeTrendingAnimeView: View {
 }
 
 #Preview {
-    HomeTrendingAnimeView()
+    HomeTodayAnimeView()
 }
