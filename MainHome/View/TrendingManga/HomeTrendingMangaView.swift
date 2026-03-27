@@ -9,24 +9,24 @@ import SwiftUI
 
 struct HomeTrendingMangaView: View {
     @StateObject private var viewModel = HomeTrendingMangaViewModel()
-
+    
     private static let cardHeight: CGFloat = 240
     private static let posterAspectRatio: CGFloat = 2.0 / 3.0
     private static let cardCornerRadius: CGFloat = 16
     private static let cardSpacing: CGFloat = 16
     private static let horizontalPadding: CGFloat = 16
     private static let skeletonCount: Int = 10
-
+    
     private static var cardWidth: CGFloat {
         cardHeight * Self.posterAspectRatio
     }
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("熱門漫畫")
                 .font(.title3.weight(.semibold))
                 .foregroundStyle(ThemeColor.textPrimary)
-
+            
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: Self.cardSpacing) {
                     if viewModel.isLoading {
@@ -51,7 +51,7 @@ struct HomeTrendingMangaView: View {
                             PosterCardView(rank: item.rank) {
                                 RemotePosterImageView(url: item.imageURL)
                             }
-                                .frame(width: Self.cardWidth, height: Self.cardHeight)
+                            .frame(width: Self.cardWidth, height: Self.cardHeight)
                         }
                     }
                 }

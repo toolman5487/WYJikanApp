@@ -9,7 +9,8 @@ import SwiftUI
 
 struct HomeTrendingAnimeView: View {
     @StateObject private var viewModel = HomeTrendingAnimeViewModel()
-
+    @EnvironmentObject private var router: MainHomeRouter
+    
     private static let cardHeight: CGFloat = 240
     private static let posterAspectRatio: CGFloat = 2.0 / 3.0
     private static let cardCornerRadius: CGFloat = 16
@@ -19,13 +20,13 @@ struct HomeTrendingAnimeView: View {
     private static var cardWidth: CGFloat {
         cardHeight * Self.posterAspectRatio
     }
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("熱門動畫")
                 .font(.title3.weight(.semibold))
                 .foregroundStyle(ThemeColor.textPrimary)
-
+            
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: Self.cardSpacing) {
                     if viewModel.isLoading {
@@ -42,10 +43,15 @@ struct HomeTrendingAnimeView: View {
                             .frame(width: Self.cardWidth)
                     } else {
                         ForEach(viewModel.items) { item in
-                            PosterCardView(rank: item.rank) {
-                                RemotePosterImageView(url: item.imageURL)
-                            }
+                            Button {
+                                router.push(.animeDetail(malId: item.id))
+                            } label: {
+                                PosterCardView(rank: item.rank) {
+                                    RemotePosterImageView(url: item.imageURL)
+                                }
                                 .frame(width: Self.cardWidth, height: Self.cardHeight)
+                            }
+                            .buttonStyle(.plain)
                         }
                     }
                 }
@@ -63,4 +69,5 @@ struct HomeTrendingAnimeView: View {
 
 #Preview {
     HomeTrendingAnimeView()
+        .environmentObject(MainHomeRouter())
 }

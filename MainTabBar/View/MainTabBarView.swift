@@ -7,7 +7,7 @@ import SwiftUI
 
 struct MainTabBarView: View {
     @State private var viewModel = MainTabBarViewModel()
-
+    
     var body: some View {
         TabView(selection: $viewModel.selectedTab) {
             TabSection("主頁") {
@@ -15,7 +15,6 @@ struct MainTabBarView: View {
                     MainHomeView()
                 } label: {
                     Image(systemName: viewModel.selectedTab == .home ? "square.grid.3x3.fill" : "square.grid.3x3")
-                        .accessibilityLabel("首頁")
                 }
                 
                 Tab(value: AppTab.category) {
@@ -24,14 +23,12 @@ struct MainTabBarView: View {
                     }
                 } label: {
                     Image(systemName: viewModel.selectedTab == .category ? "rectangle.stack.fill" : "rectangle.stack")
-                        .accessibilityLabel("分類")
                 }
                 
                 Tab(value: AppTab.myList) {
                     PlaceholderView()
                 } label: {
                     Image(systemName: viewModel.selectedTab == .myList ? "heart.fill" : "heart")
-                        .accessibilityLabel("收藏")
                 }
             }
             
@@ -43,7 +40,6 @@ struct MainTabBarView: View {
                     }
                 } label: {
                     Image(systemName: viewModel.selectedTab == .searchLiquidGlass ? "magnifyingglass" : "magnifyingglass")
-                        .accessibilityLabel("搜尋")
                 }
             }
         }

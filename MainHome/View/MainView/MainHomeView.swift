@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct MainHomeView: View {
+    @StateObject private var router = MainHomeRouter()
+    
     enum Section: Identifiable {
         case banner
         case todayAnime
@@ -32,13 +34,22 @@ struct MainHomeView: View {
     ]
     
     var body: some View {
-        ScrollView {
-            LazyVStack(spacing: 16) {
-                ForEach(sections) { section in
-                    sectionView(section)
+        NavigationStack(path: $router.path) {
+            ScrollView {
+                LazyVStack(spacing: 16) {
+                    ForEach(sections) { section in
+                        sectionView(section)
+                    }
+                }
+            }
+            .navigationDestination(for: MainHomeRoute.self) { route in
+                switch route {
+                case .animeDetail(let malId):
+                    AnimeDetailView(malId: malId)
                 }
             }
         }
+        .environmentObject(router)
     }
     
     @ViewBuilder

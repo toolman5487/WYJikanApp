@@ -32,7 +32,6 @@ struct ErrorMessageView: View {
                 .foregroundStyle(.secondary)
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("Error")
         .accessibilityValue(message)
     }
 }
