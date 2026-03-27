@@ -9,7 +9,7 @@ import Foundation
 
 extension AnimeDetailDTO {
     var displayTitle: String {
-        titleJapanese ?? titleEnglish ?? title ?? "動畫"
+        titleJapanese ?? titleEnglish ?? title ?? "🎬"
     }
     
     var posterURL: URL? {

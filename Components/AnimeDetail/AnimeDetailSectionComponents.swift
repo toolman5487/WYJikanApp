@@ -19,14 +19,12 @@ struct AnimeDetailSectionCard<Content: View>: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(title)
-                .font(.headline)
-                .foregroundStyle(ThemeColor.textPrimary)
+                .font(.title3)
+                .foregroundStyle(ThemeColor.sakura)
 
             content
         }
-        .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 }
 

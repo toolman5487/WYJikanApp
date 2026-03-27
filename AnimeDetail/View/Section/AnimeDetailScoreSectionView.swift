@@ -15,7 +15,7 @@ struct AnimeDetailScoreSectionView: View {
             VStack(spacing: 10) {
                 AnimeDetailInfoRow(
                     title: "分數",
-                    value: anime.score.map { String(format: "%.2f", $0) + " / 10" } ?? " ⭐️"
+                    value: anime.score.map { String(format: "%.2f", $0) + " / 10.0" } ?? " ⭐️"
                 )
                 AnimeDetailInfoRow(title: "評分人數", value: anime.scoredBy.map(anime.formatNumber(_:)) ?? "-")
                 AnimeDetailInfoRow(title: "排名", value: anime.rank.map { "#\($0)" } ?? "-")

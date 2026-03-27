@@ -14,20 +14,19 @@ struct AnimeDetailHighlightsSectionView: View {
         if !highlightItems.isEmpty {
             VStack(alignment: .leading, spacing: 12) {
                 Text("重點資訊")
-                    .font(.headline)
-                    .foregroundStyle(ThemeColor.textPrimary)
+                    .font(.title3)
+                    .foregroundStyle(ThemeColor.sakura)
                 
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 8) {
                         ForEach(highlightItems, id: \.title) { item in
                             VStack(alignment: .leading, spacing: 4) {
                                 Text(item.title)
-                                    .font(.subheadline)
                                     .foregroundStyle(ThemeColor.textPrimary)
                                     .lineLimit(1)
                                     .fixedSize(horizontal: true, vertical: false)
                                 Text(item.value)
-                                    .font(.subheadline.weight(.semibold))
+                                    .font(.headline)
                                     .foregroundStyle(ThemeColor.textPrimary)
                                     .lineLimit(1)
                                     .truncationMode(.tail)
