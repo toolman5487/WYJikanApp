@@ -10,15 +10,15 @@ import SwiftUI
 struct HomeTrendingMangaView: View {
     @StateObject private var viewModel = HomeTrendingMangaViewModel()
 
-    private static let cardWidth: CGFloat = 160
+    private static let cardHeight: CGFloat = 240
     private static let posterAspectRatio: CGFloat = 2.0 / 3.0
     private static let cardCornerRadius: CGFloat = 16
     private static let cardSpacing: CGFloat = 16
     private static let horizontalPadding: CGFloat = 16
     private static let skeletonCount: Int = 10
 
-    private static var cardHeight: CGFloat {
-        cardWidth / Self.posterAspectRatio
+    private static var cardWidth: CGFloat {
+        cardHeight * Self.posterAspectRatio
     }
 
     var body: some View {

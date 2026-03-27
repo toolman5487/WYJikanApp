@@ -11,33 +11,34 @@ import SDWebImageSwiftUI
 struct TrendingAnimeImageView: View {
     let url: URL
 
-    private static let posterAspectRatio: CGFloat = 2.0 / 3.0
-
     @State private var didFail = false
 
     var body: some View {
-        WebImage(url: url) { image in
-            image
-                .resizable()
-                .scaledToFill()
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .aspectRatio(Self.posterAspectRatio, contentMode: .fill)
-                .clipped()
-        } placeholder: {
-            Color(.systemBackground)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .aspectRatio(Self.posterAspectRatio, contentMode: .fill)
-                .clipped()
-        }
-        .onFailure { _ in
-            didFail = true
-        }
-        .overlay {
-            if didFail {
+        GeometryReader { proxy in
+            WebImage(url: url) { image in
+                image
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: proxy.size.width, height: proxy.size.height)
+                    .clipped()
+            } placeholder: {
                 Color(.systemBackground)
-                    .overlay(Image(systemName: "photo").imageScale(.large))
+                    .frame(width: proxy.size.width, height: proxy.size.height)
+                    .clipped()
+            }
+            .onFailure { _ in
+                didFail = true
+            }
+            .overlay {
+                if didFail {
+                    Color(.systemBackground)
+                        .overlay(Image(systemName: "photo").imageScale(.large))
+                        .frame(width: proxy.size.width, height: proxy.size.height)
+                        .clipped()
+                }
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onChange(of: url) { _, _ in
             didFail = false
         }

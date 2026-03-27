@@ -9,11 +9,12 @@ import SwiftUI
 
 struct TrendingAnimeCardView: View {
     private static let cornerRadius: CGFloat = 16
+    private static let rankPadding: CGFloat = 6
     
     let item: HomeTrendingAnimeCardItem
     
     var body: some View {
-        ZStack(alignment: .bottomLeading) {
+        ZStack {
             TrendingAnimeImageView(url: item.imageURL)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color.black.opacity(0.06))
@@ -26,8 +27,11 @@ struct TrendingAnimeCardView: View {
                 startPoint: .center,
                 endPoint: .bottom
             )
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .allowsHitTesting(false)
-            
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .overlay(alignment: .bottomLeading) {
             if let rank = item.rank {
                 Text("#\(rank)")
                     .font(.caption.weight(.bold))
@@ -35,9 +39,10 @@ struct TrendingAnimeCardView: View {
                     .foregroundStyle(ThemeColor.textPrimary)
                     .background(ThemeColor.sakuraGlassStrong)
                     .clipShape(Capsule())
-                    .padding(4)
+                    .padding(Self.rankPadding)
             }
         }
+        .compositingGroup()
         .clipShape(RoundedRectangle(cornerRadius: Self.cornerRadius, style: .continuous))
     }
 }
