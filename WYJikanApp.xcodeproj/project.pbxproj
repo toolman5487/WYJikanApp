@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		155A9BF62F782B1100E9E3E0 /* SkeletonBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 155A9BF52F782B1100E9E3E0 /* SkeletonBar.swift */; };
+		155A9C022F782C2200F1E4F0 /* SectionCardSkeleton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 155A9C012F782C2200F1E4F0 /* SectionCardSkeleton.swift */; };
 		1572FE052F762D7000756CBA /* HomeTodayAnimeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1572FE042F762D7000756CBA /* HomeTodayAnimeViewModel.swift */; };
 		1572FE072F762D7700756CBA /* HomeTodayAnimeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1572FE062F762D7700756CBA /* HomeTodayAnimeModel.swift */; };
 		1572FE0A2F762DE300756CBA /* HomeTodayAnimeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1572FE082F762DE300756CBA /* HomeTodayAnimeView.swift */; };
@@ -52,6 +54,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		155A9BF52F782B1100E9E3E0 /* SkeletonBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkeletonBar.swift; sourceTree = "<group>"; };
+		155A9C012F782C2200F1E4F0 /* SectionCardSkeleton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionCardSkeleton.swift; sourceTree = "<group>"; };
 		1572FE042F762D7000756CBA /* HomeTodayAnimeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeViewModel.swift; sourceTree = "<group>"; };
 		1572FE062F762D7700756CBA /* HomeTodayAnimeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeModel.swift; sourceTree = "<group>"; };
 		1572FE082F762DE300756CBA /* HomeTodayAnimeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeView.swift; sourceTree = "<group>"; };
@@ -286,8 +290,26 @@
 			isa = PBXGroup;
 			children = (
 				15FC4F4C2F74E6150054153E /* Banner */,
+				155A9C042F782C2200F1E4F0 /* SectionCardSkeleton */,
+				155A9C032F782C2200F1E4F0 /* SkeletonBar */,
 			);
 			path = Skeleton;
+			sourceTree = "<group>";
+		};
+		155A9C032F782C2200F1E4F0 /* SkeletonBar */ = {
+			isa = PBXGroup;
+			children = (
+				155A9BF52F782B1100E9E3E0 /* SkeletonBar.swift */,
+			);
+			path = SkeletonBar;
+			sourceTree = "<group>";
+		};
+		155A9C042F782C2200F1E4F0 /* SectionCardSkeleton */ = {
+			isa = PBXGroup;
+			children = (
+				155A9C012F782C2200F1E4F0 /* SectionCardSkeleton.swift */,
+			);
+			path = SectionCardSkeleton;
 			sourceTree = "<group>";
 		};
 		15FC4F4C2F74E6150054153E /* Banner */ = {
@@ -561,6 +583,8 @@
 				15FC4F3E2F73E7620054153E /* HeroBannerViewModel.swift in Sources */,
 				15FC4F522F7507300054153E /* HomeTrendingAnimeView.swift in Sources */,
 				1572FE052F762D7000756CBA /* HomeTodayAnimeViewModel.swift in Sources */,
+				155A9BF62F782B1100E9E3E0 /* SkeletonBar.swift in Sources */,
+				155A9C022F782C2200F1E4F0 /* SectionCardSkeleton.swift in Sources */,
 				15FC4F5F2F750C0B0054153E /* ThemeColor.swift in Sources */,
 				15FF29642F76351700D3241C /* PosterCardView.swift in Sources */,
 				15FF80292F7662A100D3241C /* AnimeDetailHighlightsSectionView.swift in Sources */,

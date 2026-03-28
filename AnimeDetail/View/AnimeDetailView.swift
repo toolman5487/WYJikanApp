@@ -53,8 +53,18 @@ struct AnimeDetailView: View {
                 ErrorMessageView(message: message, height: 200)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                ProgressView()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                ScrollView {
+                    LazyVStack(alignment: .leading, spacing: 20) {
+                        AnimeDetailHeaderSectionSkeletonView()
+                        AnimeDetailHighlightsSectionSkeletonView()
+                        AnimeDetailBasicInfoSectionSkeletonView()
+                        AnimeDetailScoreSectionSkeletonView()
+                        AnimeDetailSynopsisSectionSkeletonView()
+                        AnimeDetailStaffSectionSkeletonView()
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
             }
         }
         .navigationBarTitleDisplayMode(.inline)

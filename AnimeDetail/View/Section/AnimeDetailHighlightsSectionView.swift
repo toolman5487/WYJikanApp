@@ -64,3 +64,20 @@ struct AnimeDetailHighlightsSectionView: View {
         return items
     }
 }
+
+struct AnimeDetailHighlightsSectionSkeletonView: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            SkeletonBar(width: 88, height: 22, cornerRadius: 6)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(0..<4, id: \.self) { _ in
+                        SkeletonBar(width: 112, height: 72, cornerRadius: 16)
+                    }
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
