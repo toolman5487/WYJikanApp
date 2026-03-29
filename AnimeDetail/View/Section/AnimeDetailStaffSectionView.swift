@@ -8,12 +8,13 @@
 import SwiftUI
 
 struct AnimeDetailStaffSectionView: View {
+    let viewModel: AnimeDetailViewModel
     let anime: AnimeDetailDTO
-    
+
     var body: some View {
-        let studioText = anime.joinedNames(from: anime.studios)
-        let producerText = anime.joinedNames(from: anime.producers)
-        let genreText = anime.joinedNames(from: anime.genres)
+        let studioText = viewModel.joinedNames(from: anime.studios)
+        let producerText = viewModel.joinedNames(from: anime.producers)
+        let genreText = viewModel.joinedNames(from: anime.genres)
         
         AnimeDetailSectionCard("製作資訊") {
             VStack(spacing: 10) {

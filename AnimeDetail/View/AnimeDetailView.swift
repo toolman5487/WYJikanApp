@@ -43,7 +43,7 @@ struct AnimeDetailView: View {
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 20) {
                         ForEach(sections(for: anime)) { section in
-                            sectionView(section, anime: anime)
+                            sectionView(section, viewModel: viewModel, anime: anime)
                         }
                     }
                     .padding()
@@ -82,43 +82,31 @@ struct AnimeDetailView: View {
             .basicInfo,
             .score
         ]
-        if hasSynopsis(anime) {
+        if viewModel.hasSynopsis(for: anime) {
             result.append(.synopsis)
         }
-        if hasStaffInfo(anime) {
+        if viewModel.hasStaffInfo(for: anime) {
             result.append(.staff)
         }
         return result
     }
 
     @ViewBuilder
-    private func sectionView(_ section: Section, anime: AnimeDetailDTO) -> some View {
+    private func sectionView(_ section: Section, viewModel: AnimeDetailViewModel, anime: AnimeDetailDTO) -> some View {
         switch section {
         case .header:
-            AnimeDetailHeaderSectionView(anime: anime)
+            AnimeDetailHeaderSectionView(viewModel: viewModel, anime: anime)
         case .highlights:
-            AnimeDetailHighlightsSectionView(anime: anime)
+            AnimeDetailHighlightsSectionView(viewModel: viewModel, anime: anime)
         case .basicInfo:
-            AnimeDetailBasicInfoSectionView(anime: anime)
+            AnimeDetailBasicInfoSectionView(viewModel: viewModel, anime: anime)
         case .score:
-            AnimeDetailScoreSectionView(anime: anime)
+            AnimeDetailScoreSectionView(viewModel: viewModel, anime: anime)
         case .synopsis:
             AnimeDetailSynopsisSectionView(anime: anime)
         case .staff:
-            AnimeDetailStaffSectionView(anime: anime)
+            AnimeDetailStaffSectionView(viewModel: viewModel, anime: anime)
         }
-    }
-
-    private func hasSynopsis(_ anime: AnimeDetailDTO) -> Bool {
-        guard let synopsis = anime.synopsis else { return false }
-        return !synopsis.isEmpty
-    }
-
-    private func hasStaffInfo(_ anime: AnimeDetailDTO) -> Bool {
-        let studioText = anime.joinedNames(from: anime.studios)
-        let producerText = anime.joinedNames(from: anime.producers)
-        let genreText = anime.joinedNames(from: anime.genres)
-        return studioText != "-" || producerText != "-" || genreText != "-"
     }
 }
 

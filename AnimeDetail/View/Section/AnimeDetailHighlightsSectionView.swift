@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct AnimeDetailHighlightsSectionView: View {
+    let viewModel: AnimeDetailViewModel
     let anime: AnimeDetailDTO
     
     var body: some View {
@@ -58,8 +59,9 @@ struct AnimeDetailHighlightsSectionView: View {
         if let source = anime.source, !source.isEmpty {
             items.append(("來源", source))
         }
-        if anime.seasonText != "-" {
-            items.append(("季度", anime.seasonText))
+        let season = viewModel.seasonText(for: anime)
+        if season != "-" {
+            items.append(("季度", season))
         }
         return items
     }

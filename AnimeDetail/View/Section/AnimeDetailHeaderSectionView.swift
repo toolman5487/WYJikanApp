@@ -8,14 +8,15 @@
 import SwiftUI
 
 struct AnimeDetailHeaderSectionView: View {
+    let viewModel: AnimeDetailViewModel
     let anime: AnimeDetailDTO
-    
+
     var body: some View {
         HStack(alignment: .top, spacing: 16) {
             posterView
             
             VStack(alignment: .leading, spacing: 8) {
-                Text(anime.displayTitle)
+                Text(viewModel.displayTitle(for: anime))
                     .font(.title2.weight(.bold))
                     .foregroundStyle(ThemeColor.textPrimary)
                 
@@ -32,7 +33,7 @@ struct AnimeDetailHeaderSectionView: View {
     
     @ViewBuilder
     private var posterView: some View {
-        if let url = anime.posterURL {
+        if let url = viewModel.posterURL(for: anime) {
             RemotePosterImageView(url: url)
                 .aspectRatio(2.0 / 3.0, contentMode: .fit)
                 .frame(width: 132, height: 196)
