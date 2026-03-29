@@ -59,32 +59,65 @@ final class AnimeDetailViewModel: ObservableObject {
         return airing ? "連載中" : "結束連載"
     }
 
-    func broadcastDisplayText(for anime: AnimeDetailDTO) -> String {
-        if let broadcast = anime.broadcast {
-            let day = broadcast.day?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-            let time = broadcast.time?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-            if !day.isEmpty, !time.isEmpty {
-                let tzId = Self.sourceTimeZoneIdentifier(for: broadcast)
-                if let local = Self.localBroadcastString(
-                    dayEnglish: day,
-                    timeHHMM: time,
-                    sourceTimeZoneIdentifier: tzId
-                ) {
-                    return local
-                }
-                return "\(Self.weekdayChinese(from: day)) \(time)"
+    func weeklyBroadcastScheduleText(for anime: AnimeDetailDTO) -> String? {
+        guard let broadcast = anime.broadcast else { return nil }
+        let day = broadcast.day?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let time = broadcast.time?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        if !day.isEmpty, !time.isEmpty {
+            let tzId = Self.sourceTimeZoneIdentifier(for: broadcast)
+            if let local = Self.localBroadcastString(
+                dayEnglish: day,
+                timeHHMM: time,
+                sourceTimeZoneIdentifier: tzId
+            ) {
+                return local
             }
-            if let string = broadcast.string?.trimmingCharacters(in: .whitespacesAndNewlines), !string.isEmpty {
-                if let local = Self.localBroadcastFromEnglishString(string) {
-                    return local
-                }
-                return Self.translateBroadcastEnglishString(string)
-            }
+            return "\(Self.weekdayChinese(from: day)) \(time)"
         }
-        if let airedString = anime.aired?.string?.trimmingCharacters(in: .whitespacesAndNewlines), !airedString.isEmpty {
-            return airedString
+        if let string = broadcast.string?.trimmingCharacters(in: .whitespacesAndNewlines), !string.isEmpty {
+            if let local = Self.localBroadcastFromEnglishString(string) {
+                return local
+            }
+            return Self.translateBroadcastEnglishString(string)
+        }
+        return nil
+    }
+
+    func airedPeriodDisplayText(for anime: AnimeDetailDTO) -> String? {
+        guard let airedString = anime.aired?.string?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !airedString.isEmpty else { return nil }
+        return airedString
+    }
+
+    func broadcastDisplayText(for anime: AnimeDetailDTO) -> String {
+        if let weekly = weeklyBroadcastScheduleText(for: anime) {
+            return weekly
+        }
+        if let aired = airedPeriodDisplayText(for: anime) {
+            return aired
         }
         return "-"
+    }
+
+    func seasonInfoRowTitle(for anime: AnimeDetailDTO) -> String {
+        let season = seasonText(for: anime)
+        if season != "-" { return "播出季度" }
+        if airedPeriodDisplayText(for: anime) != nil { return "播出期間" }
+        return "播出季度"
+    }
+
+    func seasonBlockPrimaryText(for anime: AnimeDetailDTO) -> String {
+        let season = seasonText(for: anime)
+        if season != "-" { return season }
+        if let aired = airedPeriodDisplayText(for: anime) { return aired }
+        return "-"
+    }
+
+    func seasonBlockSubtitle(for anime: AnimeDetailDTO) -> String? {
+        let season = seasonText(for: anime)
+        guard season != "-" else { return nil }
+        guard weeklyBroadcastScheduleText(for: anime) == nil else { return nil }
+        return airedPeriodDisplayText(for: anime)
     }
 
     func seasonText(for anime: AnimeDetailDTO) -> String {

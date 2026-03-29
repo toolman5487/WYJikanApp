@@ -31,6 +31,13 @@ struct AnimeDetailSectionCard<Content: View>: View {
 struct AnimeDetailInfoRow: View {
     let title: String
     let value: String
+    var subtitle: String?
+
+    init(title: String, value: String, subtitle: String? = nil) {
+        self.title = title
+        self.value = value
+        self.subtitle = subtitle
+    }
 
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
@@ -39,10 +46,24 @@ struct AnimeDetailInfoRow: View {
                 .foregroundStyle(ThemeColor.textSecondary)
                 .frame(width: 72, alignment: .leading)
 
-            Text(value)
-                .font(.subheadline)
-                .foregroundStyle(ThemeColor.textPrimary)
-                .frame(maxWidth: .infinity, alignment: .leading)
+            Group {
+                if let subtitle, !subtitle.isEmpty {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(value)
+                            .font(.subheadline)
+                            .foregroundStyle(ThemeColor.textPrimary)
+                        Text(subtitle)
+                            .font(.footnote)
+                            .foregroundStyle(ThemeColor.textTertiary)
+                    }
+                } else {
+                    Text(value)
+                        .font(.subheadline)
+                        .foregroundStyle(ThemeColor.textPrimary)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
+        .accessibilityElement(children: .combine)
     }
 }

@@ -16,8 +16,14 @@ struct AnimeDetailBasicInfoSectionView: View {
             VStack(spacing: 10) {
                 AnimeDetailInfoRow(title: "連載", value: viewModel.airingDisplayText(for: anime))
                 AnimeDetailInfoRow(title: "集數", value: anime.episodes.map(String.init) ?? "-")
-                AnimeDetailInfoRow(title: "播出季度", value: viewModel.seasonText(for: anime))
-                AnimeDetailInfoRow(title: "播出時間", value: viewModel.broadcastDisplayText(for: anime))
+                AnimeDetailInfoRow(
+                    title: viewModel.seasonInfoRowTitle(for: anime),
+                    value: viewModel.seasonBlockPrimaryText(for: anime),
+                    subtitle: viewModel.seasonBlockSubtitle(for: anime)
+                )
+                if let weekly = viewModel.weeklyBroadcastScheduleText(for: anime) {
+                    AnimeDetailInfoRow(title: "播出時間", value: weekly)
+                }
                 AnimeDetailInfoRow(title: "片長", value: anime.duration ?? "-")
             }
         }
