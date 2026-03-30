@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct AnimeDetailHighlightsSectionView: View {
-    let viewModel: AnimeDetailViewModel
     let anime: AnimeDetailDTO
     
     var body: some View {
@@ -59,10 +58,6 @@ struct AnimeDetailHighlightsSectionView: View {
         if let source = anime.source, !source.isEmpty {
             items.append(("來源", source))
         }
-        let season = viewModel.seasonText(for: anime)
-        if season != "-" {
-            items.append(("季度", season))
-        }
         return items
     }
 }
@@ -70,8 +65,6 @@ struct AnimeDetailHighlightsSectionView: View {
 struct AnimeDetailHighlightsSectionSkeletonView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            SkeletonBar(width: 88, height: 22, cornerRadius: 6)
-
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
                     ForEach(0..<4, id: \.self) { _ in
@@ -80,6 +73,5 @@ struct AnimeDetailHighlightsSectionSkeletonView: View {
                 }
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }

@@ -44,17 +44,9 @@ struct AnimeDetailHeaderSectionView: View {
 
 struct AnimeDetailHeaderSectionSkeletonView: View {
     var body: some View {
-        HStack(alignment: .top, spacing: 16) {
-            BannerSkeletonView()
-                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                .frame(width: 132, height: 196)
-
-            VStack(alignment: .leading, spacing: 8) {
-                SkeletonBar(width: nil, height: 26, cornerRadius: 8)
-                SkeletonBar(width: 200, height: 18, cornerRadius: 8)
-            }
-
-            Spacer(minLength: 0)
-        }
+        RoundedRectangle(cornerRadius: 16, style: .continuous)
+            .fill(Color(.systemGray5))
+            .frame(maxWidth: .infinity)
+            .frame(height: 196)
     }
 }

@@ -32,6 +32,6 @@ struct AnimeDetailBasicInfoSectionView: View {
 
 struct AnimeDetailBasicInfoSectionSkeletonView: View {
     var body: some View {
-        SectionCardSkeleton(titleWidth: 88, rowCount: 5)
+        SectionCardSkeleton(rowCount: 5)
     }
 }

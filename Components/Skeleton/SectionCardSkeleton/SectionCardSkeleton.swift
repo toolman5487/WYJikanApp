@@ -8,22 +8,20 @@
 import SwiftUI
 
 struct SectionCardSkeleton: View {
-    let titleWidth: CGFloat
     let rowCount: Int
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            SkeletonBar(width: titleWidth, height: 22, cornerRadius: 6)
-
-            VStack(spacing: 10) {
-                ForEach(0..<rowCount, id: \.self) { _ in
-                    HStack(alignment: .top, spacing: 12) {
-                        SkeletonBar(width: 72, height: 16, cornerRadius: 4)
-                        SkeletonBar(width: nil, height: 16, cornerRadius: 4)
-                    }
-                }
-            }
-        }
+        RoundedRectangle(cornerRadius: 16, style: .continuous)
+            .fill(Color(.systemGray5))
+            .frame(maxWidth: .infinity)
+            .frame(height: sectionHeight)
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var sectionHeight: CGFloat {
+        let verticalSpacing: CGFloat = 10
+        let rowHeight: CGFloat = 20
+        let contentPadding: CGFloat = 24
+        return CGFloat(rowCount) * rowHeight + CGFloat(max(0, rowCount - 1)) * verticalSpacing + contentPadding
     }
 }

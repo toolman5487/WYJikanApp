@@ -29,6 +29,6 @@ struct AnimeDetailScoreSectionView: View {
 
 struct AnimeDetailScoreSectionSkeletonView: View {
     var body: some View {
-        SectionCardSkeleton(titleWidth: 110, rowCount: 5)
+        SectionCardSkeleton(rowCount: 5)
     }
 }
