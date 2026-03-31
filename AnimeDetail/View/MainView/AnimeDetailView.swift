@@ -8,6 +8,14 @@
 import SwiftUI
 
 struct AnimeDetailView: View {
+    
+    let malId: Int
+    @StateObject private var viewModel: AnimeDetailViewModel
+    init(malId: Int, service: AnimeDetailServicing = AnimeDetailService()) {
+        self.malId = malId
+        _viewModel = StateObject(wrappedValue: AnimeDetailViewModel(malId: malId, service: service))
+    }
+    
     enum Section: Identifiable {
         case header
         case highlights
@@ -30,15 +38,6 @@ struct AnimeDetailView: View {
             case .pictures: return "pictures"
             }
         }
-    }
-
-    let malId: Int
-
-    @StateObject private var viewModel: AnimeDetailViewModel
-
-    init(malId: Int, service: AnimeDetailServicing = AnimeDetailService()) {
-        self.malId = malId
-        _viewModel = StateObject(wrappedValue: AnimeDetailViewModel(malId: malId, service: service))
     }
     
     // MARK: - Sections
@@ -120,6 +119,21 @@ struct AnimeDetailView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                NavigationLink {
+                    AnimeReviewView(
+                        malId: malId,
+                        animeTitle: viewModel.detail.map { viewModel.displayTitle(for: $0) }
+                    )
+                } label: {
+                    Image(systemName: "text.bubble.fill")
+                        .font(.body)
+                        .frame(minWidth: 44, minHeight: 44)
+                        .contentShape(Rectangle())
+                }
+            }
+        }
         .task(id: malId) {
             await viewModel.load()
         }

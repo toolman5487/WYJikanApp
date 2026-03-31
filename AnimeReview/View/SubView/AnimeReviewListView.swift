@@ -8,9 +8,9 @@
 import SwiftUI
 
 struct AnimeReviewListView: View {
-
+    
     @ObservedObject var viewModel: AnimeReviewViewModel
-
+    
     var body: some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 20) {
@@ -20,7 +20,7 @@ struct AnimeReviewListView: View {
                     }
                     AnimeReviewRowView(viewModel: viewModel, entry: entry)
                 }
-
+                
                 if viewModel.hasNextPage {
                     Button {
                         Task { await viewModel.loadMore() }
@@ -30,12 +30,15 @@ struct AnimeReviewListView: View {
                                 ProgressView()
                             }
                             Text("載入更多")
-                                .font(.subheadline.weight(.semibold))
+                                .font(.subheadline.weight(.medium))
+                                .foregroundStyle(ThemeColor.textPrimary)
                         }
                         .frame(maxWidth: .infinity)
                         .frame(minHeight: 44)
                     }
-                    .buttonStyle(.bordered)
+                    .buttonStyle(.plain)
+                    .background(ThemeColor.sakura)
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                     .disabled(viewModel.isLoadingMore)
                 }
             }

@@ -26,9 +26,13 @@ struct AnimeReviewView: View {
                 ErrorMessageView(message: message, height: 200)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if viewModel.isLoading, viewModel.reviews.isEmpty {
-                AnimeReviewLoadingView()
+                ProgressView()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if viewModel.reviews.isEmpty {
-                AnimeReviewEmptyView()
+                Text("尚無評論")
+                    .font(.body)
+                    .foregroundStyle(ThemeColor.textSecondary)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
                 AnimeReviewListView(viewModel: viewModel)
             }
