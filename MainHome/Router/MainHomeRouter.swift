@@ -11,6 +11,7 @@ import SwiftUI
 
 enum MainHomeRoute: Hashable {
     case animeDetail(malId: Int)
+    case mangaDetail(malId: Int)
 }
 
 @MainActor

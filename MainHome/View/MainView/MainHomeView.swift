@@ -63,6 +63,8 @@ struct MainHomeView: View {
                 switch route {
                 case .animeDetail(let malId):
                     AnimeDetailView(malId: malId)
+                case .mangaDetail(let malId):
+                    MangaDetailView(malId: malId)
                 }
             }
         }

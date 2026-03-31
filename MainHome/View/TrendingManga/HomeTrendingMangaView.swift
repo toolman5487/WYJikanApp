@@ -9,6 +9,7 @@ import SwiftUI
 
 struct HomeTrendingMangaView: View {
     @StateObject private var viewModel = HomeTrendingMangaViewModel()
+    @EnvironmentObject private var router: MainHomeRouter
     
     private static let cardHeight: CGFloat = 240
     private static let posterAspectRatio: CGFloat = 2.0 / 3.0
@@ -49,10 +50,15 @@ struct HomeTrendingMangaView: View {
                             .frame(width: Self.cardWidth)
                     } else {
                         ForEach(viewModel.items) { item in
-                            PosterCardView(rank: item.rank) {
-                                RemotePosterImageView(url: item.imageURL)
+                            Button {
+                                router.push(.mangaDetail(malId: item.id))
+                            } label: {
+                                PosterCardView(rank: item.rank) {
+                                    RemotePosterImageView(url: item.imageURL)
+                                }
+                                .frame(width: Self.cardWidth, height: Self.cardHeight)
                             }
-                            .frame(width: Self.cardWidth, height: Self.cardHeight)
+                            .buttonStyle(.plain)
                         }
                     }
                 }
@@ -70,4 +76,5 @@ struct HomeTrendingMangaView: View {
 
 #Preview {
     HomeTrendingMangaView()
+        .environmentObject(MainHomeRouter())
 }
