@@ -25,6 +25,82 @@ extension AnimeDetailViewModel {
         return URL(string: urlString)
     }
 
+    func hasSensitiveContent(for anime: AnimeDetailDTO) -> Bool {
+        sensitiveContentText(for: anime) != nil
+    }
+
+    func sensitiveContentText(for anime: AnimeDetailDTO) -> String? {
+        var names = (anime.explicitGenres ?? []).compactMap(\.name).filter { !$0.isEmpty }
+        if names.isEmpty {
+            let fallback = (anime.genres ?? [])
+                .compactMap(\.name)
+                .filter { name in
+                    let lower = name.lowercased()
+                    return lower == "hentai" || lower == "ecchi"
+                }
+            names = fallback
+        }
+        guard !names.isEmpty else { return nil }
+        return "敏感內容"
+    }
+
+    // MARK: - Trailer
+
+    func hasTrailer(for anime: AnimeDetailDTO) -> Bool {
+        trailerEmbedURL(for: anime) != nil
+    }
+
+    func trailerEmbedURL(for anime: AnimeDetailDTO) -> URL? {
+        guard let trailer = anime.trailer else { return nil }
+        if let id = resolvedYouTubeVideoId(from: trailer),
+           var components = URLComponents(string: "https://www.youtube.com/embed/\(id)") {
+            components.queryItems = [
+                URLQueryItem(name: "playsinline", value: "1"),
+                URLQueryItem(name: "rel", value: "0"),
+                URLQueryItem(name: "modestbranding", value: "1"),
+                URLQueryItem(name: "autoplay", value: "0")
+            ]
+            if let url = components.url {
+                return url
+            }
+        }
+        if let embed = trailer.embedUrl?.trimmingCharacters(in: .whitespacesAndNewlines),
+           !embed.isEmpty,
+           let url = URL(string: embed) {
+            return url
+        }
+        return nil
+    }
+
+    func trailerWatchURL(for anime: AnimeDetailDTO) -> URL? {
+        guard let trailer = anime.trailer else { return nil }
+        if let raw = trailer.url?.trimmingCharacters(in: .whitespacesAndNewlines),
+           !raw.isEmpty,
+           let url = URL(string: raw) {
+            return url
+        }
+        guard let id = resolvedYouTubeVideoId(from: trailer) else { return nil }
+        return URL(string: "https://www.youtube.com/watch?v=\(id)")
+    }
+
+    func trailerThumbnailURL(for anime: AnimeDetailDTO) -> URL? {
+        guard let trailer = anime.trailer else { return nil }
+        let candidates: [String?] = [
+            trailer.images?.maximumImageUrl,
+            trailer.images?.largeImageUrl,
+            trailer.images?.mediumImageUrl,
+            trailer.images?.smallImageUrl,
+            trailer.images?.imageUrl
+        ]
+        for candidate in candidates {
+            guard let s = candidate?.trimmingCharacters(in: .whitespacesAndNewlines), !s.isEmpty,
+                  let url = URL(string: s) else { continue }
+            return url
+        }
+        guard let id = resolvedYouTubeVideoId(from: trailer) else { return nil }
+        return URL(string: "https://img.youtube.com/vi/\(id)/hqdefault.jpg")
+    }
+
     // MARK: - Basic Info
 
     func airingDisplayText(for anime: AnimeDetailDTO) -> String {
@@ -59,29 +135,27 @@ extension AnimeDetailViewModel {
         let day = broadcast.day?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         let time = broadcast.time?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         if !day.isEmpty, !time.isEmpty {
-            let tzId = AnimeDetailBroadcastFormatting.sourceTimeZoneIdentifier(for: broadcast)
-            if let local = AnimeDetailBroadcastFormatting.localBroadcastString(
+            let tzId = AnimeDetailDateFormatting.sourceTimeZoneIdentifier(for: broadcast)
+            if let local = AnimeDetailDateFormatting.localBroadcastString(
                 dayEnglish: day,
                 timeHHMM: time,
                 sourceTimeZoneIdentifier: tzId
             ) {
                 return local
             }
-            return "\(AnimeDetailBroadcastFormatting.weekdayChinese(from: day)) \(time)"
+            return "\(AnimeDetailDateFormatting.weekdayChinese(from: day)) \(time)"
         }
         if let string = broadcast.string?.trimmingCharacters(in: .whitespacesAndNewlines), !string.isEmpty {
-            if let local = AnimeDetailBroadcastFormatting.localBroadcastFromEnglishString(string) {
+            if let local = AnimeDetailDateFormatting.localBroadcastFromEnglishString(string) {
                 return local
             }
-            return AnimeDetailBroadcastFormatting.translateBroadcastEnglishString(string)
+            return AnimeDetailDateFormatting.translateBroadcastEnglishString(string)
         }
         return nil
     }
 
     func airedPeriodDisplayText(for anime: AnimeDetailDTO) -> String? {
-        guard let airedString = anime.aired?.string?.trimmingCharacters(in: .whitespacesAndNewlines),
-              !airedString.isEmpty else { return nil }
-        return airedString
+        AnimeDetailDateFormatting.localizedPeriod(from: anime.aired)
     }
 
     func broadcastDisplayText(for anime: AnimeDetailDTO) -> String {
@@ -132,18 +206,7 @@ extension AnimeDetailViewModel {
     }
 
     func typeDisplayText(for anime: AnimeDetailDTO) -> String {
-        guard let raw = anime.type?.trimmingCharacters(in: .whitespacesAndNewlines), !raw.isEmpty else {
-            return "-"
-        }
-        switch raw.uppercased() {
-        case "TV": return "電視動畫"
-        case "MOVIE": return "劇場版"
-        case "OVA": return "OVA"
-        case "ONA": return "網路動畫"
-        case "SPECIAL": return "特別篇"
-        case "MUSIC": return "音樂"
-        default: return raw
-        }
+        mediaKind(for: anime).displayName
     }
 
     func statusDisplayText(for anime: AnimeDetailDTO) -> String {
@@ -215,6 +278,26 @@ extension AnimeDetailViewModel {
         return !synopsis.isEmpty
     }
 
+    func hasThemes(for anime: AnimeDetailDTO) -> Bool {
+        guard let themes = anime.themes, !themes.isEmpty else { return false }
+        return themes.contains { theme in
+            let name = theme.name?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            return !name.isEmpty
+        }
+    }
+
+    func themeDisplayItems(for anime: AnimeDetailDTO) -> [AnimeRelatedEntityDTO] {
+        guard let themes = anime.themes else { return [] }
+        return themes
+            .filter { theme in
+                let name = theme.name?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+                return !name.isEmpty
+            }
+            .sorted {
+                ($0.name ?? "").localizedCaseInsensitiveCompare($1.name ?? "") == .orderedAscending
+            }
+    }
+
     func hasStaffInfo(for anime: AnimeDetailDTO) -> Bool {
         let studioText = joinedNames(from: anime.studios)
         let producerText = joinedNames(from: anime.producers)
@@ -222,7 +305,34 @@ extension AnimeDetailViewModel {
         return studioText != "-" || producerText != "-" || genreText != "-"
     }
 
+    var hasPictures: Bool {
+        !pictureItems.isEmpty
+    }
+
     // MARK: - Private Methods
+
+    private func resolvedYouTubeVideoId(from trailer: AnimeDetailTrailerDTO) -> String? {
+        if let embed = trailer.embedUrl?.trimmingCharacters(in: .whitespacesAndNewlines),
+           !embed.isEmpty,
+           let url = URL(string: embed) {
+            let path = url.path
+            if let range = path.range(of: "/embed/") {
+                let rest = String(path[range.upperBound...])
+                let segment = rest.split(separator: "/").first.map(String.init) ?? String(rest)
+                let withoutQuery = segment.split(separator: "?").first.map(String.init) ?? segment
+                if !withoutQuery.isEmpty { return withoutQuery }
+            }
+        }
+        if let id = trailer.youtubeId?.trimmingCharacters(in: .whitespacesAndNewlines), !id.isEmpty {
+            return id
+        }
+        if let watch = trailer.url,
+           let url = URL(string: watch),
+           let components = URLComponents(url: url, resolvingAgainstBaseURL: false) {
+            return components.queryItems?.first(where: { $0.name == "v" })?.value
+        }
+        return nil
+    }
 
     private func cleanedSynopsis(for anime: AnimeDetailDTO) -> String? {
         guard var synopsis = anime.synopsis?.trimmingCharacters(in: .whitespacesAndNewlines), !synopsis.isEmpty else {
@@ -235,6 +345,21 @@ extension AnimeDetailViewModel {
         )
         synopsis = synopsis.replacingOccurrences(
             of: "[Written by MAL Rewrite]",
+            with: "",
+            options: .caseInsensitive
+        )
+        synopsis = synopsis.replacingOccurrences(
+            of: "\n\n(Source: MAL News)",
+            with: "",
+            options: .caseInsensitive
+        )
+        synopsis = synopsis.replacingOccurrences(
+            of: "\n(Source: MAL News)",
+            with: "",
+            options: .caseInsensitive
+        )
+        synopsis = synopsis.replacingOccurrences(
+            of: "(Source: MAL News)",
             with: "",
             options: .caseInsensitive
         )

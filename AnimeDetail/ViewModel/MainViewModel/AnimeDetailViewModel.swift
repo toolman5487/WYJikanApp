@@ -12,6 +12,7 @@ import Foundation
 final class AnimeDetailViewModel: ObservableObject {
 
     @Published private(set) var detail: AnimeDetailDTO?
+    @Published private(set) var pictureItems: [AnimeDetailPictureItem] = []
     @Published private(set) var errorMessage: String?
 
     private let malId: Int
@@ -28,15 +29,25 @@ final class AnimeDetailViewModel: ObservableObject {
         guard detail == nil else { return }
 
         errorMessage = nil
+        pictureItems = []
 
         do {
-            let response = try await service.fetchAnimeDetail(malId: malId)
-            detail = response.data
+            let resolvedDetail = try await service.fetchAnimeDetail(malId: malId)
+            detail = resolvedDetail.data
+            do {
+                let resolvedPictures = try await service.fetchAnimePictures(malId: malId)
+                pictureItems = AnimeDetailPictureMapping.items(from: resolvedPictures)
+            } catch is CancellationError {
+                return
+            } catch {
+                pictureItems = []
+            }
         } catch is CancellationError {
             return
         } catch {
             errorMessage = error.localizedDescription
             detail = nil
+            pictureItems = []
         }
     }
 }

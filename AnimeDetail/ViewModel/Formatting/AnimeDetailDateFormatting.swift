@@ -1,5 +1,5 @@
 //
-//  AnimeDetailBroadcastFormatting.swift
+//  AnimeDetailDateFormatting.swift
 //  WYJikanApp
 //
 //  Created by Willy Hsu on 2026/3/27.
@@ -7,7 +7,40 @@
 
 import Foundation
 
-enum AnimeDetailBroadcastFormatting {
+enum AnimeDetailDateFormatting {
+
+    // MARK: - Aired Period
+
+    static func localizedPeriod(from aired: AnimeAiredDTO?) -> String? {
+        guard let aired else { return nil }
+        if let fromProp = aired.prop?.from,
+           let y = fromProp.year, let m = fromProp.month, let d = fromProp.day {
+            let start = chineseDateString(year: y, month: m, day: d)
+            if let toProp = aired.prop?.to,
+               let y2 = toProp.year, let m2 = toProp.month, let d2 = toProp.day {
+                let end = chineseDateString(year: y2, month: m2, day: d2)
+                return "\(start) 至 \(end)"
+            }
+            return start
+        }
+        if let fromDate = dateFromISOString(aired.from) {
+            let start = chineseDateStringFromUTC(fromDate)
+            if let toDate = dateFromISOString(aired.to) {
+                let end = chineseDateStringFromUTC(toDate)
+                return "\(start) 至 \(end)"
+            }
+            return start
+        }
+        if let raw = aired.string?.trimmingCharacters(in: .whitespacesAndNewlines), !raw.isEmpty {
+            if let parsed = parseEnglishMalAiredString(raw) {
+                return parsed
+            }
+            return raw
+        }
+        return nil
+    }
+
+    // MARK: - Broadcast Schedule
 
     static func sourceTimeZoneIdentifier(for broadcast: AnimeBroadcastDTO) -> String {
         if let id = broadcast.timezone?.trimmingCharacters(in: .whitespacesAndNewlines), !id.isEmpty,
@@ -101,6 +134,63 @@ enum AnimeDetailBroadcastFormatting {
     }
 
     // MARK: - Private Methods
+
+    private static func chineseDateString(year: Int, month: Int, day: Int) -> String {
+        "\(year) 年 \(month) 月 \(day) 日"
+    }
+
+    private static func chineseDateStringFromUTC(_ date: Date) -> String {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0) ?? .current
+        let y = calendar.component(.year, from: date)
+        let m = calendar.component(.month, from: date)
+        let d = calendar.component(.day, from: date)
+        return chineseDateString(year: y, month: m, day: d)
+    }
+
+    private static func dateFromISOString(_ raw: String?) -> Date? {
+        guard let raw = raw?.trimmingCharacters(in: .whitespacesAndNewlines), !raw.isEmpty else {
+            return nil
+        }
+        let iso = ISO8601DateFormatter()
+        iso.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        if let d = iso.date(from: raw) {
+            return d
+        }
+        iso.formatOptions = [.withInternetDateTime]
+        if let d = iso.date(from: raw) {
+            return d
+        }
+        iso.formatOptions = [.withFullDate]
+        return iso.date(from: raw)
+    }
+
+    private static func parseEnglishMalAiredString(_ raw: String) -> String? {
+        let segments = raw.components(separatedBy: " to ")
+        guard let first = segments.first else { return nil }
+        let head = first.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !head.isEmpty else { return nil }
+
+        let inputFormatter = DateFormatter()
+        inputFormatter.locale = Locale(identifier: "en_US_POSIX")
+        inputFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+        inputFormatter.dateFormat = "MMM d, yyyy"
+
+        guard let startDate = inputFormatter.date(from: head) else { return nil }
+        let start = chineseDateStringFromUTC(startDate)
+
+        guard segments.count >= 2 else { return start }
+        let tail = segments.dropFirst().joined(separator: " to ").trimmingCharacters(in: .whitespacesAndNewlines)
+        let tailLower = tail.lowercased()
+        if tailLower == "?" || tailLower.hasPrefix("?") {
+            return start
+        }
+        if let endDate = inputFormatter.date(from: tail) {
+            let end = chineseDateStringFromUTC(endDate)
+            return "\(start) 至 \(end)"
+        }
+        return start
+    }
 
     private static func calendarWeekdayComponent(fromEnglishDay day: String) -> Int? {
         let lower = day.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()

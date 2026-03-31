@@ -13,7 +13,7 @@ alwaysApply: true
 - **觸控區域**：按鈕、連結等可點擊元素最小 44×44 pt
 - **即時回饋**：載入時顯示 `ProgressView`，操作成功/失敗給予清楚提示
 - **導覽一致性**：使用 `NavigationStack`、`TabView` 等系統導覽模式
-- **可存取性**：支援 Dynamic Type、VoiceOver（`.accessibilityLabel`、`.accessibilityHint`）
+- **可存取性**：支援 Dynamic Type、VoiceOver；**勿**在 View 上撰寫 `.accessibilityLabel`（沿用系統推導或可讀文字即可）
 - **平台適性**：依 iOS / iPadOS 調整版面與手勢
 - **避免阻斷**：非緊急操作用 `.confirmationDialog` 或 `.alert`，不強制 modal
 
