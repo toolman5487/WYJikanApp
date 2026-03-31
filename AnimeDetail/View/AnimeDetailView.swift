@@ -103,7 +103,7 @@ struct AnimeDetailView: View {
         case .score:
             AnimeDetailScoreSectionView(viewModel: viewModel, anime: anime)
         case .synopsis:
-            AnimeDetailSynopsisSectionView(anime: anime)
+            AnimeDetailSynopsisSectionView(viewModel: viewModel, anime: anime)
         case .staff:
             AnimeDetailStaffSectionView(viewModel: viewModel, anime: anime)
         }

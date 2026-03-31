@@ -32,6 +32,28 @@ extension AnimeDetailViewModel {
         return airing ? "連載中" : "結束連載"
     }
 
+    func durationDisplayText(for anime: AnimeDetailDTO) -> String {
+        guard let raw = anime.duration?.trimmingCharacters(in: .whitespacesAndNewlines), !raw.isEmpty else {
+            return "-"
+        }
+        let lower = raw.lowercased()
+        if lower == "unknown" {
+            return "未知"
+        }
+        var result = raw
+        result = result.replacingOccurrences(of: "min per episode", with: "分鐘／集", options: .caseInsensitive)
+        result = result.replacingOccurrences(of: "min per ep", with: "分鐘／集", options: .caseInsensitive)
+        result = result.replacingOccurrences(of: "minutes", with: "分鐘", options: .caseInsensitive)
+        result = result.replacingOccurrences(of: "minute", with: "分鐘", options: .caseInsensitive)
+        result = result.replacingOccurrences(of: "hours", with: "小時", options: .caseInsensitive)
+        result = result.replacingOccurrences(of: "hour", with: "小時", options: .caseInsensitive)
+        result = result.replacingOccurrences(of: "hrs", with: "小時", options: .caseInsensitive)
+        result = result.replacingOccurrences(of: " hr", with: " 小時", options: .caseInsensitive)
+        result = result.replacingOccurrences(of: " mins", with: " 分鐘", options: .caseInsensitive)
+        result = result.replacingOccurrences(of: " min", with: " 分鐘", options: .caseInsensitive)
+        return result.replacingOccurrences(of: "  ", with: " ").trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
     func weeklyBroadcastScheduleText(for anime: AnimeDetailDTO) -> String? {
         guard let broadcast = anime.broadcast else { return nil }
         let day = broadcast.day?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
@@ -184,8 +206,12 @@ extension AnimeDetailViewModel {
         return String(format: "%.2f", score) + " / 10.0"
     }
 
+    func synopsisDisplayText(for anime: AnimeDetailDTO) -> String {
+        cleanedSynopsis(for: anime) ?? "-"
+    }
+
     func hasSynopsis(for anime: AnimeDetailDTO) -> Bool {
-        guard let synopsis = anime.synopsis else { return false }
+        guard let synopsis = cleanedSynopsis(for: anime) else { return false }
         return !synopsis.isEmpty
     }
 
@@ -194,5 +220,25 @@ extension AnimeDetailViewModel {
         let producerText = joinedNames(from: anime.producers)
         let genreText = joinedNames(from: anime.genres)
         return studioText != "-" || producerText != "-" || genreText != "-"
+    }
+
+    // MARK: - Private Methods
+
+    private func cleanedSynopsis(for anime: AnimeDetailDTO) -> String? {
+        guard var synopsis = anime.synopsis?.trimmingCharacters(in: .whitespacesAndNewlines), !synopsis.isEmpty else {
+            return nil
+        }
+        synopsis = synopsis.replacingOccurrences(
+            of: "\n\n[Written by MAL Rewrite]",
+            with: "",
+            options: .caseInsensitive
+        )
+        synopsis = synopsis.replacingOccurrences(
+            of: "[Written by MAL Rewrite]",
+            with: "",
+            options: .caseInsensitive
+        )
+        let trimmed = synopsis.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? nil : trimmed
     }
 }

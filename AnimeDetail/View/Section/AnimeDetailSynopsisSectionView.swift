@@ -8,11 +8,12 @@
 import SwiftUI
 
 struct AnimeDetailSynopsisSectionView: View {
+    let viewModel: AnimeDetailViewModel
     let anime: AnimeDetailDTO
-    
+
     var body: some View {
         AnimeDetailSectionCard("作品簡介") {
-            Text(anime.synopsis ?? "-")
+            Text(viewModel.synopsisDisplayText(for: anime))
                 .font(.body)
                 .foregroundStyle(ThemeColor.textPrimary.opacity(0.9))
                 .fixedSize(horizontal: false, vertical: true)

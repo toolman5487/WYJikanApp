@@ -23,7 +23,7 @@ struct AnimeDetailBasicInfoSectionView: View {
                 if let weekly = viewModel.weeklyBroadcastScheduleText(for: anime) {
                     AnimeDetailInfoRow(title: "播出時間", value: weekly)
                 }
-                AnimeDetailInfoRow(title: "片長", value: anime.duration ?? "-")
+                AnimeDetailInfoRow(title: "片長", value: viewModel.durationDisplayText(for: anime))
             }
         }
     }
