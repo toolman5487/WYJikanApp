@@ -33,24 +33,6 @@ struct MainHomeView: View {
         .trendingManga
     ]
     
-    var body: some View {
-        NavigationStack(path: $router.path) {
-            ScrollView {
-                LazyVStack(spacing: 16) {
-                    ForEach(sections) { section in
-                        sectionView(section)
-                    }
-                }
-            }
-            .navigationDestination(for: MainHomeRoute.self) { route in
-                switch route {
-                case .animeDetail(let malId):
-                    AnimeDetailView(malId: malId)
-                }
-            }
-        }
-        .environmentObject(router)
-    }
     
     @ViewBuilder
     private func sectionView(_ section: Section) -> some View {
@@ -64,6 +46,25 @@ struct MainHomeView: View {
         case .trendingManga:
             HomeTrendingMangaView()
         }
+    }
+    
+    var body: some View {
+        NavigationStack(path: $router.path) {
+            ScrollView {
+                LazyVStack {
+                    ForEach(sections) { section in
+                        sectionView(section)
+                    }
+                }
+            }
+            .navigationDestination(for: MainHomeRoute.self) { route in
+                switch route {
+                case .animeDetail(let malId):
+                    AnimeDetailView(malId: malId)
+                }
+            }
+        }
+        .environmentObject(router)
     }
 }
 

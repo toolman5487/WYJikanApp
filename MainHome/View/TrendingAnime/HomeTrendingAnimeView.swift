@@ -22,10 +22,11 @@ struct HomeTrendingAnimeView: View {
     }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 0) {
             Text("熱門動畫")
-                .font(.title3.weight(.semibold))
-                .foregroundStyle(ThemeColor.textPrimary)
+                .padding()
+                .font(.title3.weight(.bold))
+                .foregroundStyle(ThemeColor.sakura)
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: Self.cardSpacing) {
@@ -39,7 +40,7 @@ struct HomeTrendingAnimeView: View {
                         ErrorMessageView(message: errorMessage, height: Self.cardHeight)
                             .frame(width: Self.cardWidth)
                     } else if viewModel.items.isEmpty {
-                        ErrorMessageView(message: "Empty Data", height: Self.cardHeight)
+                        ErrorMessageView(message: "尚無資料，稍後嘗試", height: Self.cardHeight)
                             .frame(width: Self.cardWidth)
                     } else {
                         ForEach(viewModel.items) { item in

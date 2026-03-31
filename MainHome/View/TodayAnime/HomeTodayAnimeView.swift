@@ -23,10 +23,11 @@ struct HomeTodayAnimeView: View {
     }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 0) {
             Text("當日動畫")
-                .font(.title3.weight(.semibold))
-                .foregroundStyle(ThemeColor.textPrimary)
+                .padding()
+                .font(.title3.weight(.bold))
+                .foregroundStyle(ThemeColor.sakura)
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: Self.cardSpacing) {

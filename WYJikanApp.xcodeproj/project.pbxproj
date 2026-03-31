@@ -17,6 +17,8 @@
 		1572FE052F762D7000756CBA /* HomeTodayAnimeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1572FE042F762D7000756CBA /* HomeTodayAnimeViewModel.swift */; };
 		1572FE072F762D7700756CBA /* HomeTodayAnimeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1572FE062F762D7700756CBA /* HomeTodayAnimeModel.swift */; };
 		1572FE0A2F762DE300756CBA /* HomeTodayAnimeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1572FE082F762DE300756CBA /* HomeTodayAnimeView.swift */; };
+		1574EC342F7BC8B100E37AE8 /* AnimeDetailReviewSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1574EC332F7BC8B100E37AE8 /* AnimeDetailReviewSectionView.swift */; };
+		1574EC362F7BC9CF00E37AE8 /* AnimeDetailReviewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1574EC352F7BC9CF00E37AE8 /* AnimeDetailReviewModel.swift */; };
 		15750AF32F7282C70037E8A5 /* MainTabBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15750AF22F7282C70037E8A5 /* MainTabBarView.swift */; };
 		15750AFF2F7285520037E8A5 /* PlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15750AFE2F7285520037E8A5 /* PlaceholderView.swift */; };
 		157561A72F728F8B0037E8A5 /* MainTabBarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 157561A62F728F8B0037E8A5 /* MainTabBarViewModel.swift */; };
@@ -72,6 +74,8 @@
 		1572FE042F762D7000756CBA /* HomeTodayAnimeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeViewModel.swift; sourceTree = "<group>"; };
 		1572FE062F762D7700756CBA /* HomeTodayAnimeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeModel.swift; sourceTree = "<group>"; };
 		1572FE082F762DE300756CBA /* HomeTodayAnimeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeView.swift; sourceTree = "<group>"; };
+		1574EC332F7BC8B100E37AE8 /* AnimeDetailReviewSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeDetailReviewSectionView.swift; sourceTree = "<group>"; };
+		1574EC352F7BC9CF00E37AE8 /* AnimeDetailReviewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeDetailReviewModel.swift; sourceTree = "<group>"; };
 		15750AF22F7282C70037E8A5 /* MainTabBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarView.swift; sourceTree = "<group>"; };
 		15750AFE2F7285520037E8A5 /* PlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderView.swift; sourceTree = "<group>"; };
 		157561A62F728F8B0037E8A5 /* MainTabBarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarViewModel.swift; sourceTree = "<group>"; };
@@ -485,6 +489,7 @@
 			children = (
 				1555A2532F7BB38900501496 /* AnimeDetailPicturesModel.swift */,
 				15FF29672F763B3100D3241C /* AnimeDetailModel.swift */,
+				1574EC352F7BC9CF00E37AE8 /* AnimeDetailReviewModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -551,6 +556,7 @@
 				15FF801B2F765C9500D3241C /* AnimeDetailScoreSectionView.swift */,
 				15FF801D2F765C9500D3241C /* AnimeDetailStaffSectionView.swift */,
 				15FF801E2F765C9500D3241C /* AnimeDetailSynopsisSectionView.swift */,
+				1574EC332F7BC8B100E37AE8 /* AnimeDetailReviewSectionView.swift */,
 			);
 			path = Section;
 			sourceTree = "<group>";
@@ -667,10 +673,12 @@
 				15FF295D2F76332700D3241C /* AnimeDetailView.swift in Sources */,
 				15FF80152F7653E200D3241C /* MainHomeRouter.swift in Sources */,
 				15DE55B72F723F2800B292AD /* APIConfig.swift in Sources */,
+				1574EC362F7BC9CF00E37AE8 /* AnimeDetailReviewModel.swift in Sources */,
 				1585971B2F7B614200B0BDA1 /* AnimeDetailViewModel+Presentation.swift in Sources */,
 				15FC4F6E2F752C250054153E /* HomeTrendingMangaView.swift in Sources */,
 				15FC4F472F74DF4D0054153E /* HeroBannerImageView.swift in Sources */,
 				15FF80172F76575F00D3241C /* HeroBannerSlideView.swift in Sources */,
+				1574EC342F7BC8B100E37AE8 /* AnimeDetailReviewSectionView.swift in Sources */,
 				15FF296D2F763B4C00D3241C /* AnimeDetailService.swift in Sources */,
 				15FC4F562F7507910054153E /* HomeTrendingAnimeViewModel.swift in Sources */,
 				1555A2382F7B94F300501496 /* AnimeDetailMediaKind.swift in Sources */,

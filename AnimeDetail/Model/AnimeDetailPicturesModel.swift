@@ -7,7 +7,7 @@
 
 import Foundation
 
-// MARK: - Response (Jikan /anime/{id}/pictures)
+// MARK: - Response
 
 struct AnimePicturesResponse: Codable {
     let data: [AnimeImagesDTO]
