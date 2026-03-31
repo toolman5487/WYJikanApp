@@ -23,6 +23,7 @@ struct AnimeDetailHighlightsSectionView: View {
                         ForEach(highlightItems, id: \.title) { item in
                             VStack(alignment: .leading, spacing: 4) {
                                 Text(item.title)
+                                    .font(.subheadline)
                                     .foregroundStyle(ThemeColor.textPrimary)
                                     .lineLimit(1)
                                     .fixedSize(horizontal: true, vertical: false)
@@ -35,7 +36,7 @@ struct AnimeDetailHighlightsSectionView: View {
                             }
                             .padding(.vertical, 8)
                             .padding(.horizontal, 12)
-                            .frame(minHeight: 72, alignment: .topLeading)
+                            .frame(minHeight: 64, alignment: .leading)
                             .background(ThemeColor.sakura)
                             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                         }

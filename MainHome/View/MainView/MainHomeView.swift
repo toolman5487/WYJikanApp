@@ -57,6 +57,8 @@ struct MainHomeView: View {
                     }
                 }
             }
+            .ignoresSafeArea(edges: .top)
+            .toolbarBackground(.hidden, for: .navigationBar)
             .navigationDestination(for: MainHomeRoute.self) { route in
                 switch route {
                 case .animeDetail(let malId):

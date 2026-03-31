@@ -26,13 +26,9 @@ struct AnimeReviewView: View {
                 ErrorMessageView(message: message, height: 200)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if viewModel.isLoading, viewModel.reviews.isEmpty {
-                ProgressView()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                reviewListSkeleton
             } else if viewModel.reviews.isEmpty {
-                Text("尚無評論")
-                    .font(.body)
-                    .foregroundStyle(ThemeColor.textSecondary)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                AnimeReviewEmptyStateView()
             } else {
                 AnimeReviewListView(viewModel: viewModel)
             }
@@ -45,6 +41,23 @@ struct AnimeReviewView: View {
     }
 
     // MARK: - Private
+
+    private static let skeletonRowCount = 6
+
+    private var reviewListSkeleton: some View {
+        ScrollView {
+            LazyVStack(alignment: .leading, spacing: 20) {
+                ForEach(0..<Self.skeletonRowCount, id: \.self) { index in
+                    if index > 0 {
+                        Divider()
+                    }
+                    AnimeReviewRowSkeletonView()
+                }
+            }
+            .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
 
     private var navigationTitleText: String {
         let trimmed = animeTitle?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
