@@ -14,7 +14,7 @@ struct SkeletonBar: View {
 
     var body: some View {
         RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-            .fill(Color.gray.opacity(0.22))
+            .fill(Color(.systemGray5))
             .frame(width: width, height: height)
             .frame(maxWidth: width == nil ? .infinity : nil, alignment: .leading)
     }

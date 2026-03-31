@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct AnimeDetailHighlightsSectionView: View {
+    let viewModel: AnimeDetailViewModel
     let anime: AnimeDetailDTO
     
     var body: some View {
@@ -46,16 +47,20 @@ struct AnimeDetailHighlightsSectionView: View {
     
     private var highlightItems: [(title: String, value: String)] {
         var items: [(String, String)] = []
-        if let type = anime.type, !type.isEmpty {
+        let type = viewModel.typeDisplayText(for: anime)
+        if type != "-" {
             items.append(("類型", type))
         }
-        if let status = anime.status, !status.isEmpty {
+        let status = viewModel.statusDisplayText(for: anime)
+        if status != "-" {
             items.append(("狀態", status))
         }
-        if let rating = anime.rating, !rating.isEmpty {
+        let rating = viewModel.ratingDisplayText(for: anime)
+        if rating != "-" {
             items.append(("分級", rating))
         }
-        if let source = anime.source, !source.isEmpty {
+        let source = viewModel.sourceDisplayText(for: anime)
+        if source != "-" {
             items.append(("來源", source))
         }
         return items

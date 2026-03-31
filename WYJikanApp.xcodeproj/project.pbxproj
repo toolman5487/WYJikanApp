@@ -15,6 +15,9 @@
 		15750AF32F7282C70037E8A5 /* MainTabBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15750AF22F7282C70037E8A5 /* MainTabBarView.swift */; };
 		15750AFF2F7285520037E8A5 /* PlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15750AFE2F7285520037E8A5 /* PlaceholderView.swift */; };
 		157561A72F728F8B0037E8A5 /* MainTabBarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 157561A62F728F8B0037E8A5 /* MainTabBarViewModel.swift */; };
+		1585971B2F7B614200B0BDA1 /* AnimeDetailViewModel+Presentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1585971A2F7B614200B0BDA1 /* AnimeDetailViewModel+Presentation.swift */; };
+		1585971F2F7B614A00B0BDA1 /* AnimeDetailSeasonFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1585971D2F7B614A00B0BDA1 /* AnimeDetailSeasonFormatting.swift */; };
+		158597202F7B614A00B0BDA1 /* AnimeDetailBroadcastFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1585971C2F7B614A00B0BDA1 /* AnimeDetailBroadcastFormatting.swift */; };
 		15DE55A02F723A9C00B292AD /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 15DE559F2F723A9C00B292AD /* SDWebImageSwiftUI */; };
 		15DE55A42F723C0000B292AD /* JikanAPIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15DE55A52F723C0000B292AD /* JikanAPIService.swift */; };
 		15DE55B72F723F2800B292AD /* APIConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15DE55B62F723F2800B292AD /* APIConfig.swift */; };
@@ -61,6 +64,9 @@
 		15750AF22F7282C70037E8A5 /* MainTabBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarView.swift; sourceTree = "<group>"; };
 		15750AFE2F7285520037E8A5 /* PlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderView.swift; sourceTree = "<group>"; };
 		157561A62F728F8B0037E8A5 /* MainTabBarViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarViewModel.swift; sourceTree = "<group>"; };
+		1585971A2F7B614200B0BDA1 /* AnimeDetailViewModel+Presentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AnimeDetailViewModel+Presentation.swift"; sourceTree = "<group>"; };
+		1585971C2F7B614A00B0BDA1 /* AnimeDetailBroadcastFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeDetailBroadcastFormatting.swift; sourceTree = "<group>"; };
+		1585971D2F7B614A00B0BDA1 /* AnimeDetailSeasonFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeDetailSeasonFormatting.swift; sourceTree = "<group>"; };
 		15DE55902F723A1700B292AD /* WYJikanApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WYJikanApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		15DE55A52F723C0000B292AD /* JikanAPIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JikanAPIService.swift; sourceTree = "<group>"; };
 		15DE55B62F723F2800B292AD /* APIConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIConfig.swift; sourceTree = "<group>"; };
@@ -173,6 +179,23 @@
 				157561A62F728F8B0037E8A5 /* MainTabBarViewModel.swift */,
 			);
 			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		1585971E2F7B614A00B0BDA1 /* Formatting */ = {
+			isa = PBXGroup;
+			children = (
+				1585971C2F7B614A00B0BDA1 /* AnimeDetailBroadcastFormatting.swift */,
+				1585971D2F7B614A00B0BDA1 /* AnimeDetailSeasonFormatting.swift */,
+			);
+			path = Formatting;
+			sourceTree = "<group>";
+		};
+		158597212F7B661F00B0BDA1 /* Presentation */ = {
+			isa = PBXGroup;
+			children = (
+				1585971A2F7B614200B0BDA1 /* AnimeDetailViewModel+Presentation.swift */,
+			);
+			path = Presentation;
 			sourceTree = "<group>";
 		};
 		15DE55872F723A1700B292AD = {
@@ -429,6 +452,8 @@
 		15FF295B2F76331300D3241C /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
+				158597212F7B661F00B0BDA1 /* Presentation */,
+				1585971E2F7B614A00B0BDA1 /* Formatting */,
 				15FF296A2F763B4300D3241C /* AnimeDetailViewModel.swift */,
 			);
 			path = ViewModel;
@@ -575,6 +600,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				15750AF32F7282C70037E8A5 /* MainTabBarView.swift in Sources */,
+				1585971F2F7B614A00B0BDA1 /* AnimeDetailSeasonFormatting.swift in Sources */,
+				158597202F7B614A00B0BDA1 /* AnimeDetailBroadcastFormatting.swift in Sources */,
 				15FC4F542F75077C0054153E /* HomeTrendingAnimeModel.swift in Sources */,
 				15FC4F742F752CB60054153E /* HomeTrendingMangaViewModel.swift in Sources */,
 				15FC4F3E2F73E7620054153E /* HeroBannerViewModel.swift in Sources */,
@@ -595,6 +622,7 @@
 				15FF295D2F76332700D3241C /* AnimeDetailView.swift in Sources */,
 				15FF80152F7653E200D3241C /* MainHomeRouter.swift in Sources */,
 				15DE55B72F723F2800B292AD /* APIConfig.swift in Sources */,
+				1585971B2F7B614200B0BDA1 /* AnimeDetailViewModel+Presentation.swift in Sources */,
 				15FC4F6E2F752C250054153E /* HomeTrendingMangaView.swift in Sources */,
 				15FC4F472F74DF4D0054153E /* HeroBannerImageView.swift in Sources */,
 				15FF80172F76575F00D3241C /* HeroBannerSlideView.swift in Sources */,

@@ -97,7 +97,7 @@ struct AnimeDetailView: View {
         case .header:
             AnimeDetailHeaderSectionView(viewModel: viewModel, anime: anime)
         case .highlights:
-            AnimeDetailHighlightsSectionView(anime: anime)
+            AnimeDetailHighlightsSectionView(viewModel: viewModel, anime: anime)
         case .basicInfo:
             AnimeDetailBasicInfoSectionView(viewModel: viewModel, anime: anime)
         case .score:
