@@ -1,11 +1,35 @@
 //
-//  AnimeReviewRowSkeletonView.swift
+//  AnimeReviewSkeletonViews.swift
 //  WYJikanApp
 //
 //  Created by Willy Hsu on 2026/3/31.
 //
 
 import SwiftUI
+
+// MARK: - List
+
+struct AnimeReviewListSkeletonView: View {
+
+    private static let rowCount = 6
+
+    var body: some View {
+        ScrollView {
+            LazyVStack(alignment: .leading, spacing: 20) {
+                ForEach(0..<Self.rowCount, id: \.self) { index in
+                    if index > 0 {
+                        Divider()
+                    }
+                    AnimeReviewRowSkeletonView()
+                }
+            }
+            .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+}
+
+// MARK: - Row
 
 struct AnimeReviewRowSkeletonView: View {
 
@@ -59,7 +83,11 @@ struct AnimeReviewRowSkeletonView: View {
     }
 }
 
-#Preview {
+#Preview("List") {
+    AnimeReviewListSkeletonView()
+}
+
+#Preview("Row") {
     ScrollView {
         AnimeReviewRowSkeletonView()
             .padding()

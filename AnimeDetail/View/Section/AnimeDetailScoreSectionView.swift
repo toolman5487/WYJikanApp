@@ -31,9 +31,3 @@ struct AnimeDetailScoreSectionView: View {
         .buttonStyle(.plain)
     }
 }
-
-struct AnimeDetailScoreSectionSkeletonView: View {
-    var body: some View {
-        SectionCardSkeleton(rowCount: 5)
-    }
-}

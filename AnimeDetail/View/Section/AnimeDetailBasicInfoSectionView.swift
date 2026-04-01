@@ -28,9 +28,3 @@ struct AnimeDetailBasicInfoSectionView: View {
         }
     }
 }
-
-struct AnimeDetailBasicInfoSectionSkeletonView: View {
-    var body: some View {
-        SectionCardSkeleton(rowCount: 5)
-    }
-}

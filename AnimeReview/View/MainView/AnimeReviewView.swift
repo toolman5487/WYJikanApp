@@ -26,7 +26,7 @@ struct AnimeReviewView: View {
                 ErrorMessageView(message: message, height: 200)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if viewModel.isLoading, viewModel.reviews.isEmpty {
-                reviewListSkeleton
+                AnimeReviewListSkeletonView()
             } else if viewModel.reviews.isEmpty {
                 AnimeReviewEmptyStateView()
             } else {
@@ -41,23 +41,6 @@ struct AnimeReviewView: View {
     }
 
     // MARK: - Private
-
-    private static let skeletonRowCount = 6
-
-    private var reviewListSkeleton: some View {
-        ScrollView {
-            LazyVStack(alignment: .leading, spacing: 20) {
-                ForEach(0..<Self.skeletonRowCount, id: \.self) { index in
-                    if index > 0 {
-                        Divider()
-                    }
-                    AnimeReviewRowSkeletonView()
-                }
-            }
-            .padding()
-            .frame(maxWidth: .infinity, alignment: .leading)
-        }
-    }
 
     private var navigationTitleText: String {
         let trimmed = animeTitle?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""

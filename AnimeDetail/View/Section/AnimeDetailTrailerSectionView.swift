@@ -79,12 +79,3 @@ struct AnimeDetailTrailerSectionView: View {
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 }
-
-struct AnimeDetailTrailerSectionSkeletonView: View {
-    var body: some View {
-        RoundedRectangle(cornerRadius: 12, style: .continuous)
-            .fill(Color(.systemGray5))
-            .aspectRatio(16.0 / 9.0, contentMode: .fit)
-            .frame(maxWidth: .infinity)
-    }
-}
