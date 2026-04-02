@@ -11,6 +11,7 @@ import Foundation
 @MainActor
 final class HomeTodayAnimeViewModel: ObservableObject {
     private static let maxCards = 10
+    private static let scheduleFetchLimit = 25
 
     @Published private(set) var items: [HomeTodayAnimeCardItem] = []
     @Published private(set) var isLoading: Bool = false
@@ -36,7 +37,7 @@ final class HomeTodayAnimeViewModel: ObservableObject {
         loadTask = Task { [weak self] in
             guard let self else { return }
             do {
-                let response = try await self.service.fetchTodayAnime(limit: Self.maxCards)
+                let response = try await self.service.fetchTodayAnime(limit: Self.scheduleFetchLimit)
                 let mapped: [HomeTodayAnimeCardItem] = response.data.compactMap { dto -> HomeTodayAnimeCardItem? in
                     guard let urlString =
                         dto.images?.jpg?.largeImageUrl ??
@@ -51,7 +52,9 @@ final class HomeTodayAnimeViewModel: ObservableObject {
                     )
                 }
 
-                self.items = mapped
+                var seenIDs = Set<Int>()
+                let uniqueInOrder = mapped.filter { seenIDs.insert($0.id).inserted }
+                self.items = Array(uniqueInOrder.prefix(Self.maxCards))
                 self.isLoading = false
             } catch {
                 self.errorMessage = error.localizedDescription

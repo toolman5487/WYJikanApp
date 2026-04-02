@@ -113,6 +113,21 @@ struct MangaDetailView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                NavigationLink {
+                    MangaReviewView(
+                        malId: malId,
+                        mangaTitle: viewModel.detail.map { viewModel.displayTitle(for: $0) }
+                    )
+                } label: {
+                    Image(systemName: "text.bubble.fill")
+                        .font(.body)
+                        .frame(minWidth: 44, minHeight: 44)
+                        .contentShape(Rectangle())
+                }
+            }
+        }
         .task(id: malId) {
             await viewModel.load()
         }
