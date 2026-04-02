@@ -12,15 +12,40 @@ struct AnimeDetailStaffSectionView: View {
     let anime: AnimeDetailDTO
 
     var body: some View {
-        let studioText = viewModel.joinedNames(from: anime.studios)
-        let producerText = viewModel.joinedNames(from: anime.producers)
-        let genreText = viewModel.joinedNames(from: anime.genres)
-        
-        AnimeDetailSectionCard("製作資訊") {
-            VStack(spacing: 10) {
-                AnimeDetailInfoRow(title: "工作室", value: studioText)
-                AnimeDetailInfoRow(title: "製作", value: producerText)
-                AnimeDetailInfoRow(title: "類型", value: genreText)
+        VStack(alignment: .leading, spacing: 20) {
+            if viewModel.hasStaffInfo(for: anime) {
+                let studioText = viewModel.joinedNames(from: anime.studios)
+                let producerText = viewModel.joinedNames(from: anime.producers)
+                let genreText = viewModel.joinedNames(from: anime.genres)
+                AnimeDetailSectionCard("製作資訊") {
+                    VStack(spacing: 10) {
+                        AnimeDetailInfoRow(title: "工作室", value: studioText)
+                        AnimeDetailInfoRow(title: "製作", value: producerText)
+                        AnimeDetailInfoRow(title: "類型", value: genreText)
+                    }
+                }
+            }
+            if viewModel.hasThemes(for: anime) {
+                VStack(alignment: .leading, spacing: 16) {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 10) {
+                            ForEach(viewModel.themeDisplayItems(for: anime)) { theme in
+                                Text(theme.name ?? "—")
+                                    .font(.subheadline.weight(.medium))
+                                    .foregroundStyle(ThemeColor.textPrimary)
+                                    .lineLimit(1)
+                                    .padding(.vertical, 8)
+                                    .padding(.horizontal, 16)
+                                    .frame(minHeight: 44)
+                                    .background(ThemeColor.sakura)
+                                    .clipShape(Capsule())
+                            }
+                        }
+                    }
+                    if !viewModel.hasSynopsis(for: anime), let url = viewModel.malWorkPageURL(for: anime) {
+                        MALWorkPageOpenButton(url: url)
+                    }
+                }
             }
         }
     }

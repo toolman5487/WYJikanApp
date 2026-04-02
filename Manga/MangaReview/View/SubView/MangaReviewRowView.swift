@@ -22,7 +22,7 @@ struct MangaReviewRowView: View {
                 .foregroundStyle(ThemeColor.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
             if let url = reviewDetailURL {
-                AnimeReviewRowMALButton(url: url)
+                MALWorkPageOpenButton(url: url)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)

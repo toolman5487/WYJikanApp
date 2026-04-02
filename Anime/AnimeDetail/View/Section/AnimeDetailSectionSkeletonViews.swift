@@ -83,7 +83,17 @@ struct AnimeDetailSynopsisSectionSkeletonView: View {
 
 struct AnimeDetailStaffSectionSkeletonView: View {
     var body: some View {
-        SectionCardSkeleton(rowCount: 3)
+        VStack(alignment: .leading, spacing: 20) {
+            SectionCardSkeleton(rowCount: 3)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 10) {
+                    ForEach(0..<5, id: \.self) { _ in
+                        SkeletonBar(width: 88, height: 40, cornerRadius: 20)
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
     }
 }
 

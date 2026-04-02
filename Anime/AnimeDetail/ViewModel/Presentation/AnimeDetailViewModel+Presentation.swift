@@ -25,6 +25,14 @@ extension AnimeDetailViewModel {
         return URL(string: urlString)
     }
 
+    func malWorkPageURL(for anime: AnimeDetailDTO) -> URL? {
+        if let raw = anime.url?.trimmingCharacters(in: .whitespacesAndNewlines), !raw.isEmpty,
+           let url = URL(string: raw) {
+            return url
+        }
+        return URL(string: "https://myanimelist.net/anime/\(anime.malId)")
+    }
+
     func hasSensitiveContent(for anime: AnimeDetailDTO) -> Bool {
         sensitiveContentText(for: anime) != nil
     }

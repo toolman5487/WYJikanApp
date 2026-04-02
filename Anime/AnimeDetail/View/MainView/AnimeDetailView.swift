@@ -52,10 +52,10 @@ struct AnimeDetailView: View {
         if viewModel.hasTrailer(for: anime) {
             result.append(.trailer)
         }
-        if viewModel.hasSynopsis(for: anime) || viewModel.hasThemes(for: anime) {
+        if viewModel.hasSynopsis(for: anime) {
             result.append(.synopsis)
         }
-        if viewModel.hasStaffInfo(for: anime) {
+        if viewModel.hasStaffInfo(for: anime) || viewModel.hasThemes(for: anime) {
             result.append(.staff)
         }
         if viewModel.hasPictures {

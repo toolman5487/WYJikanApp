@@ -1,13 +1,13 @@
 //
-//  AnimeReviewRowMALButton.swift
+//  MALWorkPageOpenButton.swift
 //  WYJikanApp
 //
-//  Created by Willy Hsu on 2026/3/31.
+//  Created by Willy Hsu on 2026/4/2.
 //
 
 import SwiftUI
 
-struct AnimeReviewRowMALButton: View {
+struct MALWorkPageOpenButton: View {
 
     @Environment(\.openURL) private var openURL
 

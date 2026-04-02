@@ -48,19 +48,11 @@ struct MangaDetailHighlightsSectionSkeletonView: View {
     }
 }
 
-// MARK: - Basic Info
-
-struct MangaDetailBasicInfoSectionSkeletonView: View {
-    var body: some View {
-        SectionCardSkeleton(rowCount: 4)
-    }
-}
-
 // MARK: - Score
 
 struct MangaDetailScoreSectionSkeletonView: View {
     var body: some View {
-        SectionCardSkeleton(rowCount: 5)
+        SectionCardSkeleton(rowCount: 6)
     }
 }
 
@@ -86,6 +78,16 @@ struct MangaDetailSynopsisSectionSkeletonView: View {
 
 struct MangaDetailPublicationSectionSkeletonView: View {
     var body: some View {
-        SectionCardSkeleton(rowCount: 4)
+        VStack(alignment: .leading, spacing: 20) {
+            SectionCardSkeleton(rowCount: 4)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 10) {
+                    ForEach(0..<5, id: \.self) { _ in
+                        SkeletonBar(width: 88, height: 40, cornerRadius: 20)
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
     }
 }

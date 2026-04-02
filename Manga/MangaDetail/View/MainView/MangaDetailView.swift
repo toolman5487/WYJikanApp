@@ -27,7 +27,6 @@ struct MangaDetailView: View {
     enum Section: Identifiable {
         case header
         case highlights
-        case basicInfo
         case score
         case synopsis
         case publication
@@ -36,7 +35,6 @@ struct MangaDetailView: View {
             switch self {
             case .header: return "header"
             case .highlights: return "highlights"
-            case .basicInfo: return "basicInfo"
             case .score: return "score"
             case .synopsis: return "synopsis"
             case .publication: return "publication"
@@ -50,13 +48,13 @@ struct MangaDetailView: View {
         var result: [Section] = [
             .header,
             .highlights,
-            .basicInfo,
             .score
         ]
-        if viewModel.hasSynopsis(for: manga) || viewModel.hasThemes(for: manga) {
+        if viewModel.hasSynopsis(for: manga) {
             result.append(.synopsis)
         }
-        if viewModel.hasPublicationInfo(for: manga) {
+        if viewModel.hasPublicationInfo(for: manga) || viewModel.hasThemes(for: manga)
+            || !viewModel.hasSynopsis(for: manga) {
             result.append(.publication)
         }
         return result
@@ -69,8 +67,6 @@ struct MangaDetailView: View {
             MangaDetailHeaderSectionView(viewModel: viewModel, manga: manga)
         case .highlights:
             MangaDetailHighlightsSectionView(viewModel: viewModel, manga: manga)
-        case .basicInfo:
-            MangaDetailBasicInfoSectionView(viewModel: viewModel, manga: manga)
         case .score:
             MangaDetailScoreSectionView(viewModel: viewModel, manga: manga)
         case .synopsis:
@@ -102,7 +98,6 @@ struct MangaDetailView: View {
                     LazyVStack(alignment: .leading, spacing: 20) {
                         MangaDetailHeaderSectionSkeletonView()
                         MangaDetailHighlightsSectionSkeletonView()
-                        MangaDetailBasicInfoSectionSkeletonView()
                         MangaDetailScoreSectionSkeletonView()
                         MangaDetailSynopsisSectionSkeletonView()
                         MangaDetailPublicationSectionSkeletonView()

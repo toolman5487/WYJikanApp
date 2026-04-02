@@ -25,6 +25,14 @@ extension MangaDetailViewModel {
         return URL(string: urlString)
     }
 
+    func malWorkPageURL(for manga: MangaDetailDTO) -> URL? {
+        if let raw = manga.url?.trimmingCharacters(in: .whitespacesAndNewlines), !raw.isEmpty,
+           let url = URL(string: raw) {
+            return url
+        }
+        return URL(string: "https://myanimelist.net/manga/\(manga.malId)")
+    }
+
     func sensitiveContentText(for manga: MangaDetailDTO) -> String? {
         var names = (manga.explicitGenres ?? []).compactMap(\.name).filter { !$0.isEmpty }
         if names.isEmpty {
@@ -81,7 +89,7 @@ extension MangaDetailViewModel {
     }
 
     func publishedPeriodDisplayText(for manga: MangaDetailDTO) -> String {
-        AnimeDetailDateFormatting.localizedPeriod(from: manga.published) ?? "-"
+        AnimeDetailDateFormatting.slashSeparatedPeriod(from: manga.published) ?? "-"
     }
 
     // MARK: - Lists & Numbers

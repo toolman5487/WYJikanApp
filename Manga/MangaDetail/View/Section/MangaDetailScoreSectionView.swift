@@ -14,6 +14,7 @@ struct MangaDetailScoreSectionView: View {
     var body: some View {
         AnimeDetailSectionCard("評分與人氣") {
             VStack(spacing: 10) {
+                AnimeDetailInfoRow(title: "連載期間", value: viewModel.publishedPeriodDisplayText(for: manga))
                 AnimeDetailInfoRow(
                     title: "分數",
                     value: viewModel.scoreDisplayText(for: manga)
