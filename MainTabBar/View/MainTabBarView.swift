@@ -19,14 +19,14 @@ struct MainTabBarView: View {
                 
                 Tab(value: AppTab.category) {
                     NavigationStack {
-                        PlaceholderView()
+                        PlaceholderView(placeholderName: "category")
                     }
                 } label: {
                     Image(systemName: viewModel.selectedTab == .category ? "rectangle.stack.fill" : "rectangle.stack")
                 }
                 
                 Tab(value: AppTab.myList) {
-                    PlaceholderView()
+                    PlaceholderView(placeholderName: "myList")
                 } label: {
                     Image(systemName: viewModel.selectedTab == .myList ? "heart.fill" : "heart")
                 }
@@ -35,7 +35,7 @@ struct MainTabBarView: View {
             TabSection("搜尋") {
                 Tab(value: AppTab.searchLiquidGlass, role: .search) {
                     NavigationStack {
-                        PlaceholderView()
+                      MainSearchView()
                             .searchable(text: $viewModel.searchQuery, prompt: "搜尋動畫")
                     }
                 } label: {

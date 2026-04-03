@@ -8,11 +8,14 @@
 import SwiftUI
 
 struct PlaceholderView: View {
+    
+    let placeholderName:String
+    
     var body: some View {
-        Text("Placeholder")
+        Text(placeholderName)
     }
 }
 
 #Preview {
-    PlaceholderView()
+    PlaceholderView(placeholderName: "Placeholder")
 }
