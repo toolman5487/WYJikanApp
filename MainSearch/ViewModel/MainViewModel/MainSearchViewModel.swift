@@ -11,6 +11,11 @@ import Foundation
 @Observable
 final class MainSearchViewModel {
 
+    // MARK: - Properties
+
+    private static let debounceNanoseconds: UInt64 = 350_000_000
+    private static let searchResultLimit = 25
+
     var query: String = ""
     var kind: MainSearchKind = .anime
 
@@ -18,20 +23,29 @@ final class MainSearchViewModel {
     private(set) var isLoading: Bool = false
     private(set) var errorMessage: String?
 
-    private let service: MainSearchServicing
-    private var searchTask: Task<Void, Never>?
+    let service: MainSearchServicing
+    var searchTask: Task<Void, Never>?
 
-    private static let debounceNanoseconds: UInt64 = 350_000_000
-    private static let resultLimit = 25
+    var bodyState: MainSearchBodyState {
+        MainSearchBodyState.resolve(
+            trimmedQuery: Self.trim(query),
+            query: query,
+            isLoading: isLoading,
+            errorMessage: errorMessage,
+            rows: rows
+        )
+    }
 
     init(service: MainSearchServicing = MainSearchService()) {
         self.service = service
     }
 
+    // MARK: - Search
+
     func scheduleSearch() {
         searchTask?.cancel()
 
-        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmed = Self.trim(query)
         if trimmed.isEmpty {
             rows = []
             errorMessage = nil
@@ -50,11 +64,15 @@ final class MainSearchViewModel {
         }
     }
 
-    private func runSearch(query: String, kind: MainSearchKind) async {
+    func runSearch(query: String, kind: MainSearchKind) async {
         do {
-            let results = try await service.search(kind: kind, query: query, limit: Self.resultLimit)
+            let results = try await service.search(
+                kind: kind,
+                query: query,
+                limit: Self.searchResultLimit
+            )
             guard !Task.isCancelled else { return }
-            guard self.query.trimmingCharacters(in: .whitespacesAndNewlines) == query, self.kind == kind else {
+            guard Self.trim(self.query) == query, self.kind == kind else {
                 self.isLoading = false
                 return
             }
@@ -63,7 +81,7 @@ final class MainSearchViewModel {
             self.isLoading = false
         } catch {
             guard !Task.isCancelled else { return }
-            guard self.query.trimmingCharacters(in: .whitespacesAndNewlines) == query, self.kind == kind else {
+            guard Self.trim(self.query) == query, self.kind == kind else {
                 self.isLoading = false
                 return
             }
@@ -71,5 +89,11 @@ final class MainSearchViewModel {
             self.errorMessage = error.localizedDescription
             self.isLoading = false
         }
+    }
+
+    // MARK: - Private
+
+    private static func trim(_ string: String) -> String {
+        string.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }

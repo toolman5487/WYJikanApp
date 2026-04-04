@@ -61,6 +61,7 @@ struct MainSearchAnimeListDTO: Codable, Identifiable, Hashable, Sendable {
     let images: AnimeImagesDTO?
     let title: String?
     let titleEnglish: String?
+    let titleJapanese: String?
     let type: String?
     let year: Int?
 
@@ -73,6 +74,7 @@ struct MainSearchMangaListDTO: Codable, Identifiable, Hashable, Sendable {
     let images: AnimeImagesDTO?
     let title: String?
     let titleEnglish: String?
+    let titleJapanese: String?
     let type: String?
     let year: Int?
 
@@ -152,7 +154,11 @@ struct MainSearchResultRow: Identifiable, Hashable, Sendable {
     // MARK: Factory Methods
 
     static func from(anime dto: MainSearchAnimeListDTO) -> MainSearchResultRow {
-        let title = Self.displayTitle(primary: dto.title, alternate: dto.titleEnglish)
+        let title = Self.displayWorkTitle(
+            japanese: dto.titleJapanese,
+            english: dto.titleEnglish,
+            fallback: dto.title
+        )
         var parts: [String] = []
         if let type = dto.type, !type.isEmpty { parts.append(type) }
         if let year = dto.year { parts.append(String(year)) }
@@ -169,7 +175,11 @@ struct MainSearchResultRow: Identifiable, Hashable, Sendable {
     }
 
     static func from(manga dto: MainSearchMangaListDTO) -> MainSearchResultRow {
-        let title = Self.displayTitle(primary: dto.title, alternate: dto.titleEnglish)
+        let title = Self.displayWorkTitle(
+            japanese: dto.titleJapanese,
+            english: dto.titleEnglish,
+            fallback: dto.title
+        )
         var parts: [String] = []
         if let type = dto.type, !type.isEmpty { parts.append(type) }
         if let year = dto.year { parts.append(String(year)) }
@@ -213,6 +223,13 @@ struct MainSearchResultRow: Identifiable, Hashable, Sendable {
     }
 
     // MARK: Private
+
+    private static func displayWorkTitle(japanese: String?, english: String?, fallback: String?) -> String {
+        if let t = japanese?.trimmingCharacters(in: .whitespacesAndNewlines), !t.isEmpty { return t }
+        if let t = english?.trimmingCharacters(in: .whitespacesAndNewlines), !t.isEmpty { return t }
+        if let t = fallback?.trimmingCharacters(in: .whitespacesAndNewlines), !t.isEmpty { return t }
+        return "—"
+    }
 
     private static func displayTitle(primary: String?, alternate: String?) -> String {
         if let t = primary?.trimmingCharacters(in: .whitespacesAndNewlines), !t.isEmpty { return t }

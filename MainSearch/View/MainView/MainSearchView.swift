@@ -11,20 +11,6 @@ struct MainSearchView: View {
 
     @Bindable var viewModel: MainSearchViewModel
 
-    private var trimmedQuery: String {
-        viewModel.query.trimmingCharacters(in: .whitespacesAndNewlines)
-    }
-
-    private var bodyState: MainSearchBodyState {
-        MainSearchBodyState.resolve(
-            trimmedQuery: trimmedQuery,
-            query: viewModel.query,
-            isLoading: viewModel.isLoading,
-            errorMessage: viewModel.errorMessage,
-            rows: viewModel.rows
-        )
-    }
-
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
@@ -37,10 +23,10 @@ struct MainSearchView: View {
                 .padding(.horizontal, 16)
                 .padding(.vertical, 12)
 
-                MainSearchResultsContentView(bodyState: bodyState)
+                MainSearchResultsContentView(bodyState: viewModel.bodyState)
             }
             .navigationDestination(for: MainSearchResultRow.self) { row in
-                destinationView(for: row)
+                MainSearchRouter.destination(for: row)
             }
         }
         .searchable(text: $viewModel.query, prompt: viewModel.kind.searchPrompt)
@@ -52,20 +38,6 @@ struct MainSearchView: View {
         }
         .onAppear {
             viewModel.scheduleSearch()
-        }
-    }
-
-    // MARK: - Destinations
-
-    @ViewBuilder
-    private func destinationView(for row: MainSearchResultRow) -> some View {
-        switch row.kind {
-        case .anime:
-            AnimeDetailView(malId: row.malId)
-        case .manga:
-            MangaDetailView(malId: row.malId)
-        case .character, .people:
-            MainSearchMALStubView(title: row.title, malPageURL: row.malPageURL)
         }
     }
 }
