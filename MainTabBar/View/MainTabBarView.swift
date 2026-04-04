@@ -7,6 +7,7 @@ import SwiftUI
 
 struct MainTabBarView: View {
     @State private var viewModel = MainTabBarViewModel()
+    @State private var mainSearchViewModel = MainSearchViewModel()
     
     var body: some View {
         TabView(selection: $viewModel.selectedTab) {
@@ -34,10 +35,7 @@ struct MainTabBarView: View {
             
             TabSection("搜尋") {
                 Tab(value: AppTab.searchLiquidGlass, role: .search) {
-                    NavigationStack {
-                      MainSearchView(selectedKind: $viewModel.searchKind)
-                            .searchable(text: $viewModel.searchQuery, prompt: viewModel.searchKind.searchPrompt)
-                    }
+                    MainSearchView(viewModel: mainSearchViewModel)
                 } label: {
                     Image(systemName: viewModel.selectedTab == .searchLiquidGlass ? "magnifyingglass" : "magnifyingglass")
                 }

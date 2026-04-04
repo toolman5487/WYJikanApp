@@ -4,7 +4,6 @@
 //
 
 import SwiftUI
-import Combine
 
 enum AppTab: Hashable {
     case home
@@ -17,6 +16,4 @@ enum AppTab: Hashable {
 @Observable
 final class MainTabBarViewModel {
     var selectedTab: AppTab = .home
-    var searchQuery = ""
-    var searchKind: MainSearchKind = .anime
 }
