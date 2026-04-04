@@ -18,4 +18,5 @@ enum AppTab: Hashable {
 final class MainTabBarViewModel {
     var selectedTab: AppTab = .home
     var searchQuery = ""
+    var searchKind: MainSearchKind = .anime
 }

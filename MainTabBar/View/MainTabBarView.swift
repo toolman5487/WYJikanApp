@@ -35,8 +35,8 @@ struct MainTabBarView: View {
             TabSection("搜尋") {
                 Tab(value: AppTab.searchLiquidGlass, role: .search) {
                     NavigationStack {
-                      MainSearchView()
-                            .searchable(text: $viewModel.searchQuery, prompt: "搜尋動畫")
+                      MainSearchView(selectedKind: $viewModel.searchKind)
+                            .searchable(text: $viewModel.searchQuery, prompt: viewModel.searchKind.searchPrompt)
                     }
                 } label: {
                     Image(systemName: viewModel.selectedTab == .searchLiquidGlass ? "magnifyingglass" : "magnifyingglass")

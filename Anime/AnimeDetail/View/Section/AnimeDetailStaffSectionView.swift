@@ -27,21 +27,10 @@ struct AnimeDetailStaffSectionView: View {
             }
             if viewModel.hasThemes(for: anime) {
                 VStack(alignment: .leading, spacing: 16) {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 10) {
-                            ForEach(viewModel.themeDisplayItems(for: anime)) { theme in
-                                Text(theme.name ?? "—")
-                                    .font(.subheadline.weight(.medium))
-                                    .foregroundStyle(ThemeColor.textPrimary)
-                                    .lineLimit(1)
-                                    .padding(.vertical, 8)
-                                    .padding(.horizontal, 16)
-                                    .frame(minHeight: 44)
-                                    .background(ThemeColor.sakura)
-                                    .clipShape(Capsule())
-                            }
-                        }
-                    }
+                    CapsuleTagScrollView(
+                        tags: viewModel.themeDisplayItems(for: anime),
+                        title: { $0.name ?? "—" }
+                    )
                     if !viewModel.hasSynopsis(for: anime), let url = viewModel.malWorkPageURL(for: anime) {
                         MALWorkPageOpenButton(url: url)
                     }
