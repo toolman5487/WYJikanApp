@@ -9,7 +9,7 @@ import SwiftUI
 
 struct MainSearchView: View {
 
-    @Bindable var viewModel: MainSearchViewModel
+    @ObservedObject var viewModel: MainSearchViewModel
 
     var body: some View {
         NavigationStack {
@@ -30,18 +30,15 @@ struct MainSearchView: View {
             }
         }
         .searchable(text: $viewModel.query, prompt: viewModel.kind.searchPrompt)
-        .onChange(of: viewModel.query) { _, _ in
-            viewModel.scheduleSearch()
-        }
-        .onChange(of: viewModel.kind) { _, _ in
-            viewModel.scheduleSearch()
-        }
-        .onAppear {
-            viewModel.scheduleSearch()
-        }
     }
 }
 
 #Preview {
-    MainSearchView(viewModel: MainSearchViewModel())
+    struct MainSearchPreview: View {
+        @StateObject private var viewModel = MainSearchViewModel()
+        var body: some View {
+            MainSearchView(viewModel: viewModel)
+        }
+    }
+    return MainSearchPreview()
 }

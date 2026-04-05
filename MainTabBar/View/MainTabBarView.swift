@@ -7,7 +7,7 @@ import SwiftUI
 
 struct MainTabBarView: View {
     @State private var viewModel = MainTabBarViewModel()
-    @State private var mainSearchViewModel = MainSearchViewModel()
+    @StateObject private var mainSearchViewModel = MainSearchViewModel()
     
     var body: some View {
         TabView(selection: $viewModel.selectedTab) {
