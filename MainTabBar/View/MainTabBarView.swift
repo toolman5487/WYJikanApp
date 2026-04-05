@@ -20,7 +20,7 @@ struct MainTabBarView: View {
                 
                 Tab(value: AppTab.category) {
                     NavigationStack {
-                        PlaceholderView(placeholderName: "category")
+                      MainListView()
                     }
                 } label: {
                     Image(systemName: viewModel.selectedTab == .category ? "rectangle.stack.fill" : "rectangle.stack")

@@ -50,6 +50,7 @@ final class HeroBannerViewModel: ObservableObject {
             guard let self else { return }
             do {
                 let response = try await self.service.fetchHeroBanner()
+                var seenMalIds = Set<Int>()
                 let mapped: [BannerItem] = response.data.compactMap { dto in
                     guard let urlString =
                         dto.images?.webp?.largeImageUrl ??
@@ -59,6 +60,7 @@ final class HeroBannerViewModel: ObservableObject {
                         let url = URL(string: urlString)
                     else { return nil }
 
+                    guard seenMalIds.insert(dto.malId).inserted else { return nil }
                     return BannerItem(id: dto.malId, imageURL: url)
                 }
 
