@@ -18,12 +18,16 @@ struct MainTabBarView: View {
                     Image(systemName: viewModel.selectedTab == .home ? "square.grid.3x3.fill" : "square.grid.3x3")
                 }
                 
-                Tab(value: AppTab.category) {
-                    NavigationStack {
-                      MainListView()
-                    }
+                Tab(value: AppTab.animeList) {
+                    MainAnimeMangaListView()
                 } label: {
-                    Image(systemName: viewModel.selectedTab == .category ? "rectangle.stack.fill" : "rectangle.stack")
+                    Image(systemName: viewModel.selectedTab == .animeList ? "film.stack.fill" : "film.stack")
+                }
+                
+                Tab(value: AppTab.characterList){
+                    MainCharactersPeopleView()
+                } label: {
+                    Image(systemName: viewModel.selectedTab == .characterList ? "microphone.fill" : "microphone")
                 }
                 
                 Tab(value: AppTab.myList) {
