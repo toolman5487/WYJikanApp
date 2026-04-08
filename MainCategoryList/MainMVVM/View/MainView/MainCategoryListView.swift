@@ -8,9 +8,9 @@
 import SwiftUI
 
 struct MainCategoryListView: View {
-
+    
     @StateObject private var viewModel = MainCategoryListViewModel()
-
+    
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -36,9 +36,9 @@ struct MainCategoryListView: View {
             .navigationTitle("分類")
         }
     }
-
+    
     // MARK: - Private Views
-
+    
     @ViewBuilder
     private var selectedContentView: some View {
         switch viewModel.selectedKind {

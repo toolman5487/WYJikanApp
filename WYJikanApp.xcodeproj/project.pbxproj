@@ -460,6 +460,16 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
+		159667D12F8645D90033410A /* MainMVVM */ = {
+			isa = PBXGroup;
+			children = (
+				15A2955E2F8631B50056071F /* Model */,
+				15A2955D2F8631AD0056071F /* ViewModel */,
+				15A295542F86301C0056071F /* View */,
+			);
+			path = MainMVVM;
+			sourceTree = "<group>";
+		};
 		15A295462F86297D0056071F /* Logging */ = {
 			isa = PBXGroup;
 			children = (
@@ -471,9 +481,11 @@
 		15A295532F86300F0056071F /* MainCategoryList */ = {
 			isa = PBXGroup;
 			children = (
-				15A2955E2F8631B50056071F /* Model */,
-				15A2955D2F8631AD0056071F /* ViewModel */,
-				15A295542F86301C0056071F /* View */,
+				159667D12F8645D90033410A /* MainMVVM */,
+				15A295592F8630860056071F /* AnimeListMVVM */,
+				15A2955A2F86313B0056071F /* MangaListMVVM */,
+				15A2955B2F8631470056071F /* CharacterListMVVM */,
+				15A2955C2F8631680056071F /* PeopleListView */,
 			);
 			path = MainCategoryList;
 			sourceTree = "<group>";
@@ -498,36 +510,32 @@
 		15A295582F8630810056071F /* SubView */ = {
 			isa = PBXGroup;
 			children = (
-				15A2955C2F8631680056071F /* PeopleListView */,
-				15A2955B2F8631470056071F /* CharacterListView */,
-				15A2955A2F86313B0056071F /* MangaListView */,
-				15A295592F8630860056071F /* AnimeListView */,
 			);
 			path = SubView;
 			sourceTree = "<group>";
 		};
-		15A295592F8630860056071F /* AnimeListView */ = {
+		15A295592F8630860056071F /* AnimeListMVVM */ = {
 			isa = PBXGroup;
 			children = (
 				159667BE2F8632AC0033410A /* AnimeListView.swift */,
 			);
-			path = AnimeListView;
+			path = AnimeListMVVM;
 			sourceTree = "<group>";
 		};
-		15A2955A2F86313B0056071F /* MangaListView */ = {
+		15A2955A2F86313B0056071F /* MangaListMVVM */ = {
 			isa = PBXGroup;
 			children = (
 				159667C02F8632B70033410A /* MangaListView.swift */,
 			);
-			path = MangaListView;
+			path = MangaListMVVM;
 			sourceTree = "<group>";
 		};
-		15A2955B2F8631470056071F /* CharacterListView */ = {
+		15A2955B2F8631470056071F /* CharacterListMVVM */ = {
 			isa = PBXGroup;
 			children = (
 				159667C42F8632DC0033410A /* CharacterListView.swift */,
 			);
-			path = CharacterListView;
+			path = CharacterListMVVM;
 			sourceTree = "<group>";
 		};
 		15A2955C2F8631680056071F /* PeopleListView */ = {
