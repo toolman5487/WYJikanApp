@@ -7,8 +7,7 @@ import SwiftUI
 
 enum AppTab: Hashable {
     case home
-    case animeList
-    case characterList
+    case categorylist
     case myList
     case searchLiquidGlass
 }

@@ -5,6 +5,7 @@
 //
 
 import Foundation
+import OSLog
 
 enum JikanAPIError: LocalizedError {
     case invalidURL
@@ -60,35 +61,47 @@ final class JikanAPIService {
         guard let url = urlComponents.url else {
             throw JikanAPIError.invalidURL
         }
-        
+
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("application/json", forHTTPHeaderField: "Accept")
-        
+
+        AppLogger.network.debug("GET \(url.absoluteString, privacy: .public)")
+
         do {
             let (data, response) = try await session.data(for: request)
-            
+
+            if let httpResponse = response as? HTTPURLResponse {
+                AppLogger.network.debug(
+                    "HTTP \(httpResponse.statusCode) bytes \(data.count) \(url.absoluteString, privacy: .public)"
+                )
+            }
+
             if let httpResponse = response as? HTTPURLResponse, !(200...299).contains(httpResponse.statusCode) {
+                AppLogger.network.error("server error HTTP \(httpResponse.statusCode) \(url.absoluteString, privacy: .public)")
                 throw JikanAPIError.serverError(statusCode: httpResponse.statusCode)
             }
-            
+
             guard !data.isEmpty else {
+                AppLogger.network.error("empty body \(url.absoluteString, privacy: .public)")
                 throw JikanAPIError.noData
             }
-            
+
             do {
                 let decoded = try decoder.decode(T.self, from: data)
                 return decoded
             } catch {
+                AppLogger.decoding.error("decode failed \(url.absoluteString, privacy: .public) \(error.localizedDescription, privacy: .public)")
                 throw JikanAPIError.decodingError(error)
             }
         } catch let apiError as JikanAPIError {
             throw apiError
         } catch {
+            AppLogger.network.error("request failed \(url.absoluteString, privacy: .public) \(error.localizedDescription, privacy: .public)")
             throw JikanAPIError.networkError(error)
         }
     }
-    
+
     func fetchFromURL<T: Decodable>(_ urlString: String) async throws -> T {
         guard let url = URL(string: urlString) else {
             throw JikanAPIError.invalidURL
@@ -97,27 +110,39 @@ final class JikanAPIService {
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("application/json", forHTTPHeaderField: "Accept")
-        
+
+        AppLogger.network.debug("GET \(url.absoluteString, privacy: .public)")
+
         do {
             let (data, response) = try await session.data(for: request)
-            
+
+            if let httpResponse = response as? HTTPURLResponse {
+                AppLogger.network.debug(
+                    "HTTP \(httpResponse.statusCode) bytes \(data.count) \(url.absoluteString, privacy: .public)"
+                )
+            }
+
             if let httpResponse = response as? HTTPURLResponse, !(200...299).contains(httpResponse.statusCode) {
+                AppLogger.network.error("server error HTTP \(httpResponse.statusCode) \(url.absoluteString, privacy: .public)")
                 throw JikanAPIError.serverError(statusCode: httpResponse.statusCode)
             }
-            
+
             guard !data.isEmpty else {
+                AppLogger.network.error("empty body \(url.absoluteString, privacy: .public)")
                 throw JikanAPIError.noData
             }
-            
+
             do {
                 let decoded = try decoder.decode(T.self, from: data)
                 return decoded
             } catch {
+                AppLogger.decoding.error("decode failed \(url.absoluteString, privacy: .public) \(error.localizedDescription, privacy: .public)")
                 throw JikanAPIError.decodingError(error)
             }
         } catch let apiError as JikanAPIError {
             throw apiError
         } catch {
+            AppLogger.network.error("request failed \(url.absoluteString, privacy: .public) \(error.localizedDescription, privacy: .public)")
             throw JikanAPIError.networkError(error)
         }
     }
