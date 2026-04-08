@@ -32,6 +32,8 @@ struct AnimeListView: View {
                 randomPick: viewModel.randomPick,
                 isDrawing: viewModel.isDrawing,
                 drawError: viewModel.drawError,
+                cooldownRemainingSeconds: viewModel.cooldownRemainingSeconds,
+                cooldownDisplayText: viewModel.cooldownDisplayText,
                 onDrawTap: viewModel.drawRandomAnime
             )
         }
@@ -44,9 +46,6 @@ struct AnimeListView: View {
             }
         }
         .padding(.top, 8)
-        .onAppear {
-            viewModel.loadRandomIfNeeded()
-        }
         .onDisappear {
             viewModel.stop()
         }

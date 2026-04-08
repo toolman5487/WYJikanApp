@@ -11,6 +11,8 @@ struct RandomHeroSectionView: View {
     let randomPick: AnimeListRandomDTO?
     let isDrawing: Bool
     let drawError: String?
+    let cooldownRemainingSeconds: Int
+    let cooldownDisplayText: String
     let onDrawTap: () -> Void
 
     var body: some View {
@@ -31,9 +33,10 @@ struct RandomHeroSectionView: View {
                     )
                 }
             }
-
+            
             RandomHeroActionButtonsView(
                 isDrawing: isDrawing,
+                cooldownRemainingSeconds: cooldownRemainingSeconds,
                 detailMalId: randomPick?.malId,
                 onDrawTap: onDrawTap
             )
@@ -46,6 +49,8 @@ struct RandomHeroSectionView: View {
         randomPick: nil,
         isDrawing: true,
         drawError: nil,
+        cooldownRemainingSeconds: 0,
+        cooldownDisplayText: "00:00",
         onDrawTap: {}
     )
 }
