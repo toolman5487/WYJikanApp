@@ -45,6 +45,16 @@
 		159667C52F8632DC0033410A /* CharacterListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 159667C42F8632DC0033410A /* CharacterListView.swift */; };
 		159667CA2F8634440033410A /* MainListKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 159667C92F8634440033410A /* MainListKind.swift */; };
 		159667E02F864A6F0033410A /* PeopleListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 159667DE2F864A6F0033410A /* PeopleListView.swift */; };
+		159667EC2F8651EA0033410A /* AnimeListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 159667EB2F8651EA0033410A /* AnimeListViewModel.swift */; };
+		159667EE2F8651FC0033410A /* MainCategoryListService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 159667ED2F8651FC0033410A /* MainCategoryListService.swift */; };
+		159667F02F8652B90033410A /* AnimeListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 159667EF2F8652B90033410A /* AnimeListModel.swift */; };
+		159667F42F8659AD0033410A /* PosterTextGradientOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 159667F12F8659AD0033410A /* PosterTextGradientOverlayView.swift */; };
+		159667F52F8659AD0033410A /* RemotePosterImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 159667F22F8659AD0033410A /* RemotePosterImageView.swift */; };
+		159667FE2F865AC60033410A /* RandomHeroActionButtonsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 159667FB2F865AC60033410A /* RandomHeroActionButtonsView.swift */; };
+		159667FF2F865AC60033410A /* RandomHeroSkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 159667FD2F865AC60033410A /* RandomHeroSkeletonView.swift */; };
+		159668002F865AC60033410A /* RandomHeroCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 159667FC2F865AC60033410A /* RandomHeroCardView.swift */; };
+		1596680B2F865F720033410A /* RandomHeroSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1596680A2F865F720033410A /* RandomHeroSectionView.swift */; };
+		1596680C2F865F720033410A /* RandomHeroErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 159668092F865F720033410A /* RandomHeroErrorView.swift */; };
 		15A295482F86297D0056071F /* AppLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15A295442F86297D0056071F /* AppLogger.swift */; };
 		15A295562F86302A0056071F /* MainCategoryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15A295552F86302A0056071F /* MainCategoryListView.swift */; };
 		15A295602F8631D60056071F /* MainCategoryListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15A2955F2F8631D60056071F /* MainCategoryListViewModel.swift */; };
@@ -99,7 +109,6 @@
 		15FC4F742F752CB60054153E /* HomeTrendingMangaViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F732F752CB60054153E /* HomeTrendingMangaViewModel.swift */; };
 		15FCF8882F73C28B0054153E /* MainHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FCF8872F73C28B0054153E /* MainHomeView.swift */; };
 		15FF295D2F76332700D3241C /* AnimeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FF295C2F76332700D3241C /* AnimeDetailView.swift */; };
-		15FF29602F76341D00D3241C /* RemotePosterImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FF295E2F76341D00D3241C /* RemotePosterImageView.swift */; };
 		15FF29642F76351700D3241C /* PosterCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FF29622F76351700D3241C /* PosterCardView.swift */; };
 		15FF29682F763B3100D3241C /* AnimeDetailModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FF29672F763B3100D3241C /* AnimeDetailModel.swift */; };
 		15FF296B2F763B4300D3241C /* AnimeDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FF296A2F763B4300D3241C /* AnimeDetailViewModel.swift */; };
@@ -155,6 +164,16 @@
 		159667C42F8632DC0033410A /* CharacterListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterListView.swift; sourceTree = "<group>"; };
 		159667C92F8634440033410A /* MainListKind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainListKind.swift; sourceTree = "<group>"; };
 		159667DE2F864A6F0033410A /* PeopleListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleListView.swift; sourceTree = "<group>"; };
+		159667EB2F8651EA0033410A /* AnimeListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeListViewModel.swift; sourceTree = "<group>"; };
+		159667ED2F8651FC0033410A /* MainCategoryListService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainCategoryListService.swift; sourceTree = "<group>"; };
+		159667EF2F8652B90033410A /* AnimeListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeListModel.swift; sourceTree = "<group>"; };
+		159667F12F8659AD0033410A /* PosterTextGradientOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PosterTextGradientOverlayView.swift; sourceTree = "<group>"; };
+		159667F22F8659AD0033410A /* RemotePosterImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemotePosterImageView.swift; sourceTree = "<group>"; };
+		159667FB2F865AC60033410A /* RandomHeroActionButtonsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomHeroActionButtonsView.swift; sourceTree = "<group>"; };
+		159667FC2F865AC60033410A /* RandomHeroCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomHeroCardView.swift; sourceTree = "<group>"; };
+		159667FD2F865AC60033410A /* RandomHeroSkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomHeroSkeletonView.swift; sourceTree = "<group>"; };
+		159668092F865F720033410A /* RandomHeroErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomHeroErrorView.swift; sourceTree = "<group>"; };
+		1596680A2F865F720033410A /* RandomHeroSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomHeroSectionView.swift; sourceTree = "<group>"; };
 		15A295442F86297D0056071F /* AppLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLogger.swift; sourceTree = "<group>"; };
 		15A295552F86302A0056071F /* MainCategoryListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainCategoryListView.swift; sourceTree = "<group>"; };
 		15A2955F2F8631D60056071F /* MainCategoryListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainCategoryListViewModel.swift; sourceTree = "<group>"; };
@@ -209,7 +228,6 @@
 		15FC4F732F752CB60054153E /* HomeTrendingMangaViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTrendingMangaViewModel.swift; sourceTree = "<group>"; };
 		15FCF8872F73C28B0054153E /* MainHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainHomeView.swift; sourceTree = "<group>"; };
 		15FF295C2F76332700D3241C /* AnimeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeDetailView.swift; sourceTree = "<group>"; };
-		15FF295E2F76341D00D3241C /* RemotePosterImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemotePosterImageView.swift; sourceTree = "<group>"; };
 		15FF29622F76351700D3241C /* PosterCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PosterCardView.swift; sourceTree = "<group>"; };
 		15FF29672F763B3100D3241C /* AnimeDetailModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeDetailModel.swift; sourceTree = "<group>"; };
 		15FF296A2F763B4300D3241C /* AnimeDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeDetailViewModel.swift; sourceTree = "<group>"; };
@@ -481,9 +499,81 @@
 		159667E22F864AE40033410A /* AnimeList */ = {
 			isa = PBXGroup;
 			children = (
-				159667BE2F8632AC0033410A /* AnimeListView.swift */,
+				159667F82F865A240033410A /* ViewModel */,
+				159667F72F865A1F0033410A /* Model */,
+				159667F62F865A190033410A /* View */,
 			);
 			path = AnimeList;
+			sourceTree = "<group>";
+		};
+		159667EA2F86516D0033410A /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				159667ED2F8651FC0033410A /* MainCategoryListService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		159667F32F8659AD0033410A /* PosterImage */ = {
+			isa = PBXGroup;
+			children = (
+				159667F12F8659AD0033410A /* PosterTextGradientOverlayView.swift */,
+				159667F22F8659AD0033410A /* RemotePosterImageView.swift */,
+			);
+			path = PosterImage;
+			sourceTree = "<group>";
+		};
+		159667F62F865A190033410A /* View */ = {
+			isa = PBXGroup;
+			children = (
+				159667FA2F865A3C0033410A /* SubView */,
+				159667F92F865A340033410A /* MainView */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		159667F72F865A1F0033410A /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				159667EF2F8652B90033410A /* AnimeListModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		159667F82F865A240033410A /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				159667EB2F8651EA0033410A /* AnimeListViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		159667F92F865A340033410A /* MainView */ = {
+			isa = PBXGroup;
+			children = (
+				159667BE2F8632AC0033410A /* AnimeListView.swift */,
+			);
+			path = MainView;
+			sourceTree = "<group>";
+		};
+		159667FA2F865A3C0033410A /* SubView */ = {
+			isa = PBXGroup;
+			children = (
+				159668082F865C960033410A /* RandomHero */,
+			);
+			path = SubView;
+			sourceTree = "<group>";
+		};
+		159668082F865C960033410A /* RandomHero */ = {
+			isa = PBXGroup;
+			children = (
+				159668092F865F720033410A /* RandomHeroErrorView.swift */,
+				1596680A2F865F720033410A /* RandomHeroSectionView.swift */,
+				159667FB2F865AC60033410A /* RandomHeroActionButtonsView.swift */,
+				159667FC2F865AC60033410A /* RandomHeroCardView.swift */,
+				159667FD2F865AC60033410A /* RandomHeroSkeletonView.swift */,
+			);
+			path = RandomHero;
 			sourceTree = "<group>";
 		};
 		15A295462F86297D0056071F /* Logging */ = {
@@ -497,6 +587,7 @@
 		15A295532F86300F0056071F /* MainCategoryList */ = {
 			isa = PBXGroup;
 			children = (
+				159667EA2F86516D0033410A /* Services */,
 				159667E22F864AE40033410A /* AnimeList */,
 				15A2955B2F8631470056071F /* CharacterList */,
 				159667D12F8645D90033410A /* MainMVVM */,
@@ -1039,14 +1130,6 @@
 			path = ViewModel;
 			sourceTree = "<group>";
 		};
-		15FF29612F76343F00D3241C /* PosterImage */ = {
-			isa = PBXGroup;
-			children = (
-				15FF295E2F76341D00D3241C /* RemotePosterImageView.swift */,
-			);
-			path = PosterImage;
-			sourceTree = "<group>";
-		};
 		15FF29632F76351700D3241C /* PosterCard */ = {
 			isa = PBXGroup;
 			children = (
@@ -1058,8 +1141,8 @@
 		15FF29652F76352D00D3241C /* MainHome */ = {
 			isa = PBXGroup;
 			children = (
+				159667F32F8659AD0033410A /* PosterImage */,
 				15FF29632F76351700D3241C /* PosterCard */,
-				15FF29612F76343F00D3241C /* PosterImage */,
 			);
 			path = MainHome;
 			sourceTree = "<group>";
@@ -1192,6 +1275,7 @@
 			files = (
 				15750AF32F7282C70037E8A5 /* MainTabBarView.swift in Sources */,
 				1574ECA72F7CB2F100E37AE8 /* MangaDetailModel.swift in Sources */,
+				159667EC2F8651EA0033410A /* AnimeListViewModel.swift in Sources */,
 				1585971F2F7B614A00B0BDA1 /* AnimeDetailSeasonFormatting.swift in Sources */,
 				1576E4252F7B82680082CD46 /* YouTubeEmbedWebView.swift in Sources */,
 				15C80E702F8E200100DDB201 /* PageWebView.swift in Sources */,
@@ -1213,6 +1297,8 @@
 				15A80E402F7E560600DDB201 /* MainSearchView.swift in Sources */,
 				15B80E602F8E100100DDB201 /* MainSearchResultsContentView.swift in Sources */,
 				15B80E612F8E100200DDB201 /* MainSearchListSkeletonView.swift in Sources */,
+				1596680B2F865F720033410A /* RandomHeroSectionView.swift in Sources */,
+				1596680C2F865F720033410A /* RandomHeroErrorView.swift in Sources */,
 				15B80E622F8E100300DDB201 /* MainSearchResultRowView.swift in Sources */,
 				15FC4F522F7507300054153E /* HomeTrendingAnimeView.swift in Sources */,
 				15A295482F86297D0056071F /* AppLogger.swift in Sources */,
@@ -1237,6 +1323,8 @@
 				1572FE0A2F762DE300756CBA /* HomeTodayAnimeView.swift in Sources */,
 				15FC4F412F73EB7B0054153E /* MainHomeService.swift in Sources */,
 				15FC4F452F74C7CF0054153E /* ErrorMessageView.swift in Sources */,
+				159667F42F8659AD0033410A /* PosterTextGradientOverlayView.swift in Sources */,
+				159667F52F8659AD0033410A /* RemotePosterImageView.swift in Sources */,
 				15FF295D2F76332700D3241C /* AnimeDetailView.swift in Sources */,
 				15FF80152F7653E200D3241C /* MainHomeRouter.swift in Sources */,
 				15DE55B72F723F2800B292AD /* APIConfig.swift in Sources */,
@@ -1249,6 +1337,7 @@
 				15FF296D2F763B4C00D3241C /* AnimeDetailService.swift in Sources */,
 				159667C52F8632DC0033410A /* CharacterListView.swift in Sources */,
 				15FC4F562F7507910054153E /* HomeTrendingAnimeViewModel.swift in Sources */,
+				159667F02F8652B90033410A /* AnimeListModel.swift in Sources */,
 				1555A2382F7B94F300501496 /* AnimeDetailMediaKind.swift in Sources */,
 				1574EC3D2F7BCB5300E37AE8 /* AnimeReviewView.swift in Sources */,
 				1574EC4C2F7BCC0000E37AE8 /* AnimeReviewListView.swift in Sources */,
@@ -1260,9 +1349,9 @@
 				1574EC792F7BCE1000E37AE8 /* AnimeReviewRowTagsView.swift in Sources */,
 				15MAL022F7F2000100MAL02 /* MALWorkPageOpenButton.swift in Sources */,
 				1572FE072F762D7700756CBA /* HomeTodayAnimeModel.swift in Sources */,
-				15FF29602F76341D00D3241C /* RemotePosterImageView.swift in Sources */,
 				15FF80202F765C9500D3241C /* AnimeDetailSynopsisSectionView.swift in Sources */,
 				15FF80212F765C9500D3241C /* AnimeDetailBasicInfoSectionView.swift in Sources */,
+				159667EE2F8651FC0033410A /* MainCategoryListService.swift in Sources */,
 				1574EC412F7BCB7800E37AE8 /* AnimeReviewModel.swift in Sources */,
 				15A295562F86302A0056071F /* MainCategoryListView.swift in Sources */,
 				15FF80232F765C9500D3241C /* AnimeDetailStaffSectionView.swift in Sources */,
@@ -1285,6 +1374,9 @@
 				1574ECAB2F7CB30F00E37AE8 /* MangaDetailService.swift in Sources */,
 				15CF35722F8100D900384C5C /* CapsuleTagScrollView.swift in Sources */,
 				1574EC3F2F7BCB6900E37AE8 /* AnimeReviewViewModel.swift in Sources */,
+				159667FE2F865AC60033410A /* RandomHeroActionButtonsView.swift in Sources */,
+				159667FF2F865AC60033410A /* RandomHeroSkeletonView.swift in Sources */,
+				159668002F865AC60033410A /* RandomHeroCardView.swift in Sources */,
 				1574EC562F7BCCA000E37AE8 /* AnimeReviewViewModel+Presentation.swift in Sources */,
 				15A8C0112F7E0E0100E20002 /* MangaReviewView.swift in Sources */,
 				15A8C0132F7E0E0100E20004 /* MangaReviewModel.swift in Sources */,
