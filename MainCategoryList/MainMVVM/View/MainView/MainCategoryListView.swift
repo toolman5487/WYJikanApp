@@ -29,7 +29,6 @@ struct MainCategoryListView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal)
                         .padding(.vertical, 12)
-                        .background(.background)
                     }
                 }
             }
