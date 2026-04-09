@@ -1,59 +1,11 @@
 //
-//  AnimeListModel.swift
+//  AnimeListRandomDisplayModel.swift
 //  WYJikanApp
 //
-//  Created by Willy Hsu on 2026/4/8.
+//  Created by Willy Hsu on 2026/4/9.
 //
 
 import Foundation
-
-// MARK: - Random Anime Response
-
-struct AnimeListRandomResponse: Codable {
-    let data: AnimeListRandomDTO
-}
-
-// MARK: - Random Anime Item
-
-struct AnimeListRandomDTO: Codable, Identifiable, Hashable {
-    let malId: Int
-    let title: String?
-    let titleEnglish: String?
-    let titleJapanese: String?
-    let synopsis: String?
-    let type: String?
-    let score: Double?
-    let rank: Int?
-    let popularity: Int?
-    let members: Int?
-    let episodes: Int?
-    let images: AnimeListImagesDTO?
-    let genres: [AnimeListGenreDTO]?
-
-    var id: Int { malId }
-}
-
-// MARK: - Images
-
-struct AnimeListImagesDTO: Codable, Hashable {
-    let jpg: AnimeListImageURLDTO?
-    let webp: AnimeListImageURLDTO?
-}
-
-struct AnimeListImageURLDTO: Codable, Hashable {
-    let imageUrl: String?
-    let smallImageUrl: String?
-    let largeImageUrl: String?
-}
-
-// MARK: - Genre
-
-struct AnimeListGenreDTO: Codable, Identifiable, Hashable {
-    let malId: Int
-    let name: String?
-
-    var id: Int { malId }
-}
 
 // MARK: - Display
 

@@ -10,22 +10,25 @@ import Combine
 
 @MainActor
 final class AnimeListViewModel: ObservableObject {
-    
-    // MARK: - Published State
+    // MARK: - Properties
 
-    @Published private(set) var randomHeroViewModel: RandomHeroViewModel
+    let randomHeroViewModel: RandomHeroViewModel
+    let genreAnimeViewModel: GenreAnimeViewModel
 
     // MARK: - Lifecycle
 
     init(
-        randomHeroViewModel: RandomHeroViewModel = RandomHeroViewModel()
+        randomHeroViewModel: RandomHeroViewModel = RandomHeroViewModel(),
+        genreAnimeViewModel: GenreAnimeViewModel = GenreAnimeViewModel()
     ) {
         self.randomHeroViewModel = randomHeroViewModel
+        self.genreAnimeViewModel = genreAnimeViewModel
     }
 
     // MARK: - Public Methods
 
     func stop() {
         randomHeroViewModel.stop()
+        genreAnimeViewModel.stop()
     }
 }

@@ -1,0 +1,199 @@
+//
+//  GenreAnimeViewModel.swift
+//  WYJikanApp
+//
+//  Created by Willy Hsu on 2026/4/9.
+//
+
+import Foundation
+import Combine
+
+@MainActor
+final class GenreAnimeViewModel: ObservableObject {
+    // MARK: - Types
+
+    enum LoadState: Equatable {
+        case idle
+        case loadingInitial
+        case loadingMore
+        case loaded
+        case failed(message: String)
+    }
+
+    // MARK: - Constants
+    
+    private static let initialGenreSections = 12
+    private static let loadMoreGenreSections = 12
+    private static let genreAnimeLimit = 10
+    private static let maxRetryCount = 2
+    private static let requestIntervalNanoseconds: UInt64 = 400_000_000
+    private static let retryBackoffNanoseconds: UInt64 = 800_000_000
+    private static let genreErrorMessage = "目前無法載入分類資料，請稍後再試"
+    
+    // MARK: - Published State
+    
+    @Published private(set) var genreSections: [AnimeGenreSection] = []
+    @Published private(set) var loadState: LoadState = .idle
+    @Published private(set) var canLoadMore: Bool = false
+
+    var isLoading: Bool {
+        switch loadState {
+        case .loadingInitial:
+            return true
+        default:
+            return false
+        }
+    }
+
+    var isLoadingMore: Bool {
+        switch loadState {
+        case .loadingMore:
+            return true
+        default:
+            return false
+        }
+    }
+
+    var errorMessage: String? {
+        switch loadState {
+        case .failed(let message):
+            return message
+        default:
+            return nil
+        }
+    }
+    
+    // MARK: - Dependencies
+    
+    private let service: MainCategoryListServicing
+    
+    // MARK: - Private Properties
+    
+    private var loadTask: Task<Void, Never>?
+    private var allLocalizedGenres: [AnimeListGenreDTO] = []
+    private var loadedGenreCount: Int = 0
+    
+    // MARK: - Lifecycle
+    
+    init(service: MainCategoryListServicing = MainCategoryListService()) {
+        self.service = service
+        loadSections()
+    }
+    
+    // MARK: - Public Methods
+    
+    func loadSections() {
+        loadTask?.cancel()
+        loadTask = Task { [weak self] in
+            guard let self else { return }
+            await self.fetchSections()
+        }
+    }
+
+    func loadMoreSections() {
+        switch loadState {
+        case .loadingInitial, .loadingMore:
+            return
+        default:
+            break
+        }
+        guard canLoadMore else { return }
+        loadTask?.cancel()
+        loadTask = Task { [weak self] in
+            guard let self else { return }
+            await self.fetchNextGenreBatch(isInitialLoad: false)
+        }
+    }
+    
+    func stop() {
+        loadTask?.cancel()
+        loadTask = nil
+    }
+    
+    // MARK: - Private Methods
+    
+    private func fetchSections() async {
+        loadState = .loadingInitial
+        canLoadMore = false
+        genreSections = []
+        allLocalizedGenres = []
+        loadedGenreCount = 0
+        
+        do {
+            let genres = try await service.fetchAnimeGenres().data
+            let validGenres = genres.filter { genre in
+                guard let name = genre.name else { return false }
+                return !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            }
+            allLocalizedGenres = validGenres.map(localizedGenre)
+            await fetchNextGenreBatch(isInitialLoad: true)
+        } catch {
+            guard !Task.isCancelled else { return }
+            loadState = .failed(message: Self.genreErrorMessage)
+            canLoadMore = false
+        }
+    }
+
+    private func fetchNextGenreBatch(isInitialLoad: Bool) async {
+        switch isInitialLoad {
+        case true:
+            loadState = .loadingInitial
+        case false:
+            loadState = .loadingMore
+        }
+
+        let batchSize = isInitialLoad ? Self.initialGenreSections : Self.loadMoreGenreSections
+        let nextEndIndex = min(loadedGenreCount + batchSize, allLocalizedGenres.count)
+        let batchGenres = Array(allLocalizedGenres[loadedGenreCount..<nextEndIndex])
+
+        for genre in batchGenres {
+            guard !Task.isCancelled else { return }
+            let items = await fetchGenreItemsWithRetry(genreId: genre.id)
+            guard !Task.isCancelled else { return }
+            if !items.isEmpty {
+                genreSections.append(
+                    AnimeGenreSection(
+                        genre: genre,
+                        items: items
+                    )
+                )
+            }
+            try? await Task.sleep(nanoseconds: Self.requestIntervalNanoseconds)
+        }
+        
+        loadedGenreCount = nextEndIndex
+        canLoadMore = loadedGenreCount < allLocalizedGenres.count
+
+        switch genreSections.isEmpty {
+        case true:
+            loadState = .failed(message: Self.genreErrorMessage)
+        case false:
+            loadState = .loaded
+        }
+    }
+    
+    private func localizedGenre(_ genre: AnimeListGenreDTO) -> AnimeListGenreDTO {
+        guard let englishName = genre.name else { return genre }
+        let localizedName = AnimeGenreLocalizationModel.localizedName(for: englishName)
+        return AnimeListGenreDTO(malId: genre.malId, name: localizedName)
+    }
+
+    private func fetchGenreItemsWithRetry(genreId: Int) async -> [AnimeListRandomDTO] {
+        var attempt = 0
+        while attempt <= Self.maxRetryCount {
+            guard !Task.isCancelled else { return [] }
+            do {
+                let response = try await service.fetchAnimeByGenre(
+                    genreId: genreId,
+                    limit: Self.genreAnimeLimit
+                )
+                return response.data
+            } catch {
+                attempt += 1
+                guard attempt <= Self.maxRetryCount else { return [] }
+                try? await Task.sleep(nanoseconds: Self.retryBackoffNanoseconds * UInt64(attempt))
+            }
+        }
+        return []
+    }
+}

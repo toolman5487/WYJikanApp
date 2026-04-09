@@ -1,0 +1,95 @@
+//
+//  AnimeGenreLocalizationModel.swift
+//  WYJikanApp
+//
+//  Created by Willy Hsu on 2026/4/9.
+//
+
+import Foundation
+
+enum AnimeGenreLocalizationModel {
+    static let translations: [String: String] = [
+        "Action": "動作",
+        "Adventure": "冒險",
+        "Avant Garde": "前衛",
+        "Award Winning": "得獎作品",
+        "Boys Love": "BL",
+        "Comedy": "喜劇",
+        "Drama": "劇情",
+        "Fantasy": "奇幻",
+        "Girls Love": "GL",
+        "Gourmet": "美食",
+        "Horror": "恐怖",
+        "Mystery": "推理",
+        "Romance": "戀愛",
+        "Sci-Fi": "科幻",
+        "Slice of Life": "日常",
+        "Sports": "運動",
+        "Supernatural": "超自然",
+        "Suspense": "懸疑",
+        "Ecchi": "賣肉",
+        "Erotica": "情色",
+        "Hentai": "成人",
+        "Adult Cast": "成人主角",
+        "Anthropomorphic": "擬人",
+        "CGDCT": "可愛女孩日常",
+        "Childcare": "育兒",
+        "Combat Sports": "格鬥",
+        "Crossdressing": "變裝",
+        "Delinquents": "不良少年",
+        "Detective": "偵探",
+        "Educational": "教育",
+        "Gag Humor": "搞笑",
+        "Gore": "獵奇",
+        "Harem": "後宮",
+        "High Stakes Game": "高風險遊戲",
+        "Historical": "歷史",
+        "Idols (Female)": "女偶像",
+        "Idols (Male)": "男偶像",
+        "Isekai": "異世界",
+        "Iyashikei": "療癒",
+        "Love Polygon": "多角戀",
+        "Magical Sex Shift": "性轉",
+        "Mahou Shoujo": "魔法少女",
+        "Martial Arts": "武術",
+        "Mecha": "機甲",
+        "Medical": "醫療",
+        "Military": "軍事",
+        "Music": "音樂",
+        "Mythology": "神話",
+        "Organized Crime": "黑道",
+        "Otaku Culture": "御宅文化",
+        "Parody": "惡搞",
+        "Performing Arts": "表演藝術",
+        "Pets": "寵物",
+        "Psychological": "心理",
+        "Racing": "競速",
+        "Reincarnation": "轉生",
+        "Reverse Harem": "逆後宮",
+        "Love Status Quo": "戀愛現狀",
+        "Samurai": "武士",
+        "School": "校園",
+        "Showbiz": "演藝圈",
+        "Space": "太空",
+        "Strategy Game": "策略遊戲",
+        "Super Power": "超能力",
+        "Survival": "生存",
+        "Team Sports": "團隊運動",
+        "Time Travel": "時間旅行",
+        "Vampire": "吸血鬼",
+        "Video Game": "遊戲",
+        "Visual Arts": "視覺藝術",
+        "Workplace": "職場",
+        "Urban Fantasy": "都市奇幻",
+        "Villainess": "惡役千金",
+        "Josei": "女性向",
+        "Kids": "兒童向",
+        "Seinen": "青年向",
+        "Shoujo": "少女向",
+        "Shounen": "少年向"
+    ]
+
+    static func localizedName(for englishName: String) -> String {
+        translations[englishName] ?? englishName
+    }
+}
