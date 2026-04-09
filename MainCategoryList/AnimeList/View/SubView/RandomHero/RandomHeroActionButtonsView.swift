@@ -8,23 +8,14 @@
 import SwiftUI
 
 struct RandomHeroActionButtonsView: View {
-    let isDrawing: Bool
-    let cooldownRemainingSeconds: Int
+    // MARK: - Properties
+
+    let drawButtonTitle: String
+    let canDraw: Bool
     let detailMalId: Int?
     let onDrawTap: () -> Void
 
-    private var canDraw: Bool {
-        !isDrawing && cooldownRemainingSeconds == 0
-    }
-
-    private var drawButtonTitle: String {
-        if cooldownRemainingSeconds == 0 {
-            return "再抽一次"
-        }
-        let minutes = cooldownRemainingSeconds / 60
-        let seconds = cooldownRemainingSeconds % 60
-        return String(format: "%02d:%02d 後可再抽", minutes, seconds)
-    }
+    // MARK: - View
 
     var body: some View {
         if let id = detailMalId {
@@ -61,8 +52,8 @@ struct RandomHeroActionButtonsView: View {
 
 #Preview {
     RandomHeroActionButtonsView(
-        isDrawing: false,
-        cooldownRemainingSeconds: 0,
+        drawButtonTitle: "再抽一次",
+        canDraw: true,
         detailMalId: 1,
         onDrawTap: {}
     )

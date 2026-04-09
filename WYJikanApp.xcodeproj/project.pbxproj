@@ -75,6 +75,7 @@
 		15A8C01F2F7E0E0100E20010 /* MangaReviewRowHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15A8C01E2F7E0E0100E2000F /* MangaReviewRowHeaderView.swift */; };
 		15A8C0212F7E0E0100E20012 /* MangaReviewRowBadgesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15A8C0202F7E0E0100E20011 /* MangaReviewRowBadgesView.swift */; };
 		15A8C0232F7E0E0100E20014 /* MangaReviewSkeletonViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15A8C0222F7E0E0100E20013 /* MangaReviewSkeletonViews.swift */; };
+		15AC99672F8797BA008EAAEE /* RandomHeroViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15AC99652F8797BA008EAAEE /* RandomHeroViewModel.swift */; };
 		15ADSK022F7C700200E37E02 /* AnimeDetailSectionSkeletonViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15ADSK012F7C700100E37E01 /* AnimeDetailSectionSkeletonViews.swift */; };
 		15B80E602F8E100100DDB201 /* MainSearchResultsContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15B80E642F8E100100DDB201 /* MainSearchResultsContentView.swift */; };
 		15B80E612F8E100200DDB201 /* MainSearchListSkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15B80E652F8E100200DDB201 /* MainSearchListSkeletonView.swift */; };
@@ -196,6 +197,7 @@
 		15A8C01E2F7E0E0100E2000F /* MangaReviewRowHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MangaReviewRowHeaderView.swift; sourceTree = "<group>"; };
 		15A8C0202F7E0E0100E20011 /* MangaReviewRowBadgesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MangaReviewRowBadgesView.swift; sourceTree = "<group>"; };
 		15A8C0222F7E0E0100E20013 /* MangaReviewSkeletonViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MangaReviewSkeletonViews.swift; sourceTree = "<group>"; };
+		15AC99652F8797BA008EAAEE /* RandomHeroViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomHeroViewModel.swift; sourceTree = "<group>"; };
 		15ADSK012F7C700100E37E01 /* AnimeDetailSectionSkeletonViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeDetailSectionSkeletonViews.swift; sourceTree = "<group>"; };
 		15B80E642F8E100100DDB201 /* MainSearchResultsContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSearchResultsContentView.swift; sourceTree = "<group>"; };
 		15B80E652F8E100200DDB201 /* MainSearchListSkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSearchListSkeletonView.swift; sourceTree = "<group>"; };
@@ -556,7 +558,8 @@
 		159667F82F865A240033410A /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
-				159667EB2F8651EA0033410A /* AnimeListViewModel.swift */,
+				15AC99682F8797F7008EAAEE /* MainViewModel */,
+				15AC99662F8797BA008EAAEE /* RandomHero */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -803,6 +806,22 @@
 				15A8C0202F7E0E0100E20011 /* MangaReviewRowBadgesView.swift */,
 			);
 			path = SubView;
+			sourceTree = "<group>";
+		};
+		15AC99662F8797BA008EAAEE /* RandomHero */ = {
+			isa = PBXGroup;
+			children = (
+				15AC99652F8797BA008EAAEE /* RandomHeroViewModel.swift */,
+			);
+			path = RandomHero;
+			sourceTree = "<group>";
+		};
+		15AC99682F8797F7008EAAEE /* MainViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				159667EB2F8651EA0033410A /* AnimeListViewModel.swift */,
+			);
+			path = MainViewModel;
 			sourceTree = "<group>";
 		};
 		15B80E682F8E100500DDB201 /* MainView */ = {
@@ -1398,6 +1417,7 @@
 				15A8C0132F7E0E0100E20004 /* MangaReviewModel.swift in Sources */,
 				15A8C0152F7E0E0100E20006 /* MangaReviewService.swift in Sources */,
 				15A8C0172F7E0E0100E20008 /* MangaReviewViewModel.swift in Sources */,
+				15AC99672F8797BA008EAAEE /* RandomHeroViewModel.swift in Sources */,
 				15A8C0192F7E0E0100E2000A /* MangaReviewViewModel+Presentation.swift in Sources */,
 				15A8C01B2F7E0E0100E2000C /* MangaReviewListView.swift in Sources */,
 				15A8C01D2F7E0E0100E2000E /* MangaReviewRowView.swift in Sources */,

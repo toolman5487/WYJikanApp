@@ -8,19 +8,22 @@
 import SwiftUI
 
 struct RandomHeroSectionView: View {
-    let randomPick: AnimeListRandomDTO?
-    let isDrawing: Bool
-    let drawError: String?
-    let cooldownRemainingSeconds: Int
-    let cooldownDisplayText: String
-    let onDrawTap: () -> Void
+    // MARK: - Properties
+
+    @ObservedObject var viewModel: RandomHeroViewModel
+
+    // MARK: - View
 
     var body: some View {
+        let pick = viewModel.randomPick
+        let isDrawing = viewModel.isDrawing
+        let drawError = viewModel.drawError
+
         VStack(alignment: .leading, spacing: 12) {
             Group {
-                if isDrawing, randomPick == nil {
+                if isDrawing, pick == nil {
                     RandomHeroSkeletonView()
-                } else if let error = drawError, randomPick == nil {
+                } else if let error = drawError, pick == nil {
                     RandomHeroCardView(
                         pick: nil,
                         isDrawing: false,
@@ -28,17 +31,17 @@ struct RandomHeroSectionView: View {
                     )
                 } else {
                     RandomHeroCardView(
-                        pick: randomPick,
+                        pick: pick,
                         isDrawing: isDrawing
                     )
                 }
             }
-            
+
             RandomHeroActionButtonsView(
-                isDrawing: isDrawing,
-                cooldownRemainingSeconds: cooldownRemainingSeconds,
-                detailMalId: randomPick?.malId,
-                onDrawTap: onDrawTap
+                drawButtonTitle: viewModel.drawButtonTitle,
+                canDraw: viewModel.canDraw,
+                detailMalId: pick?.malId,
+                onDrawTap: viewModel.drawRandomAnime
             )
         }
     }
@@ -46,11 +49,6 @@ struct RandomHeroSectionView: View {
 
 #Preview {
     RandomHeroSectionView(
-        randomPick: nil,
-        isDrawing: true,
-        drawError: nil,
-        cooldownRemainingSeconds: 0,
-        cooldownDisplayText: "00:00",
-        onDrawTap: {}
+        viewModel: RandomHeroViewModel()
     )
 }

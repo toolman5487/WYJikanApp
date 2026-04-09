@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct AnimeListView: View {
-    @StateObject private var viewModel = AnimeListViewModel()
+    // MARK: - Types
 
     enum Section: Identifiable {
         case randomHero
@@ -20,24 +20,27 @@ struct AnimeListView: View {
         }
     }
 
+    // MARK: - Properties
+
+    @StateObject private var viewModel = AnimeListViewModel()
+
     private let sections: [Section] = [
         .randomHero
     ]
+
+    // MARK: - Private Methods
 
     @ViewBuilder
     private func sectionView(_ section: Section) -> some View {
         switch section {
         case .randomHero:
             RandomHeroSectionView(
-                randomPick: viewModel.randomPick,
-                isDrawing: viewModel.isDrawing,
-                drawError: viewModel.drawError,
-                cooldownRemainingSeconds: viewModel.cooldownRemainingSeconds,
-                cooldownDisplayText: viewModel.cooldownDisplayText,
-                onDrawTap: viewModel.drawRandomAnime
+                viewModel: viewModel.randomHeroViewModel
             )
         }
     }
+
+    // MARK: - View
 
     var body: some View {
         LazyVStack(alignment: .leading, spacing: 20) {
