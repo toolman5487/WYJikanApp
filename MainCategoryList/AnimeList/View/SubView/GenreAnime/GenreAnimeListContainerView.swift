@@ -18,13 +18,16 @@ struct GenreAnimeListContainerView: View {
         Group {
             if viewModel.isLoading && viewModel.genreSections.isEmpty {
                 GenreAnimeListSkeletonView()
-            } else if let message = viewModel.errorMessage, viewModel.genreSections.isEmpty {
-                Text(message)
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 16)
             } else {
+                if let message = viewModel.errorMessage {
+                    Text(message)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 8)
+                }
+
                 ForEach(viewModel.genreSections) { section in
                     GenreAnimeSectionView(section: section)
                 }

@@ -14,13 +14,16 @@ struct GenreMangaListContainerView: View {
         Group {
             if viewModel.isLoading && viewModel.genreSections.isEmpty {
                 GenreMangaListSkeletonView()
-            } else if let message = viewModel.errorMessage, viewModel.genreSections.isEmpty {
-                Text(message)
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 16)
             } else {
+                if let message = viewModel.errorMessage {
+                    Text(message)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 8)
+                }
+
                 ForEach(viewModel.genreSections) { section in
                     GenreMangaSectionView(section: section)
                 }
@@ -70,18 +73,31 @@ private struct GenreMangaSectionView: View {
                 .font(.title3.weight(.bold))
                 .foregroundStyle(ThemeColor.sakura)
 
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: Self.cardSpacing) {
-                    ForEach(section.items.prefix(10)) { item in
-                        GenreMangaPosterCardView(
-                            item: item,
-                            cardWidth: Self.cardWidth,
-                            cardHeight: Self.cardHeight,
-                            cardCornerRadius: Self.cardCornerRadius
-                        )
+            if section.items.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: Self.cardSpacing) {
+                        ForEach(0..<6, id: \.self) { _ in
+                            RoundedRectangle(cornerRadius: Self.cardCornerRadius, style: .continuous)
+                                .fill(Color(.systemGray5))
+                                .frame(width: Self.cardWidth, height: Self.cardHeight)
+                        }
                     }
+                    .padding(.horizontal, Self.horizontalPadding)
                 }
-                .padding(.horizontal, Self.horizontalPadding)
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: Self.cardSpacing) {
+                        ForEach(section.items.prefix(10)) { item in
+                            GenreMangaPosterCardView(
+                                item: item,
+                                cardWidth: Self.cardWidth,
+                                cardHeight: Self.cardHeight,
+                                cardCornerRadius: Self.cardCornerRadius
+                            )
+                        }
+                    }
+                    .padding(.horizontal, Self.horizontalPadding)
+                }
             }
         }
     }

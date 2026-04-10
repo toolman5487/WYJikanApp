@@ -33,7 +33,11 @@ struct GenreAnimeSectionView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             titleView
-            contentView
+            if section.items.isEmpty {
+                contentSkeletonView
+            } else {
+                contentView
+            }
         }
     }
 
@@ -53,6 +57,19 @@ struct GenreAnimeSectionView: View {
                         cardHeight: Self.cardHeight,
                         cardCornerRadius: Self.cardCornerRadius
                     )
+                }
+            }
+            .padding(.horizontal, Self.horizontalPadding)
+        }
+    }
+
+    private var contentSkeletonView: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: Self.cardSpacing) {
+                ForEach(0..<6, id: \.self) { _ in
+                    RoundedRectangle(cornerRadius: Self.cardCornerRadius, style: .continuous)
+                        .fill(Color(.systemGray5))
+                        .frame(width: Self.cardWidth, height: Self.cardHeight)
                 }
             }
             .padding(.horizontal, Self.horizontalPadding)

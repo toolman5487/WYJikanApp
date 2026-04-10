@@ -8,12 +8,12 @@
 import SwiftUI
 
 struct MangaListView: View {
-    @StateObject private var viewModel = MangaListViewModel()
+    @ObservedObject var viewModel: MangaListViewModel
 
     var body: some View {
         MainView(viewModel: viewModel)
-            .onDisappear {
-                viewModel.stop()
+            .onAppear {
+                viewModel.loadIfNeeded()
             }
     }
 }
@@ -33,7 +33,7 @@ private struct MainView: View {
 #Preview {
     NavigationStack {
         ScrollView {
-            MangaListView()
+            MangaListView(viewModel: MangaListViewModel())
                 .padding(.horizontal)
         }
     }

@@ -8,16 +8,12 @@
 import SwiftUI
 
 struct AnimeListView: View {
-    // MARK: - Properties
-
-    @StateObject private var viewModel = AnimeListViewModel()
-
-    // MARK: - View
+    @ObservedObject var viewModel: AnimeListViewModel
 
     var body: some View {
         MainView(viewModel: viewModel)
-            .onDisappear {
-                viewModel.stop()
+            .onAppear {
+                viewModel.loadIfNeeded()
             }
     }
 }
@@ -39,7 +35,7 @@ private struct MainView: View {
 #Preview {
     NavigationStack {
         ScrollView {
-            AnimeListView()
+            AnimeListView(viewModel: AnimeListViewModel())
                 .padding(.horizontal)
         }
     }

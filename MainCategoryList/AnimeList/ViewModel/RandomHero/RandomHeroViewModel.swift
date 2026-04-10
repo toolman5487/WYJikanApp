@@ -172,9 +172,15 @@ final class RandomHeroViewModel: ObservableObject {
     func stop() {
         drawTask?.cancel()
         drawTask = nil
-        drawCooldownTimer.stop()
-        cooldownCancellable?.cancel()
-        cooldownCancellable = nil
+        if isDrawing {
+            let pick = randomPick
+            let seconds = drawCooldownTimer.remainingSeconds
+            if seconds > 0 {
+                drawState = .cooldown(pick: pick, remainingSeconds: seconds)
+            } else {
+                drawState = .ready(pick: pick)
+            }
+        }
     }
 
     // MARK: - Private Methods

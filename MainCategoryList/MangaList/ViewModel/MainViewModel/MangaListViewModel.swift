@@ -21,6 +21,10 @@ final class MangaListViewModel: ObservableObject {
         self.genreMangaViewModel = genreMangaViewModel
     }
 
+    func loadIfNeeded() {
+        genreMangaViewModel.loadIfNeeded()
+    }
+
     func stop() {
         randomHeroViewModel.stop()
         genreMangaViewModel.stop()

@@ -33,6 +33,9 @@ struct MainCategoryListView: View {
                 }
             }
             .navigationTitle("分類")
+            .onDisappear {
+                viewModel.stopLoading()
+            }
         }
     }
     
@@ -42,9 +45,9 @@ struct MainCategoryListView: View {
     private var selectedContentView: some View {
         switch viewModel.selectedKind {
         case .anime:
-            AnimeListView()
+            AnimeListView(viewModel: viewModel.animeListViewModel)
         case .manga:
-            MangaListView()
+            MangaListView(viewModel: viewModel.mangaListViewModel)
         case .people:
             PeopleListView()
         case .character:
