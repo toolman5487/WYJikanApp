@@ -1,5 +1,5 @@
 //
-//  AnimeListView.swift
+//  MangaListView.swift
 //  WYJikanApp
 //
 //  Created by Willy Hsu on 2026/4/8.
@@ -7,12 +7,8 @@
 
 import SwiftUI
 
-struct AnimeListView: View {
-    // MARK: - Properties
-
-    @StateObject private var viewModel = AnimeListViewModel()
-
-    // MARK: - View
+struct MangaListView: View {
+    @StateObject private var viewModel = MangaListViewModel()
 
     var body: some View {
         MainView(viewModel: viewModel)
@@ -22,15 +18,13 @@ struct AnimeListView: View {
     }
 }
 
-// MARK: - MainView
-
 private struct MainView: View {
-    @ObservedObject var viewModel: AnimeListViewModel
+    @ObservedObject var viewModel: MangaListViewModel
 
     var body: some View {
         LazyVStack(alignment: .leading, spacing: 20) {
-            RandomHeroSectionView(viewModel: viewModel.randomHeroViewModel)
-            GenreAnimeListContainerView(viewModel: viewModel.genreAnimeViewModel)
+            RandomMangaSectionView(viewModel: viewModel.randomHeroViewModel)
+            GenreMangaListContainerView(viewModel: viewModel.genreMangaViewModel)
         }
         .padding(.top, 8)
     }
@@ -39,7 +33,7 @@ private struct MainView: View {
 #Preview {
     NavigationStack {
         ScrollView {
-            AnimeListView()
+            MangaListView()
                 .padding(.horizontal)
         }
     }
