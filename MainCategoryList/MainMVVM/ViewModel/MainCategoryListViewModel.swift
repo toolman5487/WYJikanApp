@@ -23,6 +23,17 @@ final class MainCategoryListViewModel: ObservableObject {
         self.mangaListViewModel = mangaListViewModel
     }
 
+    func loadIfNeeded(for kind: MainListKind) {
+        switch kind {
+        case .anime:
+            animeListViewModel.loadIfNeeded()
+        case .manga:
+            mangaListViewModel.loadIfNeeded()
+        case .people, .character:
+            break
+        }
+    }
+
     func stopLoading() {
         animeListViewModel.stop()
         mangaListViewModel.stop()

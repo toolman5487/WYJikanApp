@@ -33,6 +33,9 @@ struct MainCategoryListView: View {
                 }
             }
             .navigationTitle("分類")
+            .task(id: viewModel.selectedKind) {
+                viewModel.loadIfNeeded(for: viewModel.selectedKind)
+            }
             .onDisappear {
                 viewModel.stopLoading()
             }
