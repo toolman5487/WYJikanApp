@@ -10,26 +10,37 @@ import SwiftUI
 struct MainCategoryListView: View {
     
     @StateObject private var viewModel = MainCategoryListViewModel()
+    private let topAnchorId = "MainCategoryListTopAnchor"
     
     var body: some View {
         NavigationStack {
-            ScrollView {
-                LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
-                    Section {
-                        selectedContentView
+            ScrollViewReader { proxy in
+                ScrollView {
+                    Color.clear
+                        .frame(height: 0)
+                        .id(topAnchorId)
+
+                    LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
+                        Section {
+                            selectedContentView
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.horizontal)
+                                .padding(.bottom, 16)
+                                .id(viewModel.selectedKind)
+                        } header: {
+                            CapsuleTagScrollView(
+                                tags: MainListKind.categoryTags,
+                                title: { $0.title },
+                                selection: $viewModel.selectedKind
+                            )
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.horizontal)
-                            .padding(.bottom, 16)
-                    } header: {
-                        CapsuleTagScrollView(
-                            tags: MainListKind.categoryTags,
-                            title: { $0.title },
-                            selection: $viewModel.selectedKind
-                        )
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal)
-                        .padding(.vertical, 12)
+                            .padding(.vertical, 12)
+                        }
                     }
+                }
+                .onChange(of: viewModel.selectedKind) { _, _ in
+                    proxy.scrollTo(topAnchorId, anchor: .top)
                 }
             }
             .navigationTitle("分類")

@@ -9,7 +9,7 @@ import SwiftUI
 
 struct CharacterListView: View {
     var body: some View {
-        ScrollView {
+        VStack(alignment: .leading, spacing: 12) {
             Text("CharacterListView")
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding()
