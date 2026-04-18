@@ -44,6 +44,16 @@ struct MainCategoryListView: View {
                 }
             }
             .navigationTitle("分類")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        viewModel.reloadSelectedKind()
+                    } label: {
+                        Image(systemName: "arrow.trianglehead.counterclockwise")
+                    }
+                    .accessibilityLabel("重新整理")
+                }
+            }
             .task(id: viewModel.selectedKind) {
                 viewModel.loadIfNeeded(for: viewModel.selectedKind)
             }

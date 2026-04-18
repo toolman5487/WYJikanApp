@@ -31,6 +31,10 @@ final class AnimeListViewModel: ObservableObject {
         genreAnimeViewModel.loadIfNeeded()
     }
 
+    func reload() {
+        genreAnimeViewModel.loadSections()
+    }
+
     func stop() {
         randomHeroViewModel.stop()
         genreAnimeViewModel.stop()

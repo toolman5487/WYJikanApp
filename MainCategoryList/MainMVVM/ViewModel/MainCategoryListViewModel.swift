@@ -34,6 +34,17 @@ final class MainCategoryListViewModel: ObservableObject {
         }
     }
 
+    func reloadSelectedKind() {
+        switch selectedKind {
+        case .anime:
+            animeListViewModel.reload()
+        case .manga:
+            mangaListViewModel.reload()
+        case .people, .character:
+            break
+        }
+    }
+
     func stopLoading() {
         animeListViewModel.stop()
         mangaListViewModel.stop()
