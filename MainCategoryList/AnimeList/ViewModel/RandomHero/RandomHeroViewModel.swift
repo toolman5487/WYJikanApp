@@ -30,7 +30,7 @@ final class RandomHeroViewModel: ObservableObject {
     // MARK: - Constants
 
     private static let drawCooldownSeconds = 10
-    private static let minimumDrawLoadingNanoseconds: UInt64 = 2_000_000_000
+    private static let minimumDrawLoadingDuration: Duration = .seconds(2)
     private static let persistedRandomPickKey = "anime.random.lastPick"
 
     // MARK: - Published State
@@ -143,7 +143,7 @@ final class RandomHeroViewModel: ObservableObject {
         drawTask?.cancel()
         let currentPick = randomPick
         drawState = .loading(pick: currentPick)
-        let drawStartedAt = Date()
+        let drawStartedAt = ContinuousClock().now
 
         drawTask = Task { [weak self] in
             guard let self else { return }
@@ -214,10 +214,10 @@ final class RandomHeroViewModel: ObservableObject {
         return try? JSONDecoder().decode(AnimeListRandomDTO.self, from: data)
     }
 
-    private func waitForMinimumLoadingDuration(since startTime: Date) async {
-        let elapsedNanoseconds = UInt64(max(0, Date().timeIntervalSince(startTime)) * 1_000_000_000)
-        guard elapsedNanoseconds < Self.minimumDrawLoadingNanoseconds else { return }
-        let remainingNanoseconds = Self.minimumDrawLoadingNanoseconds - elapsedNanoseconds
-        try? await Task.sleep(nanoseconds: remainingNanoseconds)
+    private func waitForMinimumLoadingDuration(since startTime: ContinuousClock.Instant) async {
+        let elapsed = startTime.duration(to: ContinuousClock().now)
+        let remaining = Self.minimumDrawLoadingDuration - elapsed
+        guard remaining > .zero else { return }
+        try? await Task.sleep(for: remaining)
     }
 }

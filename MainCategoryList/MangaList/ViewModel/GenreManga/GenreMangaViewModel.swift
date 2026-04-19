@@ -22,7 +22,8 @@ final class GenreMangaViewModel: ObservableObject {
     private static let loadMoreGenreSections = 12
     private static let genreMangaLimit = 5
     private static let maxRetryCount = 2
-    private static let requestIntervalNanoseconds: UInt64 = 400_000_000
+    private static let initialItemRequestDelayNanoseconds: UInt64 = 1_200_000_000
+    private static let requestIntervalNanoseconds: UInt64 = 1_000_000_000
     private static let retryBackoffNanoseconds: UInt64 = 800_000_000
     private static let genreErrorMessage = "目前無法載入分類資料，請稍後再試"
 
@@ -143,6 +144,9 @@ final class GenreMangaViewModel: ObservableObject {
         } else {
             genreSections.append(contentsOf: placeholderSections)
         }
+
+        try? await Task.sleep(nanoseconds: Self.initialItemRequestDelayNanoseconds)
+        guard !Task.isCancelled else { return }
 
         for genre in batchGenres {
             guard !Task.isCancelled else { return }

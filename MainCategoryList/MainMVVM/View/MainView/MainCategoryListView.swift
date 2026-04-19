@@ -54,9 +54,6 @@ struct MainCategoryListView: View {
                     .accessibilityLabel("重新整理")
                 }
             }
-            .task(id: viewModel.selectedKind) {
-                viewModel.loadIfNeeded(for: viewModel.selectedKind)
-            }
             .onDisappear {
                 viewModel.stopLoading()
             }

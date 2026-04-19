@@ -15,15 +15,28 @@ final class MainCategoryListViewModel: ObservableObject {
 
     @Published var selectedKind: MainListKind = .anime
 
+    private var cancellables = Set<AnyCancellable>()
+
     init(
         animeListViewModel: AnimeListViewModel = AnimeListViewModel(),
         mangaListViewModel: MangaListViewModel = MangaListViewModel()
     ) {
         self.animeListViewModel = animeListViewModel
         self.mangaListViewModel = mangaListViewModel
+
+        bindSelectedKind()
     }
 
-    func loadIfNeeded(for kind: MainListKind) {
+    private func bindSelectedKind() {
+        $selectedKind
+            .removeDuplicates()
+            .sink { [weak self] kind in
+                self?.loadIfNeeded(for: kind)
+            }
+            .store(in: &cancellables)
+    }
+
+    private func loadIfNeeded(for kind: MainListKind) {
         switch kind {
         case .anime:
             animeListViewModel.loadIfNeeded()
