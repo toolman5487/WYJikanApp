@@ -22,9 +22,9 @@ final class GenreMangaViewModel: ObservableObject {
     private static let loadMoreGenreSections = 12
     private static let genreMangaLimit = 5
     private static let maxRetryCount = 2
-    private static let initialItemRequestDelayNanoseconds: UInt64 = 1_200_000_000
-    private static let requestIntervalNanoseconds: UInt64 = 1_000_000_000
-    private static let retryBackoffNanoseconds: UInt64 = 800_000_000
+    private static let initialItemRequestDelay: Duration = .milliseconds(1200)
+    private static let requestInterval: Duration = .seconds(1)
+    private static let retryBackoff: Duration = .milliseconds(800)
     private static let genreErrorMessage = "目前無法載入分類資料，請稍後再試"
 
     @Published private(set) var genreSections: [MangaGenreSection] = []
@@ -145,7 +145,7 @@ final class GenreMangaViewModel: ObservableObject {
             genreSections.append(contentsOf: placeholderSections)
         }
 
-        try? await Task.sleep(nanoseconds: Self.initialItemRequestDelayNanoseconds)
+        try? await Task.sleep(for: Self.initialItemRequestDelay)
         guard !Task.isCancelled else { return }
 
         for genre in batchGenres {
@@ -153,7 +153,7 @@ final class GenreMangaViewModel: ObservableObject {
             let items = await fetchGenreItemsWithRetry(genreId: genre.id)
             guard !Task.isCancelled else { return }
             updateGenreSection(genreId: genre.id, items: items)
-            try? await Task.sleep(nanoseconds: Self.requestIntervalNanoseconds)
+            try? await Task.sleep(for: Self.requestInterval)
         }
 
         loadedGenreCount = nextEndIndex
@@ -180,7 +180,7 @@ final class GenreMangaViewModel: ObservableObject {
             } catch {
                 attempt += 1
                 guard attempt <= Self.maxRetryCount else { return [] }
-                try? await Task.sleep(nanoseconds: Self.retryBackoffNanoseconds * UInt64(attempt))
+                try? await Task.sleep(for: Self.retryBackoff * attempt)
             }
         }
         return []
