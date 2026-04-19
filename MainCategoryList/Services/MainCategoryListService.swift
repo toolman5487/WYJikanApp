@@ -14,6 +14,8 @@ protocol MainCategoryListServicing {
     func fetchMangaGenres() async throws -> MangaGenreListResponse
     func fetchAnimeByGenre(genreId: Int, limit: Int) async throws -> AnimeListResponse
     func fetchMangaByGenre(genreId: Int, limit: Int) async throws -> MangaListResponse
+    func fetchCharacters(page: Int, limit: Int) async throws -> MainSearchCharacterSearchResponse
+    func fetchPeople(page: Int, limit: Int) async throws -> MainSearchPersonSearchResponse
 }
 
 final class MainCategoryListService: MainCategoryListServicing {
@@ -57,6 +59,28 @@ final class MainCategoryListService: MainCategoryListServicing {
         ]
         return try await apiService.fetch(
             endpoint: APIConfig.Manga.list,
+            queryItems: queryItems
+        )
+    }
+
+    func fetchCharacters(page: Int, limit: Int) async throws -> MainSearchCharacterSearchResponse {
+        let queryItems = [
+            URLQueryItem(name: "page", value: "\(page)"),
+            URLQueryItem(name: "limit", value: "\(limit)")
+        ]
+        return try await apiService.fetch(
+            endpoint: APIConfig.Characters.list,
+            queryItems: queryItems
+        )
+    }
+
+    func fetchPeople(page: Int, limit: Int) async throws -> MainSearchPersonSearchResponse {
+        let queryItems = [
+            URLQueryItem(name: "page", value: "\(page)"),
+            URLQueryItem(name: "limit", value: "\(limit)")
+        ]
+        return try await apiService.fetch(
+            endpoint: APIConfig.People.list,
             queryItems: queryItems
         )
     }

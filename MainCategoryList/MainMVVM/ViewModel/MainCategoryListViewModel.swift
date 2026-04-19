@@ -12,6 +12,8 @@ import Combine
 final class MainCategoryListViewModel: ObservableObject {
     let animeListViewModel: AnimeListViewModel
     let mangaListViewModel: MangaListViewModel
+    let peopleListViewModel: PeopleListViewModel
+    let characterListViewModel: CharacterListViewModel
 
     @Published var selectedKind: MainListKind = .anime
 
@@ -19,10 +21,14 @@ final class MainCategoryListViewModel: ObservableObject {
 
     init(
         animeListViewModel: AnimeListViewModel = AnimeListViewModel(),
-        mangaListViewModel: MangaListViewModel = MangaListViewModel()
+        mangaListViewModel: MangaListViewModel = MangaListViewModel(),
+        peopleListViewModel: PeopleListViewModel = PeopleListViewModel(),
+        characterListViewModel: CharacterListViewModel = CharacterListViewModel()
     ) {
         self.animeListViewModel = animeListViewModel
         self.mangaListViewModel = mangaListViewModel
+        self.peopleListViewModel = peopleListViewModel
+        self.characterListViewModel = characterListViewModel
 
         bindSelectedKind()
     }
@@ -42,8 +48,10 @@ final class MainCategoryListViewModel: ObservableObject {
             animeListViewModel.loadIfNeeded()
         case .manga:
             mangaListViewModel.loadIfNeeded()
-        case .people, .character:
-            break
+        case .people:
+            peopleListViewModel.loadIfNeeded()
+        case .character:
+            characterListViewModel.loadIfNeeded()
         }
     }
 
@@ -53,13 +61,17 @@ final class MainCategoryListViewModel: ObservableObject {
             animeListViewModel.reload()
         case .manga:
             mangaListViewModel.reload()
-        case .people, .character:
-            break
+        case .people:
+            peopleListViewModel.reload()
+        case .character:
+            characterListViewModel.reload()
         }
     }
 
     func stopLoading() {
         animeListViewModel.stop()
         mangaListViewModel.stop()
+        peopleListViewModel.stop()
+        characterListViewModel.stop()
     }
 }

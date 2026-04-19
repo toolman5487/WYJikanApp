@@ -70,9 +70,9 @@ struct MainCategoryListView: View {
         case .manga:
             MangaListView(viewModel: viewModel.mangaListViewModel)
         case .people:
-            PeopleListView()
+            PeopleListView(viewModel: viewModel.peopleListViewModel)
         case .character:
-            CharacterListView()
+            CharacterListView(viewModel: viewModel.characterListViewModel)
         }
     }
 }
