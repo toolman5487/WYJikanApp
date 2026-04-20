@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct PeopleGridItemView: View {
-    let row: MainSearchResultRow
+    let row: PeopleListRow
 
     var body: some View {
         VStack(spacing: 8) {
@@ -16,7 +16,7 @@ struct PeopleGridItemView: View {
                 .aspectRatio(1, contentMode: .fit)
                 .clipShape(Circle())
 
-            Text(row.title)
+            Text(row.name)
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(.primary)
                 .multilineTextAlignment(.center)

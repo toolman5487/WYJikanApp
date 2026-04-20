@@ -19,7 +19,7 @@ struct NavigationWebPageView: View {
             if let url {
                 PageWebView(url: url)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .ignoresSafeArea(edges: .bottom)
+                    .ignoresSafeArea()
             } else {
                 ContentUnavailableView {
                     Label("No Link", systemImage: "link.badge.plus")
@@ -28,7 +28,5 @@ struct NavigationWebPageView: View {
                 }
             }
         }
-        .navigationTitle(title)
-        .navigationBarTitleDisplayMode(.inline)
     }
 }

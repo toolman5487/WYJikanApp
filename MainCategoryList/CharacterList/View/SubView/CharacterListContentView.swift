@@ -25,7 +25,12 @@ struct CharacterListContentView: View {
             } else {
                 LazyVGrid(columns: CharacterListGridMetrics.columns, spacing: 16) {
                     ForEach(viewModel.rows) { row in
-                        CharacterPersonGridItemView(row: row)
+                        NavigationLink {
+                            NavigationWebPageView(title: row.name, url: row.malPageURL)
+                        } label: {
+                            CharacterPersonGridItemView(row: row)
+                        }
+                        .buttonStyle(.plain)
                     }
                 }
 

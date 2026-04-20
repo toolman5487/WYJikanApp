@@ -10,7 +10,7 @@ import Combine
 
 @MainActor
 final class PeopleListViewModel: ObservableObject {
-    @Published private(set) var rows: [MainSearchResultRow] = []
+    @Published private(set) var rows: [PeopleListRow] = []
     @Published private(set) var isLoading = false
     @Published private(set) var isLoadingMore = false
     @Published private(set) var errorMessage: String?
@@ -63,7 +63,7 @@ final class PeopleListViewModel: ObservableObject {
                 let response = try await service.fetchPeople(page: page, limit: pageLimit)
                 guard !Task.isCancelled else { return }
 
-                let newRows = response.data.map(MainSearchResultRow.from(person:))
+                let newRows = response.data.map(PeopleListRow.from)
                 currentPage = response.pagination?.currentPage ?? page
                 hasNextPage = response.pagination?.hasNextPage ?? !newRows.isEmpty
                 rows = isFirstPage ? newRows : rows + newRows

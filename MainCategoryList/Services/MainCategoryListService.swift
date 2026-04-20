@@ -14,8 +14,8 @@ protocol MainCategoryListServicing {
     func fetchMangaGenres() async throws -> MangaGenreListResponse
     func fetchAnimeByGenre(genreId: Int, limit: Int) async throws -> AnimeListResponse
     func fetchMangaByGenre(genreId: Int, limit: Int) async throws -> MangaListResponse
-    func fetchCharacters(page: Int, limit: Int) async throws -> MainSearchCharacterSearchResponse
-    func fetchPeople(page: Int, limit: Int) async throws -> MainSearchPersonSearchResponse
+    func fetchCharacters(page: Int, limit: Int) async throws -> CharacterListResponse
+    func fetchPeople(page: Int, limit: Int) async throws -> PeopleListResponse
 }
 
 final class MainCategoryListService: MainCategoryListServicing {
@@ -63,7 +63,7 @@ final class MainCategoryListService: MainCategoryListServicing {
         )
     }
 
-    func fetchCharacters(page: Int, limit: Int) async throws -> MainSearchCharacterSearchResponse {
+    func fetchCharacters(page: Int, limit: Int) async throws -> CharacterListResponse {
         let queryItems = [
             URLQueryItem(name: "page", value: "\(page)"),
             URLQueryItem(name: "limit", value: "\(limit)")
@@ -74,7 +74,7 @@ final class MainCategoryListService: MainCategoryListServicing {
         )
     }
 
-    func fetchPeople(page: Int, limit: Int) async throws -> MainSearchPersonSearchResponse {
+    func fetchPeople(page: Int, limit: Int) async throws -> PeopleListResponse {
         let queryItems = [
             URLQueryItem(name: "page", value: "\(page)"),
             URLQueryItem(name: "limit", value: "\(limit)")

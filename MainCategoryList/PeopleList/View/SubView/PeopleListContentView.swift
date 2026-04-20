@@ -25,7 +25,12 @@ struct PeopleListContentView: View {
             } else {
                 LazyVGrid(columns: PeopleListGridMetrics.columns, spacing: 16) {
                     ForEach(viewModel.rows) { row in
-                        PeopleGridItemView(row: row)
+                        NavigationLink {
+                            NavigationWebPageView(title: row.name, url: row.malPageURL)
+                        } label: {
+                            PeopleGridItemView(row: row)
+                        }
+                        .buttonStyle(.plain)
                     }
                 }
 
