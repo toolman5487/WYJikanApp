@@ -102,6 +102,12 @@
 		15DE55A02F723A9C00B292AD /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 15DE559F2F723A9C00B292AD /* SDWebImageSwiftUI */; };
 		15DE55A42F723C0000B292AD /* JikanAPIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15DE55A52F723C0000B292AD /* JikanAPIService.swift */; };
 		15DE55B72F723F2800B292AD /* APIConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15DE55B62F723F2800B292AD /* APIConfig.swift */; };
+		15FA4A002F97C81700EC4C09 /* MainMyListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FA49FF2F97C81700EC4C09 /* MainMyListView.swift */; };
+		15FA4A122F97D00000EC4C09 /* MyListHeaderSkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FA4A112F97D00000EC4C09 /* MyListHeaderSkeletonView.swift */; };
+		15FA4A142F97D00000EC4C09 /* MyListCategorySkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FA4A132F97D00000EC4C09 /* MyListCategorySkeletonView.swift */; };
+		15FA4A162F97D00000EC4C09 /* MyListSummarySkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FA4A152F97D00000EC4C09 /* MyListSummarySkeletonView.swift */; };
+		15FA4A182F97D00000EC4C09 /* MyListFavoritesSkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FA4A172F97D00000EC4C09 /* MyListFavoritesSkeletonView.swift */; };
+		15FA4A1A2F97D00000EC4C09 /* MyListSectionHeaderSkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FA4A192F97D00000EC4C09 /* MyListSectionHeaderSkeletonView.swift */; };
 		15FC4F3A2F73E7340054153E /* HeroBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F392F73E7340054153E /* HeroBannerView.swift */; };
 		15FC4F3C2F73E7520054153E /* HeroBannerModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F3B2F73E7520054153E /* HeroBannerModel.swift */; };
 		15FC4F3E2F73E7620054153E /* HeroBannerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F3D2F73E7620054153E /* HeroBannerViewModel.swift */; };
@@ -252,6 +258,12 @@
 		15DE55902F723A1700B292AD /* WYJikanApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WYJikanApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		15DE55A52F723C0000B292AD /* JikanAPIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JikanAPIService.swift; sourceTree = "<group>"; };
 		15DE55B62F723F2800B292AD /* APIConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIConfig.swift; sourceTree = "<group>"; };
+		15FA49FF2F97C81700EC4C09 /* MainMyListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMyListView.swift; sourceTree = "<group>"; };
+		15FA4A112F97D00000EC4C09 /* MyListHeaderSkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListHeaderSkeletonView.swift; sourceTree = "<group>"; };
+		15FA4A132F97D00000EC4C09 /* MyListCategorySkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListCategorySkeletonView.swift; sourceTree = "<group>"; };
+		15FA4A152F97D00000EC4C09 /* MyListSummarySkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListSummarySkeletonView.swift; sourceTree = "<group>"; };
+		15FA4A172F97D00000EC4C09 /* MyListFavoritesSkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListFavoritesSkeletonView.swift; sourceTree = "<group>"; };
+		15FA4A192F97D00000EC4C09 /* MyListSectionHeaderSkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListSectionHeaderSkeletonView.swift; sourceTree = "<group>"; };
 		15FC4F392F73E7340054153E /* HeroBannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroBannerView.swift; sourceTree = "<group>"; };
 		15FC4F3B2F73E7520054153E /* HeroBannerModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroBannerModel.swift; sourceTree = "<group>"; };
 		15FC4F3D2F73E7620054153E /* HeroBannerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroBannerViewModel.swift; sourceTree = "<group>"; };
@@ -1020,6 +1032,7 @@
 		15DE55872F723A1700B292AD = {
 			isa = PBXGroup;
 			children = (
+				15FA49FD2F97C7F900EC4C09 /* MainMyList */,
 				15A295532F86300F0056071F /* MainCategoryList */,
 				15A8B72A2F7E0D8D00DDB201 /* Anime */,
 				15FC4F482F74E4EB0054153E /* Components */,
@@ -1068,6 +1081,35 @@
 				15DE55A52F723C0000B292AD /* JikanAPIService.swift */,
 			);
 			path = Service;
+			sourceTree = "<group>";
+		};
+		15FA49FD2F97C7F900EC4C09 /* MainMyList */ = {
+			isa = PBXGroup;
+			children = (
+				15FA49FE2F97C80500EC4C09 /* View */,
+			);
+			path = MainMyList;
+			sourceTree = "<group>";
+		};
+		15FA49FE2F97C80500EC4C09 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				15FA49FF2F97C81700EC4C09 /* MainMyListView.swift */,
+				15FA4A102F97D00000EC4C09 /* SubView */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		15FA4A102F97D00000EC4C09 /* SubView */ = {
+			isa = PBXGroup;
+			children = (
+				15FA4A112F97D00000EC4C09 /* MyListHeaderSkeletonView.swift */,
+				15FA4A132F97D00000EC4C09 /* MyListCategorySkeletonView.swift */,
+				15FA4A152F97D00000EC4C09 /* MyListSummarySkeletonView.swift */,
+				15FA4A172F97D00000EC4C09 /* MyListFavoritesSkeletonView.swift */,
+				15FA4A192F97D00000EC4C09 /* MyListSectionHeaderSkeletonView.swift */,
+			);
+			path = SubView;
 			sourceTree = "<group>";
 		};
 		15FC4F342F73E6480054153E /* Model */ = {
@@ -1636,6 +1678,12 @@
 				16B100042F8A000000000004 /* CharacterListViewModel.swift in Sources */,
 				16B100062F8A000000000006 /* CharacterListContentView.swift in Sources */,
 				16B100082F8A000000000008 /* CharacterPersonGridItemView.swift in Sources */,
+				15FA4A002F97C81700EC4C09 /* MainMyListView.swift in Sources */,
+				15FA4A122F97D00000EC4C09 /* MyListHeaderSkeletonView.swift in Sources */,
+				15FA4A142F97D00000EC4C09 /* MyListCategorySkeletonView.swift in Sources */,
+				15FA4A162F97D00000EC4C09 /* MyListSummarySkeletonView.swift in Sources */,
+				15FA4A182F97D00000EC4C09 /* MyListFavoritesSkeletonView.swift in Sources */,
+				15FA4A1A2F97D00000EC4C09 /* MyListSectionHeaderSkeletonView.swift in Sources */,
 				16B1000A2F8A00000000000A /* CharacterListLoadingView.swift in Sources */,
 				16B1000C2F8A00000000000C /* CharacterLoadMoreButton.swift in Sources */,
 				15FC4F562F7507910054153E /* HomeTrendingAnimeViewModel.swift in Sources */,

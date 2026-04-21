@@ -25,7 +25,7 @@ struct MainTabBarView: View {
                 }
                 
                 Tab(value: AppTab.myList) {
-                    PlaceholderView(placeholderName: "myList")
+                    MainMyListView()
                 } label: {
                     Image(systemName: viewModel.selectedTab == .myList ? "heart.fill" : "heart")
                 }
