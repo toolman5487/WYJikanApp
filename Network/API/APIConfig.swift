@@ -38,6 +38,7 @@ enum APIConfig {
     enum Characters {
         static let list = "/characters"
         static func detail(id: Int) -> String { "/characters/\(id)" }
+        static func full(id: Int) -> String { "/characters/\(id)/full" }
     }
 
     enum People {

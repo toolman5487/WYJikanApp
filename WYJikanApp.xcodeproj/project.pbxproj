@@ -160,6 +160,16 @@
 		16B100182F8A000000000018 /* PeopleListLoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B100172F8A000000000017 /* PeopleListLoadingView.swift */; };
 		16B1001A2F8A10000000001A /* CharacterListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B100192F8A100000000019 /* CharacterListModel.swift */; };
 		16B1001C2F8A10000000001C /* PeopleListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B1001B2F8A10000000001B /* PeopleListModel.swift */; };
+		16C200022F99000000000002 /* CharacterDetailModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C200012F99000000000001 /* CharacterDetailModel.swift */; };
+		16C200042F99000000000004 /* CharacterDetailService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C200032F99000000000003 /* CharacterDetailService.swift */; };
+		16C200062F99000000000006 /* CharacterDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C200052F99000000000005 /* CharacterDetailViewModel.swift */; };
+		16C200082F99000000000008 /* CharacterDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C200072F99000000000007 /* CharacterDetailView.swift */; };
+		16C2000A2F9900000000000A /* CharacterDetailHeaderSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C200092F99000000000009 /* CharacterDetailHeaderSectionView.swift */; };
+		16C2000C2F9900000000000C /* CharacterDetailInfoSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C2000B2F9900000000000B /* CharacterDetailInfoSectionView.swift */; };
+		16C2000E2F9900000000000E /* CharacterDetailAboutSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C2000D2F9900000000000D /* CharacterDetailAboutSectionView.swift */; };
+		16C200102F99000000000010 /* CharacterDetailWorksSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C2000F2F9900000000000F /* CharacterDetailWorksSectionView.swift */; };
+		16C200122F99000000000012 /* CharacterDetailVoiceActorsSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C200112F99000000000011 /* CharacterDetailVoiceActorsSectionView.swift */; };
+		16C200142F99000000000014 /* CharacterDetailSectionSkeletonViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C200132F99000000000013 /* CharacterDetailSectionSkeletonViews.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -316,6 +326,16 @@
 		16B100172F8A000000000017 /* PeopleListLoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleListLoadingView.swift; sourceTree = "<group>"; };
 		16B100192F8A100000000019 /* CharacterListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterListModel.swift; sourceTree = "<group>"; };
 		16B1001B2F8A10000000001B /* PeopleListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleListModel.swift; sourceTree = "<group>"; };
+		16C200012F99000000000001 /* CharacterDetailModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterDetailModel.swift; sourceTree = "<group>"; };
+		16C200032F99000000000003 /* CharacterDetailService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterDetailService.swift; sourceTree = "<group>"; };
+		16C200052F99000000000005 /* CharacterDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterDetailViewModel.swift; sourceTree = "<group>"; };
+		16C200072F99000000000007 /* CharacterDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterDetailView.swift; sourceTree = "<group>"; };
+		16C200092F99000000000009 /* CharacterDetailHeaderSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterDetailHeaderSectionView.swift; sourceTree = "<group>"; };
+		16C2000B2F9900000000000B /* CharacterDetailInfoSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterDetailInfoSectionView.swift; sourceTree = "<group>"; };
+		16C2000D2F9900000000000D /* CharacterDetailAboutSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterDetailAboutSectionView.swift; sourceTree = "<group>"; };
+		16C2000F2F9900000000000F /* CharacterDetailWorksSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterDetailWorksSectionView.swift; sourceTree = "<group>"; };
+		16C200112F99000000000011 /* CharacterDetailVoiceActorsSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterDetailVoiceActorsSectionView.swift; sourceTree = "<group>"; };
+		16C200132F99000000000013 /* CharacterDetailSectionSkeletonViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterDetailSectionSkeletonViews.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -397,6 +417,14 @@
 				155A9C012F782C2200F1E4F0 /* SectionCardSkeleton.swift */,
 			);
 			path = SectionCardSkeleton;
+			sourceTree = "<group>";
+		};
+		155B53D12F991E990014A4C0 /* Character */ = {
+			isa = PBXGroup;
+			children = (
+				16C201002F99000000000100 /* CharacterDetail */,
+			);
+			path = Character;
 			sourceTree = "<group>";
 		};
 		156C80532F86882A00D0CF6B /* Timer */ = {
@@ -1032,6 +1060,7 @@
 		15DE55872F723A1700B292AD = {
 			isa = PBXGroup;
 			children = (
+				155B53D12F991E990014A4C0 /* Character */,
 				15FA49FD2F97C7F900EC4C09 /* MainMyList */,
 				15A295532F86300F0056071F /* MainCategoryList */,
 				15A8B72A2F7E0D8D00DDB201 /* Anime */,
@@ -1522,6 +1551,71 @@
 			path = Model;
 			sourceTree = "<group>";
 		};
+		16C201002F99000000000100 /* CharacterDetail */ = {
+			isa = PBXGroup;
+			children = (
+				16C201012F99000000000101 /* Model */,
+				16C201022F99000000000102 /* Services */,
+				16C201032F99000000000103 /* View */,
+				16C201062F99000000000106 /* ViewModel */,
+			);
+			path = CharacterDetail;
+			sourceTree = "<group>";
+		};
+		16C201012F99000000000101 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				16C200012F99000000000001 /* CharacterDetailModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		16C201022F99000000000102 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				16C200032F99000000000003 /* CharacterDetailService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		16C201032F99000000000103 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				16C201042F99000000000104 /* MainView */,
+				16C201052F99000000000105 /* Section */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		16C201042F99000000000104 /* MainView */ = {
+			isa = PBXGroup;
+			children = (
+				16C200072F99000000000007 /* CharacterDetailView.swift */,
+			);
+			path = MainView;
+			sourceTree = "<group>";
+		};
+		16C201052F99000000000105 /* Section */ = {
+			isa = PBXGroup;
+			children = (
+				16C200092F99000000000009 /* CharacterDetailHeaderSectionView.swift */,
+				16C2000B2F9900000000000B /* CharacterDetailInfoSectionView.swift */,
+				16C2000D2F9900000000000D /* CharacterDetailAboutSectionView.swift */,
+				16C2000F2F9900000000000F /* CharacterDetailWorksSectionView.swift */,
+				16C200112F99000000000011 /* CharacterDetailVoiceActorsSectionView.swift */,
+				16C200132F99000000000013 /* CharacterDetailSectionSkeletonViews.swift */,
+			);
+			path = Section;
+			sourceTree = "<group>";
+		};
+		16C201062F99000000000106 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				16C200052F99000000000005 /* CharacterDetailViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -1684,6 +1778,16 @@
 				15FA4A162F97D00000EC4C09 /* MyListSummarySkeletonView.swift in Sources */,
 				15FA4A182F97D00000EC4C09 /* MyListFavoritesSkeletonView.swift in Sources */,
 				15FA4A1A2F97D00000EC4C09 /* MyListSectionHeaderSkeletonView.swift in Sources */,
+				16C200022F99000000000002 /* CharacterDetailModel.swift in Sources */,
+				16C200042F99000000000004 /* CharacterDetailService.swift in Sources */,
+				16C200062F99000000000006 /* CharacterDetailViewModel.swift in Sources */,
+				16C200082F99000000000008 /* CharacterDetailView.swift in Sources */,
+				16C2000A2F9900000000000A /* CharacterDetailHeaderSectionView.swift in Sources */,
+				16C2000C2F9900000000000C /* CharacterDetailInfoSectionView.swift in Sources */,
+				16C2000E2F9900000000000E /* CharacterDetailAboutSectionView.swift in Sources */,
+				16C200102F99000000000010 /* CharacterDetailWorksSectionView.swift in Sources */,
+				16C200122F99000000000012 /* CharacterDetailVoiceActorsSectionView.swift in Sources */,
+				16C200142F99000000000014 /* CharacterDetailSectionSkeletonViews.swift in Sources */,
 				16B1000A2F8A00000000000A /* CharacterListLoadingView.swift in Sources */,
 				16B1000C2F8A00000000000C /* CharacterLoadMoreButton.swift in Sources */,
 				15FC4F562F7507910054153E /* HomeTrendingAnimeViewModel.swift in Sources */,

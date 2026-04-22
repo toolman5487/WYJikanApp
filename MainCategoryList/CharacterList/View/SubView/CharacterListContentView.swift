@@ -26,7 +26,7 @@ struct CharacterListContentView: View {
                 LazyVGrid(columns: CharacterListGridMetrics.columns, spacing: 16) {
                     ForEach(viewModel.rows) { row in
                         NavigationLink {
-                            NavigationWebPageView(title: row.name, url: row.malPageURL)
+                            CharacterDetailView(malId: row.malId)
                         } label: {
                             CharacterPersonGridItemView(row: row)
                         }
