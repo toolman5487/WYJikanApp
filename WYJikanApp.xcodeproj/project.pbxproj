@@ -84,6 +84,15 @@
 		15AC99822F87AA07008EAAEE /* AnimeListGenreModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15AC997B2F87AA07008EAAEE /* AnimeListGenreModel.swift */; };
 		15AC99832F87AA07008EAAEE /* AnimeListImageModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15AC997C2F87AA07008EAAEE /* AnimeListImageModel.swift */; };
 		15AC99842F87AA07008EAAEE /* AnimeListRandomDisplayModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15AC997D2F87AA07008EAAEE /* AnimeListRandomDisplayModel.swift */; };
+		15ADF0992F9A10F4004B3BB0 /* PeopleDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15ADF0982F9A10F4004B3BB0 /* PeopleDetailView.swift */; };
+		15ADF0AF2F9A169F004B3BB0 /* PeopleDetailModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15ADF0A92F9A169F004B3BB0 /* PeopleDetailModels.swift */; };
+		15ADF0B02F9A169F004B3BB0 /* PeopleDetailService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15ADF0AB2F9A169F004B3BB0 /* PeopleDetailService.swift */; };
+		15ADF0B12F9A169F004B3BB0 /* PeopleDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15ADF0AD2F9A169F004B3BB0 /* PeopleDetailViewModel.swift */; };
+		15ADF0C12F9A1A49004B3BB0 /* PeopleDetailAboutSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15ADF0BB2F9A1A49004B3BB0 /* PeopleDetailAboutSectionView.swift */; };
+		15ADF0C22F9A1A49004B3BB0 /* PeopleDetailHeaderSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15ADF0BC2F9A1A49004B3BB0 /* PeopleDetailHeaderSectionView.swift */; };
+		15ADF0C32F9A1A49004B3BB0 /* PeopleDetailInfoSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15ADF0BD2F9A1A49004B3BB0 /* PeopleDetailInfoSectionView.swift */; };
+		15ADF0C42F9A1A49004B3BB0 /* PeopleDetailWorksSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15ADF0BF2F9A1A49004B3BB0 /* PeopleDetailWorksSectionView.swift */; };
+		15ADF0C52F9A1A49004B3BB0 /* PeopleDetailVoiceRolesSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15ADF0BE2F9A1A49004B3BB0 /* PeopleDetailVoiceRolesSectionView.swift */; };
 		15ADSK022F7C700200E37E02 /* AnimeDetailSectionSkeletonViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15ADSK012F7C700100E37E01 /* AnimeDetailSectionSkeletonViews.swift */; };
 		15B80E602F8E100100DDB201 /* MainSearchResultsContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15B80E642F8E100100DDB201 /* MainSearchResultsContentView.swift */; };
 		15B80E612F8E100200DDB201 /* MainSearchListSkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15B80E652F8E100200DDB201 /* MainSearchListSkeletonView.swift */; };
@@ -250,6 +259,15 @@
 		15AC997D2F87AA07008EAAEE /* AnimeListRandomDisplayModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeListRandomDisplayModel.swift; sourceTree = "<group>"; };
 		15AC997E2F87AA07008EAAEE /* AnimeListRandomModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeListRandomModel.swift; sourceTree = "<group>"; };
 		15AC997F2F87AA07008EAAEE /* AnimeListResponseModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeListResponseModel.swift; sourceTree = "<group>"; };
+		15ADF0982F9A10F4004B3BB0 /* PeopleDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleDetailView.swift; sourceTree = "<group>"; };
+		15ADF0A92F9A169F004B3BB0 /* PeopleDetailModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleDetailModels.swift; sourceTree = "<group>"; };
+		15ADF0AB2F9A169F004B3BB0 /* PeopleDetailService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleDetailService.swift; sourceTree = "<group>"; };
+		15ADF0AD2F9A169F004B3BB0 /* PeopleDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleDetailViewModel.swift; sourceTree = "<group>"; };
+		15ADF0BB2F9A1A49004B3BB0 /* PeopleDetailAboutSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleDetailAboutSectionView.swift; sourceTree = "<group>"; };
+		15ADF0BC2F9A1A49004B3BB0 /* PeopleDetailHeaderSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleDetailHeaderSectionView.swift; sourceTree = "<group>"; };
+		15ADF0BD2F9A1A49004B3BB0 /* PeopleDetailInfoSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleDetailInfoSectionView.swift; sourceTree = "<group>"; };
+		15ADF0BE2F9A1A49004B3BB0 /* PeopleDetailVoiceRolesSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleDetailVoiceRolesSectionView.swift; sourceTree = "<group>"; };
+		15ADF0BF2F9A1A49004B3BB0 /* PeopleDetailWorksSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleDetailWorksSectionView.swift; sourceTree = "<group>"; };
 		15ADSK012F7C700100E37E01 /* AnimeDetailSectionSkeletonViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeDetailSectionSkeletonViews.swift; sourceTree = "<group>"; };
 		15B80E642F8E100100DDB201 /* MainSearchResultsContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSearchResultsContentView.swift; sourceTree = "<group>"; };
 		15B80E652F8E100200DDB201 /* MainSearchListSkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSearchListSkeletonView.swift; sourceTree = "<group>"; };
@@ -988,6 +1006,78 @@
 			path = GenreAnime;
 			sourceTree = "<group>";
 		};
+		15ADF0942F9A10C7004B3BB0 /* People */ = {
+			isa = PBXGroup;
+			children = (
+				15ADF0952F9A10CF004B3BB0 /* PeopleDetail */,
+			);
+			path = People;
+			sourceTree = "<group>";
+		};
+		15ADF0952F9A10CF004B3BB0 /* PeopleDetail */ = {
+			isa = PBXGroup;
+			children = (
+				15ADF0AA2F9A169F004B3BB0 /* Model */,
+				15ADF0AC2F9A169F004B3BB0 /* Service */,
+				15ADF0AE2F9A169F004B3BB0 /* ViewModel */,
+				15ADF0962F9A10D9004B3BB0 /* View */,
+			);
+			path = PeopleDetail;
+			sourceTree = "<group>";
+		};
+		15ADF0962F9A10D9004B3BB0 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				15ADF0C02F9A1A49004B3BB0 /* Section */,
+				15ADF0972F9A10E3004B3BB0 /* MainView */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		15ADF0972F9A10E3004B3BB0 /* MainView */ = {
+			isa = PBXGroup;
+			children = (
+				15ADF0982F9A10F4004B3BB0 /* PeopleDetailView.swift */,
+			);
+			path = MainView;
+			sourceTree = "<group>";
+		};
+		15ADF0AA2F9A169F004B3BB0 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				15ADF0A92F9A169F004B3BB0 /* PeopleDetailModels.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		15ADF0AC2F9A169F004B3BB0 /* Service */ = {
+			isa = PBXGroup;
+			children = (
+				15ADF0AB2F9A169F004B3BB0 /* PeopleDetailService.swift */,
+			);
+			path = Service;
+			sourceTree = "<group>";
+		};
+		15ADF0AE2F9A169F004B3BB0 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				15ADF0AD2F9A169F004B3BB0 /* PeopleDetailViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		15ADF0C02F9A1A49004B3BB0 /* Section */ = {
+			isa = PBXGroup;
+			children = (
+				15ADF0BB2F9A1A49004B3BB0 /* PeopleDetailAboutSectionView.swift */,
+				15ADF0BC2F9A1A49004B3BB0 /* PeopleDetailHeaderSectionView.swift */,
+				15ADF0BD2F9A1A49004B3BB0 /* PeopleDetailInfoSectionView.swift */,
+				15ADF0BE2F9A1A49004B3BB0 /* PeopleDetailVoiceRolesSectionView.swift */,
+				15ADF0BF2F9A1A49004B3BB0 /* PeopleDetailWorksSectionView.swift */,
+			);
+			path = Section;
+			sourceTree = "<group>";
+		};
 		15B80E682F8E100500DDB201 /* MainView */ = {
 			isa = PBXGroup;
 			children = (
@@ -1060,6 +1150,7 @@
 		15DE55872F723A1700B292AD = {
 			isa = PBXGroup;
 			children = (
+				15ADF0942F9A10C7004B3BB0 /* People */,
 				155B53D12F991E990014A4C0 /* Character */,
 				15FA49FD2F97C7F900EC4C09 /* MainMyList */,
 				15A295532F86300F0056071F /* MainCategoryList */,
@@ -1718,6 +1809,11 @@
 				15D4MD0B2F7C50B00E37C0B /* MangaDetailSynopsisSectionView.swift in Sources */,
 				15D4MD0D2F7C50D00E37C0D /* MangaDetailPublicationSectionView.swift in Sources */,
 				156C80562F8689F700D0CF6B /* CooldownManager.swift in Sources */,
+				15ADF0C12F9A1A49004B3BB0 /* PeopleDetailAboutSectionView.swift in Sources */,
+				15ADF0C22F9A1A49004B3BB0 /* PeopleDetailHeaderSectionView.swift in Sources */,
+				15ADF0C32F9A1A49004B3BB0 /* PeopleDetailInfoSectionView.swift in Sources */,
+				15ADF0C42F9A1A49004B3BB0 /* PeopleDetailWorksSectionView.swift in Sources */,
+				15ADF0C52F9A1A49004B3BB0 /* PeopleDetailVoiceRolesSectionView.swift in Sources */,
 				15D4SK022F7C600200E37D02 /* MangaDetailSectionSkeletonViews.swift in Sources */,
 				15A80E402F7E560600DDB201 /* MainSearchView.swift in Sources */,
 				15B80E602F8E100100DDB201 /* MainSearchResultsContentView.swift in Sources */,
@@ -1801,12 +1897,16 @@
 				1574EC4C2F7BCC0000E37AE8 /* AnimeReviewListView.swift in Sources */,
 				1574EC4D2F7BCC1000E37AE8 /* AnimeReviewRowView.swift in Sources */,
 				1574EC752F7BCDD000E37AE8 /* AnimeReviewRowHeaderView.swift in Sources */,
+				15ADF0992F9A10F4004B3BB0 /* PeopleDetailView.swift in Sources */,
 				155399772F7C14220028BD24 /* AnimeReviewEmptyStateView.swift in Sources */,
 				1553997B2F7C18BD0028BD24 /* MangaDetailView.swift in Sources */,
 				1574EC772F7BCDF000E37AE8 /* AnimeReviewRowBadgesView.swift in Sources */,
 				1574EC792F7BCE1000E37AE8 /* AnimeReviewRowTagsView.swift in Sources */,
 				15MAL022F7F2000100MAL02 /* MALWorkPageOpenButton.swift in Sources */,
 				1572FE072F762D7700756CBA /* HomeTodayAnimeModel.swift in Sources */,
+				15ADF0AF2F9A169F004B3BB0 /* PeopleDetailModels.swift in Sources */,
+				15ADF0B02F9A169F004B3BB0 /* PeopleDetailService.swift in Sources */,
+				15ADF0B12F9A169F004B3BB0 /* PeopleDetailViewModel.swift in Sources */,
 				15FF80202F765C9500D3241C /* AnimeDetailSynopsisSectionView.swift in Sources */,
 				15FF80212F765C9500D3241C /* AnimeDetailBasicInfoSectionView.swift in Sources */,
 				159667EE2F8651FC0033410A /* MainCategoryListService.swift in Sources */,

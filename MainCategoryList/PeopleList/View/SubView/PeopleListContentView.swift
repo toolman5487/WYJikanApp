@@ -26,7 +26,7 @@ struct PeopleListContentView: View {
                 LazyVGrid(columns: PeopleListGridMetrics.columns, spacing: 16) {
                     ForEach(viewModel.rows) { row in
                         NavigationLink {
-                            NavigationWebPageView(title: row.name, url: row.malPageURL)
+                            PeopleDetailView(malId: row.malId)
                         } label: {
                             PeopleGridItemView(row: row)
                         }

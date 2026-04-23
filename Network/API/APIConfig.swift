@@ -44,6 +44,7 @@ enum APIConfig {
     enum People {
         static let list = "/people"
         static func detail(id: Int) -> String { "/people/\(id)" }
+        static func full(id: Int) -> String { "/people/\(id)/full" }
     }
 
     // MARK: - Top, Seasons, Schedules
