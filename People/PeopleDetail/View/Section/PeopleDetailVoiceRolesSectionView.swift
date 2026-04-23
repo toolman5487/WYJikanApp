@@ -15,12 +15,19 @@ struct PeopleDetailVoiceRolesSectionView: View {
         let roles = viewModel.voiceRoles(for: person)
         PeopleDetailHorizontalSection(title: "配音角色") {
             ForEach(roles) { role in
-                PeopleDetailVoiceRoleCardView(
-                    characterName: role.character.map(viewModel.characterName) ?? "-",
-                    workTitle: role.anime.map(viewModel.workTitle) ?? "-",
-                    role: viewModel.roleText(role.role),
-                    imageURL: viewModel.imageURL(from: role.character?.images)
-                )
+                if let character = role.character {
+                    NavigationLink {
+                        CharacterDetailView(malId: character.malId)
+                    } label: {
+                        PeopleDetailVoiceRoleCardView(
+                            characterName: viewModel.characterName(character),
+                            workTitle: role.anime.map(viewModel.workTitle) ?? "-",
+                            role: viewModel.roleText(role.role),
+                            imageURL: viewModel.imageURL(from: character.images)
+                        )
+                    }
+                    .buttonStyle(.plain)
+                }
             }
         }
     }

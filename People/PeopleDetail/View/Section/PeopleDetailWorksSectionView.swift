@@ -16,11 +16,16 @@ struct PeopleDetailAnimeStaffSectionView: View {
         PeopleDetailHorizontalSection(title: "動畫作品") {
             ForEach(positions) { position in
                 if let anime = position.anime {
-                    PeopleDetailWorkCardView(
-                        title: viewModel.workTitle(anime),
-                        subtitle: viewModel.roleText(position.position),
-                        imageURL: viewModel.imageURL(from: anime.images)
-                    )
+                    NavigationLink {
+                        AnimeDetailView(malId: anime.malId)
+                    } label: {
+                        PeopleDetailWorkCardView(
+                            title: viewModel.workTitle(anime),
+                            subtitle: viewModel.roleText(position.position),
+                            imageURL: viewModel.imageURL(from: anime.images)
+                        )
+                    }
+                    .buttonStyle(.plain)
                 }
             }
         }
@@ -36,11 +41,16 @@ struct PeopleDetailMangaStaffSectionView: View {
         PeopleDetailHorizontalSection(title: "漫畫作品") {
             ForEach(positions) { position in
                 if let manga = position.manga {
-                    PeopleDetailWorkCardView(
-                        title: viewModel.workTitle(manga),
-                        subtitle: viewModel.roleText(position.position),
-                        imageURL: viewModel.imageURL(from: manga.images)
-                    )
+                    NavigationLink {
+                        MangaDetailView(malId: manga.malId)
+                    } label: {
+                        PeopleDetailWorkCardView(
+                            title: viewModel.workTitle(manga),
+                            subtitle: viewModel.roleText(position.position),
+                            imageURL: viewModel.imageURL(from: manga.images)
+                        )
+                    }
+                    .buttonStyle(.plain)
                 }
             }
         }
