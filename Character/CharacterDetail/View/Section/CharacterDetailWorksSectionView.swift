@@ -16,11 +16,16 @@ struct CharacterDetailAnimeWorksSectionView: View {
         CharacterDetailHorizontalSection(title: "出演動畫") {
             ForEach(roles) { role in
                 if let anime = role.anime {
-                    CharacterDetailWorkCardView(
-                        title: viewModel.workTitle(anime),
-                        subtitle: viewModel.roleText(role.role),
-                        imageURL: viewModel.imageURL(from: anime.images)
-                    )
+                    NavigationLink {
+                        AnimeDetailView(malId: anime.malId)
+                    } label: {
+                        CharacterDetailWorkCardView(
+                            title: viewModel.workTitle(anime),
+                            subtitle: viewModel.roleText(role.role),
+                            imageURL: viewModel.imageURL(from: anime.images)
+                        )
+                    }
+                    .buttonStyle(.plain)
                 }
             }
         }
@@ -36,11 +41,16 @@ struct CharacterDetailMangaWorksSectionView: View {
         CharacterDetailHorizontalSection(title: "出演漫畫") {
             ForEach(roles) { role in
                 if let manga = role.manga {
-                    CharacterDetailWorkCardView(
-                        title: viewModel.workTitle(manga),
-                        subtitle: viewModel.roleText(role.role),
-                        imageURL: viewModel.imageURL(from: manga.images)
-                    )
+                    NavigationLink {
+                        MangaDetailView(malId: manga.malId)
+                    } label: {
+                        CharacterDetailWorkCardView(
+                            title: viewModel.workTitle(manga),
+                            subtitle: viewModel.roleText(role.role),
+                            imageURL: viewModel.imageURL(from: manga.images)
+                        )
+                    }
+                    .buttonStyle(.plain)
                 }
             }
         }

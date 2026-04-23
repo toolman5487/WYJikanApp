@@ -16,11 +16,16 @@ struct CharacterDetailVoiceActorsSectionView: View {
         CharacterDetailHorizontalSection(title: "聲優") {
             ForEach(voices) { voice in
                 if let person = voice.person {
-                    CharacterDetailVoiceActorCardView(
-                        name: viewModel.personName(person),
-                        language: viewModel.languageText(voice.language),
-                        imageURL: viewModel.imageURL(from: person.images)
-                    )
+                    NavigationLink {
+                        PeopleDetailView(malId: person.malId)
+                    } label: {
+                        CharacterDetailVoiceActorCardView(
+                            name: viewModel.personName(person),
+                            language: viewModel.languageText(voice.language),
+                            imageURL: viewModel.imageURL(from: person.images)
+                        )
+                    }
+                    .buttonStyle(.plain)
                 }
             }
         }
