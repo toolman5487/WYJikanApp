@@ -8,9 +8,16 @@
 import SwiftUI
 
 struct AnimeDetailView: View {
+
+    private struct ImagePreviewSession: Identifiable {
+        let id = UUID()
+        let items: [ImagePreviewItem]
+        var selectedIndex: Int
+    }
     
     let malId: Int
     @StateObject private var viewModel: AnimeDetailViewModel
+    @State private var imagePreviewSession: ImagePreviewSession?
     init(malId: Int, service: AnimeDetailServicing = AnimeDetailService()) {
         self.malId = malId
         _viewModel = StateObject(wrappedValue: AnimeDetailViewModel(malId: malId, service: service))
@@ -68,7 +75,13 @@ struct AnimeDetailView: View {
     private func sectionView(_ section: Section, viewModel: AnimeDetailViewModel, anime: AnimeDetailDTO) -> some View {
         switch section {
         case .header:
-            AnimeDetailHeaderSectionView(viewModel: viewModel, anime: anime)
+            AnimeDetailHeaderSectionView(
+                viewModel: viewModel,
+                anime: anime,
+                onTapPoster: {
+                    showImagePreview(for: anime, selectedImageURL: viewModel.posterURL(for: anime))
+                }
+            )
         case .highlights:
             AnimeDetailHighlightsSectionView(viewModel: viewModel, anime: anime)
         case .basicInfo:
@@ -82,8 +95,51 @@ struct AnimeDetailView: View {
         case .staff:
             AnimeDetailStaffSectionView(viewModel: viewModel, anime: anime)
         case .pictures:
-            AnimeDetailPicturesSectionView(viewModel: viewModel)
+            AnimeDetailPicturesSectionView(
+                viewModel: viewModel,
+                onTapImage: { index in
+                    showImagePreview(for: anime, selectedPictureIndex: index)
+                }
+            )
         }
+    }
+
+    private func showImagePreview(for anime: AnimeDetailDTO, selectedImageURL: URL?) {
+        let items = imagePreviewItems(for: anime)
+        guard !items.isEmpty else { return }
+
+        let selectedIndex: Int
+        if let selectedImageURL,
+           let index = items.firstIndex(where: { $0.url == selectedImageURL }) {
+            selectedIndex = index
+        } else {
+            selectedIndex = 0
+        }
+        imagePreviewSession = ImagePreviewSession(items: items, selectedIndex: selectedIndex)
+    }
+
+    private func showImagePreview(for anime: AnimeDetailDTO, selectedPictureIndex: Int) {
+        let items = imagePreviewItems(for: anime)
+        guard !items.isEmpty else { return }
+
+        let posterOffset = viewModel.posterURL(for: anime) == nil ? 0 : 1
+        let selectedIndex = min(selectedPictureIndex + posterOffset, max(items.count - 1, 0))
+        imagePreviewSession = ImagePreviewSession(items: items, selectedIndex: selectedIndex)
+    }
+
+    private func imagePreviewItems(for anime: AnimeDetailDTO) -> [ImagePreviewItem] {
+        var items: [ImagePreviewItem] = []
+        var seenURLs = Set<URL>()
+
+        if let posterURL = viewModel.posterURL(for: anime), seenURLs.insert(posterURL).inserted {
+            items.append(ImagePreviewItem(id: "poster-\(anime.malId)", url: posterURL))
+        }
+
+        for picture in viewModel.pictureItems where seenURLs.insert(picture.url).inserted {
+            items.append(ImagePreviewItem(id: "picture-\(picture.id)", url: picture.url))
+        }
+
+        return items
     }
 
     var body: some View {
@@ -119,6 +175,17 @@ struct AnimeDetailView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
+        .fullScreenCover(item: $imagePreviewSession) { session in
+            ImagePreviewViewer(
+                items: session.items,
+                selectedIndex: Binding(
+                    get: { imagePreviewSession?.selectedIndex ?? session.selectedIndex },
+                    set: { newValue in
+                        imagePreviewSession?.selectedIndex = newValue
+                    }
+                )
+            )
+        }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 NavigationLink {

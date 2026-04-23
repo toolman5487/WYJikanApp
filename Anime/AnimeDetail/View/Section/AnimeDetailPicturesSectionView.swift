@@ -10,6 +10,12 @@ import SwiftUI
 struct AnimeDetailPicturesSectionView: View {
 
     let viewModel: AnimeDetailViewModel
+    let onTapImage: ((Int) -> Void)?
+
+    init(viewModel: AnimeDetailViewModel, onTapImage: ((Int) -> Void)? = nil) {
+        self.viewModel = viewModel
+        self.onTapImage = onTapImage
+    }
 
     private var gridColumns: [GridItem] {
         [
@@ -22,11 +28,15 @@ struct AnimeDetailPicturesSectionView: View {
     var body: some View {
         AnimeDetailSectionCard("劇照") {
             LazyVGrid(columns: gridColumns, alignment: .center, spacing: 12) {
-                ForEach(viewModel.pictureItems) { item in
+                ForEach(Array(viewModel.pictureItems.enumerated()), id: \.element.id) { index, item in
                     RemotePosterImageView(url: item.url)
                         .aspectRatio(2.0 / 3.0, contentMode: .fill)
                         .frame(maxWidth: .infinity)
                         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            onTapImage?(index)
+                        }
                 }
             }
         }
