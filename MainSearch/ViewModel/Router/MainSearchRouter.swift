@@ -16,8 +16,11 @@ enum MainSearchRouter {
             AnimeDetailView(malId: row.malId)
         case .manga:
             MangaDetailView(malId: row.malId)
-        case .character, .people:
-            NavigationWebPageView(title: row.title, url: row.malPageURL)
+        case .character:
+            CharacterDetailView(malId: row.malId)
+        case .people:
+            PeopleDetailView(malId: row.malId)
+
         }
     }
 }
