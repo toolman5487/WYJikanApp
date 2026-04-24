@@ -73,7 +73,7 @@ private struct RandomMangaCardView: View {
                 if let pick {
                     Text(pick.displayTitle)
                         .font(.title3.weight(.bold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(ThemeColor.textPrimary)
                         .lineLimit(2)
 
                     HStack(spacing: 8) {
@@ -87,10 +87,10 @@ private struct RandomMangaCardView: View {
                 } else if let errorMessage {
                     Text("載入失敗")
                         .font(.title3.weight(.bold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(ThemeColor.textPrimary)
                     Text(errorMessage)
                         .font(.footnote)
-                        .foregroundStyle(.white.opacity(0.9))
+                        .foregroundStyle(ThemeColor.textPrimary.opacity(0.9))
                         .lineLimit(2)
                 }
             }
@@ -112,10 +112,10 @@ private struct RandomMangaCardView: View {
     private func chip(text: String) -> some View {
         Text(text)
             .font(.caption.weight(.semibold))
-            .foregroundStyle(.white)
+            .foregroundStyle(ThemeColor.textPrimary)
             .padding(.horizontal, 10)
             .padding(.vertical, 4)
-            .background(.white.opacity(0.22))
+            .background(ThemeColor.textPrimary.opacity(0.22))
             .clipShape(Capsule())
     }
 }

@@ -5,6 +5,8 @@
 //  Created by Willy Hsu on 2026/4/23.
 //
 
+import Combine
+import Foundation
 import SwiftUI
 
 struct PeopleDetailView: View {

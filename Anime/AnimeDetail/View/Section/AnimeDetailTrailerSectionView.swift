@@ -29,7 +29,7 @@ struct AnimeDetailTrailerSectionView: View {
                             } label: {
                                 Image(systemName: "play.circle.fill")
                                     .font(.system(size: 56))
-                                    .foregroundStyle(.white.opacity(0.95))
+                                    .foregroundStyle(ThemeColor.textPrimary.opacity(0.95))
                                     .shadow(radius: 8)
                                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                             }

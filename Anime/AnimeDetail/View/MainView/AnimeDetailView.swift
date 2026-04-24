@@ -105,41 +105,21 @@ struct AnimeDetailView: View {
     }
 
     private func showImagePreview(for anime: AnimeDetailDTO, selectedImageURL: URL?) {
-        let items = imagePreviewItems(for: anime)
+        let items = viewModel.imagePreviewItems(for: anime)
         guard !items.isEmpty else { return }
-
-        let selectedIndex: Int
-        if let selectedImageURL,
-           let index = items.firstIndex(where: { $0.url == selectedImageURL }) {
-            selectedIndex = index
-        } else {
-            selectedIndex = 0
-        }
+        let selectedIndex = viewModel.initialPreviewIndex(for: items, selectedImageURL: selectedImageURL)
         imagePreviewSession = ImagePreviewSession(items: items, selectedIndex: selectedIndex)
     }
 
     private func showImagePreview(for anime: AnimeDetailDTO, selectedPictureIndex: Int) {
-        let items = imagePreviewItems(for: anime)
+        let items = viewModel.imagePreviewItems(for: anime)
         guard !items.isEmpty else { return }
-
-        let posterOffset = viewModel.posterURL(for: anime) == nil ? 0 : 1
-        let selectedIndex = min(selectedPictureIndex + posterOffset, max(items.count - 1, 0))
+        let selectedIndex = viewModel.initialPreviewIndex(
+            for: anime,
+            items: items,
+            selectedPictureIndex: selectedPictureIndex
+        )
         imagePreviewSession = ImagePreviewSession(items: items, selectedIndex: selectedIndex)
-    }
-
-    private func imagePreviewItems(for anime: AnimeDetailDTO) -> [ImagePreviewItem] {
-        var items: [ImagePreviewItem] = []
-        var seenURLs = Set<URL>()
-
-        if let posterURL = viewModel.posterURL(for: anime), seenURLs.insert(posterURL).inserted {
-            items.append(ImagePreviewItem(id: "poster-\(anime.malId)", url: posterURL))
-        }
-
-        for picture in viewModel.pictureItems where seenURLs.insert(picture.url).inserted {
-            items.append(ImagePreviewItem(id: "picture-\(picture.id)", url: picture.url))
-        }
-
-        return items
     }
 
     var body: some View {

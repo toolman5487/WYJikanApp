@@ -317,6 +317,43 @@ extension AnimeDetailViewModel {
         !pictureItems.isEmpty
     }
 
+    func imagePreviewItems(for anime: AnimeDetailDTO) -> [ImagePreviewItem] {
+        var items: [ImagePreviewItem] = []
+        var seenURLs = Set<URL>()
+
+        if let posterURL = posterURL(for: anime), seenURLs.insert(posterURL).inserted {
+            items.append(ImagePreviewItem(id: "poster-\(anime.malId)", url: posterURL))
+        }
+
+        for picture in pictureItems where seenURLs.insert(picture.url).inserted {
+            items.append(ImagePreviewItem(id: "picture-\(picture.id)", url: picture.url))
+        }
+
+        return items
+    }
+
+    func initialPreviewIndex(
+        for items: [ImagePreviewItem],
+        selectedImageURL: URL?
+    ) -> Int {
+        guard !items.isEmpty else { return 0 }
+        guard let selectedImageURL,
+              let index = items.firstIndex(where: { $0.url == selectedImageURL }) else {
+            return 0
+        }
+        return index
+    }
+
+    func initialPreviewIndex(
+        for anime: AnimeDetailDTO,
+        items: [ImagePreviewItem],
+        selectedPictureIndex: Int
+    ) -> Int {
+        guard !items.isEmpty else { return 0 }
+        let posterOffset = posterURL(for: anime) == nil ? 0 : 1
+        return min(selectedPictureIndex + posterOffset, max(items.count - 1, 0))
+    }
+
     // MARK: - Private Methods
 
     private func resolvedYouTubeVideoId(from trailer: AnimeDetailTrailerDTO) -> String? {

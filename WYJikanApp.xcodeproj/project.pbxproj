@@ -51,7 +51,6 @@
 		159667EE2F8651FC0033410A /* MainCategoryListService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 159667ED2F8651FC0033410A /* MainCategoryListService.swift */; };
 		159667F42F8659AD0033410A /* PosterTextGradientOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 159667F12F8659AD0033410A /* PosterTextGradientOverlayView.swift */; };
 		159667F52F8659AD0033410A /* RemotePosterImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 159667F22F8659AD0033410A /* RemotePosterImageView.swift */; };
-		16D100032FAA100000000003 /* ImagePreviewViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16D100012FAA100000000001 /* ImagePreviewViewer.swift */; };
 		159667FE2F865AC60033410A /* RandomHeroActionButtonsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 159667FB2F865AC60033410A /* RandomHeroActionButtonsView.swift */; };
 		159667FF2F865AC60033410A /* RandomHeroSkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 159667FD2F865AC60033410A /* RandomHeroSkeletonView.swift */; };
 		159668002F865AC60033410A /* RandomHeroCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 159667FC2F865AC60033410A /* RandomHeroCardView.swift */; };
@@ -180,6 +179,11 @@
 		16C200102F99000000000010 /* CharacterDetailWorksSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C2000F2F9900000000000F /* CharacterDetailWorksSectionView.swift */; };
 		16C200122F99000000000012 /* CharacterDetailVoiceActorsSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C200112F99000000000011 /* CharacterDetailVoiceActorsSectionView.swift */; };
 		16C200142F99000000000014 /* CharacterDetailSectionSkeletonViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C200132F99000000000013 /* CharacterDetailSectionSkeletonViews.swift */; };
+		16D100032FAA100000000003 /* ImagePreviewViewer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16D100012FAA100000000001 /* ImagePreviewViewer.swift */; };
+		16D100172FAA100000000017 /* ImagePreviewPagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16D100162FAA100000000016 /* ImagePreviewPagerView.swift */; };
+		16D100192FAA100000000019 /* ImagePreviewViewerChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16D100182FAA100000000018 /* ImagePreviewViewerChrome.swift */; };
+		16D1001B2FAA10000000001B /* ZoomableRemoteImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16D1001A2FAA10000000001A /* ZoomableRemoteImageView.swift */; };
+		16D1001D2FAA10000000001D /* ImagePreviewViewerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16D1001C2FAA10000000001C /* ImagePreviewViewerViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -227,7 +231,6 @@
 		159667ED2F8651FC0033410A /* MainCategoryListService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainCategoryListService.swift; sourceTree = "<group>"; };
 		159667F12F8659AD0033410A /* PosterTextGradientOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PosterTextGradientOverlayView.swift; sourceTree = "<group>"; };
 		159667F22F8659AD0033410A /* RemotePosterImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemotePosterImageView.swift; sourceTree = "<group>"; };
-		16D100012FAA100000000001 /* ImagePreviewViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePreviewViewer.swift; sourceTree = "<group>"; };
 		159667FB2F865AC60033410A /* RandomHeroActionButtonsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomHeroActionButtonsView.swift; sourceTree = "<group>"; };
 		159667FC2F865AC60033410A /* RandomHeroCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomHeroCardView.swift; sourceTree = "<group>"; };
 		159667FD2F865AC60033410A /* RandomHeroSkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomHeroSkeletonView.swift; sourceTree = "<group>"; };
@@ -356,6 +359,11 @@
 		16C2000F2F9900000000000F /* CharacterDetailWorksSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterDetailWorksSectionView.swift; sourceTree = "<group>"; };
 		16C200112F99000000000011 /* CharacterDetailVoiceActorsSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterDetailVoiceActorsSectionView.swift; sourceTree = "<group>"; };
 		16C200132F99000000000013 /* CharacterDetailSectionSkeletonViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterDetailSectionSkeletonViews.swift; sourceTree = "<group>"; };
+		16D100012FAA100000000001 /* ImagePreviewViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePreviewViewer.swift; sourceTree = "<group>"; };
+		16D100162FAA100000000016 /* ImagePreviewPagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePreviewPagerView.swift; sourceTree = "<group>"; };
+		16D100182FAA100000000018 /* ImagePreviewViewerChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePreviewViewerChrome.swift; sourceTree = "<group>"; };
+		16D1001A2FAA10000000001A /* ZoomableRemoteImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomableRemoteImageView.swift; sourceTree = "<group>"; };
+		16D1001C2FAA10000000001C /* ImagePreviewViewerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePreviewViewerViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -385,6 +393,25 @@
 				15750AF12F7282AE0037E8A5 /* View */,
 			);
 			path = MainTabBar;
+			sourceTree = "<group>";
+		};
+		153EC2CB2F9B2374001ABCDC /* View */ = {
+			isa = PBXGroup;
+			children = (
+				16D100012FAA100000000001 /* ImagePreviewViewer.swift */,
+				16D100162FAA100000000016 /* ImagePreviewPagerView.swift */,
+				16D100182FAA100000000018 /* ImagePreviewViewerChrome.swift */,
+				16D1001A2FAA10000000001A /* ZoomableRemoteImageView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		153EC2CC2F9B237E001ABCDC /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				16D1001C2FAA10000000001C /* ImagePreviewViewerViewModel.swift */,
+			);
+			path = ViewModel;
 			sourceTree = "<group>";
 		};
 		155399782F7C188F0028BD24 /* MangaDetail */ = {
@@ -698,14 +725,6 @@
 				159667F22F8659AD0033410A /* RemotePosterImageView.swift */,
 			);
 			path = PosterImage;
-			sourceTree = "<group>";
-		};
-		16D100022FAA100000000002 /* ImagePreview */ = {
-			isa = PBXGroup;
-			children = (
-				16D100012FAA100000000001 /* ImagePreviewViewer.swift */,
-			);
-			path = ImagePreview;
 			sourceTree = "<group>";
 		};
 		159667F62F865A190033410A /* View */ = {
@@ -1718,6 +1737,15 @@
 			path = ViewModel;
 			sourceTree = "<group>";
 		};
+		16D100022FAA100000000002 /* ImagePreview */ = {
+			isa = PBXGroup;
+			children = (
+				153EC2CC2F9B237E001ABCDC /* ViewModel */,
+				153EC2CB2F9B2374001ABCDC /* View */,
+			);
+			path = ImagePreview;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -1864,6 +1892,10 @@
 				159667F42F8659AD0033410A /* PosterTextGradientOverlayView.swift in Sources */,
 				159667F52F8659AD0033410A /* RemotePosterImageView.swift in Sources */,
 				16D100032FAA100000000003 /* ImagePreviewViewer.swift in Sources */,
+				16D1001D2FAA10000000001D /* ImagePreviewViewerViewModel.swift in Sources */,
+				16D100172FAA100000000017 /* ImagePreviewPagerView.swift in Sources */,
+				16D100192FAA100000000019 /* ImagePreviewViewerChrome.swift in Sources */,
+				16D1001B2FAA10000000001B /* ZoomableRemoteImageView.swift in Sources */,
 				15FF295D2F76332700D3241C /* AnimeDetailView.swift in Sources */,
 				15FF80152F7653E200D3241C /* MainHomeRouter.swift in Sources */,
 				15DE55B72F723F2800B292AD /* APIConfig.swift in Sources */,
