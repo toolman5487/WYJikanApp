@@ -99,6 +99,12 @@ private struct RandomMangaCardView: View {
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         .frame(maxWidth: .infinity)
         .frame(height: 260)
+        .overlay(alignment: .topTrailing) {
+            if let malId = pick?.id {
+                MyListCollectionStatusBadgeView(malId: malId, mediaKind: .manga)
+                    .padding(10)
+            }
+        }
         .overlay {
             if isDrawing {
                 RoundedRectangle(cornerRadius: 16, style: .continuous)

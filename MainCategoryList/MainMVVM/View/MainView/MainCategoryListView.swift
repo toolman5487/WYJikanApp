@@ -50,6 +50,7 @@ struct MainCategoryListView: View {
                         viewModel.reloadSelectedKind()
                     } label: {
                         Image(systemName: "arrow.trianglehead.counterclockwise")
+                            .font(.body.weight(.bold))
                     }
                     .accessibilityLabel("重新整理")
                 }

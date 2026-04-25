@@ -112,7 +112,7 @@ struct PeopleDetailView: View {
                         NavigationWebPageView(title: viewModel.displayName(for: detail), url: url)
                     } label: {
                         Image(systemName: "safari")
-                            .font(.body)
+                            .font(.body.weight(.bold))
                             .frame(minWidth: 44, minHeight: 44)
                             .contentShape(Rectangle())
                     }

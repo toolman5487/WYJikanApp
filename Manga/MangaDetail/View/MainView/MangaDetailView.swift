@@ -149,22 +149,19 @@ struct MangaDetailView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItemGroup(placement: .topBarTrailing) {
                 Button {
                     toggleFavorite()
                 } label: {
                     Image(systemName: isFavorite ? "heart.fill" : "heart")
-                        .font(.body)
-                        .foregroundStyle(isFavorite ? ThemeColor.sakura : ThemeColor.textPrimary)
+                        .font(.body.weight(.bold))
+                        .foregroundStyle(ThemeColor.sakura)
                         .frame(minWidth: 44, minHeight: 44)
                         .contentShape(Rectangle())
                 }
                 .disabled(viewModel.detail == nil)
                 .accessibilityLabel(isFavorite ? "移除漫畫收藏" : "加入漫畫收藏")
-            }
-        }
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
+
                 NavigationLink {
                     MangaReviewView(
                         malId: malId,
@@ -172,7 +169,7 @@ struct MangaDetailView: View {
                     )
                 } label: {
                     Image(systemName: "text.bubble.fill")
-                        .font(.body)
+                        .font(.body.weight(.bold))
                         .frame(minWidth: 44, minHeight: 44)
                         .contentShape(Rectangle())
                 }

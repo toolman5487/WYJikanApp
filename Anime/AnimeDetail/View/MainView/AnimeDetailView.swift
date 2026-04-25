@@ -196,18 +196,30 @@ struct AnimeDetailView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItemGroup(placement: .topBarTrailing) {
                 Button {
                     toggleFavorite()
                 } label: {
                     Image(systemName: isFavorite ? "heart.fill" : "heart")
-                        .font(.body)
-                        .foregroundStyle(isFavorite ? ThemeColor.sakura : ThemeColor.textPrimary)
+                        .font(.body.weight(.bold))
+                        .foregroundStyle(ThemeColor.sakura)
                         .frame(minWidth: 44, minHeight: 44)
                         .contentShape(Rectangle())
                 }
                 .disabled(viewModel.detail == nil)
                 .accessibilityLabel(isFavorite ? "移除動畫收藏" : "加入動畫收藏")
+
+                NavigationLink {
+                    AnimeReviewView(
+                        malId: malId,
+                        animeTitle: viewModel.detail.map { viewModel.displayTitle(for: $0) }
+                    )
+                } label: {
+                    Image(systemName: "text.bubble.fill")
+                        .font(.body.weight(.bold))
+                        .frame(minWidth: 44, minHeight: 44)
+                        .contentShape(Rectangle())
+                }
             }
         }
         .fullScreenCover(item: $imagePreviewSession) { session in
@@ -220,21 +232,6 @@ struct AnimeDetailView: View {
                     }
                 )
             )
-        }
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                NavigationLink {
-                    AnimeReviewView(
-                        malId: malId,
-                        animeTitle: viewModel.detail.map { viewModel.displayTitle(for: $0) }
-                    )
-                } label: {
-                    Image(systemName: "text.bubble.fill")
-                        .font(.body)
-                        .frame(minWidth: 44, minHeight: 44)
-                        .contentShape(Rectangle())
-                }
-            }
         }
         .task(id: malId) {
             await viewModel.load()

@@ -57,6 +57,10 @@ struct HomeTrendingMangaView: View {
                                     RemotePosterImageView(url: item.imageURL)
                                 }
                                 .frame(width: Self.cardWidth, height: Self.cardHeight)
+                                .overlay(alignment: .topTrailing) {
+                                    MyListCollectionStatusBadgeView(malId: item.id, mediaKind: .manga)
+                                        .padding(8)
+                                }
                             }
                             .buttonStyle(.plain)
                         }

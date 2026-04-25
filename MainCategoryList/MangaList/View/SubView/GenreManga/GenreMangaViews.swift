@@ -128,6 +128,10 @@ private struct GenreMangaPosterCardView: View {
                 }
             }
             .frame(width: cardWidth, height: cardHeight)
+            .overlay(alignment: .topTrailing) {
+                MyListCollectionStatusBadgeView(malId: item.id, mediaKind: .manga)
+                    .padding(8)
+            }
             .clipShape(RoundedRectangle(cornerRadius: cardCornerRadius, style: .continuous))
         }
         .buttonStyle(.plain)

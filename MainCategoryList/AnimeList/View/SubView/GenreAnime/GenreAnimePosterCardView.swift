@@ -32,6 +32,10 @@ struct GenreAnimePosterCardView: View {
                 }
             }
             .frame(width: cardWidth, height: cardHeight)
+            .overlay(alignment: .topTrailing) {
+                MyListCollectionStatusBadgeView(malId: item.id, mediaKind: .anime)
+                    .padding(8)
+            }
             .clipShape(RoundedRectangle(cornerRadius: cardCornerRadius, style: .continuous))
         }
         .buttonStyle(.plain)

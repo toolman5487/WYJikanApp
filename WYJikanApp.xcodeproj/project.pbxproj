@@ -189,6 +189,7 @@
 		16E200072FAA200000000007 /* MyListSummaryTile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E200082FAA200000000008 /* MyListSummaryTile.swift */; };
 		16E200092FAA200000000009 /* MyListItemRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E2000A2FAA20000000000A /* MyListItemRowView.swift */; };
 		16E2000B2FAA20000000000B /* MyListEmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E2000C2FAA20000000000C /* MyListEmptyStateView.swift */; };
+		16E2000D2FAA20000000000D /* MyListCollectionStatusBadgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E2000E2FAA20000000000E /* MyListCollectionStatusBadgeView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -374,6 +375,7 @@
 		16E200082FAA200000000008 /* MyListSummaryTile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListSummaryTile.swift; sourceTree = "<group>"; };
 		16E2000A2FAA20000000000A /* MyListItemRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListItemRowView.swift; sourceTree = "<group>"; };
 		16E2000C2FAA20000000000C /* MyListEmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListEmptyStateView.swift; sourceTree = "<group>"; };
+		16E2000E2FAA20000000000E /* MyListCollectionStatusBadgeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListCollectionStatusBadgeView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -1288,6 +1290,7 @@
 				16E200082FAA200000000008 /* MyListSummaryTile.swift */,
 				16E2000A2FAA20000000000A /* MyListItemRowView.swift */,
 				16E2000C2FAA20000000000C /* MyListEmptyStateView.swift */,
+				16E2000E2FAA20000000000E /* MyListCollectionStatusBadgeView.swift */,
 			);
 			path = SubView;
 			sourceTree = "<group>";
@@ -1965,6 +1968,7 @@
 				16E200072FAA200000000007 /* MyListSummaryTile.swift in Sources */,
 				16E200092FAA200000000009 /* MyListItemRowView.swift in Sources */,
 				16E2000B2FAA20000000000B /* MyListEmptyStateView.swift in Sources */,
+				16E2000D2FAA20000000000D /* MyListCollectionStatusBadgeView.swift in Sources */,
 				15FA4A122F97D00000EC4C09 /* MyListHeaderSkeletonView.swift in Sources */,
 				15FA4A142F97D00000EC4C09 /* MyListCategorySkeletonView.swift in Sources */,
 				15FA4A162F97D00000EC4C09 /* MyListSummarySkeletonView.swift in Sources */,
