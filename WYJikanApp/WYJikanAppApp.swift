@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct WYJikanAppApp: App {
@@ -14,5 +15,6 @@ struct WYJikanAppApp: App {
             MainTabBarView()
                 .preferredColorScheme(.dark)
         }
+        .modelContainer(for: [MyListCollectionItem.self])
     }
 }

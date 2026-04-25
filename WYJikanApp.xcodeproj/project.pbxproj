@@ -184,6 +184,11 @@
 		16D100192FAA100000000019 /* ImagePreviewViewerChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16D100182FAA100000000018 /* ImagePreviewViewerChrome.swift */; };
 		16D1001B2FAA10000000001B /* ZoomableRemoteImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16D1001A2FAA10000000001A /* ZoomableRemoteImageView.swift */; };
 		16D1001D2FAA10000000001D /* ImagePreviewViewerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16D1001C2FAA10000000001C /* ImagePreviewViewerViewModel.swift */; };
+		16E200032FAA200000000003 /* MyListCollectionItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E200012FAA200000000001 /* MyListCollectionItem.swift */; };
+		16E200042FAA200000000004 /* MainMyListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E200022FAA200000000002 /* MainMyListViewModel.swift */; };
+		16E200072FAA200000000007 /* MyListSummaryTile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E200082FAA200000000008 /* MyListSummaryTile.swift */; };
+		16E200092FAA200000000009 /* MyListItemRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E2000A2FAA20000000000A /* MyListItemRowView.swift */; };
+		16E2000B2FAA20000000000B /* MyListEmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E2000C2FAA20000000000C /* MyListEmptyStateView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -364,6 +369,11 @@
 		16D100182FAA100000000018 /* ImagePreviewViewerChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePreviewViewerChrome.swift; sourceTree = "<group>"; };
 		16D1001A2FAA10000000001A /* ZoomableRemoteImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoomableRemoteImageView.swift; sourceTree = "<group>"; };
 		16D1001C2FAA10000000001C /* ImagePreviewViewerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePreviewViewerViewModel.swift; sourceTree = "<group>"; };
+		16E200012FAA200000000001 /* MyListCollectionItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListCollectionItem.swift; sourceTree = "<group>"; };
+		16E200022FAA200000000002 /* MainMyListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMyListViewModel.swift; sourceTree = "<group>"; };
+		16E200082FAA200000000008 /* MyListSummaryTile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListSummaryTile.swift; sourceTree = "<group>"; };
+		16E2000A2FAA20000000000A /* MyListItemRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListItemRowView.swift; sourceTree = "<group>"; };
+		16E2000C2FAA20000000000C /* MyListEmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListEmptyStateView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -1232,9 +1242,31 @@
 			path = Service;
 			sourceTree = "<group>";
 		};
+		15F3B6ED2F9CA192000754C1 /* Skeleton */ = {
+			isa = PBXGroup;
+			children = (
+				15FA4A112F97D00000EC4C09 /* MyListHeaderSkeletonView.swift */,
+				15FA4A132F97D00000EC4C09 /* MyListCategorySkeletonView.swift */,
+				15FA4A152F97D00000EC4C09 /* MyListSummarySkeletonView.swift */,
+				15FA4A172F97D00000EC4C09 /* MyListFavoritesSkeletonView.swift */,
+				15FA4A192F97D00000EC4C09 /* MyListSectionHeaderSkeletonView.swift */,
+			);
+			path = Skeleton;
+			sourceTree = "<group>";
+		};
+		15F3B7062F9CA290000754C1 /* MainView */ = {
+			isa = PBXGroup;
+			children = (
+				15FA49FF2F97C81700EC4C09 /* MainMyListView.swift */,
+			);
+			path = MainView;
+			sourceTree = "<group>";
+		};
 		15FA49FD2F97C7F900EC4C09 /* MainMyList */ = {
 			isa = PBXGroup;
 			children = (
+				16E200052FAA200000000005 /* Model */,
+				16E200062FAA200000000006 /* ViewModel */,
 				15FA49FE2F97C80500EC4C09 /* View */,
 			);
 			path = MainMyList;
@@ -1243,7 +1275,7 @@
 		15FA49FE2F97C80500EC4C09 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				15FA49FF2F97C81700EC4C09 /* MainMyListView.swift */,
+				15F3B7062F9CA290000754C1 /* MainView */,
 				15FA4A102F97D00000EC4C09 /* SubView */,
 			);
 			path = View;
@@ -1252,11 +1284,10 @@
 		15FA4A102F97D00000EC4C09 /* SubView */ = {
 			isa = PBXGroup;
 			children = (
-				15FA4A112F97D00000EC4C09 /* MyListHeaderSkeletonView.swift */,
-				15FA4A132F97D00000EC4C09 /* MyListCategorySkeletonView.swift */,
-				15FA4A152F97D00000EC4C09 /* MyListSummarySkeletonView.swift */,
-				15FA4A172F97D00000EC4C09 /* MyListFavoritesSkeletonView.swift */,
-				15FA4A192F97D00000EC4C09 /* MyListSectionHeaderSkeletonView.swift */,
+				15F3B6ED2F9CA192000754C1 /* Skeleton */,
+				16E200082FAA200000000008 /* MyListSummaryTile.swift */,
+				16E2000A2FAA20000000000A /* MyListItemRowView.swift */,
+				16E2000C2FAA20000000000C /* MyListEmptyStateView.swift */,
 			);
 			path = SubView;
 			sourceTree = "<group>";
@@ -1746,6 +1777,22 @@
 			path = ImagePreview;
 			sourceTree = "<group>";
 		};
+		16E200052FAA200000000005 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				16E200012FAA200000000001 /* MyListCollectionItem.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		16E200062FAA200000000006 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				16E200022FAA200000000002 /* MainMyListViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -1913,6 +1960,11 @@
 				16B100062F8A000000000006 /* CharacterListContentView.swift in Sources */,
 				16B100082F8A000000000008 /* CharacterPersonGridItemView.swift in Sources */,
 				15FA4A002F97C81700EC4C09 /* MainMyListView.swift in Sources */,
+				16E200032FAA200000000003 /* MyListCollectionItem.swift in Sources */,
+				16E200042FAA200000000004 /* MainMyListViewModel.swift in Sources */,
+				16E200072FAA200000000007 /* MyListSummaryTile.swift in Sources */,
+				16E200092FAA200000000009 /* MyListItemRowView.swift in Sources */,
+				16E2000B2FAA20000000000B /* MyListEmptyStateView.swift in Sources */,
 				15FA4A122F97D00000EC4C09 /* MyListHeaderSkeletonView.swift in Sources */,
 				15FA4A142F97D00000EC4C09 /* MyListCategorySkeletonView.swift in Sources */,
 				15FA4A162F97D00000EC4C09 /* MyListSummarySkeletonView.swift in Sources */,

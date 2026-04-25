@@ -5,7 +5,9 @@
 //  Created by Willy Hsu on 2026/3/27.
 //
 
+import OSLog
 import SwiftUI
+import SwiftData
 
 struct AnimeDetailView: View {
 
@@ -17,10 +19,18 @@ struct AnimeDetailView: View {
     
     let malId: Int
     @StateObject private var viewModel: AnimeDetailViewModel
+    @Environment(\.modelContext) private var modelContext
+    @Query private var favorites: [MyListCollectionItem]
     @State private var imagePreviewSession: ImagePreviewSession?
     init(malId: Int, service: AnimeDetailServicing = AnimeDetailService()) {
+        let mediaKindRawValue = MyListMediaKind.anime.rawValue
         self.malId = malId
         _viewModel = StateObject(wrappedValue: AnimeDetailViewModel(malId: malId, service: service))
+        _favorites = Query(
+            filter: #Predicate<MyListCollectionItem> {
+                $0.malId == malId && $0.mediaKindRawValue == mediaKindRawValue
+            }
+        )
     }
     
     enum Section: Identifiable {
@@ -122,6 +132,36 @@ struct AnimeDetailView: View {
         imagePreviewSession = ImagePreviewSession(items: items, selectedIndex: selectedIndex)
     }
 
+    private var isFavorite: Bool {
+        !favorites.isEmpty
+    }
+
+    private func toggleFavorite() {
+        withAnimation(.spring(response: 0.28, dampingFraction: 0.8)) {
+            if let existing = favorites.first {
+                modelContext.delete(existing)
+            } else if let anime = viewModel.detail {
+                let item = MyListCollectionItem(
+                    malId: anime.malId,
+                    mediaKind: .anime,
+                    title: viewModel.displayTitle(for: anime),
+                    subtitle: anime.titleEnglish ?? anime.title,
+                    imageURLString: viewModel.posterURL(for: anime)?.absoluteString,
+                    addedAt: Date()
+                )
+                modelContext.insert(item)
+            } else {
+                return
+            }
+        }
+
+        do {
+            try modelContext.save()
+        } catch {
+            AppLogger.persistence.error("Anime favorite update failed: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
     var body: some View {
         Group {
             if let anime = viewModel.detail {
@@ -155,6 +195,21 @@ struct AnimeDetailView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    toggleFavorite()
+                } label: {
+                    Image(systemName: isFavorite ? "heart.fill" : "heart")
+                        .font(.body)
+                        .foregroundStyle(isFavorite ? ThemeColor.sakura : ThemeColor.textPrimary)
+                        .frame(minWidth: 44, minHeight: 44)
+                        .contentShape(Rectangle())
+                }
+                .disabled(viewModel.detail == nil)
+                .accessibilityLabel(isFavorite ? "移除動畫收藏" : "加入動畫收藏")
+            }
+        }
         .fullScreenCover(item: $imagePreviewSession) { session in
             ImagePreviewViewer(
                 items: session.items,

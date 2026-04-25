@@ -5,7 +5,9 @@
 //  Created by Willy Hsu on 2026/3/31.
 //
 
+import OSLog
 import SwiftUI
+import SwiftData
 
 struct MangaDetailView: View {
 
@@ -14,12 +16,20 @@ struct MangaDetailView: View {
     let malId: Int
 
     @StateObject private var viewModel: MangaDetailViewModel
+    @Environment(\.modelContext) private var modelContext
+    @Query private var favorites: [MyListCollectionItem]
 
     // MARK: - Initialization
 
     init(malId: Int, service: MangaDetailServicing = MangaDetailService()) {
+        let mediaKindRawValue = MyListMediaKind.manga.rawValue
         self.malId = malId
         _viewModel = StateObject(wrappedValue: MangaDetailViewModel(malId: malId, service: service))
+        _favorites = Query(
+            filter: #Predicate<MyListCollectionItem> {
+                $0.malId == malId && $0.mediaKindRawValue == mediaKindRawValue
+            }
+        )
     }
 
     // MARK: - Nested Types
@@ -76,6 +86,36 @@ struct MangaDetailView: View {
         }
     }
 
+    private var isFavorite: Bool {
+        !favorites.isEmpty
+    }
+
+    private func toggleFavorite() {
+        withAnimation(.spring(response: 0.28, dampingFraction: 0.8)) {
+            if let existing = favorites.first {
+                modelContext.delete(existing)
+            } else if let manga = viewModel.detail {
+                let item = MyListCollectionItem(
+                    malId: manga.malId,
+                    mediaKind: .manga,
+                    title: viewModel.displayTitle(for: manga),
+                    subtitle: manga.titleEnglish ?? manga.title,
+                    imageURLString: viewModel.posterURL(for: manga)?.absoluteString,
+                    addedAt: Date()
+                )
+                modelContext.insert(item)
+            } else {
+                return
+            }
+        }
+
+        do {
+            try modelContext.save()
+        } catch {
+            AppLogger.persistence.error("Manga favorite update failed: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
     // MARK: - Body
 
     var body: some View {
@@ -108,6 +148,21 @@ struct MangaDetailView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    toggleFavorite()
+                } label: {
+                    Image(systemName: isFavorite ? "heart.fill" : "heart")
+                        .font(.body)
+                        .foregroundStyle(isFavorite ? ThemeColor.sakura : ThemeColor.textPrimary)
+                        .frame(minWidth: 44, minHeight: 44)
+                        .contentShape(Rectangle())
+                }
+                .disabled(viewModel.detail == nil)
+                .accessibilityLabel(isFavorite ? "移除漫畫收藏" : "加入漫畫收藏")
+            }
+        }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 NavigationLink {
