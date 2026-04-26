@@ -13,6 +13,7 @@ final class MangaDetailViewModel: ObservableObject {
 
     @Published private(set) var detail: MangaDetailDTO?
     @Published private(set) var errorMessage: String?
+    @Published private(set) var isLoading = false
 
     private let malId: Int
     private let service: MangaDetailServicing
@@ -24,10 +25,13 @@ final class MangaDetailViewModel: ObservableObject {
 
     // MARK: - Load
 
-    func load() async {
-        guard detail == nil else { return }
+    func load(forceRefresh: Bool = false) async {
+        guard forceRefresh || detail == nil else { return }
+        guard !isLoading else { return }
 
+        isLoading = true
         errorMessage = nil
+        defer { isLoading = false }
 
         do {
             let response = try await service.fetchMangaDetail(malId: malId)
@@ -36,7 +40,9 @@ final class MangaDetailViewModel: ObservableObject {
             return
         } catch {
             errorMessage = error.localizedDescription
-            detail = nil
+            if !forceRefresh {
+                detail = nil
+            }
         }
     }
 }

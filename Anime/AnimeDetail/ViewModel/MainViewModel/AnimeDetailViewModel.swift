@@ -14,6 +14,7 @@ final class AnimeDetailViewModel: ObservableObject {
     @Published private(set) var detail: AnimeDetailDTO?
     @Published private(set) var pictureItems: [AnimeDetailPictureItem] = []
     @Published private(set) var errorMessage: String?
+    @Published private(set) var isLoading = false
 
     private let malId: Int
     private let service: AnimeDetailServicing
@@ -25,11 +26,16 @@ final class AnimeDetailViewModel: ObservableObject {
 
     // MARK: - Load
 
-    func load() async {
-        guard detail == nil else { return }
+    func load(forceRefresh: Bool = false) async {
+        guard forceRefresh || detail == nil else { return }
+        guard !isLoading else { return }
 
+        isLoading = true
         errorMessage = nil
-        pictureItems = []
+        if !forceRefresh {
+            pictureItems = []
+        }
+        defer { isLoading = false }
 
         do {
             let resolvedDetail = try await service.fetchAnimeDetail(malId: malId)
@@ -40,14 +46,18 @@ final class AnimeDetailViewModel: ObservableObject {
             } catch is CancellationError {
                 return
             } catch {
-                pictureItems = []
+                if !forceRefresh {
+                    pictureItems = []
+                }
             }
         } catch is CancellationError {
             return
         } catch {
             errorMessage = error.localizedDescription
-            detail = nil
-            pictureItems = []
+            if !forceRefresh {
+                detail = nil
+                pictureItems = []
+            }
         }
     }
 }

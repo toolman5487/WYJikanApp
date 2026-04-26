@@ -208,7 +208,9 @@ struct AnimeDetailView: View {
                 }
                 .disabled(viewModel.detail == nil)
                 .accessibilityLabel(isFavorite ? "移除動畫收藏" : "加入動畫收藏")
-
+            }
+            ToolbarSpacer(.fixed, placement: .topBarTrailing)
+            ToolbarItemGroup(placement: .topBarTrailing) {
                 NavigationLink {
                     AnimeReviewView(
                         malId: malId,
@@ -217,6 +219,19 @@ struct AnimeDetailView: View {
                 } label: {
                     Image(systemName: "text.bubble.fill")
                         .font(.body.weight(.bold))
+                        .frame(minWidth: 44, minHeight: 44)
+                        .contentShape(Rectangle())
+                }
+
+                Button {
+                    Task {
+                        await viewModel.load(forceRefresh: true)
+                    }
+                } label: {
+                    Image(systemName: "arrow.trianglehead.counterclockwise")
+                        .font(.body.weight(.bold))
+                        .symbolEffect(.rotate, options: .repeating, isActive: viewModel.isLoading)
+                        .opacity(viewModel.isLoading ? 0.7 : 1)
                         .frame(minWidth: 44, minHeight: 44)
                         .contentShape(Rectangle())
                 }

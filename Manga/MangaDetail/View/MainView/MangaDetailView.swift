@@ -10,17 +10,17 @@ import SwiftUI
 import SwiftData
 
 struct MangaDetailView: View {
-
+    
     // MARK: - Properties
-
+    
     let malId: Int
-
+    
     @StateObject private var viewModel: MangaDetailViewModel
     @Environment(\.modelContext) private var modelContext
     @Query private var favorites: [MyListCollectionItem]
-
+    
     // MARK: - Initialization
-
+    
     init(malId: Int, service: MangaDetailServicing = MangaDetailService()) {
         let mediaKindRawValue = MyListMediaKind.manga.rawValue
         self.malId = malId
@@ -31,16 +31,16 @@ struct MangaDetailView: View {
             }
         )
     }
-
+    
     // MARK: - Nested Types
-
+    
     enum Section: Identifiable {
         case header
         case highlights
         case score
         case synopsis
         case publication
-
+        
         var id: String {
             switch self {
             case .header: return "header"
@@ -51,9 +51,9 @@ struct MangaDetailView: View {
             }
         }
     }
-
+    
     // MARK: - Sections
-
+    
     private func sections(for manga: MangaDetailDTO) -> [Section] {
         var result: [Section] = [
             .header,
@@ -69,7 +69,7 @@ struct MangaDetailView: View {
         }
         return result
     }
-
+    
     @ViewBuilder
     private func sectionView(_ section: Section, viewModel: MangaDetailViewModel, manga: MangaDetailDTO) -> some View {
         switch section {
@@ -85,11 +85,11 @@ struct MangaDetailView: View {
             MangaDetailPublicationSectionView(viewModel: viewModel, manga: manga)
         }
     }
-
+    
     private var isFavorite: Bool {
         !favorites.isEmpty
     }
-
+    
     private func toggleFavorite() {
         withAnimation(.spring(response: 0.28, dampingFraction: 0.8)) {
             if let existing = favorites.first {
@@ -108,16 +108,16 @@ struct MangaDetailView: View {
                 return
             }
         }
-
+        
         do {
             try modelContext.save()
         } catch {
             AppLogger.persistence.error("Manga favorite update failed: \(error.localizedDescription, privacy: .public)")
         }
     }
-
+    
     // MARK: - Body
-
+    
     var body: some View {
         Group {
             if let manga = viewModel.detail {
@@ -159,9 +159,9 @@ struct MangaDetailView: View {
                         .frame(minWidth: 44, minHeight: 44)
                         .contentShape(Rectangle())
                 }
-                .disabled(viewModel.detail == nil)
-                .accessibilityLabel(isFavorite ? "移除漫畫收藏" : "加入漫畫收藏")
-
+            }
+            ToolbarSpacer(.fixed, placement: .topBarTrailing)
+            ToolbarItemGroup(placement: .topBarTrailing) {
                 NavigationLink {
                     MangaReviewView(
                         malId: malId,
@@ -170,6 +170,19 @@ struct MangaDetailView: View {
                 } label: {
                     Image(systemName: "text.bubble.fill")
                         .font(.body.weight(.bold))
+                        .frame(minWidth: 44, minHeight: 44)
+                        .contentShape(Rectangle())
+                }
+                
+                Button {
+                    Task {
+                        await viewModel.load(forceRefresh: true)
+                    }
+                } label: {
+                    Image(systemName: "arrow.trianglehead.counterclockwise")
+                        .font(.body.weight(.bold))
+                        .symbolEffect(.rotate, options: .repeating, isActive: viewModel.isLoading)
+                        .opacity(viewModel.isLoading ? 0.7 : 1)
                         .frame(minWidth: 44, minHeight: 44)
                         .contentShape(Rectangle())
                 }
