@@ -52,12 +52,12 @@ struct MainMyListView: View {
     }
     
     private var filterView: some View {
-        Picker("收藏類型", selection: $viewModel.selectedFilter) {
-            ForEach(MainMyListViewModel.Filter.allCases) { filter in
-                Text(filter.title).tag(filter)
-            }
-        }
-        .pickerStyle(.segmented)
+        CapsuleTagScrollView(
+            tags: MainMyListViewModel.Filter.allCases,
+            title: { $0.title },
+            selection: $viewModel.selectedFilter
+        )
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
     
     private var summaryView: some View {

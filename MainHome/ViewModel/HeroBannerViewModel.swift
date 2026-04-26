@@ -8,6 +8,13 @@
 import Combine
 import Foundation
 
+enum HeroBannerViewState: Equatable {
+    case loading
+    case error(String)
+    case empty
+    case loaded
+}
+
 @MainActor
 final class HeroBannerViewModel: ObservableObject {
     
@@ -26,10 +33,15 @@ final class HeroBannerViewModel: ObservableObject {
 
     init(
         service: MainHomeServicing = MainHomeService(),
-        emptyStateMessage: String = "Empty Data"
+        emptyStateMessage: String = "目前沒有本季焦點作品"
     ) {
         self.service = service
         self.emptyStateMessage = emptyStateMessage
+    }
+
+    deinit {
+        loadTask?.cancel()
+        autoScrollTask?.cancel()
     }
 
     func loadIfNeeded() {
@@ -38,11 +50,46 @@ final class HeroBannerViewModel: ObservableObject {
     }
 
     func setCurrentIndex(_ index: Int) {
+        guard items.indices.contains(index) else { return }
         currentIndex = index
+        startAutoScrollIfNeeded()
+    }
+
+    func retry() {
+        load()
+    }
+
+    func resumeAutoScrollIfNeeded() {
+        startAutoScrollIfNeeded()
+    }
+
+    var currentItem: BannerItem? {
+        guard items.indices.contains(currentIndex) else { return nil }
+        return items[currentIndex]
+    }
+
+    var pageLabel: String {
+        guard !items.isEmpty else { return "" }
+        return "\(currentIndex + 1) / \(items.count)"
+    }
+
+    var viewState: HeroBannerViewState {
+        if isLoading {
+            return .loading
+        }
+        if items.isEmpty {
+            if let errorMessage,
+               errorMessage != emptyStateMessage {
+                return .error(errorMessage)
+            }
+            return .empty
+        }
+        return .loaded
     }
 
     func load() {
         loadTask?.cancel()
+        stopAutoScroll()
         isLoading = true
         errorMessage = nil
 
@@ -61,14 +108,20 @@ final class HeroBannerViewModel: ObservableObject {
                     else { return nil }
 
                     guard seenMalIds.insert(dto.malId).inserted else { return nil }
-                    return BannerItem(id: dto.malId, imageURL: url)
+                    return BannerItem(
+                        id: dto.malId,
+                        imageURL: url
+                    )
                 }
 
                 let capped = Array(mapped.prefix(Self.maxBannerItems))
                 self.items = capped
                 self.currentIndex = 0
                 self.isLoading = false
+                self.errorMessage = capped.isEmpty ? self.emptyStateMessage : nil
                 self.startAutoScrollIfNeeded()
+            } catch is CancellationError {
+                self.isLoading = false
             } catch {
                 self.errorMessage = error.localizedDescription
                 self.items = []

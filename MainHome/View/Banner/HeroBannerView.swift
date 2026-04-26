@@ -11,17 +11,18 @@ struct HeroBannerView: View {
     @StateObject private var viewModel = HeroBannerViewModel()
     @EnvironmentObject private var router: MainHomeRouter
     
-    private static let posterAspectRatio: CGFloat = 2.0 / 3.0
+    private static let heroAspectRatio: CGFloat = 2.0 / 3.0
     
     var body: some View {
         VStack(spacing: 0) {
             content
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .aspectRatio(Self.posterAspectRatio, contentMode: .fit)
+        .aspectRatio(Self.heroAspectRatio, contentMode: .fit)
         .frame(maxWidth: .infinity)
         .onAppear {
             viewModel.loadIfNeeded()
+            viewModel.resumeAutoScrollIfNeeded()
         }
         .onDisappear {
             viewModel.stopAutoScroll()
@@ -30,27 +31,48 @@ struct HeroBannerView: View {
     
     @ViewBuilder
     private var content: some View {
-        if viewModel.isLoading {
+        switch viewModel.viewState {
+        case .loading:
             BannerSkeletonView()
-        } else if let errorMessage = viewModel.errorMessage {
-            ErrorMessageView(message: errorMessage, height: nil)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-        } else if viewModel.items.isEmpty {
-            ErrorMessageView(message: viewModel.emptyStateMessage, height: nil)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-        } else {
+        case .error(let errorMessage):
+            bannerMessageView(message: errorMessage, buttonTitle: "重試")
+        case .empty:
+            bannerMessageView(message: viewModel.emptyStateMessage, buttonTitle: "重新整理")
+        case .loaded:
             TabView(selection: selectionBinding) {
                 ForEach(Array(viewModel.items.enumerated()), id: \.element.id) { index, item in
                     Button {
                         router.push(.animeDetail(malId: item.id))
                     } label: {
-                        HeroBannerSlideView(imageURL: item.imageURL)
+                        HeroBannerSlideView(item: item, pageLabel: "\(index + 1) / \(viewModel.items.count)")
                     }
                     .buttonStyle(.plain)
+                    .contentShape(Rectangle())
+                    .tag(index)
                 }
             }
-            .tabViewStyle(.page(indexDisplayMode: .automatic))
+            .tabViewStyle(.page(indexDisplayMode: .never))
         }
+    }
+
+    private func bannerMessageView(message: String, buttonTitle: String) -> some View {
+        ZStack {
+            BannerSkeletonView()
+            VStack(spacing: 12) {
+                ErrorMessageView(message: message, height: nil)
+                Button(buttonTitle) {
+                    viewModel.retry()
+                }
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(ThemeColor.textPrimary)
+                .padding(.vertical, 10)
+                .padding(.horizontal, 16)
+                .background(ThemeColor.sakura)
+                .clipShape(Capsule())
+            }
+            .padding(24)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
     
     private var selectionBinding: Binding<Int> {
