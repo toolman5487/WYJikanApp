@@ -120,7 +120,8 @@ struct MangaDetailView: View {
     
     var body: some View {
         Group {
-            if let manga = viewModel.detail {
+            switch viewModel.viewState {
+            case let .content(manga):
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 20) {
                         ForEach(sections(for: manga)) { section in
@@ -130,10 +131,10 @@ struct MangaDetailView: View {
                     .padding()
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
-            } else if let message = viewModel.errorMessage {
+            case let .error(message):
                 ErrorMessageView(message: message, height: 200)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
+            case .loading:
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 20) {
                         MangaDetailHeaderSectionSkeletonView()

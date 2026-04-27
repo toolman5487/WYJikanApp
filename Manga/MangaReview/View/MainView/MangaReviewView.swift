@@ -22,14 +22,15 @@ struct MangaReviewView: View {
 
     var body: some View {
         Group {
-            if let message = viewModel.errorMessage {
+            switch viewModel.viewState {
+            case let .error(message):
                 ErrorMessageView(message: message, height: 200)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else if viewModel.isLoading, viewModel.reviews.isEmpty {
+            case .loading:
                 MangaReviewListSkeletonView()
-            } else if viewModel.reviews.isEmpty {
+            case .empty:
                 AnimeReviewEmptyStateView()
-            } else {
+            case .content:
                 MangaReviewListView(viewModel: viewModel)
             }
         }

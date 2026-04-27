@@ -10,6 +10,11 @@ import Foundation
 
 @MainActor
 final class MangaDetailViewModel: ObservableObject {
+    enum ViewState {
+        case loading
+        case content(MangaDetailDTO)
+        case error(String)
+    }
 
     @Published private(set) var detail: MangaDetailDTO?
     @Published private(set) var errorMessage: String?
@@ -21,6 +26,16 @@ final class MangaDetailViewModel: ObservableObject {
     init(malId: Int, service: MangaDetailServicing = MangaDetailService()) {
         self.malId = malId
         self.service = service
+    }
+
+    var viewState: ViewState {
+        if let detail {
+            return .content(detail)
+        }
+        if let errorMessage, !errorMessage.isEmpty {
+            return .error(errorMessage)
+        }
+        return .loading
     }
 
     // MARK: - Load

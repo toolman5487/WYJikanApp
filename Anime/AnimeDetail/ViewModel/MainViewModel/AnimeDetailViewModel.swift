@@ -10,6 +10,11 @@ import Foundation
 
 @MainActor
 final class AnimeDetailViewModel: ObservableObject {
+    enum ViewState {
+        case loading
+        case content(AnimeDetailDTO)
+        case error(String)
+    }
 
     @Published private(set) var detail: AnimeDetailDTO?
     @Published private(set) var pictureItems: [AnimeDetailPictureItem] = []
@@ -22,6 +27,16 @@ final class AnimeDetailViewModel: ObservableObject {
     init(malId: Int, service: AnimeDetailServicing = AnimeDetailService()) {
         self.malId = malId
         self.service = service
+    }
+
+    var viewState: ViewState {
+        if let detail {
+            return .content(detail)
+        }
+        if let errorMessage, !errorMessage.isEmpty {
+            return .error(errorMessage)
+        }
+        return .loading
     }
 
     // MARK: - Load

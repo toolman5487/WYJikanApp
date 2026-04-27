@@ -10,6 +10,12 @@ import Foundation
 
 @MainActor
 final class MangaReviewViewModel: ObservableObject {
+    enum ViewState {
+        case loading
+        case error(String)
+        case empty
+        case content
+    }
 
     @Published private(set) var reviews: [MangaReviewEntryDTO] = []
     @Published private(set) var isLoading = false
@@ -24,6 +30,19 @@ final class MangaReviewViewModel: ObservableObject {
     init(malId: Int, service: MangaReviewServicing = MangaReviewService()) {
         self.malId = malId
         self.service = service
+    }
+
+    var viewState: ViewState {
+        if let errorMessage, !errorMessage.isEmpty {
+            return .error(errorMessage)
+        }
+        if isLoading && reviews.isEmpty {
+            return .loading
+        }
+        if reviews.isEmpty {
+            return .empty
+        }
+        return .content
     }
 
     // MARK: - Load
