@@ -63,10 +63,12 @@ struct PosterCardMetadataOverlayView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(title)
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(ThemeColor.textPrimary)
-                .lineLimit(2)
+            if !title.isEmpty {
+                Text(title)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(ThemeColor.textPrimary)
+                    .lineLimit(2)
+            }
 
             HStack(spacing: 6) {
                 if let type, !type.isEmpty {
@@ -85,6 +87,8 @@ struct PosterCardMetadataOverlayView: View {
         Text(text)
             .font(.caption2.weight(.semibold))
             .foregroundStyle(ThemeColor.textPrimary)
+            .lineLimit(1)
+            .truncationMode(.tail)
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
             .background(.ultraThinMaterial.opacity(0.72))

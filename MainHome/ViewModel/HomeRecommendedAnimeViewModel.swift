@@ -17,13 +17,16 @@ enum HomeRecommendedAnimeViewState: Equatable {
 
 @MainActor
 final class HomeRecommendedAnimeViewModel: ObservableObject {
-    private static let maxCards = 10
+    private static let initialVisibleCards = 9
+    private static let loadMoreStep = 9
+    private static let maxCards = 30
     private static let titleEnrichmentDelayNanoseconds: UInt64 = 350_000_000
     private static var titleCache: [Int: String] = [:]
 
     @Published private(set) var items: [HomeRecommendedAnimeCardItem] = []
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var errorMessage: String?
+    @Published private(set) var visibleCount: Int = 9
 
     private let service: MainHomeServicing
     private var loadTask: Task<Void, Never>?
@@ -46,6 +49,14 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
         return .loaded
     }
 
+    var displayedItems: [HomeRecommendedAnimeCardItem] {
+        Array(items.prefix(visibleCount))
+    }
+
+    var canLoadMore: Bool {
+        visibleCount < items.count
+    }
+
     func loadIfNeeded() {
         guard items.isEmpty, !isLoading else { return }
         load()
@@ -56,6 +67,7 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
         titleEnrichmentTask?.cancel()
         isLoading = true
         errorMessage = nil
+        visibleCount = Self.initialVisibleCards
 
         loadTask = Task { [weak self] in
             guard let self else { return }
@@ -102,6 +114,10 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
         loadTask = nil
         titleEnrichmentTask?.cancel()
         titleEnrichmentTask = nil
+    }
+
+    func loadMore() {
+        visibleCount = min(visibleCount + Self.loadMoreStep, items.count)
     }
 
     private func startTitleEnrichmentIfNeeded() {

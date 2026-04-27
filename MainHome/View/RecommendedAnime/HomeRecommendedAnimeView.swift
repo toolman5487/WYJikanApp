@@ -11,15 +11,15 @@ struct HomeRecommendedAnimeView: View {
     @StateObject private var viewModel = HomeRecommendedAnimeViewModel()
     @EnvironmentObject private var router: MainHomeRouter
 
-    private static let posterHeight: CGFloat = 240
-    private static let posterAspectRatio: CGFloat = 2.0 / 3.0
-    private static let cardSpacing: CGFloat = 16
+    private static let gridSpacing: CGFloat = 16
     private static let horizontalPadding: CGFloat = 16
-    private static let skeletonCount: Int = 6
-
-    private static var cardWidth: CGFloat {
-        posterHeight * posterAspectRatio
-    }
+    private static let skeletonCount: Int = 9
+    private static let columnCount: Int = 3
+    private static let loadMoreTopPadding: CGFloat = 8
+    private let columns = Array(
+        repeating: GridItem(.flexible(), spacing: Self.gridSpacing, alignment: .top),
+        count: Self.columnCount
+    )
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -28,33 +28,36 @@ struct HomeRecommendedAnimeView: View {
                 .font(.title3.weight(.bold))
                 .foregroundStyle(ThemeColor.sakura)
 
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: Self.cardSpacing) {
-                    switch viewModel.viewState {
-                    case .loading:
+            VStack(alignment: .leading, spacing: 0) {
+                switch viewModel.viewState {
+                case .loading:
+                    LazyVGrid(columns: columns, alignment: .leading, spacing: Self.gridSpacing) {
                         ForEach(0..<Self.skeletonCount, id: \.self) { _ in
                             BannerSkeletonView()
+                                .aspectRatio(2.0 / 3.0, contentMode: .fit)
                                 .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                                .frame(width: Self.cardWidth, height: Self.posterHeight)
                         }
-                    case .failed(let errorMessage):
-                        ErrorMessageView(message: errorMessage, height: Self.posterHeight)
-                            .frame(width: Self.cardWidth)
-                    case .empty:
-                        ErrorMessageView(message: "尚無推薦資料", height: Self.posterHeight)
-                            .frame(width: Self.cardWidth)
-                    case .loaded:
-                        ForEach(viewModel.items) { item in
+                    }
+                    .padding(.horizontal, Self.horizontalPadding)
+                case .failed(let errorMessage):
+                    ErrorMessageView(message: errorMessage, height: 240)
+                        .padding(.horizontal, Self.horizontalPadding)
+                case .empty:
+                    ErrorMessageView(message: "尚無推薦資料", height: 240)
+                        .padding(.horizontal, Self.horizontalPadding)
+                case .loaded:
+                    LazyVGrid(columns: columns, alignment: .leading, spacing: Self.gridSpacing) {
+                        ForEach(viewModel.displayedItems) { item in
                             Button {
                                 router.push(.animeDetail(malId: item.detailMalId))
                             } label: {
                                 PosterCardView {
                                     RemotePosterImageView(url: item.imageURL)
                                 }
-                                .frame(width: Self.cardWidth, height: Self.posterHeight)
+                                .aspectRatio(2.0 / 3.0, contentMode: .fit)
                                 .overlay(alignment: .bottomLeading) {
                                     PosterCardMetadataOverlayView(
-                                        title: item.recommendedTitle,
+                                        title: "",
                                         type: item.username.map { "@\($0)" },
                                         score: nil
                                     )
@@ -67,8 +70,21 @@ struct HomeRecommendedAnimeView: View {
                             .buttonStyle(.plain)
                         }
                     }
+                    .padding(.horizontal, Self.horizontalPadding)
+
+                    if viewModel.canLoadMore {
+                        Button("載入更多") {
+                            viewModel.loadMore()
+                        }
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(ThemeColor.textPrimary)
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                        .background(ThemeColor.sakura)
+                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                        .padding(.top, Self.loadMoreTopPadding)
+                        .padding(.horizontal, Self.horizontalPadding)
+                    }
                 }
-                .padding(.horizontal, Self.horizontalPadding)
             }
         }
         .onAppear {
@@ -78,6 +94,7 @@ struct HomeRecommendedAnimeView: View {
             viewModel.stop()
         }
     }
+
 }
 
 #Preview {
