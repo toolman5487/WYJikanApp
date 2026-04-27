@@ -11,6 +11,9 @@ import Foundation
 
 struct BannerItem: Identifiable, Hashable, Sendable {
     let id: Int
+    let title: String
+    let type: String?
+    let score: Double?
     let imageURL: URL
 }
 
@@ -24,6 +27,11 @@ struct HeroBannerResponse: Codable {
 
 struct HeroBannerAnimeDTO: Codable, Identifiable, Hashable {
     let malId: Int
+    let title: String?
+    let titleEnglish: String?
+    let titleJapanese: String?
+    let type: String?
+    let score: Double?
     let images: AnimeImagesDTO?
 
     var id: Int { malId }

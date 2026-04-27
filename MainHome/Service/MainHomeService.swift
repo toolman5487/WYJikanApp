@@ -12,6 +12,8 @@ protocol MainHomeServicing {
     func fetchTopAnime(limit: Int) async throws -> HomeTrendingAnimeResponse
     func fetchTopManga(limit: Int) async throws -> HomeTrendingMangaResponse
     func fetchTodayAnime(limit: Int) async throws -> HomeTodayAnimeResponse
+    func fetchRecommendedAnime(limit: Int) async throws -> HomeRecommendedAnimeResponse
+    func fetchAnimeDetail(malId: Int) async throws -> AnimeDetailResponse
 }
 
 final class MainHomeService: MainHomeServicing {
@@ -56,6 +58,19 @@ final class MainHomeService: MainHomeServicing {
         )
     }
 
+    func fetchRecommendedAnime(limit: Int) async throws -> HomeRecommendedAnimeResponse {
+        try await apiService.fetch(
+            endpoint: APIConfig.Recommendations.anime,
+            queryItems: [
+                URLQueryItem(name: "limit", value: String(limit))
+            ]
+        )
+    }
+
+    func fetchAnimeDetail(malId: Int) async throws -> AnimeDetailResponse {
+        try await apiService.fetch(endpoint: APIConfig.Anime.detail(id: malId))
+    }
+
     private static func currentWeekdayForAPI() -> String {
         let weekdayIndex = Calendar.current.component(.weekday, from: Date())
         switch weekdayIndex {
@@ -70,4 +85,3 @@ final class MainHomeService: MainHomeServicing {
         }
     }
 }
-

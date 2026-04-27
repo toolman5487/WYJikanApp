@@ -8,6 +8,13 @@
 import Combine
 import Foundation
 
+enum HomeTodayAnimeViewState: Equatable {
+    case loading
+    case failed(String)
+    case empty
+    case loaded
+}
+
 @MainActor
 final class HomeTodayAnimeViewModel: ObservableObject {
     private static let maxCards = 10
@@ -22,6 +29,19 @@ final class HomeTodayAnimeViewModel: ObservableObject {
 
     init(service: MainHomeServicing = MainHomeService()) {
         self.service = service
+    }
+
+    var viewState: HomeTodayAnimeViewState {
+        if isLoading {
+            return .loading
+        }
+        if let errorMessage {
+            return .failed(errorMessage)
+        }
+        if items.isEmpty {
+            return .empty
+        }
+        return .loaded
     }
 
     func loadIfNeeded() {
@@ -48,6 +68,13 @@ final class HomeTodayAnimeViewModel: ObservableObject {
 
                     return HomeTodayAnimeCardItem(
                         id: dto.malId,
+                        title: Self.displayTitle(
+                            japanese: dto.titleJapanese,
+                            english: dto.titleEnglish,
+                            fallback: dto.title
+                        ),
+                        type: dto.type,
+                        score: dto.score,
                         imageURL: url
                     )
                 }
@@ -67,5 +94,18 @@ final class HomeTodayAnimeViewModel: ObservableObject {
     func stop() {
         loadTask?.cancel()
         loadTask = nil
+    }
+
+    private static func displayTitle(japanese: String?, english: String?, fallback: String?) -> String {
+        if let japanese, !japanese.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return japanese
+        }
+        if let english, !english.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return english
+        }
+        if let fallback, !fallback.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return fallback
+        }
+        return "未命名作品"
     }
 }

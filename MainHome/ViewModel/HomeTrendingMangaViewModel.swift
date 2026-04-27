@@ -8,6 +8,13 @@
 import Combine
 import Foundation
 
+enum HomeTrendingMangaViewState: Equatable {
+    case loading
+    case failed(String)
+    case empty
+    case loaded
+}
+
 @MainActor
 final class HomeTrendingMangaViewModel: ObservableObject {
     private static let maxCards = 10
@@ -21,6 +28,19 @@ final class HomeTrendingMangaViewModel: ObservableObject {
 
     init(service: MainHomeServicing = MainHomeService()) {
         self.service = service
+    }
+
+    var viewState: HomeTrendingMangaViewState {
+        if isLoading {
+            return .loading
+        }
+        if let errorMessage {
+            return .failed(errorMessage)
+        }
+        if items.isEmpty {
+            return .empty
+        }
+        return .loaded
     }
 
     func loadIfNeeded() {
@@ -44,6 +64,13 @@ final class HomeTrendingMangaViewModel: ObservableObject {
 
                     return HomeTrendingMangaCardItem(
                         id: dto.id,
+                        title: Self.displayTitle(
+                            japanese: dto.titleJapanese,
+                            english: dto.titleEnglish,
+                            fallback: dto.title
+                        ),
+                        type: dto.type,
+                        score: dto.score,
                         rank: dto.rank,
                         imageURL: url
                     )
@@ -62,5 +89,18 @@ final class HomeTrendingMangaViewModel: ObservableObject {
     func stop() {
         loadTask?.cancel()
         loadTask = nil
+    }
+
+    private static func displayTitle(japanese: String?, english: String?, fallback: String?) -> String {
+        if let japanese, !japanese.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return japanese
+        }
+        if let english, !english.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return english
+        }
+        if let fallback, !fallback.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return fallback
+        }
+        return "未命名作品"
     }
 }

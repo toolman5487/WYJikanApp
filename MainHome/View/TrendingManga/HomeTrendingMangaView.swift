@@ -31,7 +31,8 @@ struct HomeTrendingMangaView: View {
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: Self.cardSpacing) {
-                    if viewModel.isLoading {
+                    switch viewModel.viewState {
+                    case .loading:
                         ForEach(0..<Self.skeletonCount, id: \.self) { _ in
                             BannerSkeletonView()
                                 .clipShape(
@@ -42,13 +43,13 @@ struct HomeTrendingMangaView: View {
                                 )
                                 .frame(width: Self.cardWidth, height: Self.cardHeight)
                         }
-                    } else if let errorMessage = viewModel.errorMessage {
+                    case .failed(let errorMessage):
                         ErrorMessageView(message: errorMessage, height: Self.cardHeight)
                             .frame(width: Self.cardWidth)
-                    } else if viewModel.items.isEmpty {
+                    case .empty:
                         ErrorMessageView(message: "Empty Data", height: Self.cardHeight)
                             .frame(width: Self.cardWidth)
-                    } else {
+                    case .loaded:
                         ForEach(viewModel.items) { item in
                             Button {
                                 router.push(.mangaDetail(malId: item.id))
@@ -57,6 +58,13 @@ struct HomeTrendingMangaView: View {
                                     RemotePosterImageView(url: item.imageURL)
                                 }
                                 .frame(width: Self.cardWidth, height: Self.cardHeight)
+                                .overlay(alignment: .bottomLeading) {
+                                    PosterCardMetadataOverlayView(
+                                        title: item.title,
+                                        type: item.type,
+                                        score: item.score
+                                    )
+                                }
                                 .overlay(alignment: .topTrailing) {
                                     MyListCollectionStatusBadgeView(malId: item.id, mediaKind: .manga)
                                         .padding(8)

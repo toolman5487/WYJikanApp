@@ -11,6 +11,9 @@ import Foundation
 
 struct HomeTrendingMangaCardItem: Identifiable, Hashable, Sendable {
     let id: Int
+    let title: String
+    let type: String?
+    let score: Double?
     let rank: Int?
     let imageURL: URL
 }
@@ -23,6 +26,11 @@ struct HomeTrendingMangaResponse: Codable {
 
 struct HomeTrendingMangaDTO: Codable, Identifiable, Hashable {
     let malId: Int
+    let title: String?
+    let titleEnglish: String?
+    let titleJapanese: String?
+    let type: String?
+    let score: Double?
     let rank: Int?
     let images: AnimeImagesDTO?
 

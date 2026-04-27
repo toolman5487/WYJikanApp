@@ -28,27 +28,54 @@ struct HeroBannerSlideView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
 
             HStack(alignment: .center) {
-                Text("本季焦點")
-                    .font(.caption.weight(.semibold))
-                    .padding(.vertical, 6)
-                    .padding(.horizontal, 10)
-                    .background(ThemeColor.sakura.opacity(0.95))
-                    .clipShape(Capsule())
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack(spacing: 8) {
+                        Text("本季焦點")
+                            .font(.caption.weight(.semibold))
+                            .padding(.vertical, 6)
+                            .padding(.horizontal, 10)
+                            .background(ThemeColor.sakura.opacity(0.95))
+                            .clipShape(Capsule())
 
-                Spacer(minLength: 12)
+                        if let type = item.type, !type.isEmpty {
+                            badge(text: type)
+                        }
 
-                Text(pageLabel)
-                    .font(.caption.monospacedDigit())
-                    .foregroundStyle(ThemeColor.textPrimary.opacity(0.9))
-                    .padding(.vertical, 6)
-                    .padding(.horizontal, 10)
-                    .background(.ultraThinMaterial.opacity(0.55))
-                    .clipShape(Capsule())
+                        if let score = item.score {
+                            badge(text: String(format: "★ %.2f", score))
+                        }
+
+                        Spacer(minLength: 12)
+
+                        Text(pageLabel)
+                            .font(.caption.monospacedDigit())
+                            .foregroundStyle(ThemeColor.textPrimary.opacity(0.9))
+                            .padding(.vertical, 6)
+                            .padding(.horizontal, 10)
+                            .background(.ultraThinMaterial.opacity(0.55))
+                            .clipShape(Capsule())
+                    }
+
+                    Text(item.title)
+                        .font(.title2.weight(.bold))
+                        .foregroundStyle(ThemeColor.textPrimary)
+                        .lineLimit(2)
+                }
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 24)
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    private func badge(text: String) -> some View {
+        Text(text)
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(ThemeColor.textPrimary)
+            .padding(.vertical, 6)
+            .padding(.horizontal, 10)
+            .background(.ultraThinMaterial.opacity(0.55))
+            .clipShape(Capsule())
     }
 }

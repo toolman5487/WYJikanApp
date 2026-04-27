@@ -110,6 +110,13 @@ final class HeroBannerViewModel: ObservableObject {
                     guard seenMalIds.insert(dto.malId).inserted else { return nil }
                     return BannerItem(
                         id: dto.malId,
+                        title: Self.displayTitle(
+                            japanese: dto.titleJapanese,
+                            english: dto.titleEnglish,
+                            fallback: dto.title
+                        ),
+                        type: dto.type,
+                        score: dto.score,
                         imageURL: url
                     )
                 }
@@ -150,5 +157,18 @@ final class HeroBannerViewModel: ObservableObject {
     func stopAutoScroll() {
         autoScrollTask?.cancel()
         autoScrollTask = nil
+    }
+
+    private static func displayTitle(japanese: String?, english: String?, fallback: String?) -> String {
+        if let japanese, !japanese.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return japanese
+        }
+        if let english, !english.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return english
+        }
+        if let fallback, !fallback.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return fallback
+        }
+        return "未命名作品"
     }
 }

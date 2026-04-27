@@ -55,3 +55,39 @@ struct PosterCardView<ImageContent: View>: View {
         .clipShape(RoundedRectangle(cornerRadius: Self.cornerRadius, style: .continuous))
     }
 }
+
+struct PosterCardMetadataOverlayView: View {
+    let title: String
+    let type: String?
+    let score: Double?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(ThemeColor.textPrimary)
+                .lineLimit(2)
+
+            HStack(spacing: 6) {
+                if let type, !type.isEmpty {
+                    chip(text: type)
+                }
+                if let score {
+                    chip(text: String(format: "★ %.2f", score))
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(10)
+    }
+
+    private func chip(text: String) -> some View {
+        Text(text)
+            .font(.caption2.weight(.semibold))
+            .foregroundStyle(ThemeColor.textPrimary)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(.ultraThinMaterial.opacity(0.72))
+            .clipShape(Capsule())
+    }
+}

@@ -15,6 +15,7 @@ struct MainHomeView: View {
         case todayAnime
         case trendingAnime
         case trendingManga
+        case recommendedAnime
         
         var id: String {
             switch self {
@@ -22,6 +23,7 @@ struct MainHomeView: View {
             case .todayAnime: return "todayAnime"
             case .trendingAnime: return "trendingAnime"
             case .trendingManga: return "trendingManga"
+            case .recommendedAnime: return "recommendedAnime"
             }
         }
     }
@@ -30,7 +32,8 @@ struct MainHomeView: View {
         .banner,
         .todayAnime,
         .trendingAnime,
-        .trendingManga
+        .trendingManga,
+        .recommendedAnime
     ]
     
     
@@ -45,6 +48,8 @@ struct MainHomeView: View {
             HomeTrendingAnimeView()
         case .trendingManga:
             HomeTrendingMangaView()
+        case .recommendedAnime:
+            HomeRecommendedAnimeView()
         }
     }
     
