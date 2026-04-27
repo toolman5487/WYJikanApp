@@ -12,19 +12,20 @@ struct CharacterListContentView: View {
 
     var body: some View {
         LazyVStack(alignment: .leading, spacing: 14) {
-            if viewModel.isLoading {
+            switch viewModel.viewState {
+            case .loading:
                 CharacterListLoadingView()
-            } else if let message = viewModel.errorMessage, viewModel.rows.isEmpty {
+            case .error(let message):
                 ErrorMessageView(message: message, height: 180)
-            } else if viewModel.rows.isEmpty {
+            case .empty:
                 Text("目前沒有角色資料")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.vertical, 48)
-            } else {
+            case .content(let rows, let inlineError, let footer):
                 LazyVGrid(columns: CharacterListGridMetrics.columns, spacing: 16) {
-                    ForEach(viewModel.rows) { row in
+                    ForEach(rows) { row in
                         NavigationLink {
                             CharacterDetailView(malId: row.malId)
                         } label: {
@@ -34,18 +35,30 @@ struct CharacterListContentView: View {
                     }
                 }
 
-                if let message = viewModel.errorMessage {
+                if let message = inlineError {
                     ErrorMessageView(message: message)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 8)
                 }
 
-                CharacterLoadMoreButton(
-                    title: "載入更多角色",
-                    isLoading: viewModel.isLoadingMore,
-                    isVisible: viewModel.hasNextPage,
-                    action: viewModel.loadMore
-                )
+                switch footer {
+                case .hidden:
+                    EmptyView()
+                case .loadMore:
+                    CharacterLoadMoreButton(
+                        title: "載入更多角色",
+                        isLoading: false,
+                        isVisible: true,
+                        action: viewModel.loadMore
+                    )
+                case .loadingMore:
+                    CharacterLoadMoreButton(
+                        title: "載入更多角色",
+                        isLoading: true,
+                        isVisible: true,
+                        action: viewModel.loadMore
+                    )
+                }
             }
         }
         .padding(.top, 8)

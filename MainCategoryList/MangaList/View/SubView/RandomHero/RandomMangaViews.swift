@@ -11,32 +11,42 @@ struct RandomMangaSectionView: View {
     @ObservedObject var viewModel: RandomMangaViewModel
 
     var body: some View {
-        let pick = viewModel.randomPick
-        let isDrawing = viewModel.isDrawing
-        let drawError = viewModel.drawError
-
         VStack(alignment: .leading, spacing: 12) {
-            Group {
-                if isDrawing, pick == nil {
-                    RandomMangaSkeletonView()
-                } else if let error = drawError, pick == nil {
-                    RandomMangaCardView(
-                        pick: nil,
-                        isDrawing: false,
-                        errorMessage: error
-                    )
-                } else {
-                    RandomMangaCardView(
-                        pick: pick,
-                        isDrawing: isDrawing
-                    )
-                }
+            switch viewModel.drawState {
+            case .loading(let pick) where pick == nil:
+                RandomMangaSkeletonView()
+            case .failure(let error, let pick) where pick == nil:
+                RandomMangaCardView(
+                    pick: nil,
+                    isDrawing: false,
+                    errorMessage: error
+                )
+            case .loading(let pick):
+                RandomMangaCardView(
+                    pick: pick,
+                    isDrawing: true
+                )
+            case .ready(let pick):
+                RandomMangaCardView(
+                    pick: pick,
+                    isDrawing: false
+                )
+            case .failure(_, let pick):
+                RandomMangaCardView(
+                    pick: pick,
+                    isDrawing: false
+                )
+            case .cooldown(let pick, _):
+                RandomMangaCardView(
+                    pick: pick,
+                    isDrawing: false
+                )
             }
 
             RandomMangaActionButtonsView(
                 drawButtonTitle: viewModel.drawButtonTitle,
                 canDraw: viewModel.canDraw,
-                detailMalId: pick?.malId,
+                detailMalId: viewModel.randomPick?.malId,
                 onDrawTap: viewModel.drawRandomManga
             )
         }

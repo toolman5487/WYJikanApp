@@ -75,7 +75,8 @@ struct CharacterDetailView: View {
 
     var body: some View {
         Group {
-            if let character = viewModel.detail {
+            switch viewModel.viewState {
+            case .loaded(let character):
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 20) {
                         ForEach(sections(for: character)) { section in
@@ -85,10 +86,10 @@ struct CharacterDetailView: View {
                     .padding()
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
-            } else if let message = viewModel.errorMessage {
+            case .error(let message):
                 ErrorMessageView(message: message, height: 200)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else {
+            case .loading:
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 20) {
                         CharacterDetailHeaderSectionSkeletonView()

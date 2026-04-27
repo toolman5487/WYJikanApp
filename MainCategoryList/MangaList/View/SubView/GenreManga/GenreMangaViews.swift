@@ -12,10 +12,24 @@ struct GenreMangaListContainerView: View {
 
     var body: some View {
         Group {
-            if viewModel.isLoading && viewModel.genreSections.isEmpty {
+            switch viewModel.viewState {
+            case .loading:
                 GenreMangaListSkeletonView()
-            } else {
-                if let message = viewModel.errorMessage {
+            case .error(let message):
+                Text(message)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+            case .empty:
+                Text("目前沒有分類資料")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.vertical, 24)
+            case .content(let sections, let inlineError, let loadMoreState):
+                if let message = inlineError {
                     Text(message)
                         .font(.footnote)
                         .foregroundStyle(.secondary)
@@ -24,15 +38,18 @@ struct GenreMangaListContainerView: View {
                         .padding(.bottom, 8)
                 }
 
-                ForEach(viewModel.genreSections) { section in
+                ForEach(sections) { section in
                     GenreMangaSectionView(section: section)
                 }
 
-                if viewModel.canLoadMore {
+                switch loadMoreState {
+                case .hidden:
+                    EmptyView()
+                case .available, .loading:
                     Button {
                         viewModel.loadMoreSections()
                     } label: {
-                        if viewModel.isLoadingMore {
+                        if loadMoreState == .loading {
                             ProgressView()
                                 .frame(maxWidth: .infinity, minHeight: 44)
                         } else {
@@ -42,7 +59,7 @@ struct GenreMangaListContainerView: View {
                     }
                     .buttonStyle(.borderedProminent)
                     .tint(ThemeColor.sakura)
-                    .disabled(viewModel.isLoadingMore)
+                    .disabled(loadMoreState == .loading)
                     .padding(.horizontal, 16)
                 }
             }

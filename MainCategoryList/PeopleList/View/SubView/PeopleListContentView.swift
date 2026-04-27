@@ -12,19 +12,20 @@ struct PeopleListContentView: View {
 
     var body: some View {
         LazyVStack(alignment: .leading, spacing: 14) {
-            if viewModel.isLoading {
+            switch viewModel.viewState {
+            case .loading:
                 PeopleListLoadingView()
-            } else if let message = viewModel.errorMessage, viewModel.rows.isEmpty {
+            case .error(let message):
                 ErrorMessageView(message: message, height: 180)
-            } else if viewModel.rows.isEmpty {
+            case .empty:
                 Text("目前沒有聲優資料")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.vertical, 48)
-            } else {
+            case .content(let rows, let inlineError, let footer):
                 LazyVGrid(columns: PeopleListGridMetrics.columns, spacing: 16) {
-                    ForEach(viewModel.rows) { row in
+                    ForEach(rows) { row in
                         NavigationLink {
                             PeopleDetailView(malId: row.malId)
                         } label: {
@@ -34,18 +35,30 @@ struct PeopleListContentView: View {
                     }
                 }
 
-                if let message = viewModel.errorMessage {
+                if let message = inlineError {
                     ErrorMessageView(message: message)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 8)
                 }
 
-                PeopleLoadMoreButton(
-                    title: "載入更多聲優",
-                    isLoading: viewModel.isLoadingMore,
-                    isVisible: viewModel.hasNextPage,
-                    action: viewModel.loadMore
-                )
+                switch footer {
+                case .hidden:
+                    EmptyView()
+                case .loadMore:
+                    PeopleLoadMoreButton(
+                        title: "載入更多聲優",
+                        isLoading: false,
+                        isVisible: true,
+                        action: viewModel.loadMore
+                    )
+                case .loadingMore:
+                    PeopleLoadMoreButton(
+                        title: "載入更多聲優",
+                        isLoading: true,
+                        isVisible: true,
+                        action: viewModel.loadMore
+                    )
+                }
             }
         }
         .padding(.top, 8)

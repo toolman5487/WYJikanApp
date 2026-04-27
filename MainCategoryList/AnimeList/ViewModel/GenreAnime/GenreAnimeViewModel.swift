@@ -20,6 +20,19 @@ final class GenreAnimeViewModel: ObservableObject {
         case failed(message: String)
     }
 
+    enum LoadMoreState: Equatable {
+        case hidden
+        case available
+        case loading
+    }
+
+    enum ViewState {
+        case loading
+        case error(String)
+        case empty
+        case content(sections: [AnimeGenreSection], inlineError: String?, loadMoreState: LoadMoreState)
+    }
+
     // MARK: - Constants
     
     private static let initialGenreSections = 12
@@ -37,30 +50,38 @@ final class GenreAnimeViewModel: ObservableObject {
     @Published private(set) var loadState: LoadState = .idle
     @Published private(set) var canLoadMore: Bool = false
 
-    var isLoading: Bool {
+    var viewState: ViewState {
         switch loadState {
-        case .loadingInitial:
-            return true
-        default:
-            return false
-        }
-    }
+        case .loadingInitial where genreSections.isEmpty:
+            return .loading
+        case .failed(let message) where genreSections.isEmpty:
+            return .error(message)
+        case .idle, .loadingInitial, .loadingMore, .loaded, .failed:
+            if genreSections.isEmpty {
+                return .empty
+            }
 
-    var isLoadingMore: Bool {
-        switch loadState {
-        case .loadingMore:
-            return true
-        default:
-            return false
-        }
-    }
+            let inlineError: String?
+            if case .failed(let message) = loadState {
+                inlineError = message
+            } else {
+                inlineError = nil
+            }
 
-    var errorMessage: String? {
-        switch loadState {
-        case .failed(let message):
-            return message
-        default:
-            return nil
+            let loadMoreState: LoadMoreState
+            if !canLoadMore {
+                loadMoreState = .hidden
+            } else if loadState == .loadingMore {
+                loadMoreState = .loading
+            } else {
+                loadMoreState = .available
+            }
+
+            return .content(
+                sections: genreSections,
+                inlineError: inlineError,
+                loadMoreState: loadMoreState
+            )
         }
     }
     

@@ -10,11 +10,29 @@ import Combine
 
 @MainActor
 final class CharacterListViewModel: ObservableObject {
+    enum PaginationState: Equatable {
+        case idle
+        case loadingInitial
+        case loadingMore
+        case failed(String)
+    }
+
+    enum FooterState: Equatable {
+        case hidden
+        case loadMore
+        case loadingMore
+    }
+
+    enum ViewState {
+        case loading
+        case error(String)
+        case empty
+        case content(rows: [CharacterListRow], inlineError: String?, footer: FooterState)
+    }
+
     @Published private(set) var rows: [CharacterListRow] = []
-    @Published private(set) var isLoading = false
-    @Published private(set) var isLoadingMore = false
-    @Published private(set) var errorMessage: String?
     @Published private(set) var hasNextPage = true
+    @Published private(set) var paginationState: PaginationState = .idle
 
     private let service: MainCategoryListServicing
     private let pageLimit = 12
@@ -23,6 +41,37 @@ final class CharacterListViewModel: ObservableObject {
 
     init(service: MainCategoryListServicing = MainCategoryListService()) {
         self.service = service
+    }
+
+    var viewState: ViewState {
+        switch paginationState {
+        case .loadingInitial where rows.isEmpty:
+            return .loading
+        case .failed(let message) where rows.isEmpty:
+            return .error(message)
+        case .idle, .loadingInitial, .loadingMore, .failed:
+            if rows.isEmpty {
+                return .empty
+            }
+
+            let inlineError: String?
+            if case .failed(let message) = paginationState {
+                inlineError = message
+            } else {
+                inlineError = nil
+            }
+
+            let footer: FooterState
+            if !hasNextPage {
+                footer = .hidden
+            } else if paginationState == .loadingMore {
+                footer = .loadingMore
+            } else {
+                footer = .loadMore
+            }
+
+            return .content(rows: rows, inlineError: inlineError, footer: footer)
+        }
     }
 
     func loadIfNeeded() {
@@ -35,26 +84,29 @@ final class CharacterListViewModel: ObservableObject {
         currentPage = 0
         hasNextPage = true
         rows = []
-        errorMessage = nil
+        paginationState = .idle
         loadPage(1)
     }
 
     func loadMore() {
-        guard hasNextPage, !isLoading, !isLoadingMore else { return }
+        guard hasNextPage else { return }
+        switch paginationState {
+        case .loadingInitial, .loadingMore:
+            return
+        default:
+            break
+        }
         loadPage(currentPage + 1)
     }
 
     func stop() {
         loadTask?.cancel()
-        isLoading = false
-        isLoadingMore = false
+        paginationState = .idle
     }
 
     private func loadPage(_ page: Int) {
         let isFirstPage = page == 1
-        isLoading = isFirstPage
-        isLoadingMore = !isFirstPage
-        errorMessage = nil
+        paginationState = isFirstPage ? .loadingInitial : .loadingMore
 
         loadTask = Task { [weak self] in
             guard let self else { return }
@@ -67,13 +119,11 @@ final class CharacterListViewModel: ObservableObject {
                 currentPage = response.pagination?.currentPage ?? page
                 hasNextPage = response.pagination?.hasNextPage ?? !newRows.isEmpty
                 rows = isFirstPage ? newRows : rows + newRows
+                paginationState = .idle
             } catch {
                 guard !Task.isCancelled else { return }
-                errorMessage = error.localizedDescription
+                paginationState = .failed(error.localizedDescription)
             }
-
-            isLoading = false
-            isLoadingMore = false
         }
     }
 }

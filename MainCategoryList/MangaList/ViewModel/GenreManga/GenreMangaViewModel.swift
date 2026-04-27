@@ -18,6 +18,19 @@ final class GenreMangaViewModel: ObservableObject {
         case failed(message: String)
     }
 
+    enum LoadMoreState: Equatable {
+        case hidden
+        case available
+        case loading
+    }
+
+    enum ViewState {
+        case loading
+        case error(String)
+        case empty
+        case content(sections: [MangaGenreSection], inlineError: String?, loadMoreState: LoadMoreState)
+    }
+
     private static let initialGenreSections = 12
     private static let loadMoreGenreSections = 12
     private static let genreMangaLimit = 5
@@ -31,25 +44,39 @@ final class GenreMangaViewModel: ObservableObject {
     @Published private(set) var loadState: LoadState = .idle
     @Published private(set) var canLoadMore: Bool = false
 
-    var isLoading: Bool {
-        if case .loadingInitial = loadState {
-            return true
-        }
-        return false
-    }
+    var viewState: ViewState {
+        switch loadState {
+        case .loadingInitial where genreSections.isEmpty:
+            return .loading
+        case .failed(let message) where genreSections.isEmpty:
+            return .error(message)
+        case .idle, .loadingInitial, .loadingMore, .loaded, .failed:
+            if genreSections.isEmpty {
+                return .empty
+            }
 
-    var isLoadingMore: Bool {
-        if case .loadingMore = loadState {
-            return true
-        }
-        return false
-    }
+            let inlineError: String?
+            if case .failed(let message) = loadState {
+                inlineError = message
+            } else {
+                inlineError = nil
+            }
 
-    var errorMessage: String? {
-        if case .failed(let message) = loadState {
-            return message
+            let loadMoreState: LoadMoreState
+            if !canLoadMore {
+                loadMoreState = .hidden
+            } else if loadState == .loadingMore {
+                loadMoreState = .loading
+            } else {
+                loadMoreState = .available
+            }
+
+            return .content(
+                sections: genreSections,
+                inlineError: inlineError,
+                loadMoreState: loadMoreState
+            )
         }
-        return nil
     }
 
     private let service: MainCategoryListServicing

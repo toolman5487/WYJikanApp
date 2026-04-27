@@ -15,32 +15,42 @@ struct RandomHeroSectionView: View {
     // MARK: - View
 
     var body: some View {
-        let pick = viewModel.randomPick
-        let isDrawing = viewModel.isDrawing
-        let drawError = viewModel.drawError
-
         VStack(alignment: .leading, spacing: 12) {
-            Group {
-                if isDrawing, pick == nil {
-                    RandomHeroSkeletonView()
-                } else if let error = drawError, pick == nil {
-                    RandomHeroCardView(
-                        pick: nil,
-                        isDrawing: false,
-                        errorMessage: error
-                    )
-                } else {
-                    RandomHeroCardView(
-                        pick: pick,
-                        isDrawing: isDrawing
-                    )
-                }
+            switch viewModel.drawState {
+            case .loading(let pick) where pick == nil:
+                RandomHeroSkeletonView()
+            case .failure(let error, let pick) where pick == nil:
+                RandomHeroCardView(
+                    pick: nil,
+                    isDrawing: false,
+                    errorMessage: error
+                )
+            case .loading(let pick):
+                RandomHeroCardView(
+                    pick: pick,
+                    isDrawing: true
+                )
+            case .ready(let pick):
+                RandomHeroCardView(
+                    pick: pick,
+                    isDrawing: false
+                )
+            case .failure(_, let pick):
+                RandomHeroCardView(
+                    pick: pick,
+                    isDrawing: false
+                )
+            case .cooldown(let pick, _):
+                RandomHeroCardView(
+                    pick: pick,
+                    isDrawing: false
+                )
             }
 
             RandomHeroActionButtonsView(
                 drawButtonTitle: viewModel.drawButtonTitle,
                 canDraw: viewModel.canDraw,
-                detailMalId: pick?.malId,
+                detailMalId: viewModel.randomPick?.malId,
                 onDrawTap: viewModel.drawRandomAnime
             )
         }

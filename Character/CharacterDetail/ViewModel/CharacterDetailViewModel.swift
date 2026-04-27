@@ -11,6 +11,12 @@ import Foundation
 @MainActor
 final class CharacterDetailViewModel: ObservableObject {
 
+    enum ViewState {
+        case loading
+        case loaded(CharacterDetailDTO)
+        case error(String)
+    }
+
     @Published private(set) var detail: CharacterDetailDTO?
     @Published private(set) var errorMessage: String?
 
@@ -20,6 +26,16 @@ final class CharacterDetailViewModel: ObservableObject {
     init(malId: Int, service: CharacterDetailServicing = CharacterDetailService()) {
         self.malId = malId
         self.service = service
+    }
+
+    var viewState: ViewState {
+        if let detail {
+            return .loaded(detail)
+        }
+        if let errorMessage, !errorMessage.isEmpty {
+            return .error(errorMessage)
+        }
+        return .loading
     }
 
     func load() async {
