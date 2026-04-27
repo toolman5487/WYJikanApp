@@ -238,14 +238,14 @@ struct MainSearchResultRow: Identifiable, Hashable, Sendable {
     }
 }
 
-// MARK: - Body State
+// MARK: - Screen State
 
-enum MainSearchBodyState: Equatable {
+enum MainSearchScreenState: Equatable {
     case emptyPrompt
     case loading
-    case failed(String)
+    case error(String)
     case emptyResults(query: String)
-    case list([MainSearchResultRow])
+    case content([MainSearchResultRow])
 
     static func resolve(
         trimmedQuery: String,
@@ -253,11 +253,11 @@ enum MainSearchBodyState: Equatable {
         isLoading: Bool,
         errorMessage: String?,
         rows: [MainSearchResultRow]
-    ) -> MainSearchBodyState {
+    ) -> MainSearchScreenState {
         if trimmedQuery.isEmpty { return .emptyPrompt }
         if isLoading, rows.isEmpty { return .loading }
-        if let message = errorMessage, rows.isEmpty { return .failed(message) }
+        if let message = errorMessage, rows.isEmpty { return .error(message) }
         if rows.isEmpty { return .emptyResults(query: query) }
-        return .list(rows)
+        return .content(rows)
     }
 }

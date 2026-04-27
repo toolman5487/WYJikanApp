@@ -16,7 +16,7 @@ struct GenreAnimeListContainerView: View {
 
     var body: some View {
         Group {
-            switch viewModel.viewState {
+            switch viewModel.screenState {
             case .loading:
                 GenreAnimeListSkeletonView()
             case .error(let message):

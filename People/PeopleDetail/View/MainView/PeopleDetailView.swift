@@ -77,7 +77,7 @@ struct PeopleDetailView: View {
 
     var body: some View {
         Group {
-            switch viewModel.viewState {
+            switch viewModel.screenState {
             case .loaded(let person):
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 20) {

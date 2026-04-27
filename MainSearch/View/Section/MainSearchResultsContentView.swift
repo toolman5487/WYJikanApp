@@ -9,11 +9,11 @@ import SwiftUI
 
 struct MainSearchResultsContentView: View {
 
-    let bodyState: MainSearchBodyState
+    let screenState: MainSearchScreenState
 
     var body: some View {
         Group {
-            switch bodyState {
+            switch screenState {
             case .emptyPrompt:
                 ContentUnavailableView {
                     Label("開始搜尋", systemImage: "magnifyingglass")
@@ -24,7 +24,7 @@ struct MainSearchResultsContentView: View {
             case .loading:
                 MainSearchListSkeletonView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-            case .failed(let message):
+            case .error(let message):
                 ContentUnavailableView {
                     Label("搜尋失敗", systemImage: "exclamationmark.triangle")
                 } description: {
@@ -38,7 +38,7 @@ struct MainSearchResultsContentView: View {
                     Text("沒有符合「\(query)」的結果，請換個關鍵字試試。")
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-            case .list(let rows):
+            case .content(let rows):
                 List(rows) { row in
                     NavigationLink(value: row) {
                         MainSearchResultRowView(row: row)

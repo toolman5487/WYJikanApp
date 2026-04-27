@@ -120,8 +120,8 @@ struct MangaDetailView: View {
     
     var body: some View {
         Group {
-            switch viewModel.viewState {
-            case let .content(manga):
+            switch viewModel.screenState {
+            case let .loaded(manga):
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 20) {
                         ForEach(sections(for: manga)) { section in

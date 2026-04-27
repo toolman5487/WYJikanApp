@@ -10,9 +10,9 @@ import Foundation
 
 @MainActor
 final class AnimeDetailViewModel: ObservableObject {
-    enum ViewState {
+    enum ScreenState {
         case loading
-        case content(AnimeDetailDTO)
+        case loaded(AnimeDetailDTO)
         case error(String)
     }
 
@@ -29,9 +29,9 @@ final class AnimeDetailViewModel: ObservableObject {
         self.service = service
     }
 
-    var viewState: ViewState {
+    var screenState: ScreenState {
         if let detail {
-            return .content(detail)
+            return .loaded(detail)
         }
         if let errorMessage, !errorMessage.isEmpty {
             return .error(errorMessage)

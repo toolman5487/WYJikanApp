@@ -75,7 +75,7 @@ struct CharacterDetailView: View {
 
     var body: some View {
         Group {
-            switch viewModel.viewState {
+            switch viewModel.screenState {
             case .loaded(let character):
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 20) {

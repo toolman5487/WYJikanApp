@@ -10,7 +10,7 @@ import Foundation
 
 @MainActor
 final class MangaReviewViewModel: ObservableObject {
-    enum ViewState {
+    enum ScreenState {
         case loading
         case error(String)
         case empty
@@ -32,7 +32,7 @@ final class MangaReviewViewModel: ObservableObject {
         self.service = service
     }
 
-    var viewState: ViewState {
+    var screenState: ScreenState {
         if let errorMessage, !errorMessage.isEmpty {
             return .error(errorMessage)
         }

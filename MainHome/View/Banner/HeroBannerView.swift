@@ -31,14 +31,14 @@ struct HeroBannerView: View {
     
     @ViewBuilder
     private var content: some View {
-        switch viewModel.viewState {
+        switch viewModel.screenState {
         case .loading:
             BannerSkeletonView()
         case .error(let errorMessage):
             bannerMessageView(message: errorMessage, buttonTitle: "重試")
         case .empty:
             bannerMessageView(message: viewModel.emptyStateMessage, buttonTitle: "重新整理")
-        case .loaded:
+        case .content:
             TabView(selection: selectionBinding) {
                 ForEach(Array(viewModel.items.enumerated()), id: \.element.id) { index, item in
                     Button {

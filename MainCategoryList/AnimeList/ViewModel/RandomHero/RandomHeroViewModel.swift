@@ -19,14 +19,6 @@ final class RandomHeroViewModel: ObservableObject {
         case cooldown(pick: AnimeListRandomDTO?, remainingSeconds: Int)
     }
 
-    struct ViewState {
-        let pick: AnimeListRandomDTO?
-        let isDrawing: Bool
-        let errorMessage: String?
-        let drawButtonTitle: String
-        let canDraw: Bool
-    }
-
     // MARK: - Constants
 
     private static let drawCooldownSeconds = 10
@@ -91,16 +83,6 @@ final class RandomHeroViewModel: ObservableObject {
             return "\(cooldownDisplayText) 後可再抽"
         }
         return randomPick == nil ? "開始抽獎" : "再抽一次"
-    }
-
-    var viewState: ViewState {
-        ViewState(
-            pick: randomPick,
-            isDrawing: isDrawing,
-            errorMessage: drawError,
-            drawButtonTitle: drawButtonTitle,
-            canDraw: canDraw
-        )
     }
 
     // MARK: - Dependencies

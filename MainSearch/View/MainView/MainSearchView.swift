@@ -23,7 +23,7 @@ struct MainSearchView: View {
                 .padding(.horizontal, 16)
                 .padding(.vertical, 12)
 
-                MainSearchResultsContentView(bodyState: viewModel.bodyState)
+                MainSearchResultsContentView(screenState: viewModel.screenState)
             }
             .navigationDestination(for: MainSearchResultRow.self) { row in
                 MainSearchRouter.destination(for: row)

@@ -11,7 +11,7 @@ import Foundation
 @MainActor
 final class PeopleDetailViewModel: ObservableObject {
 
-    enum ViewState {
+    enum ScreenState {
         case loading
         case loaded(PeopleDetailDTO)
         case error(String)
@@ -28,7 +28,7 @@ final class PeopleDetailViewModel: ObservableObject {
         self.service = service
     }
 
-    var viewState: ViewState {
+    var screenState: ScreenState {
         if let detail {
             return .loaded(detail)
         }

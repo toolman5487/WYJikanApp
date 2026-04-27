@@ -14,7 +14,7 @@ final class PeopleListViewModel: ObservableObject {
         case idle
         case loadingInitial
         case loadingMore
-        case failed(String)
+        case error(String)
     }
 
     enum FooterState: Equatable {
@@ -23,7 +23,7 @@ final class PeopleListViewModel: ObservableObject {
         case loadingMore
     }
 
-    enum ViewState {
+    enum ScreenState {
         case loading
         case error(String)
         case empty
@@ -43,19 +43,19 @@ final class PeopleListViewModel: ObservableObject {
         self.service = service
     }
 
-    var viewState: ViewState {
+    var screenState: ScreenState {
         switch paginationState {
         case .loadingInitial where rows.isEmpty:
             return .loading
-        case .failed(let message) where rows.isEmpty:
+        case .error(let message) where rows.isEmpty:
             return .error(message)
-        case .idle, .loadingInitial, .loadingMore, .failed:
+        case .idle, .loadingInitial, .loadingMore, .error:
             if rows.isEmpty {
                 return .empty
             }
 
             let inlineError: String?
-            if case .failed(let message) = paginationState {
+            if case .error(let message) = paginationState {
                 inlineError = message
             } else {
                 inlineError = nil
@@ -122,7 +122,7 @@ final class PeopleListViewModel: ObservableObject {
                 paginationState = .idle
             } catch {
                 guard !Task.isCancelled else { return }
-                paginationState = .failed(error.localizedDescription)
+                paginationState = .error(error.localizedDescription)
             }
         }
     }

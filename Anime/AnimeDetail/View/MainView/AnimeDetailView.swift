@@ -164,8 +164,8 @@ struct AnimeDetailView: View {
 
     var body: some View {
         Group {
-            switch viewModel.viewState {
-            case let .content(anime):
+            switch viewModel.screenState {
+            case let .loaded(anime):
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 20) {
                         ForEach(sections(for: anime)) { section in

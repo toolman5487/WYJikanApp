@@ -12,7 +12,7 @@ struct CharacterListContentView: View {
 
     var body: some View {
         LazyVStack(alignment: .leading, spacing: 14) {
-            switch viewModel.viewState {
+            switch viewModel.screenState {
             case .loading:
                 CharacterListLoadingView()
             case .error(let message):

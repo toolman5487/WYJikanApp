@@ -22,7 +22,7 @@ struct MangaReviewView: View {
 
     var body: some View {
         Group {
-            switch viewModel.viewState {
+            switch viewModel.screenState {
             case let .error(message):
                 ErrorMessageView(message: message, height: 200)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)

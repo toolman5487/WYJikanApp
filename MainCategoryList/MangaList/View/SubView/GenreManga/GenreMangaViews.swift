@@ -12,7 +12,7 @@ struct GenreMangaListContainerView: View {
 
     var body: some View {
         Group {
-            switch viewModel.viewState {
+            switch viewModel.screenState {
             case .loading:
                 GenreMangaListSkeletonView()
             case .error(let message):

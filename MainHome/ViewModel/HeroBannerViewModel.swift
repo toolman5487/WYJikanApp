@@ -8,11 +8,11 @@
 import Combine
 import Foundation
 
-enum HeroBannerViewState: Equatable {
+enum HeroBannerScreenState: Equatable {
     case loading
     case error(String)
     case empty
-    case loaded
+    case content
 }
 
 @MainActor
@@ -73,7 +73,7 @@ final class HeroBannerViewModel: ObservableObject {
         return "\(currentIndex + 1) / \(items.count)"
     }
 
-    var viewState: HeroBannerViewState {
+    var screenState: HeroBannerScreenState {
         if isLoading {
             return .loading
         }
@@ -84,7 +84,7 @@ final class HeroBannerViewModel: ObservableObject {
             }
             return .empty
         }
-        return .loaded
+        return .content
     }
 
     func load() {

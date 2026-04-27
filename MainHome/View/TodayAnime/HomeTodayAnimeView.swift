@@ -31,20 +31,20 @@ struct HomeTodayAnimeView: View {
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: Self.cardSpacing) {
-                    switch viewModel.viewState {
+                    switch viewModel.screenState {
                     case .loading:
                         ForEach(0..<Self.skeletonCount, id: \.self) { _ in
                             BannerSkeletonView()
                                 .clipShape(RoundedRectangle(cornerRadius: Self.cardCornerRadius, style: .continuous))
                                 .frame(width: Self.cardWidth, height: Self.cardHeight)
                         }
-                    case .failed(let errorMessage):
+                    case .error(let errorMessage):
                         ErrorMessageView(message: errorMessage, height: Self.cardHeight)
                             .frame(width: Self.cardWidth)
                     case .empty:
                         ErrorMessageView(message: "Empty Data", height: Self.cardHeight)
                             .frame(width: Self.cardWidth)
-                    case .loaded:
+                    case .content:
                         ForEach(viewModel.items) { item in
                             Button {
                                 router.push(.animeDetail(malId: item.id))

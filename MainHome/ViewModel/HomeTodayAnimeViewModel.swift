@@ -8,11 +8,11 @@
 import Combine
 import Foundation
 
-enum HomeTodayAnimeViewState: Equatable {
+enum HomeTodayAnimeScreenState: Equatable {
     case loading
-    case failed(String)
+    case error(String)
     case empty
-    case loaded
+    case content
 }
 
 @MainActor
@@ -31,17 +31,17 @@ final class HomeTodayAnimeViewModel: ObservableObject {
         self.service = service
     }
 
-    var viewState: HomeTodayAnimeViewState {
+    var screenState: HomeTodayAnimeScreenState {
         if isLoading {
             return .loading
         }
         if let errorMessage {
-            return .failed(errorMessage)
+            return .error(errorMessage)
         }
         if items.isEmpty {
             return .empty
         }
-        return .loaded
+        return .content
     }
 
     func loadIfNeeded() {

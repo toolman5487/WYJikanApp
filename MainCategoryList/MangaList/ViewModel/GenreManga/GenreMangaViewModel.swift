@@ -15,7 +15,7 @@ final class GenreMangaViewModel: ObservableObject {
         case loadingInitial
         case loadingMore
         case loaded
-        case failed(message: String)
+        case error(message: String)
     }
 
     enum LoadMoreState: Equatable {
@@ -24,7 +24,7 @@ final class GenreMangaViewModel: ObservableObject {
         case loading
     }
 
-    enum ViewState {
+    enum ScreenState {
         case loading
         case error(String)
         case empty
@@ -44,19 +44,19 @@ final class GenreMangaViewModel: ObservableObject {
     @Published private(set) var loadState: LoadState = .idle
     @Published private(set) var canLoadMore: Bool = false
 
-    var viewState: ViewState {
+    var screenState: ScreenState {
         switch loadState {
         case .loadingInitial where genreSections.isEmpty:
             return .loading
-        case .failed(let message) where genreSections.isEmpty:
+        case .error(let message) where genreSections.isEmpty:
             return .error(message)
-        case .idle, .loadingInitial, .loadingMore, .loaded, .failed:
+        case .idle, .loadingInitial, .loadingMore, .loaded, .error:
             if genreSections.isEmpty {
                 return .empty
             }
 
             let inlineError: String?
-            if case .failed(let message) = loadState {
+            if case .error(let message) = loadState {
                 inlineError = message
             } else {
                 inlineError = nil
@@ -144,7 +144,7 @@ final class GenreMangaViewModel: ObservableObject {
             await fetchNextGenreBatch(isInitialLoad: true)
         } catch {
             guard !Task.isCancelled else { return }
-            loadState = .failed(message: Self.genreErrorMessage)
+            loadState = .error(message: Self.genreErrorMessage)
             canLoadMore = false
         }
     }
@@ -158,7 +158,7 @@ final class GenreMangaViewModel: ObservableObject {
 
         guard !batchGenres.isEmpty else {
             canLoadMore = false
-            loadState = genreSections.isEmpty ? .failed(message: Self.genreErrorMessage) : .loaded
+            loadState = genreSections.isEmpty ? .error(message: Self.genreErrorMessage) : .loaded
             return
         }
 

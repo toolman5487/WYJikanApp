@@ -27,8 +27,8 @@ final class MainSearchViewModel: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
     private var searchSequence = 0
 
-    var bodyState: MainSearchBodyState {
-        MainSearchBodyState.resolve(
+    var screenState: MainSearchScreenState {
+        MainSearchScreenState.resolve(
             trimmedQuery: Self.trim(query),
             query: query,
             isLoading: isLoading,

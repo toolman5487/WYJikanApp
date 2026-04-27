@@ -8,11 +8,11 @@
 import Combine
 import Foundation
 
-enum HomeRecommendedAnimeViewState: Equatable {
+enum HomeRecommendedAnimeScreenState: Equatable {
     case loading
-    case failed(String)
+    case error(String)
     case empty
-    case loaded
+    case content
 }
 
 @MainActor
@@ -36,17 +36,17 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
         self.service = service
     }
 
-    var viewState: HomeRecommendedAnimeViewState {
+    var screenState: HomeRecommendedAnimeScreenState {
         if isLoading {
             return .loading
         }
         if let errorMessage {
-            return .failed(errorMessage)
+            return .error(errorMessage)
         }
         if items.isEmpty {
             return .empty
         }
-        return .loaded
+        return .content
     }
 
     var displayedItems: [HomeRecommendedAnimeCardItem] {

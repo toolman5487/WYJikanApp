@@ -12,7 +12,7 @@ struct PeopleListContentView: View {
 
     var body: some View {
         LazyVStack(alignment: .leading, spacing: 14) {
-            switch viewModel.viewState {
+            switch viewModel.screenState {
             case .loading:
                 PeopleListLoadingView()
             case .error(let message):

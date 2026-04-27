@@ -29,7 +29,7 @@ struct HomeRecommendedAnimeView: View {
                 .foregroundStyle(ThemeColor.sakura)
 
             VStack(alignment: .leading, spacing: 0) {
-                switch viewModel.viewState {
+                switch viewModel.screenState {
                 case .loading:
                     LazyVGrid(columns: columns, alignment: .leading, spacing: Self.gridSpacing) {
                         ForEach(0..<Self.skeletonCount, id: \.self) { _ in
@@ -39,13 +39,13 @@ struct HomeRecommendedAnimeView: View {
                         }
                     }
                     .padding(.horizontal, Self.horizontalPadding)
-                case .failed(let errorMessage):
+                case .error(let errorMessage):
                     ErrorMessageView(message: errorMessage, height: 240)
                         .padding(.horizontal, Self.horizontalPadding)
                 case .empty:
                     ErrorMessageView(message: "尚無推薦資料", height: 240)
                         .padding(.horizontal, Self.horizontalPadding)
-                case .loaded:
+                case .content:
                     LazyVGrid(columns: columns, alignment: .leading, spacing: Self.gridSpacing) {
                         ForEach(viewModel.displayedItems) { item in
                             Button {
