@@ -11,24 +11,18 @@ import Combine
 @MainActor
 final class RandomMangaViewModel: ObservableObject {
     enum DrawState {
-        case loading(pick: MangaListRandomDTO?)
-        case ready(pick: MangaListRandomDTO?)
-        case failure(message: String, pick: MangaListRandomDTO?)
-        case cooldown(pick: MangaListRandomDTO?, remainingSeconds: Int)
+        case loading
+        case ready
+        case failure(message: String)
+        case cooldown(remainingSeconds: Int)
     }
 
     private static let drawCooldownSeconds = 10
     private static let minimumDrawLoadingDuration: Duration = .seconds(2)
     private static let persistedRandomPickKey = "manga.random.lastPick"
 
-    @Published private(set) var drawState: DrawState = .loading(pick: nil)
-
-    var randomPick: MangaListRandomDTO? {
-        switch drawState {
-        case .loading(let pick), .ready(let pick), .failure(_, let pick), .cooldown(let pick, _):
-            return pick
-        }
-    }
+    @Published private(set) var drawState: DrawState = .loading
+    @Published private(set) var randomPick: MangaListRandomDTO?
 
     var isDrawing: Bool {
         if case .loading = drawState {
@@ -38,14 +32,14 @@ final class RandomMangaViewModel: ObservableObject {
     }
 
     var drawError: String? {
-        if case .failure(let message, _) = drawState {
+        if case .failure(let message) = drawState {
             return message
         }
         return nil
     }
 
     var cooldownRemainingSeconds: Int {
-        if case .cooldown(_, let seconds) = drawState {
+        if case .cooldown(let seconds) = drawState {
             return seconds
         }
         return 0
@@ -90,7 +84,8 @@ final class RandomMangaViewModel: ObservableObject {
         )
 
         let persistedPick = restorePersistedRandomPick()
-        drawState = .ready(pick: persistedPick)
+        randomPick = persistedPick
+        drawState = .ready
         updateCooldownState(seconds: drawCooldownTimer.remainingSeconds)
         cooldownCancellable = drawCooldownTimer.$remainingSeconds
             .sink { [weak self] seconds in
@@ -103,8 +98,7 @@ final class RandomMangaViewModel: ObservableObject {
         guard drawCooldownTimer.canTrigger else { return }
 
         drawTask?.cancel()
-        let currentPick = randomPick
-        drawState = .loading(pick: currentPick)
+        drawState = .loading
         let drawStartedAt = ContinuousClock().now
 
         drawTask = Task { [weak self] in
@@ -115,18 +109,16 @@ final class RandomMangaViewModel: ObservableObject {
                 await self.waitForMinimumLoadingDuration(since: drawStartedAt)
                 guard !Task.isCancelled else { return }
                 let pickedManga = response.data
-                self.drawState = .ready(pick: pickedManga)
                 self.persistRandomPick(pickedManga)
+                self.randomPick = pickedManga
+                self.drawState = .ready
                 self.drawCooldownTimer.startCooldown()
                 self.updateCooldownState(seconds: self.drawCooldownTimer.remainingSeconds)
             } catch {
                 guard !Task.isCancelled else { return }
                 await self.waitForMinimumLoadingDuration(since: drawStartedAt)
                 guard !Task.isCancelled else { return }
-                self.drawState = .failure(
-                    message: error.localizedDescription,
-                    pick: currentPick
-                )
+                self.drawState = .failure(message: error.localizedDescription)
             }
         }
     }
@@ -135,31 +127,25 @@ final class RandomMangaViewModel: ObservableObject {
         drawTask?.cancel()
         drawTask = nil
         if isDrawing {
-            let pick = randomPick
             let seconds = drawCooldownTimer.remainingSeconds
             if seconds > 0 {
-                drawState = .cooldown(pick: pick, remainingSeconds: seconds)
+                drawState = .cooldown(remainingSeconds: seconds)
             } else {
-                drawState = .ready(pick: pick)
+                drawState = .ready
             }
         }
     }
 
     private func updateCooldownState(seconds: Int) {
-        let pick = randomPick
         switch seconds {
         case let remaining where remaining > 0:
-            drawState = .cooldown(pick: pick, remainingSeconds: remaining)
+            drawState = .cooldown(remainingSeconds: remaining)
         default:
             switch drawState {
-            case .loading(let currentPick):
-                drawState = .loading(pick: currentPick)
-            case .ready(let currentPick):
-                drawState = .ready(pick: currentPick)
-            case .failure(let message, let currentPick):
-                drawState = .failure(message: message, pick: currentPick)
-            case .cooldown(let currentPick, _):
-                drawState = .ready(pick: currentPick)
+            case .cooldown:
+                drawState = .ready
+            case .loading, .ready, .failure:
+                break
             }
         }
     }
