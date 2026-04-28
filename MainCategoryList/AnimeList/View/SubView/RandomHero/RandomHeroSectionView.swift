@@ -17,32 +17,27 @@ struct RandomHeroSectionView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             switch viewModel.drawState {
-            case .loading(let pick) where pick == nil:
+            case .loading where viewModel.randomPick == nil:
                 RandomHeroSkeletonView()
-            case .failure(let error, let pick) where pick == nil:
+            case .failure(let error) where viewModel.randomPick == nil:
                 RandomHeroCardView(
                     pick: nil,
                     isDrawing: false,
                     errorMessage: error
                 )
-            case .loading(let pick):
+            case .loading:
                 RandomHeroCardView(
-                    pick: pick,
+                    pick: viewModel.randomPick,
                     isDrawing: true
                 )
-            case .ready(let pick):
+            case .ready, .cooldown:
                 RandomHeroCardView(
-                    pick: pick,
+                    pick: viewModel.randomPick,
                     isDrawing: false
                 )
-            case .failure(_, let pick):
+            case .failure:
                 RandomHeroCardView(
-                    pick: pick,
-                    isDrawing: false
-                )
-            case .cooldown(let pick, _):
-                RandomHeroCardView(
-                    pick: pick,
+                    pick: viewModel.randomPick,
                     isDrawing: false
                 )
             }
