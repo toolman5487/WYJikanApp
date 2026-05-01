@@ -16,6 +16,16 @@ struct RandomHeroSectionView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("今天抽這部")
+                    .font(.title3.weight(.bold))
+                    .foregroundStyle(ThemeColor.sakura)
+
+                Text("不知道看什麼？試試手氣，隨機挖到下一部想追的作品。")
+                    .font(.subheadline)
+                    .foregroundStyle(ThemeColor.textSecondary)
+            }
+
             switch viewModel.drawState {
             case .loading where viewModel.randomPick == nil:
                 RandomHeroSkeletonView()
@@ -23,22 +33,26 @@ struct RandomHeroSectionView: View {
                 RandomHeroCardView(
                     pick: nil,
                     isDrawing: false,
-                    errorMessage: error
+                    errorMessage: error,
+                    cooldownText: nil
                 )
             case .loading:
                 RandomHeroCardView(
                     pick: viewModel.randomPick,
-                    isDrawing: true
+                    isDrawing: true,
+                    cooldownText: nil
                 )
             case .ready, .cooldown:
                 RandomHeroCardView(
                     pick: viewModel.randomPick,
-                    isDrawing: false
+                    isDrawing: false,
+                    cooldownText: viewModel.cooldownRemainingSeconds > 0 ? "再次抽選倒數 \(viewModel.cooldownDisplayText)" : nil
                 )
             case .failure:
                 RandomHeroCardView(
                     pick: viewModel.randomPick,
-                    isDrawing: false
+                    isDrawing: false,
+                    cooldownText: nil
                 )
             }
 

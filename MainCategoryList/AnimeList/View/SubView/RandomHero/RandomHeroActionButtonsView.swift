@@ -31,10 +31,14 @@ struct RandomHeroActionButtonsView: View {
                 NavigationLink {
                     AnimeDetailView(malId: id)
                 } label: {
-                    Text("查看詳情")
-                        .frame(maxWidth: .infinity, minHeight: 44)
+                    HStack(spacing: 6) {
+                        Text("查看詳情")
+                        Image(systemName: "arrow.right")
+                            .font(.caption.weight(.bold))
+                    }
+                    .frame(maxWidth: .infinity, minHeight: 44)
                 }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(.bordered)
                 .tint(ThemeColor.sakura)
             }
         } else {
