@@ -43,6 +43,51 @@ enum MainSearchKind: String, CaseIterable, Hashable, Sendable {
     }
 }
 
+// MARK: - Search Sort
+
+enum MainSearchSortOption: String, CaseIterable, Hashable, Sendable {
+    case `default`
+    case titleAscending
+    case titleDescending
+    case newest
+    case oldest
+    case popularityDescending
+    case popularityAscending
+
+    var title: String {
+        switch self {
+        case .default: return "預設"
+        case .titleAscending: return "名稱 A-Z"
+        case .titleDescending: return "名稱 Z-A"
+        case .newest: return "年份新到舊"
+        case .oldest: return "年份舊到新"
+        case .popularityDescending: return "人氣高到低"
+        case .popularityAscending: return "人氣低到高"
+        }
+    }
+
+    var systemImageName: String {
+        switch self {
+        case .default: return "line.3.horizontal.decrease.circle"
+        case .titleAscending: return "textformat.abc"
+        case .titleDescending: return "textformat.abc.dottedunderline"
+        case .newest: return "arrow.down.to.line.compact"
+        case .oldest: return "arrow.up.to.line.compact"
+        case .popularityDescending: return "flame.fill"
+        case .popularityAscending: return "flame"
+        }
+    }
+
+    static func supportedOptions(for kind: MainSearchKind) -> [MainSearchSortOption] {
+        switch kind {
+        case .anime, .manga:
+            return [.default, .titleAscending, .titleDescending, .newest, .oldest, .popularityDescending, .popularityAscending]
+        case .character, .people:
+            return [.default, .titleAscending, .titleDescending, .popularityDescending, .popularityAscending]
+        }
+    }
+}
+
 // MARK: - API
 
 // MARK: Pagination
@@ -64,6 +109,8 @@ struct MainSearchAnimeListDTO: Codable, Identifiable, Hashable, Sendable {
     let titleJapanese: String?
     let type: String?
     let year: Int?
+    let favorites: Int?
+    let members: Int?
 
     var id: Int { malId }
 }
@@ -77,6 +124,8 @@ struct MainSearchMangaListDTO: Codable, Identifiable, Hashable, Sendable {
     let titleJapanese: String?
     let type: String?
     let year: Int?
+    let favorites: Int?
+    let members: Int?
 
     var id: Int { malId }
 }
@@ -87,6 +136,7 @@ struct MainSearchCharacterListDTO: Codable, Identifiable, Hashable, Sendable {
     let images: AnimeImagesDTO?
     let name: String?
     let nicknames: [String]?
+    let favorites: Int?
 
     var id: Int { malId }
 }
@@ -96,6 +146,7 @@ struct MainSearchPersonListDTO: Codable, Identifiable, Hashable, Sendable {
     let url: String?
     let images: AnimeImagesDTO?
     let name: String?
+    let favorites: Int?
 
     var id: Int { malId }
 }
@@ -122,6 +173,12 @@ struct MainSearchPersonSearchResponse: Codable, Sendable {
     let data: [MainSearchPersonListDTO]
 }
 
+struct MainSearchPage: Sendable {
+    let rows: [MainSearchResultRow]
+    let currentPage: Int
+    let hasNextPage: Bool
+}
+
 // MARK: - Result Row
 
 struct MainSearchResultRow: Identifiable, Hashable, Sendable {
@@ -132,6 +189,9 @@ struct MainSearchResultRow: Identifiable, Hashable, Sendable {
     let subtitle: String?
     let imageURL: URL?
     let malPageURL: URL?
+    let sortTitle: String
+    let year: Int?
+    let popularityScore: Int?
 
     // MARK: Shared Mapping
 
@@ -170,7 +230,10 @@ struct MainSearchResultRow: Identifiable, Hashable, Sendable {
             title: title,
             subtitle: subtitle,
             imageURL: posterURL(from: dto.images),
-            malPageURL: dto.url.flatMap { URL(string: $0) }
+            malPageURL: dto.url.flatMap { URL(string: $0) },
+            sortTitle: normalizedSortTitle(from: title),
+            year: dto.year,
+            popularityScore: popularityScore(favorites: dto.favorites, members: dto.members)
         )
     }
 
@@ -191,7 +254,10 @@ struct MainSearchResultRow: Identifiable, Hashable, Sendable {
             title: title,
             subtitle: subtitle,
             imageURL: posterURL(from: dto.images),
-            malPageURL: dto.url.flatMap { URL(string: $0) }
+            malPageURL: dto.url.flatMap { URL(string: $0) },
+            sortTitle: normalizedSortTitle(from: title),
+            year: dto.year,
+            popularityScore: popularityScore(favorites: dto.favorites, members: dto.members)
         )
     }
 
@@ -205,7 +271,10 @@ struct MainSearchResultRow: Identifiable, Hashable, Sendable {
             title: title,
             subtitle: subtitle,
             imageURL: posterURL(from: dto.images),
-            malPageURL: dto.url.flatMap { URL(string: $0) }
+            malPageURL: dto.url.flatMap { URL(string: $0) },
+            sortTitle: normalizedSortTitle(from: title),
+            year: nil,
+            popularityScore: dto.favorites
         )
     }
 
@@ -218,7 +287,10 @@ struct MainSearchResultRow: Identifiable, Hashable, Sendable {
             title: title,
             subtitle: nil,
             imageURL: posterURL(from: dto.images),
-            malPageURL: dto.url.flatMap { URL(string: $0) }
+            malPageURL: dto.url.flatMap { URL(string: $0) },
+            sortTitle: normalizedSortTitle(from: title),
+            year: nil,
+            popularityScore: dto.favorites
         )
     }
 
@@ -235,6 +307,23 @@ struct MainSearchResultRow: Identifiable, Hashable, Sendable {
         if let t = primary?.trimmingCharacters(in: .whitespacesAndNewlines), !t.isEmpty { return t }
         if let t = alternate?.trimmingCharacters(in: .whitespacesAndNewlines), !t.isEmpty { return t }
         return "—"
+    }
+
+    private static func normalizedSortTitle(from title: String) -> String {
+        title.folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
+    }
+
+    private static func popularityScore(favorites: Int?, members: Int?) -> Int? {
+        switch (favorites, members) {
+        case let (favorites?, members?):
+            return max(favorites, members)
+        case let (favorites?, nil):
+            return favorites
+        case let (nil, members?):
+            return members
+        case (nil, nil):
+            return nil
+        }
     }
 }
 

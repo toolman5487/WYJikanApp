@@ -10,6 +10,10 @@ import SwiftUI
 struct MainSearchResultsContentView: View {
 
     let screenState: MainSearchScreenState
+    let isLoadingMore: Bool
+    let loadMoreErrorMessage: String?
+    let onRowAppear: (MainSearchResultRow) -> Void
+    let onRetryLoadMore: () -> Void
 
     var body: some View {
         Group {
@@ -43,7 +47,36 @@ struct MainSearchResultsContentView: View {
                     NavigationLink(value: row) {
                         MainSearchResultRowView(row: row)
                     }
+                    .onAppear {
+                        onRowAppear(row)
+                    }
                     .listRowSeparator(.visible)
+                }
+                .overlay(alignment: .bottom) {
+                    if isLoadingMore {
+                        ProgressView()
+                            .padding(.bottom, 12)
+                    } else if let loadMoreErrorMessage {
+                        VStack(spacing: 8) {
+                            Text(loadMoreErrorMessage)
+                                .font(.footnote)
+                                .foregroundStyle(ThemeColor.textSecondary)
+                                .multilineTextAlignment(.center)
+
+                            Button("重試載入更多") {
+                                onRetryLoadMore()
+                            }
+                            .buttonStyle(.borderedProminent)
+                        }
+                        .padding(12)
+                        .background(
+                            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                .fill(Color(.systemBackground))
+                        )
+                        .shadow(color: Color.black.opacity(0.08), radius: 12, y: 4)
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 12)
+                    }
                 }
                 .listStyle(.plain)
             }

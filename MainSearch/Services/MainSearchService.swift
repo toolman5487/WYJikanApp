@@ -9,6 +9,7 @@ import Foundation
 
 protocol MainSearchServicing {
     func search(kind: MainSearchKind, query: String, limit: Int) async throws -> [MainSearchResultRow]
+    func searchPage(kind: MainSearchKind, query: String, page: Int, limit: Int) async throws -> MainSearchPage
 }
 
 final class MainSearchService: MainSearchServicing {
@@ -72,11 +73,24 @@ final class MainSearchService: MainSearchServicing {
     }
 
     func search(kind: MainSearchKind, query: String, limit: Int) async throws -> [MainSearchResultRow] {
+        let page = try await searchPage(
+            kind: kind,
+            query: query,
+            page: 1,
+            limit: limit
+        )
+        return page.rows
+    }
+
+    func searchPage(kind: MainSearchKind, query: String, page: Int, limit: Int) async throws -> MainSearchPage {
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return [] }
+        guard !trimmed.isEmpty else {
+            return MainSearchPage(rows: [], currentPage: 1, hasNextPage: false)
+        }
 
         let queryItems: [URLQueryItem] = [
             URLQueryItem(name: "q", value: trimmed),
+            URLQueryItem(name: "page", value: String(page)),
             URLQueryItem(name: "limit", value: String(limit)),
             URLQueryItem(name: "sfw", value: "true")
         ]
@@ -90,28 +104,44 @@ final class MainSearchService: MainSearchServicing {
                 cachePolicy: request.cachePolicy,
                 queryItems: request.queryItems
             )
-            return response.data.map { MainSearchResultRow.from(anime: $0) }
+            return MainSearchPage(
+                rows: response.data.map { MainSearchResultRow.from(anime: $0) },
+                currentPage: response.pagination?.currentPage ?? page,
+                hasNextPage: response.pagination?.hasNextPage ?? false
+            )
         case .manga:
             let response: MainSearchMangaSearchResponse = try await apiService.fetch(
                 endpoint: request.endpoint,
                 cachePolicy: request.cachePolicy,
                 queryItems: request.queryItems
             )
-            return response.data.map { MainSearchResultRow.from(manga: $0) }
+            return MainSearchPage(
+                rows: response.data.map { MainSearchResultRow.from(manga: $0) },
+                currentPage: response.pagination?.currentPage ?? page,
+                hasNextPage: response.pagination?.hasNextPage ?? false
+            )
         case .character:
             let response: MainSearchCharacterSearchResponse = try await apiService.fetch(
                 endpoint: request.endpoint,
                 cachePolicy: request.cachePolicy,
                 queryItems: request.queryItems
             )
-            return response.data.map { MainSearchResultRow.from(character: $0) }
+            return MainSearchPage(
+                rows: response.data.map { MainSearchResultRow.from(character: $0) },
+                currentPage: response.pagination?.currentPage ?? page,
+                hasNextPage: response.pagination?.hasNextPage ?? false
+            )
         case .people:
             let response: MainSearchPersonSearchResponse = try await apiService.fetch(
                 endpoint: request.endpoint,
                 cachePolicy: request.cachePolicy,
                 queryItems: request.queryItems
             )
-            return response.data.map { MainSearchResultRow.from(person: $0) }
+            return MainSearchPage(
+                rows: response.data.map { MainSearchResultRow.from(person: $0) },
+                currentPage: response.pagination?.currentPage ?? page,
+                hasNextPage: response.pagination?.hasNextPage ?? false
+            )
         }
     }
 }

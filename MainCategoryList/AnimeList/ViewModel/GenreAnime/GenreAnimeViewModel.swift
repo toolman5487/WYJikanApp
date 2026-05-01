@@ -134,6 +134,17 @@ final class GenreAnimeViewModel: ObservableObject {
     func stop() {
         loadTask?.cancel()
         loadTask = nil
+
+        switch loadState {
+        case .loadingInitial, .loadingMore:
+            loadState = .idle
+            canLoadMore = false
+            genreSections = []
+            allLocalizedGenres = []
+            loadedGenreCount = 0
+        case .idle, .loaded, .error:
+            break
+        }
     }
     
     // MARK: - Private Methods
