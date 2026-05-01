@@ -13,9 +13,9 @@ protocol MainSearchServicing {
 
 final class MainSearchService: MainSearchServicing {
 
-    private let apiService: JikanAPIService
+    private let apiService: JikanAPIServicing
 
-    init(apiService: JikanAPIService = .shared) {
+    init(apiService: JikanAPIServicing = JikanAPIService.shared) {
         self.apiService = apiService
     }
 

@@ -19,9 +19,9 @@ protocol MainCategoryListServicing {
 }
 
 final class MainCategoryListService: MainCategoryListServicing {
-    private let apiService: JikanAPIService
+    private let apiService: JikanAPIServicing
 
-    init(apiService: JikanAPIService = .shared) {
+    init(apiService: JikanAPIServicing = JikanAPIService.shared) {
         self.apiService = apiService
     }
 
@@ -34,11 +34,17 @@ final class MainCategoryListService: MainCategoryListServicing {
     }
 
     func fetchAnimeGenres() async throws -> AnimeGenreListResponse {
-        try await apiService.fetch(endpoint: APIConfig.Genres.anime)
+        try await apiService.fetch(
+            endpoint: APIConfig.Genres.anime,
+            cachePolicy: .cacheFirst(ttl: 86_400)
+        )
     }
 
     func fetchMangaGenres() async throws -> MangaGenreListResponse {
-        try await apiService.fetch(endpoint: APIConfig.Genres.manga)
+        try await apiService.fetch(
+            endpoint: APIConfig.Genres.manga,
+            cachePolicy: .cacheFirst(ttl: 86_400)
+        )
     }
 
     func fetchAnimeByGenre(genreId: Int, limit: Int) async throws -> AnimeListResponse {
@@ -70,6 +76,7 @@ final class MainCategoryListService: MainCategoryListServicing {
         ]
         return try await apiService.fetch(
             endpoint: APIConfig.Characters.list,
+            cachePolicy: .cacheFirst(ttl: 180),
             queryItems: queryItems
         )
     }
@@ -81,6 +88,7 @@ final class MainCategoryListService: MainCategoryListServicing {
         ]
         return try await apiService.fetch(
             endpoint: APIConfig.People.list,
+            cachePolicy: .cacheFirst(ttl: 180),
             queryItems: queryItems
         )
     }

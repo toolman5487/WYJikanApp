@@ -13,13 +13,16 @@ protocol PeopleDetailServicing {
 
 final class PeopleDetailService: PeopleDetailServicing {
 
-    private let apiService: JikanAPIService
+    private let apiService: JikanAPIServicing
 
-    init(apiService: JikanAPIService = .shared) {
+    init(apiService: JikanAPIServicing = JikanAPIService.shared) {
         self.apiService = apiService
     }
 
     func fetchPeopleDetail(malId: Int) async throws -> PeopleDetailResponse {
-        try await apiService.fetch(endpoint: APIConfig.People.full(id: malId))
+        try await apiService.fetch(
+            endpoint: APIConfig.People.full(id: malId),
+            cachePolicy: .cacheFirst(ttl: 600)
+        )
     }
 }

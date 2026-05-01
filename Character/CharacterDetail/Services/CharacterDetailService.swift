@@ -13,13 +13,16 @@ protocol CharacterDetailServicing {
 
 final class CharacterDetailService: CharacterDetailServicing {
 
-    private let apiService: JikanAPIService
+    private let apiService: JikanAPIServicing
 
-    init(apiService: JikanAPIService = .shared) {
+    init(apiService: JikanAPIServicing = JikanAPIService.shared) {
         self.apiService = apiService
     }
 
     func fetchCharacterDetail(malId: Int) async throws -> CharacterDetailResponse {
-        try await apiService.fetch(endpoint: APIConfig.Characters.full(id: malId))
+        try await apiService.fetch(
+            endpoint: APIConfig.Characters.full(id: malId),
+            cachePolicy: .cacheFirst(ttl: 600)
+        )
     }
 }

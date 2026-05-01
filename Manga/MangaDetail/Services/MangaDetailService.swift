@@ -13,13 +13,16 @@ protocol MangaDetailServicing {
 
 final class MangaDetailService: MangaDetailServicing {
 
-    private let apiService: JikanAPIService
+    private let apiService: JikanAPIServicing
 
-    init(apiService: JikanAPIService = .shared) {
+    init(apiService: JikanAPIServicing = JikanAPIService.shared) {
         self.apiService = apiService
     }
 
     func fetchMangaDetail(malId: Int) async throws -> MangaDetailResponse {
-        try await apiService.fetch(endpoint: APIConfig.Manga.detail(id: malId))
+        try await apiService.fetch(
+            endpoint: APIConfig.Manga.detail(id: malId),
+            cachePolicy: .cacheFirst(ttl: 600)
+        )
     }
 }

@@ -13,9 +13,9 @@ protocol AnimeReviewServicing {
 
 final class AnimeReviewService: AnimeReviewServicing {
 
-    private let apiService: JikanAPIService
+    private let apiService: JikanAPIServicing
 
-    init(apiService: JikanAPIService = .shared) {
+    init(apiService: JikanAPIServicing = JikanAPIService.shared) {
         self.apiService = apiService
     }
 
