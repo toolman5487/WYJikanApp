@@ -19,7 +19,59 @@ protocol MainCategoryListServicing {
 }
 
 final class MainCategoryListService: MainCategoryListServicing {
+
+    // MARK: - PaginatedListRequest
+    
     private let apiService: JikanAPIServicing
+
+    private enum PaginatedListRequest {
+        case characters(page: Int, limit: Int)
+        case people(page: Int, limit: Int)
+
+        var endpoint: String {
+            switch self {
+            case .characters:
+                return APIConfig.Characters.list
+            case .people:
+                return APIConfig.People.list
+            }
+        }
+
+        var queryItems: [URLQueryItem] {
+            let page: Int
+            let limit: Int
+
+            switch self {
+            case .characters(let requestPage, let requestLimit),
+                 .people(let requestPage, let requestLimit):
+                page = requestPage
+                limit = requestLimit
+            }
+
+            return [
+                URLQueryItem(name: "page", value: "\(page)"),
+                URLQueryItem(name: "limit", value: "\(limit)")
+            ]
+        }
+
+        var cachePolicy: JikanAPICachePolicy {
+            let page: Int
+
+            switch self {
+            case .characters(let requestPage, _),
+                 .people(let requestPage, _):
+                page = requestPage
+            }
+
+            switch page {
+            case 1:
+                return .cacheFirst(ttl: 300)
+            default:
+                return .cacheFirst(ttl: 120)
+            }
+        }
+    }
+
 
     init(apiService: JikanAPIServicing = JikanAPIService.shared) {
         self.apiService = apiService
@@ -70,26 +122,20 @@ final class MainCategoryListService: MainCategoryListServicing {
     }
 
     func fetchCharacters(page: Int, limit: Int) async throws -> CharacterListResponse {
-        let queryItems = [
-            URLQueryItem(name: "page", value: "\(page)"),
-            URLQueryItem(name: "limit", value: "\(limit)")
-        ]
+        let request = PaginatedListRequest.characters(page: page, limit: limit)
         return try await apiService.fetch(
-            endpoint: APIConfig.Characters.list,
-            cachePolicy: .cacheFirst(ttl: 180),
-            queryItems: queryItems
+            endpoint: request.endpoint,
+            cachePolicy: request.cachePolicy,
+            queryItems: request.queryItems
         )
     }
 
     func fetchPeople(page: Int, limit: Int) async throws -> PeopleListResponse {
-        let queryItems = [
-            URLQueryItem(name: "page", value: "\(page)"),
-            URLQueryItem(name: "limit", value: "\(limit)")
-        ]
+        let request = PaginatedListRequest.people(page: page, limit: limit)
         return try await apiService.fetch(
-            endpoint: APIConfig.People.list,
-            cachePolicy: .cacheFirst(ttl: 180),
-            queryItems: queryItems
+            endpoint: request.endpoint,
+            cachePolicy: request.cachePolicy,
+            queryItems: request.queryItems
         )
     }
 }

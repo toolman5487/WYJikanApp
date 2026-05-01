@@ -35,8 +35,8 @@ final class GenreAnimeViewModel: ObservableObject {
 
     // MARK: - Constants
     
-    private static let initialGenreSections = 12
-    private static let loadMoreGenreSections = 12
+    private static let initialGenreSections = 5
+    private static let loadMoreGenreSections = 5
     private static let genreAnimeLimit = 5
     private static let maxRetryCount = 2
     private static let initialItemRequestDelay: Duration = .milliseconds(1200)
