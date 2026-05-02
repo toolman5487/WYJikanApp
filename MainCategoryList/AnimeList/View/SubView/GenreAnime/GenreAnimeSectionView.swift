@@ -42,9 +42,19 @@ struct GenreAnimeSectionView: View {
     }
 
     private var titleView: some View {
-        Text(titleText)
-            .font(.title3.weight(.bold))
+        NavigationLink {
+            AnimeCategoryDetailView(genre: section.genre)
+        } label: {
+            HStack(spacing: 6) {
+                Text(titleText)
+                    .font(.title3.weight(.bold))
+
+                Image(systemName: "chevron.right")
+                    .font(.footnote.weight(.semibold))
+            }
             .foregroundStyle(ThemeColor.sakura)
+        }
+        .buttonStyle(.plain)
     }
 
     private var contentView: some View {
