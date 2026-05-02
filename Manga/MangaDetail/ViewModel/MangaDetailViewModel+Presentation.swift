@@ -28,7 +28,7 @@ extension MangaDetailViewModel {
     }
 
     enum ReviewNavigationState {
-        case hidden
+        case loading
         case available(title: String)
     }
 
@@ -76,7 +76,7 @@ extension MangaDetailViewModel {
     }
 
     func reviewNavigationState() -> ReviewNavigationState {
-        guard let detail else { return .hidden }
+        guard let detail else { return .loading }
         return .available(title: reviewTitle(for: detail))
     }
 

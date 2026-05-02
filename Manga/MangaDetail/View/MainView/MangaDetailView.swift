@@ -119,8 +119,12 @@ struct MangaDetailView: View {
             ToolbarSpacer(.fixed, placement: .topBarTrailing)
             ToolbarItemGroup(placement: .topBarTrailing) {
                 switch viewModel.reviewNavigationState() {
-                case .hidden:
-                    EmptyView()
+                case .loading:
+                    Image(systemName: "text.bubble.fill")
+                        .font(.body.weight(.bold))
+                        .foregroundStyle(ThemeColor.textSecondary)
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
                 case let .available(title):
                     NavigationLink {
                         MangaReviewView(
@@ -130,11 +134,10 @@ struct MangaDetailView: View {
                     } label: {
                         Image(systemName: "text.bubble.fill")
                             .font(.body.weight(.bold))
-                            .frame(minWidth: 44, minHeight: 44)
+                            .foregroundStyle(ThemeColor.sakura)
+                            .frame(width: 44, height: 44)
                             .contentShape(Rectangle())
                     }
-                    .accessibilityLabel("查看漫畫評論")
-                    .accessibilityHint("開啟評論列表")
                 }
                 
                 Button {

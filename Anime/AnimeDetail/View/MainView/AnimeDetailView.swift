@@ -153,13 +153,15 @@ struct AnimeDetailView: View {
                         .contentShape(Rectangle())
                 }
                 .disabled(viewModel.detail == nil)
-                .accessibilityLabel(isFavorite ? "移除動畫收藏" : "加入動畫收藏")
             }
             ToolbarSpacer(.fixed, placement: .topBarTrailing)
             ToolbarItemGroup(placement: .topBarTrailing) {
                 switch viewModel.reviewNavigationState() {
-                case .hidden:
-                    EmptyView()
+                case .loading:
+                    Image(systemName: "text.bubble.fill")
+                        .font(.body.weight(.bold))
+                        .foregroundStyle(ThemeColor.textSecondary)
+                        .frame(width: 44, height: 44)
                 case let .available(title):
                     NavigationLink {
                         AnimeReviewView(
@@ -169,11 +171,9 @@ struct AnimeDetailView: View {
                     } label: {
                         Image(systemName: "text.bubble.fill")
                             .font(.body.weight(.bold))
-                            .frame(minWidth: 44, minHeight: 44)
-                            .contentShape(Rectangle())
+                            .foregroundStyle(ThemeColor.sakura)
+                            .frame(width: 44, height: 44)
                     }
-                    .accessibilityLabel("查看動畫評論")
-                    .accessibilityHint("開啟評論列表")
                 }
 
                 Button {
