@@ -32,57 +32,9 @@ struct AnimeDetailView: View {
             }
         )
     }
-    
-    enum Section: Identifiable {
-        case header
-        case highlights
-        case basicInfo
-        case score
-        case trailer
-        case synopsis
-        case staff
-        case pictures
-
-        var id: String {
-            switch self {
-            case .header: return "header"
-            case .highlights: return "highlights"
-            case .basicInfo: return "basicInfo"
-            case .score: return "score"
-            case .trailer: return "trailer"
-            case .synopsis: return "synopsis"
-            case .staff: return "staff"
-            case .pictures: return "pictures"
-            }
-        }
-    }
-    
-    // MARK: - Sections
-
-    private func sections(for anime: AnimeDetailDTO) -> [Section] {
-        var result: [Section] = [
-            .header,
-            .highlights,
-            .basicInfo,
-            .score
-        ]
-        if viewModel.hasTrailer(for: anime) {
-            result.append(.trailer)
-        }
-        if viewModel.hasSynopsis(for: anime) {
-            result.append(.synopsis)
-        }
-        if viewModel.hasStaffInfo(for: anime) || viewModel.hasThemes(for: anime) {
-            result.append(.staff)
-        }
-        if viewModel.hasPictures {
-            result.append(.pictures)
-        }
-        return result
-    }
 
     @ViewBuilder
-    private func sectionView(_ section: Section, viewModel: AnimeDetailViewModel, anime: AnimeDetailDTO) -> some View {
+    private func sectionView(_ section: AnimeDetailViewModel.Section, viewModel: AnimeDetailViewModel, anime: AnimeDetailDTO) -> some View {
         switch section {
         case .header:
             AnimeDetailHeaderSectionView(
@@ -141,14 +93,7 @@ struct AnimeDetailView: View {
             if let existing = favorites.first {
                 modelContext.delete(existing)
             } else if let anime = viewModel.detail {
-                let item = MyListCollectionItem(
-                    malId: anime.malId,
-                    mediaKind: .anime,
-                    title: viewModel.displayTitle(for: anime),
-                    subtitle: anime.titleEnglish ?? anime.title,
-                    imageURLString: viewModel.posterURL(for: anime)?.absoluteString,
-                    addedAt: Date()
-                )
+                let item = viewModel.favoriteItem(for: anime)
                 modelContext.insert(item)
             } else {
                 return
@@ -168,7 +113,7 @@ struct AnimeDetailView: View {
             case let .loaded(anime):
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 20) {
-                        ForEach(sections(for: anime)) { section in
+                        ForEach(viewModel.sections(for: anime)) { section in
                             sectionView(section, viewModel: viewModel, anime: anime)
                         }
                     }
@@ -212,16 +157,23 @@ struct AnimeDetailView: View {
             }
             ToolbarSpacer(.fixed, placement: .topBarTrailing)
             ToolbarItemGroup(placement: .topBarTrailing) {
-                NavigationLink {
-                    AnimeReviewView(
-                        malId: malId,
-                        animeTitle: viewModel.detail.map { viewModel.displayTitle(for: $0) }
-                    )
-                } label: {
-                    Image(systemName: "text.bubble.fill")
-                        .font(.body.weight(.bold))
-                        .frame(minWidth: 44, minHeight: 44)
-                        .contentShape(Rectangle())
+                switch viewModel.reviewNavigationState() {
+                case .hidden:
+                    EmptyView()
+                case let .available(title):
+                    NavigationLink {
+                        AnimeReviewView(
+                            malId: malId,
+                            animeTitle: title
+                        )
+                    } label: {
+                        Image(systemName: "text.bubble.fill")
+                            .font(.body.weight(.bold))
+                            .frame(minWidth: 44, minHeight: 44)
+                            .contentShape(Rectangle())
+                    }
+                    .accessibilityLabel("查看動畫評論")
+                    .accessibilityHint("開啟評論列表")
                 }
 
                 Button {

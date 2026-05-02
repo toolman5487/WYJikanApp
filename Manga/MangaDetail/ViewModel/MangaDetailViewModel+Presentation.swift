@@ -9,6 +9,29 @@ import Foundation
 
 extension MangaDetailViewModel {
 
+    enum Section: Identifiable {
+        case header
+        case highlights
+        case score
+        case synopsis
+        case publication
+
+        var id: String {
+            switch self {
+            case .header: return "header"
+            case .highlights: return "highlights"
+            case .score: return "score"
+            case .synopsis: return "synopsis"
+            case .publication: return "publication"
+            }
+        }
+    }
+
+    enum ReviewNavigationState {
+        case hidden
+        case available(title: String)
+    }
+
     // MARK: - Header & Media
 
     func displayTitle(for manga: MangaDetailDTO) -> String {
@@ -46,6 +69,41 @@ extension MangaDetailViewModel {
         }
         guard !names.isEmpty else { return nil }
         return "敏感內容"
+    }
+
+    func reviewTitle(for manga: MangaDetailDTO) -> String {
+        displayTitle(for: manga)
+    }
+
+    func reviewNavigationState() -> ReviewNavigationState {
+        guard let detail else { return .hidden }
+        return .available(title: reviewTitle(for: detail))
+    }
+
+    func favoriteItem(for manga: MangaDetailDTO) -> MyListCollectionItem {
+        MyListCollectionItem(
+            malId: manga.malId,
+            mediaKind: .manga,
+            title: displayTitle(for: manga),
+            subtitle: manga.titleEnglish ?? manga.title,
+            imageURLString: posterURL(for: manga)?.absoluteString,
+            addedAt: Date()
+        )
+    }
+
+    func sections(for manga: MangaDetailDTO) -> [Section] {
+        var result: [Section] = [
+            .header,
+            .highlights,
+            .score
+        ]
+        if hasSynopsis(for: manga) {
+            result.append(.synopsis)
+        }
+        if hasPublicationInfo(for: manga) || hasThemes(for: manga) || !hasSynopsis(for: manga) {
+            result.append(.publication)
+        }
+        return result
     }
 
     // MARK: - Type & Status

@@ -9,6 +9,35 @@ import Foundation
 
 extension AnimeDetailViewModel {
 
+    enum Section: Identifiable {
+        case header
+        case highlights
+        case basicInfo
+        case score
+        case trailer
+        case synopsis
+        case staff
+        case pictures
+
+        var id: String {
+            switch self {
+            case .header: return "header"
+            case .highlights: return "highlights"
+            case .basicInfo: return "basicInfo"
+            case .score: return "score"
+            case .trailer: return "trailer"
+            case .synopsis: return "synopsis"
+            case .staff: return "staff"
+            case .pictures: return "pictures"
+            }
+        }
+    }
+
+    enum ReviewNavigationState {
+        case hidden
+        case available(title: String)
+    }
+
     // MARK: - Header & Media
 
     func displayTitle(for anime: AnimeDetailDTO) -> String {
@@ -35,6 +64,48 @@ extension AnimeDetailViewModel {
 
     func hasSensitiveContent(for anime: AnimeDetailDTO) -> Bool {
         sensitiveContentText(for: anime) != nil
+    }
+
+    func reviewTitle(for anime: AnimeDetailDTO) -> String {
+        displayTitle(for: anime)
+    }
+
+    func reviewNavigationState() -> ReviewNavigationState {
+        guard let detail else { return .hidden }
+        return .available(title: reviewTitle(for: detail))
+    }
+
+    func favoriteItem(for anime: AnimeDetailDTO) -> MyListCollectionItem {
+        MyListCollectionItem(
+            malId: anime.malId,
+            mediaKind: .anime,
+            title: displayTitle(for: anime),
+            subtitle: anime.titleEnglish ?? anime.title,
+            imageURLString: posterURL(for: anime)?.absoluteString,
+            addedAt: Date()
+        )
+    }
+
+    func sections(for anime: AnimeDetailDTO) -> [Section] {
+        var result: [Section] = [
+            .header,
+            .highlights,
+            .basicInfo,
+            .score
+        ]
+        if hasTrailer(for: anime) {
+            result.append(.trailer)
+        }
+        if hasSynopsis(for: anime) {
+            result.append(.synopsis)
+        }
+        if hasStaffInfo(for: anime) || hasThemes(for: anime) {
+            result.append(.staff)
+        }
+        if hasPictures {
+            result.append(.pictures)
+        }
+        return result
     }
 
     func sensitiveContentText(for anime: AnimeDetailDTO) -> String? {
