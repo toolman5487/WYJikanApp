@@ -13,8 +13,12 @@ struct RandomHeroCardView: View {
     let isDrawing: Bool
     var errorMessage: String? = nil
     var cooldownText: String? = nil
+    let drawButtonTitle: String
+    let canDraw: Bool
+    let detailMalId: Int?
+    let onDrawTap: () -> Void
 
-    private static let heroHeight: CGFloat = 300
+    private static let heroHeight: CGFloat = 370
     private static let horizontalPadding: CGFloat = 16
     private static let verticalPadding: CGFloat = 16
 
@@ -58,6 +62,13 @@ struct RandomHeroCardView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .layoutPriority(1)
                     }
+
+                    RandomHeroActionButtonsView(
+                        drawButtonTitle: drawButtonTitle,
+                        canDraw: canDraw,
+                        detailMalId: detailMalId,
+                        onDrawTap: onDrawTap
+                    )
                 }
                 .padding(.horizontal, Self.horizontalPadding)
                 .padding(.vertical, Self.verticalPadding)
@@ -274,14 +285,22 @@ struct RandomHeroCardView: View {
                 genres: nil
             ),
             isDrawing: false,
-            cooldownText: "再次抽選倒數 00:08"
+            cooldownText: "再次抽選倒數 00:08",
+            drawButtonTitle: "再抽一次",
+            canDraw: true,
+            detailMalId: 1,
+            onDrawTap: {}
         )
         .frame(width: 343)
 
         RandomHeroCardView(
             pick: nil,
             isDrawing: false,
-            errorMessage: "網路連線不穩，請稍後再試。"
+            errorMessage: "網路連線不穩，請稍後再試。",
+            drawButtonTitle: "開始抽獎",
+            canDraw: true,
+            detailMalId: nil,
+            onDrawTap: {}
         )
         .frame(width: 343)
     }

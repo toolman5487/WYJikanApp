@@ -98,6 +98,16 @@ extension MangaListRandomDTO {
         }
         return nil
     }
+
+    var synopsisPreview: String? {
+        guard let synopsis else { return nil }
+        let trimmed = synopsis.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return nil }
+        let limit = 160
+        if trimmed.count <= limit { return trimmed }
+        let idx = trimmed.index(trimmed.startIndex, offsetBy: limit)
+        return String(trimmed[..<idx]) + "…"
+    }
 }
 
 // MARK: - Localization

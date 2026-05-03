@@ -34,34 +34,43 @@ struct RandomHeroSectionView: View {
                     pick: nil,
                     isDrawing: false,
                     errorMessage: error,
-                    cooldownText: nil
+                    cooldownText: nil,
+                    drawButtonTitle: viewModel.drawButtonTitle,
+                    canDraw: viewModel.canDraw,
+                    detailMalId: viewModel.randomPick?.malId,
+                    onDrawTap: viewModel.drawRandomAnime
                 )
             case .loading:
                 RandomHeroCardView(
                     pick: viewModel.randomPick,
                     isDrawing: true,
-                    cooldownText: nil
+                    cooldownText: nil,
+                    drawButtonTitle: viewModel.drawButtonTitle,
+                    canDraw: viewModel.canDraw,
+                    detailMalId: viewModel.randomPick?.malId,
+                    onDrawTap: viewModel.drawRandomAnime
                 )
             case .ready, .cooldown:
                 RandomHeroCardView(
                     pick: viewModel.randomPick,
                     isDrawing: false,
-                    cooldownText: viewModel.cooldownRemainingSeconds > 0 ? "再次抽選倒數 \(viewModel.cooldownDisplayText)" : nil
+                    cooldownText: viewModel.cooldownRemainingSeconds > 0 ? "再次抽選倒數 \(viewModel.cooldownDisplayText)" : nil,
+                    drawButtonTitle: viewModel.drawButtonTitle,
+                    canDraw: viewModel.canDraw,
+                    detailMalId: viewModel.randomPick?.malId,
+                    onDrawTap: viewModel.drawRandomAnime
                 )
             case .failure:
                 RandomHeroCardView(
                     pick: viewModel.randomPick,
                     isDrawing: false,
-                    cooldownText: nil
+                    cooldownText: nil,
+                    drawButtonTitle: viewModel.drawButtonTitle,
+                    canDraw: viewModel.canDraw,
+                    detailMalId: viewModel.randomPick?.malId,
+                    onDrawTap: viewModel.drawRandomAnime
                 )
             }
-
-            RandomHeroActionButtonsView(
-                drawButtonTitle: viewModel.drawButtonTitle,
-                canDraw: viewModel.canDraw,
-                detailMalId: viewModel.randomPick?.malId,
-                onDrawTap: viewModel.drawRandomAnime
-            )
         }
     }
 }

@@ -1,5 +1,5 @@
 //
-//  AnimeCategoryDetailModel.swift
+//  MangaCategoryDetailModel.swift
 //  WYJikanApp
 //
 //  Created by Codex on 2026/5/2.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct AnimeCategoryFilter: Equatable, Sendable {
+struct MangaCategoryFilter: Equatable, Sendable {
     let sort: Sort
     let format: Format
 
@@ -35,59 +35,62 @@ struct AnimeCategoryFilter: Equatable, Sendable {
 
     enum Format: String, CaseIterable, Equatable, Identifiable, Sendable {
         case all
-        case tv
-        case movie
-        case ova
-        case ona
-        case special
-        case music
+        case manga
+        case novel
+        case lightNovel
+        case oneShot
+        case doujinshi
+        case manhwa
+        case manhua
 
         var id: String { rawValue }
 
         var title: String {
             switch self {
             case .all: return "全部"
-            case .tv: return "電視動畫"
-            case .movie: return "劇場版"
-            case .ova: return "OVA"
-            case .ona: return "ONA"
-            case .special: return "特別篇"
-            case .music: return "音樂"
+            case .manga: return "漫畫"
+            case .novel: return "小說"
+            case .lightNovel: return "輕小說"
+            case .oneShot: return "單篇"
+            case .doujinshi: return "同人誌"
+            case .manhwa: return "韓漫"
+            case .manhua: return "條漫／華漫"
             }
         }
 
         var apiValue: String? {
             switch self {
             case .all: return nil
-            case .tv: return "tv"
-            case .movie: return "movie"
-            case .ova: return "ova"
-            case .ona: return "ona"
-            case .special: return "special"
-            case .music: return "music"
+            case .manga: return "manga"
+            case .novel: return "novel"
+            case .lightNovel: return "lightnovel"
+            case .oneShot: return "oneshot"
+            case .doujinshi: return "doujin"
+            case .manhwa: return "manhwa"
+            case .manhua: return "manhua"
             }
         }
     }
 }
 
-struct AnimeCategoryPage: Sendable {
-    let items: [AnimeCategoryItemDTO]
+struct MangaCategoryPage: Sendable {
+    let items: [MangaCategoryItemDTO]
     let currentPage: Int
     let hasNextPage: Bool
 }
 
-struct AnimeCategoryResponse: Decodable, Sendable {
-    let pagination: AnimeCategoryPaginationDTO?
-    let data: [AnimeCategoryItemDTO]
+struct MangaCategoryResponse: Decodable, Sendable {
+    let pagination: MangaCategoryPaginationDTO?
+    let data: [MangaCategoryItemDTO]
 }
 
-struct AnimeCategoryPaginationDTO: Decodable, Hashable, Sendable {
+struct MangaCategoryPaginationDTO: Decodable, Hashable, Sendable {
     let currentPage: Int?
     let hasNextPage: Bool?
     let lastVisiblePage: Int?
 }
 
-struct AnimeCategoryItemDTO: Decodable, Identifiable, Hashable, Sendable {
+struct MangaCategoryItemDTO: Decodable, Identifiable, Hashable, Sendable {
     let malId: Int
     let title: String?
     let titleEnglish: String?
@@ -98,33 +101,33 @@ struct AnimeCategoryItemDTO: Decodable, Identifiable, Hashable, Sendable {
     let rank: Int?
     let popularity: Int?
     let members: Int?
-    let episodes: Int?
-    let year: Int?
-    let images: AnimeCategoryImagesDTO?
-    let genres: [AnimeCategoryGenreDTO]?
+    let chapters: Int?
+    let volumes: Int?
+    let images: MangaCategoryImagesDTO?
+    let genres: [MangaCategoryGenreDTO]?
 
     var id: Int { malId }
 }
 
-struct AnimeCategoryGenreDTO: Decodable, Hashable, Sendable {
+struct MangaCategoryGenreDTO: Decodable, Hashable, Sendable {
     let malId: Int
     let name: String?
 
     var id: Int { malId }
 }
 
-struct AnimeCategoryImagesDTO: Decodable, Hashable, Sendable {
-    let jpg: AnimeCategoryImageURLDTO?
-    let webp: AnimeCategoryImageURLDTO?
+struct MangaCategoryImagesDTO: Decodable, Hashable, Sendable {
+    let jpg: MangaCategoryImageURLDTO?
+    let webp: MangaCategoryImageURLDTO?
 }
 
-struct AnimeCategoryImageURLDTO: Decodable, Hashable, Sendable {
+struct MangaCategoryImageURLDTO: Decodable, Hashable, Sendable {
     let imageUrl: String?
     let smallImageUrl: String?
     let largeImageUrl: String?
 }
 
-extension AnimeCategoryItemDTO {
+extension MangaCategoryItemDTO {
     var displayTitle: String {
         if let t = titleJapanese?.trimmingCharacters(in: .whitespacesAndNewlines), !t.isEmpty { return t }
         if let t = title?.trimmingCharacters(in: .whitespacesAndNewlines), !t.isEmpty { return t }
@@ -141,6 +144,7 @@ extension AnimeCategoryItemDTO {
             images?.webp?.smallImageUrl,
             images?.jpg?.smallImageUrl
         ]
+
         for raw in candidates {
             if let raw, let url = URL(string: raw) {
                 return url

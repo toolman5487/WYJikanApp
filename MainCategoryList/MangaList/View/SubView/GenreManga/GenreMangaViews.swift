@@ -86,9 +86,7 @@ private struct GenreMangaSectionView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text(titleText)
-                .font(.title3.weight(.bold))
-                .foregroundStyle(ThemeColor.sakura)
+            titleView
 
             if section.items.isEmpty {
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -117,6 +115,22 @@ private struct GenreMangaSectionView: View {
                 }
             }
         }
+    }
+
+    private var titleView: some View {
+        NavigationLink {
+            MangaCategoryDetailView(genre: section.genre)
+        } label: {
+            HStack(spacing: 6) {
+                Text(titleText)
+                    .font(.title3.weight(.bold))
+
+                Image(systemName: "chevron.right")
+                    .font(.footnote.weight(.semibold))
+            }
+            .foregroundStyle(ThemeColor.sakura)
+        }
+        .buttonStyle(.plain)
     }
 }
 

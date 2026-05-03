@@ -1,38 +1,38 @@
 //
-//  AnimeCategoryDetailService.swift
+//  MangaCategoryDetailService.swift
 //  WYJikanApp
 //
-//  Created by Willy Hsu 2026/5/2.
+//  Created by Codex on 2026/5/2.
 //
 
 import Foundation
 
-protocol AnimeCategoryDetailServicing {
+protocol MangaCategoryDetailServicing {
     func fetchInitialPage(
         genreId: Int,
         pageSize: Int,
-        filter: AnimeCategoryFilter
-    ) async throws -> AnimeCategoryPage
+        filter: MangaCategoryFilter
+    ) async throws -> MangaCategoryPage
 
     func fetchPage(
         genreId: Int,
         page: Int,
         pageSize: Int,
-        filter: AnimeCategoryFilter
-    ) async throws -> AnimeCategoryPage
+        filter: MangaCategoryFilter
+    ) async throws -> MangaCategoryPage
 }
 
-final class AnimeCategoryDetailService: AnimeCategoryDetailServicing {
+final class MangaCategoryDetailService: MangaCategoryDetailServicing {
     // MARK: - Request
 
-    private enum AnimeGenreRequest {
-        case page(genreId: Int, page: Int, pageSize: Int, filter: AnimeCategoryFilter)
+    private enum MangaGenreRequest {
+        case page(genreId: Int, page: Int, pageSize: Int, filter: MangaCategoryFilter)
 
         var request: JikanAPIRequest {
             switch self {
             case let .page(genreId, page, pageSize, filter):
                 return JikanAPIRequest(
-                    path: APIConfig.Anime.list,
+                    path: APIConfig.Manga.list,
                     queryItems: baseQueryItems(genreId: genreId, page: page, pageSize: pageSize)
                         + filterQueryItems(for: filter),
                     cachePolicy: cachePolicy
@@ -48,7 +48,7 @@ final class AnimeCategoryDetailService: AnimeCategoryDetailServicing {
             ]
         }
 
-        private func filterQueryItems(for filter: AnimeCategoryFilter) -> [URLQueryItem] {
+        private func filterQueryItems(for filter: MangaCategoryFilter) -> [URLQueryItem] {
             var items: [URLQueryItem] = []
 
             if let type = filter.format.apiValue {
@@ -104,8 +104,8 @@ final class AnimeCategoryDetailService: AnimeCategoryDetailServicing {
     func fetchInitialPage(
         genreId: Int,
         pageSize: Int,
-        filter: AnimeCategoryFilter
-    ) async throws -> AnimeCategoryPage {
+        filter: MangaCategoryFilter
+    ) async throws -> MangaCategoryPage {
         try await fetchPage(
             genreId: genreId,
             page: 1,
@@ -118,16 +118,16 @@ final class AnimeCategoryDetailService: AnimeCategoryDetailServicing {
         genreId: Int,
         page: Int,
         pageSize: Int,
-        filter: AnimeCategoryFilter
-    ) async throws -> AnimeCategoryPage {
-        let request = AnimeGenreRequest.page(
+        filter: MangaCategoryFilter
+    ) async throws -> MangaCategoryPage {
+        let request = MangaGenreRequest.page(
             genreId: genreId,
             page: page,
             pageSize: pageSize,
             filter: filter
         )
-        let response: AnimeCategoryResponse = try await apiService.send(request.request)
-        return AnimeCategoryPage(
+        let response: MangaCategoryResponse = try await apiService.send(request.request)
+        return MangaCategoryPage(
             items: response.data,
             currentPage: response.pagination?.currentPage ?? page,
             hasNextPage: response.pagination?.hasNextPage ?? !response.data.isEmpty
