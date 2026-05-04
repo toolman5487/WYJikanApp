@@ -66,6 +66,8 @@ struct MainHomeView: View {
             .toolbarBackground(.hidden, for: .navigationBar)
             .navigationDestination(for: MainHomeRoute.self) { route in
                 switch route {
+                case .todayAnimeSchedule:
+                    HomeTodayAnimeScheduleListView()
                 case .animeDetail(let malId):
                     AnimeDetailView(malId: malId)
                 case .mangaDetail(let malId):

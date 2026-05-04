@@ -14,6 +14,7 @@ struct WYJikanAppApp: App {
         WindowGroup {
             MainTabBarView()
                 .preferredColorScheme(.dark)
+                .dynamicTypeSize(.medium)
         }
         .modelContainer(for: [MyListCollectionItem.self])
     }

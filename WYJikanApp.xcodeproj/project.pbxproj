@@ -22,6 +22,10 @@
 		1572FE052F762D7000756CBA /* HomeTodayAnimeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1572FE042F762D7000756CBA /* HomeTodayAnimeViewModel.swift */; };
 		1572FE072F762D7700756CBA /* HomeTodayAnimeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1572FE062F762D7700756CBA /* HomeTodayAnimeModel.swift */; };
 		1572FE0A2F762DE300756CBA /* HomeTodayAnimeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1572FE082F762DE300756CBA /* HomeTodayAnimeView.swift */; };
+		16F200022FAB400000000002 /* HomeTodayAnimeScheduleListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F200012FAB400000000001 /* HomeTodayAnimeScheduleListViewModel.swift */; };
+		16F200042FAB400000000004 /* HomeTodayAnimeScheduleListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F200032FAB400000000003 /* HomeTodayAnimeScheduleListView.swift */; };
+		16F2000A2FAB40000000000A /* HomeTodayAnimeScheduleListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F2000B2FAB40000000000B /* HomeTodayAnimeScheduleListModel.swift */; };
+		16F2000C2FAB40000000000C /* HomeTodayAnimeScheduleListService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F2000D2FAB40000000000D /* HomeTodayAnimeScheduleListService.swift */; };
 		1574EC3D2F7BCB5300E37AE8 /* AnimeReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1574EC3C2F7BCB5300E37AE8 /* AnimeReviewView.swift */; };
 		1574EC3F2F7BCB6900E37AE8 /* AnimeReviewViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1574EC3E2F7BCB6900E37AE8 /* AnimeReviewViewModel.swift */; };
 		1574EC412F7BCB7800E37AE8 /* AnimeReviewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1574EC402F7BCB7800E37AE8 /* AnimeReviewModel.swift */; };
@@ -235,6 +239,10 @@
 		1572FE042F762D7000756CBA /* HomeTodayAnimeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeViewModel.swift; sourceTree = "<group>"; };
 		1572FE062F762D7700756CBA /* HomeTodayAnimeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeModel.swift; sourceTree = "<group>"; };
 		1572FE082F762DE300756CBA /* HomeTodayAnimeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeView.swift; sourceTree = "<group>"; };
+		16F200012FAB400000000001 /* HomeTodayAnimeScheduleListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeScheduleListViewModel.swift; sourceTree = "<group>"; };
+		16F200032FAB400000000003 /* HomeTodayAnimeScheduleListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeScheduleListView.swift; sourceTree = "<group>"; };
+		16F2000B2FAB40000000000B /* HomeTodayAnimeScheduleListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeScheduleListModel.swift; sourceTree = "<group>"; };
+		16F2000D2FAB40000000000D /* HomeTodayAnimeScheduleListService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeScheduleListService.swift; sourceTree = "<group>"; };
 		1574EC3C2F7BCB5300E37AE8 /* AnimeReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeReviewView.swift; sourceTree = "<group>"; };
 		1574EC3E2F7BCB6900E37AE8 /* AnimeReviewViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeReviewViewModel.swift; sourceTree = "<group>"; };
 		1574EC402F7BCB7800E37AE8 /* AnimeReviewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeReviewModel.swift; sourceTree = "<group>"; };
@@ -555,6 +563,49 @@
 				1572FE082F762DE300756CBA /* HomeTodayAnimeView.swift */,
 			);
 			path = TodayAnime;
+			sourceTree = "<group>";
+		};
+		16F200052FAB400000000005 /* HomeTodayAnimeScheduleList */ = {
+			isa = PBXGroup;
+			children = (
+				16F200062FAB400000000006 /* Model */,
+				16F200072FAB400000000007 /* Service */,
+				16F200092FAB400000000009 /* ViewModel */,
+				16F200082FAB400000000008 /* View */,
+			);
+			path = HomeTodayAnimeScheduleList;
+			sourceTree = "<group>";
+		};
+		16F200062FAB400000000006 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				16F2000B2FAB40000000000B /* HomeTodayAnimeScheduleListModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		16F200072FAB400000000007 /* Service */ = {
+			isa = PBXGroup;
+			children = (
+				16F2000D2FAB40000000000D /* HomeTodayAnimeScheduleListService.swift */,
+			);
+			path = Service;
+			sourceTree = "<group>";
+		};
+		16F200082FAB400000000008 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				16F200032FAB400000000003 /* HomeTodayAnimeScheduleListView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		16F200092FAB400000000009 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				16F200012FAB400000000001 /* HomeTodayAnimeScheduleListViewModel.swift */,
+			);
+			path = ViewModel;
 			sourceTree = "<group>";
 		};
 		1574EC372F7BCB1300E37AE8 /* AnimeReview */ = {
@@ -1654,6 +1705,7 @@
 			isa = PBXGroup;
 			children = (
 				15FF80142F7653E200D3241C /* Router */,
+				16F200052FAB400000000005 /* HomeTodayAnimeScheduleList */,
 				15FC4F3F2F73EAE20054153E /* Service */,
 				15FC4F352F73E64F0054153E /* ViewModel */,
 				15FC4F342F73E6480054153E /* Model */,
@@ -2124,6 +2176,9 @@
 				15FC4F522F7507300054153E /* HomeTrendingAnimeView.swift in Sources */,
 				15A295482F86297D0056071F /* AppLogger.swift in Sources */,
 				1572FE052F762D7000756CBA /* HomeTodayAnimeViewModel.swift in Sources */,
+				16F2000A2FAB40000000000A /* HomeTodayAnimeScheduleListModel.swift in Sources */,
+				16F2000C2FAB40000000000C /* HomeTodayAnimeScheduleListService.swift in Sources */,
+				16F200022FAB400000000002 /* HomeTodayAnimeScheduleListViewModel.swift in Sources */,
 				155A9BF62F782B1100E9E3E0 /* SkeletonBar.swift in Sources */,
 				155A9C022F782C2200F1E4F0 /* SectionCardSkeleton.swift in Sources */,
 				155399752F7C0F5B0028BD24 /* AnimeReviewSkeletonViews.swift in Sources */,
@@ -2146,6 +2201,7 @@
 				15750AFF2F7285520037E8A5 /* PlaceholderView.swift in Sources */,
 				1555A2542F7BB38900501496 /* AnimeDetailPicturesModel.swift in Sources */,
 				1572FE0A2F762DE300756CBA /* HomeTodayAnimeView.swift in Sources */,
+				16F200042FAB400000000004 /* HomeTodayAnimeScheduleListView.swift in Sources */,
 				15FC4F412F73EB7B0054153E /* MainHomeService.swift in Sources */,
 				15AC996B2F879D8B008EAAEE /* GenreAnimeSectionView.swift in Sources */,
 				15FC4F452F74C7CF0054153E /* ErrorMessageView.swift in Sources */,
