@@ -22,10 +22,6 @@
 		1572FE052F762D7000756CBA /* HomeTodayAnimeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1572FE042F762D7000756CBA /* HomeTodayAnimeViewModel.swift */; };
 		1572FE072F762D7700756CBA /* HomeTodayAnimeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1572FE062F762D7700756CBA /* HomeTodayAnimeModel.swift */; };
 		1572FE0A2F762DE300756CBA /* HomeTodayAnimeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1572FE082F762DE300756CBA /* HomeTodayAnimeView.swift */; };
-		16F200022FAB400000000002 /* HomeTodayAnimeScheduleListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F200012FAB400000000001 /* HomeTodayAnimeScheduleListViewModel.swift */; };
-		16F200042FAB400000000004 /* HomeTodayAnimeScheduleListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F200032FAB400000000003 /* HomeTodayAnimeScheduleListView.swift */; };
-		16F2000A2FAB40000000000A /* HomeTodayAnimeScheduleListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F2000B2FAB40000000000B /* HomeTodayAnimeScheduleListModel.swift */; };
-		16F2000C2FAB40000000000C /* HomeTodayAnimeScheduleListService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F2000D2FAB40000000000D /* HomeTodayAnimeScheduleListService.swift */; };
 		1574EC3D2F7BCB5300E37AE8 /* AnimeReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1574EC3C2F7BCB5300E37AE8 /* AnimeReviewView.swift */; };
 		1574EC3F2F7BCB6900E37AE8 /* AnimeReviewViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1574EC3E2F7BCB6900E37AE8 /* AnimeReviewViewModel.swift */; };
 		1574EC412F7BCB7800E37AE8 /* AnimeReviewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1574EC402F7BCB7800E37AE8 /* AnimeReviewModel.swift */; };
@@ -221,6 +217,19 @@
 		16F100042FAB300000000004 /* HomeRecommendedAnimeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F100032FAB300000000003 /* HomeRecommendedAnimeModel.swift */; };
 		16F100052FAB300000000005 /* HomeRecommendedAnimeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F100022FAB300000000002 /* HomeRecommendedAnimeViewModel.swift */; };
 		16F100062FAB300000000006 /* HomeRecommendedAnimeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F100012FAB300000000001 /* HomeRecommendedAnimeView.swift */; };
+		16F200022FAB400000000002 /* HomeTodayAnimeScheduleListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F200012FAB400000000001 /* HomeTodayAnimeScheduleListViewModel.swift */; };
+		16F200042FAB400000000004 /* HomeTodayAnimeScheduleListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F200032FAB400000000003 /* HomeTodayAnimeScheduleListView.swift */; };
+		16F2000A2FAB40000000000A /* HomeTodayAnimeScheduleListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F2000B2FAB40000000000B /* HomeTodayAnimeScheduleListModel.swift */; };
+		16F2000C2FAB40000000000C /* HomeTodayAnimeScheduleListService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F2000D2FAB40000000000D /* HomeTodayAnimeScheduleListService.swift */; };
+		16F200102FAB400000000010 /* HomeTodayAnimeScheduleListHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F200112FAB400000000011 /* HomeTodayAnimeScheduleListHeaderView.swift */; };
+		16F200122FAB400000000012 /* HomeTodayAnimeScheduleListDayFilterContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F200132FAB400000000013 /* HomeTodayAnimeScheduleListDayFilterContainerView.swift */; };
+		16F200142FAB400000000014 /* HomeTodayAnimeScheduleListDayFilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F200152FAB400000000015 /* HomeTodayAnimeScheduleListDayFilterView.swift */; };
+		16F200162FAB400000000016 /* HomeTodayAnimeScheduleListSectionHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F200172FAB400000000017 /* HomeTodayAnimeScheduleListSectionHeaderView.swift */; };
+		16F200182FAB400000000018 /* HomeTodayAnimeScheduleListTimelineRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F200192FAB400000000019 /* HomeTodayAnimeScheduleListTimelineRowView.swift */; };
+		16F2001A2FAB40000000001A /* HomeTodayAnimeScheduleListLoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F2001B2FAB40000000001B /* HomeTodayAnimeScheduleListLoadingView.swift */; };
+		16F2001C2FAB40000000001C /* HomeTodayAnimeScheduleListEmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F2001D2FAB40000000001D /* HomeTodayAnimeScheduleListEmptyStateView.swift */; };
+		16F2001E2FAB40000000001E /* HomeTodayAnimeScheduleListErrorStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F2001F2FAB40000000001F /* HomeTodayAnimeScheduleListErrorStateView.swift */; };
+		16F200202FAB400000000020 /* HomeTodayAnimeScheduleListLoadMoreFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F200212FAB400000000021 /* HomeTodayAnimeScheduleListLoadMoreFooterView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -239,10 +248,6 @@
 		1572FE042F762D7000756CBA /* HomeTodayAnimeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeViewModel.swift; sourceTree = "<group>"; };
 		1572FE062F762D7700756CBA /* HomeTodayAnimeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeModel.swift; sourceTree = "<group>"; };
 		1572FE082F762DE300756CBA /* HomeTodayAnimeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeView.swift; sourceTree = "<group>"; };
-		16F200012FAB400000000001 /* HomeTodayAnimeScheduleListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeScheduleListViewModel.swift; sourceTree = "<group>"; };
-		16F200032FAB400000000003 /* HomeTodayAnimeScheduleListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeScheduleListView.swift; sourceTree = "<group>"; };
-		16F2000B2FAB40000000000B /* HomeTodayAnimeScheduleListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeScheduleListModel.swift; sourceTree = "<group>"; };
-		16F2000D2FAB40000000000D /* HomeTodayAnimeScheduleListService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeScheduleListService.swift; sourceTree = "<group>"; };
 		1574EC3C2F7BCB5300E37AE8 /* AnimeReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeReviewView.swift; sourceTree = "<group>"; };
 		1574EC3E2F7BCB6900E37AE8 /* AnimeReviewViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeReviewViewModel.swift; sourceTree = "<group>"; };
 		1574EC402F7BCB7800E37AE8 /* AnimeReviewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeReviewModel.swift; sourceTree = "<group>"; };
@@ -438,6 +443,19 @@
 		16F100012FAB300000000001 /* HomeRecommendedAnimeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeRecommendedAnimeView.swift; sourceTree = "<group>"; };
 		16F100022FAB300000000002 /* HomeRecommendedAnimeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeRecommendedAnimeViewModel.swift; sourceTree = "<group>"; };
 		16F100032FAB300000000003 /* HomeRecommendedAnimeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeRecommendedAnimeModel.swift; sourceTree = "<group>"; };
+		16F200012FAB400000000001 /* HomeTodayAnimeScheduleListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeScheduleListViewModel.swift; sourceTree = "<group>"; };
+		16F200032FAB400000000003 /* HomeTodayAnimeScheduleListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeScheduleListView.swift; sourceTree = "<group>"; };
+		16F2000B2FAB40000000000B /* HomeTodayAnimeScheduleListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeScheduleListModel.swift; sourceTree = "<group>"; };
+		16F2000D2FAB40000000000D /* HomeTodayAnimeScheduleListService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeScheduleListService.swift; sourceTree = "<group>"; };
+		16F200112FAB400000000011 /* HomeTodayAnimeScheduleListHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeScheduleListHeaderView.swift; sourceTree = "<group>"; };
+		16F200132FAB400000000013 /* HomeTodayAnimeScheduleListDayFilterContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeScheduleListDayFilterContainerView.swift; sourceTree = "<group>"; };
+		16F200152FAB400000000015 /* HomeTodayAnimeScheduleListDayFilterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeScheduleListDayFilterView.swift; sourceTree = "<group>"; };
+		16F200172FAB400000000017 /* HomeTodayAnimeScheduleListSectionHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeScheduleListSectionHeaderView.swift; sourceTree = "<group>"; };
+		16F200192FAB400000000019 /* HomeTodayAnimeScheduleListTimelineRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeScheduleListTimelineRowView.swift; sourceTree = "<group>"; };
+		16F2001B2FAB40000000001B /* HomeTodayAnimeScheduleListLoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeScheduleListLoadingView.swift; sourceTree = "<group>"; };
+		16F2001D2FAB40000000001D /* HomeTodayAnimeScheduleListEmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeScheduleListEmptyStateView.swift; sourceTree = "<group>"; };
+		16F2001F2FAB40000000001F /* HomeTodayAnimeScheduleListErrorStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeScheduleListErrorStateView.swift; sourceTree = "<group>"; };
+		16F200212FAB400000000021 /* HomeTodayAnimeScheduleListLoadMoreFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeScheduleListLoadMoreFooterView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -467,6 +485,14 @@
 				15750AF12F7282AE0037E8A5 /* View */,
 			);
 			path = MainTabBar;
+			sourceTree = "<group>";
+		};
+		151D93AD2FAA2AC0000A5C7D /* MainView */ = {
+			isa = PBXGroup;
+			children = (
+				16F200032FAB400000000003 /* HomeTodayAnimeScheduleListView.swift */,
+			);
+			path = MainView;
 			sourceTree = "<group>";
 		};
 		153EC2CB2F9B2374001ABCDC /* View */ = {
@@ -563,49 +589,6 @@
 				1572FE082F762DE300756CBA /* HomeTodayAnimeView.swift */,
 			);
 			path = TodayAnime;
-			sourceTree = "<group>";
-		};
-		16F200052FAB400000000005 /* HomeTodayAnimeScheduleList */ = {
-			isa = PBXGroup;
-			children = (
-				16F200062FAB400000000006 /* Model */,
-				16F200072FAB400000000007 /* Service */,
-				16F200092FAB400000000009 /* ViewModel */,
-				16F200082FAB400000000008 /* View */,
-			);
-			path = HomeTodayAnimeScheduleList;
-			sourceTree = "<group>";
-		};
-		16F200062FAB400000000006 /* Model */ = {
-			isa = PBXGroup;
-			children = (
-				16F2000B2FAB40000000000B /* HomeTodayAnimeScheduleListModel.swift */,
-			);
-			path = Model;
-			sourceTree = "<group>";
-		};
-		16F200072FAB400000000007 /* Service */ = {
-			isa = PBXGroup;
-			children = (
-				16F2000D2FAB40000000000D /* HomeTodayAnimeScheduleListService.swift */,
-			);
-			path = Service;
-			sourceTree = "<group>";
-		};
-		16F200082FAB400000000008 /* View */ = {
-			isa = PBXGroup;
-			children = (
-				16F200032FAB400000000003 /* HomeTodayAnimeScheduleListView.swift */,
-			);
-			path = View;
-			sourceTree = "<group>";
-		};
-		16F200092FAB400000000009 /* ViewModel */ = {
-			isa = PBXGroup;
-			children = (
-				16F200012FAB400000000001 /* HomeTodayAnimeScheduleListViewModel.swift */,
-			);
-			path = ViewModel;
 			sourceTree = "<group>";
 		};
 		1574EC372F7BCB1300E37AE8 /* AnimeReview */ = {
@@ -2057,6 +2040,66 @@
 			path = RecommendedAnime;
 			sourceTree = "<group>";
 		};
+		16F200052FAB400000000005 /* HomeTodayAnimeScheduleList */ = {
+			isa = PBXGroup;
+			children = (
+				16F200062FAB400000000006 /* Model */,
+				16F200072FAB400000000007 /* Service */,
+				16F200092FAB400000000009 /* ViewModel */,
+				16F200082FAB400000000008 /* View */,
+			);
+			path = HomeTodayAnimeScheduleList;
+			sourceTree = "<group>";
+		};
+		16F200062FAB400000000006 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				16F2000B2FAB40000000000B /* HomeTodayAnimeScheduleListModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		16F200072FAB400000000007 /* Service */ = {
+			isa = PBXGroup;
+			children = (
+				16F2000D2FAB40000000000D /* HomeTodayAnimeScheduleListService.swift */,
+			);
+			path = Service;
+			sourceTree = "<group>";
+		};
+		16F200082FAB400000000008 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				151D93AD2FAA2AC0000A5C7D /* MainView */,
+				16F200222FAB400000000022 /* SubView */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		16F200092FAB400000000009 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				16F200012FAB400000000001 /* HomeTodayAnimeScheduleListViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		16F200222FAB400000000022 /* SubView */ = {
+			isa = PBXGroup;
+			children = (
+				16F200112FAB400000000011 /* HomeTodayAnimeScheduleListHeaderView.swift */,
+				16F200132FAB400000000013 /* HomeTodayAnimeScheduleListDayFilterContainerView.swift */,
+				16F200152FAB400000000015 /* HomeTodayAnimeScheduleListDayFilterView.swift */,
+				16F200172FAB400000000017 /* HomeTodayAnimeScheduleListSectionHeaderView.swift */,
+				16F200192FAB400000000019 /* HomeTodayAnimeScheduleListTimelineRowView.swift */,
+				16F2001B2FAB40000000001B /* HomeTodayAnimeScheduleListLoadingView.swift */,
+				16F2001D2FAB40000000001D /* HomeTodayAnimeScheduleListEmptyStateView.swift */,
+				16F2001F2FAB40000000001F /* HomeTodayAnimeScheduleListErrorStateView.swift */,
+				16F200212FAB400000000021 /* HomeTodayAnimeScheduleListLoadMoreFooterView.swift */,
+			);
+			path = SubView;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -2179,6 +2222,15 @@
 				16F2000A2FAB40000000000A /* HomeTodayAnimeScheduleListModel.swift in Sources */,
 				16F2000C2FAB40000000000C /* HomeTodayAnimeScheduleListService.swift in Sources */,
 				16F200022FAB400000000002 /* HomeTodayAnimeScheduleListViewModel.swift in Sources */,
+				16F200102FAB400000000010 /* HomeTodayAnimeScheduleListHeaderView.swift in Sources */,
+				16F200122FAB400000000012 /* HomeTodayAnimeScheduleListDayFilterContainerView.swift in Sources */,
+				16F200142FAB400000000014 /* HomeTodayAnimeScheduleListDayFilterView.swift in Sources */,
+				16F200162FAB400000000016 /* HomeTodayAnimeScheduleListSectionHeaderView.swift in Sources */,
+				16F200182FAB400000000018 /* HomeTodayAnimeScheduleListTimelineRowView.swift in Sources */,
+				16F2001A2FAB40000000001A /* HomeTodayAnimeScheduleListLoadingView.swift in Sources */,
+				16F2001C2FAB40000000001C /* HomeTodayAnimeScheduleListEmptyStateView.swift in Sources */,
+				16F2001E2FAB40000000001E /* HomeTodayAnimeScheduleListErrorStateView.swift in Sources */,
+				16F200202FAB400000000020 /* HomeTodayAnimeScheduleListLoadMoreFooterView.swift in Sources */,
 				155A9BF62F782B1100E9E3E0 /* SkeletonBar.swift in Sources */,
 				155A9C022F782C2200F1E4F0 /* SectionCardSkeleton.swift in Sources */,
 				155399752F7C0F5B0028BD24 /* AnimeReviewSkeletonViews.swift in Sources */,
