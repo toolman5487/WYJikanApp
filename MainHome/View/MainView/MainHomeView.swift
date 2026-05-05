@@ -68,6 +68,8 @@ struct MainHomeView: View {
                 switch route {
                 case .todayAnimeSchedule:
                     HomeTodayAnimeScheduleListView()
+                case .trendingAnimeList:
+                    HomeTrendingAnimeListView()
                 case .animeDetail(let malId):
                     AnimeDetailView(malId: malId)
                 case .mangaDetail(let malId):

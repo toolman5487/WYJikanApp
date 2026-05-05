@@ -10,9 +10,11 @@ import SwiftUI
 // MARK: - CapsuleTagScrollView
 
 struct CapsuleTagScrollView<Tag: Hashable>: View {
+    @Namespace private var selectionAnimation
 
     let tags: [Tag]
     let title: (Tag) -> String
+    var systemImageName: ((Tag) -> String?)? = nil
     var selection: Binding<Tag>? = nil
     var onTap: ((Tag) -> Void)? = nil
 
@@ -20,38 +22,66 @@ struct CapsuleTagScrollView<Tag: Hashable>: View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 10) {
                 ForEach(tags, id: \.self) { tag in
-                    let isSelected = selection.map { $0.wrappedValue == tag } ?? true
-                    let background: Color = isSelected ? ThemeColor.sakura : Color(.systemGray5)
-                    let foreground: Color = isSelected ? ThemeColor.textPrimary : ThemeColor.textSecondary
-
                     Button {
                         if let selection {
-                            withAnimation(.easeInOut(duration: 0.2)) {
+                            withAnimation(.spring(response: 0.28, dampingFraction: 0.84)) {
                                 selection.wrappedValue = tag
                             }
                         }
                         onTap?(tag)
                     } label: {
-                        capsuleLabel(title(tag), background: background, foreground: foreground)
+                        capsuleLabel(
+                            title: title(tag),
+                            systemImageName: systemImageName?(tag),
+                            isSelected: isSelected(tag)
+                        )
                     }
                     .buttonStyle(.plain)
                 }
             }
+            .padding(.vertical, 2)
         }
     }
 
     // MARK: - Private
 
-    @ViewBuilder
-    private func capsuleLabel(_ text: String, background: Color, foreground: Color) -> some View {
-        Text(text)
-            .font(.subheadline.weight(.medium))
-            .foregroundStyle(foreground)
-            .lineLimit(1)
-            .padding(.vertical, 8)
-            .padding(.horizontal, 16)
-            .frame(minHeight: 44)
-            .background(background)
-            .clipShape(Capsule())
+    private func isSelected(_ tag: Tag) -> Bool {
+        selection.map { $0.wrappedValue == tag } ?? true
+    }
+
+    private func capsuleLabel(
+        title: String,
+        systemImageName: String?,
+        isSelected: Bool
+    ) -> some View {
+        HStack(spacing: systemImageName == nil ? 0 : 8) {
+            if let systemImageName {
+                Image(systemName: systemImageName)
+                    .font(.footnote.weight(.semibold))
+            }
+
+            Text(title)
+                .font(.subheadline.weight(.semibold))
+                .lineLimit(1)
+        }
+        .foregroundStyle(isSelected ? ThemeColor.textPrimary : ThemeColor.textSecondary)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .frame(minHeight: 44)
+        .background {
+            ZStack {
+                if selection != nil, isSelected {
+                    Capsule()
+                        .fill(ThemeColor.sakura)
+                        .matchedGeometryEffect(id: "capsuleSelection", in: selectionAnimation)
+                } else if isSelected {
+                    Capsule()
+                        .fill(ThemeColor.sakura)
+                } else {
+                    Capsule()
+                        .fill(Color(.secondarySystemBackground))
+                }
+            }
+        }
     }
 }

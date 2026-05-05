@@ -23,10 +23,20 @@ struct HomeTrendingAnimeView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text("熱門動畫")
-                .padding()
-                .font(.title3.weight(.bold))
+            Button {
+                router.push(.trendingAnimeList)
+            } label: {
+                HStack(spacing: 6) {
+                    Text("熱門動畫")
+                        .font(.title3.weight(.bold))
+
+                    Image(systemName: "chevron.right")
+                        .font(.footnote.weight(.semibold))
+                }
                 .foregroundStyle(ThemeColor.sakura)
+                .padding()
+            }
+            .buttonStyle(.plain)
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: Self.cardSpacing) {
