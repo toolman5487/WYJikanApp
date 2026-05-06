@@ -24,10 +24,20 @@ struct HomeTrendingMangaView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text("熱門漫畫")
-                .padding()
-                .font(.title3.weight(.bold))
+            Button {
+                router.push(.trendingMangaList)
+            } label: {
+                HStack(spacing: 6) {
+                    Text("熱門漫畫")
+                        .font(.title3.weight(.bold))
+
+                    Image(systemName: "chevron.right")
+                        .font(.footnote.weight(.semibold))
+                }
                 .foregroundStyle(ThemeColor.sakura)
+                .padding()
+            }
+            .buttonStyle(.plain)
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: Self.cardSpacing) {

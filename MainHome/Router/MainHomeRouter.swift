@@ -12,6 +12,7 @@ import SwiftUI
 enum MainHomeRoute: Hashable {
     case todayAnimeSchedule
     case trendingAnimeList
+    case trendingMangaList
     case animeDetail(malId: Int)
     case mangaDetail(malId: Int)
 }

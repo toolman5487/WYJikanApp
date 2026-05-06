@@ -70,6 +70,8 @@ struct MainHomeView: View {
                     HomeTodayAnimeScheduleListView()
                 case .trendingAnimeList:
                     HomeTrendingAnimeListView()
+                case .trendingMangaList:
+                    HomeTrendingMangaListView()
                 case .animeDetail(let malId):
                     AnimeDetailView(malId: malId)
                 case .mangaDetail(let malId):

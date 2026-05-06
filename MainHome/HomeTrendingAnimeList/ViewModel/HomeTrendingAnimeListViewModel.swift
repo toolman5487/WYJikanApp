@@ -27,6 +27,7 @@ final class HomeTrendingAnimeListViewModel: ObservableObject {
     @Published var selectedSort: HomeTrendingAnimeListSort = .apiDefault
     @Published private(set) var screenState: ScreenState = .loading
     @Published private(set) var loadMoreState: LoadMoreState = .hidden
+    @Published private(set) var isApplyingMenuSelection = false
 
     private let service: HomeTrendingAnimeListServicing
     private let pageSize = 25
@@ -38,6 +39,7 @@ final class HomeTrendingAnimeListViewModel: ObservableObject {
     private var isLoadingMore = false
     private var requestGeneration = 0
     private var cancellables: Set<AnyCancellable> = []
+    private var menuSelectionTask: Task<Void, Never>?
 
     init(service: HomeTrendingAnimeListServicing = HomeTrendingAnimeListService()) {
         self.service = service
@@ -95,7 +97,7 @@ final class HomeTrendingAnimeListViewModel: ObservableObject {
             .dropFirst()
             .sink { [weak self] _ in
                 guard let self, self.hasLoaded else { return }
-                self.applyPresentation()
+                self.presentSelectionChange()
             }
             .store(in: &cancellables)
     }
@@ -188,6 +190,21 @@ final class HomeTrendingAnimeListViewModel: ObservableObject {
             )
         )
         loadMoreState = resolvedLoadMoreState()
+    }
+
+    private func presentSelectionChange() {
+        menuSelectionTask?.cancel()
+        menuSelectionTask = Task { [weak self] in
+            guard let self else { return }
+
+            isApplyingMenuSelection = true
+
+            try? await Task.sleep(nanoseconds: 350_000_000)
+            guard !Task.isCancelled else { return }
+
+            applyPresentation()
+            isApplyingMenuSelection = false
+        }
     }
 
     private func resetPagination() {
