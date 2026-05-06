@@ -12,35 +12,30 @@ enum HomeTrendingMangaScreenState: Equatable {
     case loading
     case error(String)
     case empty
-    case content
+    case content([HomeTrendingMangaCardItem])
 }
 
 @MainActor
 final class HomeTrendingMangaViewModel: ObservableObject {
     private static let maxCards = 10
 
-    @Published private(set) var items: [HomeTrendingMangaCardItem] = []
-    @Published private(set) var isLoading: Bool = false
-    @Published private(set) var errorMessage: String?
+    @Published private(set) var screenState: HomeTrendingMangaScreenState = .loading
 
     private let service: MainHomeServicing
     private var loadTask: Task<Void, Never>?
+    private var isLoading = false
 
     init(service: MainHomeServicing = MainHomeService()) {
         self.service = service
     }
 
-    var screenState: HomeTrendingMangaScreenState {
-        if isLoading {
-            return .loading
+    var items: [HomeTrendingMangaCardItem] {
+        switch screenState {
+        case .content(let items):
+            return items
+        case .loading, .error, .empty:
+            return []
         }
-        if let errorMessage {
-            return .error(errorMessage)
-        }
-        if items.isEmpty {
-            return .empty
-        }
-        return .content
     }
 
     func loadIfNeeded() {
@@ -51,7 +46,7 @@ final class HomeTrendingMangaViewModel: ObservableObject {
     func load() {
         loadTask?.cancel()
         isLoading = true
-        errorMessage = nil
+        screenState = .loading
 
         loadTask = Task { [weak self] in
             guard let self else { return }
@@ -76,12 +71,11 @@ final class HomeTrendingMangaViewModel: ObservableObject {
                     )
                 }
 
-                self.items = mapped
                 self.isLoading = false
+                self.screenState = mapped.isEmpty ? .empty : .content(mapped)
             } catch {
-                self.errorMessage = error.localizedDescription
-                self.items = []
                 self.isLoading = false
+                self.screenState = .error(error.localizedDescription)
             }
         }
     }

@@ -17,40 +17,40 @@ final class PeopleDetailViewModel: ObservableObject {
         case error(String)
     }
 
-    @Published private(set) var detail: PeopleDetailDTO?
-    @Published private(set) var errorMessage: String?
+    @Published private(set) var screenState: ScreenState = .loading
 
     private let malId: Int
     private let service: PeopleDetailServicing
+    private var isLoading = false
 
     init(malId: Int, service: PeopleDetailServicing = PeopleDetailService()) {
         self.malId = malId
         self.service = service
     }
 
-    var screenState: ScreenState {
-        if let detail {
-            return .loaded(detail)
+    var detail: PeopleDetailDTO? {
+        switch screenState {
+        case .loaded(let detail):
+            return detail
+        case .loading, .error:
+            return nil
         }
-        if let errorMessage, !errorMessage.isEmpty {
-            return .error(errorMessage)
-        }
-        return .loading
     }
 
     func load() async {
-        guard detail == nil else { return }
+        guard detail == nil, !isLoading else { return }
 
-        errorMessage = nil
+        isLoading = true
+        screenState = .loading
+        defer { isLoading = false }
 
         do {
             let response = try await service.fetchPeopleDetail(malId: malId)
-            detail = response.data
+            screenState = .loaded(response.data)
         } catch is CancellationError {
             return
         } catch {
-            errorMessage = error.localizedDescription
-            detail = nil
+            screenState = .error(error.localizedDescription)
         }
     }
 }

@@ -12,7 +12,7 @@ enum HomeTodayAnimeScreenState: Equatable {
     case loading
     case error(String)
     case empty
-    case content
+    case content([HomeTodayAnimeCardItem])
 }
 
 @MainActor
@@ -20,28 +20,23 @@ final class HomeTodayAnimeViewModel: ObservableObject {
     private static let maxCards = 10
     private static let scheduleFetchLimit = 25
 
-    @Published private(set) var items: [HomeTodayAnimeCardItem] = []
-    @Published private(set) var isLoading: Bool = false
-    @Published private(set) var errorMessage: String?
+    @Published private(set) var screenState: HomeTodayAnimeScreenState = .loading
 
     private let service: MainHomeServicing
     private var loadTask: Task<Void, Never>?
+    private var isLoading = false
 
     init(service: MainHomeServicing = MainHomeService()) {
         self.service = service
     }
 
-    var screenState: HomeTodayAnimeScreenState {
-        if isLoading {
-            return .loading
+    var items: [HomeTodayAnimeCardItem] {
+        switch screenState {
+        case .content(let items):
+            return items
+        case .loading, .error, .empty:
+            return []
         }
-        if let errorMessage {
-            return .error(errorMessage)
-        }
-        if items.isEmpty {
-            return .empty
-        }
-        return .content
     }
 
     func loadIfNeeded() {
@@ -52,7 +47,7 @@ final class HomeTodayAnimeViewModel: ObservableObject {
     func load() {
         loadTask?.cancel()
         isLoading = true
-        errorMessage = nil
+        screenState = .loading
 
         loadTask = Task { [weak self] in
             guard let self else { return }
@@ -81,12 +76,12 @@ final class HomeTodayAnimeViewModel: ObservableObject {
 
                 var seenIDs = Set<Int>()
                 let uniqueInOrder = mapped.filter { seenIDs.insert($0.id).inserted }
-                self.items = Array(uniqueInOrder.prefix(Self.maxCards))
+                let items = Array(uniqueInOrder.prefix(Self.maxCards))
                 self.isLoading = false
+                self.screenState = items.isEmpty ? .empty : .content(items)
             } catch {
-                self.errorMessage = error.localizedDescription
-                self.items = []
                 self.isLoading = false
+                self.screenState = .error(error.localizedDescription)
             }
         }
     }

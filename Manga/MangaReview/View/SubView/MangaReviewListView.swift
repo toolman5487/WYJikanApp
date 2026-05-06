@@ -21,12 +21,15 @@ struct MangaReviewListView: View {
                     MangaReviewRowView(viewModel: viewModel, entry: entry)
                 }
 
-                if viewModel.hasNextPage {
+                switch viewModel.loadMoreState {
+                case .hidden:
+                    EmptyView()
+                case .available, .loading:
                     Button {
                         Task { await viewModel.loadMore() }
                     } label: {
                         HStack {
-                            if viewModel.isLoadingMore {
+                            if case .loading = viewModel.loadMoreState {
                                 ProgressView()
                             }
                             Text("載入更多")
@@ -39,7 +42,28 @@ struct MangaReviewListView: View {
                     .buttonStyle(.plain)
                     .background(ThemeColor.sakura)
                     .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                    .disabled(viewModel.isLoadingMore)
+                    .disabled({
+                        if case .loading = viewModel.loadMoreState {
+                            return true
+                        }
+                        return false
+                    }())
+                case .error(let message):
+                    VStack(spacing: 10) {
+                        Text(message)
+                            .font(.footnote)
+                            .foregroundStyle(ThemeColor.textSecondary)
+
+                        Button("重試載入更多") {
+                            Task { await viewModel.loadMore() }
+                        }
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(ThemeColor.textPrimary)
+                        .frame(maxWidth: .infinity)
+                        .frame(minHeight: 44)
+                        .background(ThemeColor.sakura)
+                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    }
                 }
             }
             .padding()

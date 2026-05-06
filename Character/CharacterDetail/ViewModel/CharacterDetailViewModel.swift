@@ -17,40 +17,40 @@ final class CharacterDetailViewModel: ObservableObject {
         case error(String)
     }
 
-    @Published private(set) var detail: CharacterDetailDTO?
-    @Published private(set) var errorMessage: String?
+    @Published private(set) var screenState: ScreenState = .loading
 
     private let malId: Int
     private let service: CharacterDetailServicing
+    private var isLoading = false
 
     init(malId: Int, service: CharacterDetailServicing = CharacterDetailService()) {
         self.malId = malId
         self.service = service
     }
 
-    var screenState: ScreenState {
-        if let detail {
-            return .loaded(detail)
+    var detail: CharacterDetailDTO? {
+        switch screenState {
+        case .loaded(let detail):
+            return detail
+        case .loading, .error:
+            return nil
         }
-        if let errorMessage, !errorMessage.isEmpty {
-            return .error(errorMessage)
-        }
-        return .loading
     }
 
     func load() async {
-        guard detail == nil else { return }
+        guard detail == nil, !isLoading else { return }
 
-        errorMessage = nil
+        isLoading = true
+        screenState = .loading
+        defer { isLoading = false }
 
         do {
             let response = try await service.fetchCharacterDetail(malId: malId)
-            detail = response.data
+            screenState = .loaded(response.data)
         } catch is CancellationError {
             return
         } catch {
-            errorMessage = error.localizedDescription
-            detail = nil
+            screenState = .error(error.localizedDescription)
         }
     }
 }

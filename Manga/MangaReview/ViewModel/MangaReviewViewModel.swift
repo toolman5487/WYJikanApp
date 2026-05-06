@@ -14,77 +14,83 @@ final class MangaReviewViewModel: ObservableObject {
         case loading
         case error(String)
         case empty
-        case content
+        case content([MangaReviewEntryDTO])
     }
 
-    @Published private(set) var reviews: [MangaReviewEntryDTO] = []
-    @Published private(set) var isLoading = false
-    @Published private(set) var isLoadingMore = false
-    @Published private(set) var hasNextPage = false
-    @Published private(set) var errorMessage: String?
+    enum LoadMoreState: Equatable {
+        case hidden
+        case available
+        case loading
+        case error(String)
+    }
+
+    @Published private(set) var screenState: ScreenState = .loading
+    @Published private(set) var loadMoreState: LoadMoreState = .hidden
 
     private let malId: Int
     private let service: MangaReviewServicing
     private var loadedPage = 0
+    private var isLoading = false
+    private var isLoadingMore = false
+    private var hasNextPage = false
 
     init(malId: Int, service: MangaReviewServicing = MangaReviewService()) {
         self.malId = malId
         self.service = service
     }
 
-    var screenState: ScreenState {
-        if let errorMessage, !errorMessage.isEmpty {
-            return .error(errorMessage)
+    var reviews: [MangaReviewEntryDTO] {
+        switch screenState {
+        case .content(let reviews):
+            return reviews
+        case .loading, .error, .empty:
+            return []
         }
-        if isLoading && reviews.isEmpty {
-            return .loading
-        }
-        if reviews.isEmpty {
-            return .empty
-        }
-        return .content
     }
 
     // MARK: - Load
 
     func load() async {
         guard !isLoading else { return }
-        errorMessage = nil
         isLoading = true
+        screenState = .loading
         defer { isLoading = false }
 
         loadedPage = 0
-        reviews = []
         hasNextPage = false
+        loadMoreState = .hidden
 
         do {
             let response = try await service.fetchReviews(malId: malId, page: 1)
-            reviews = response.data
             hasNextPage = response.pagination?.hasNextPage ?? false
             loadedPage = 1
+            screenState = response.data.isEmpty ? .empty : .content(response.data)
+            loadMoreState = hasNextPage ? .available : .hidden
         } catch is CancellationError {
             return
         } catch {
-            errorMessage = error.localizedDescription
-            reviews = []
+            screenState = .error(error.localizedDescription)
         }
     }
 
     func loadMore() async {
         guard hasNextPage, !isLoadingMore, !isLoading, loadedPage > 0 else { return }
         isLoadingMore = true
+        loadMoreState = .loading
         defer { isLoadingMore = false }
 
         let nextPage = loadedPage + 1
         do {
             let response = try await service.fetchReviews(malId: malId, page: nextPage)
-            reviews.append(contentsOf: response.data)
+            let mergedReviews = reviews + response.data
             hasNextPage = response.pagination?.hasNextPage ?? false
             loadedPage = nextPage
+            screenState = mergedReviews.isEmpty ? .empty : .content(mergedReviews)
+            loadMoreState = hasNextPage ? .available : .hidden
         } catch is CancellationError {
             return
         } catch {
-            return
+            loadMoreState = .error("載入更多失敗")
         }
     }
 }

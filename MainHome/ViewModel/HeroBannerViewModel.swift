@@ -12,7 +12,7 @@ enum HeroBannerScreenState: Equatable {
     case loading
     case error(String)
     case empty
-    case content
+    case content([BannerItem])
 }
 
 @MainActor
@@ -22,14 +22,13 @@ final class HeroBannerViewModel: ObservableObject {
     private static let maxBannerItems = 15
     private static let autoScrollNanoseconds: UInt64 = 4_000_000_000
 
-    @Published private(set) var items: [BannerItem] = []
+    @Published private(set) var screenState: HeroBannerScreenState = .loading
     @Published private(set) var currentIndex: Int = 0
-    @Published private(set) var isLoading = false
-    @Published private(set) var errorMessage: String?
 
     private let service: MainHomeServicing
     private var loadTask: Task<Void, Never>?
     private var autoScrollTask: Task<Void, Never>?
+    private var isLoading = false
 
     init(
         service: MainHomeServicing = MainHomeService(),
@@ -73,25 +72,20 @@ final class HeroBannerViewModel: ObservableObject {
         return "\(currentIndex + 1) / \(items.count)"
     }
 
-    var screenState: HeroBannerScreenState {
-        if isLoading {
-            return .loading
+    var items: [BannerItem] {
+        switch screenState {
+        case .content(let items):
+            return items
+        case .loading, .error, .empty:
+            return []
         }
-        if items.isEmpty {
-            if let errorMessage,
-               errorMessage != emptyStateMessage {
-                return .error(errorMessage)
-            }
-            return .empty
-        }
-        return .content
     }
 
     func load() {
         loadTask?.cancel()
         stopAutoScroll()
         isLoading = true
-        errorMessage = nil
+        screenState = .loading
 
         loadTask = Task { @MainActor [weak self] in
             guard let self else { return }
@@ -122,18 +116,16 @@ final class HeroBannerViewModel: ObservableObject {
                 }
 
                 let capped = Array(mapped.prefix(Self.maxBannerItems))
-                self.items = capped
                 self.currentIndex = 0
                 self.isLoading = false
-                self.errorMessage = capped.isEmpty ? self.emptyStateMessage : nil
+                self.screenState = capped.isEmpty ? .empty : .content(capped)
                 self.startAutoScrollIfNeeded()
             } catch is CancellationError {
                 self.isLoading = false
             } catch {
-                self.errorMessage = error.localizedDescription
-                self.items = []
                 self.currentIndex = 0
                 self.isLoading = false
+                self.screenState = .error(error.localizedDescription)
                 self.stopAutoScroll()
             }
         }

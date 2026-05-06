@@ -16,8 +16,7 @@ struct MainSearchView: View {
             VStack(spacing: 0) {
                 MainSearchResultsContentView(
                     screenState: viewModel.screenState,
-                    isLoadingMore: viewModel.isLoadingMore,
-                    loadMoreErrorMessage: viewModel.loadMoreErrorMessage,
+                    loadMoreState: viewModel.loadMoreState,
                     onRowAppear: viewModel.loadMoreIfNeeded(currentRow:),
                     onRetryLoadMore: viewModel.retryLoadMore
                 )

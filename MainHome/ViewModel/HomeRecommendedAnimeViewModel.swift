@@ -12,7 +12,7 @@ enum HomeRecommendedAnimeScreenState: Equatable {
     case loading
     case error(String)
     case empty
-    case content
+    case content([HomeRecommendedAnimeCardItem])
 }
 
 @MainActor
@@ -23,42 +23,37 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
     private static let titleEnrichmentDelayNanoseconds: UInt64 = 350_000_000
     private static var titleCache: [Int: String] = [:]
 
-    @Published private(set) var items: [HomeRecommendedAnimeCardItem] = []
-    @Published private(set) var isLoading: Bool = false
-    @Published private(set) var errorMessage: String?
+    @Published private(set) var screenState: HomeRecommendedAnimeScreenState = .loading
     @Published private(set) var visibleCount: Int = 9
 
     private let service: MainHomeServicing
     private var loadTask: Task<Void, Never>?
     private var titleEnrichmentTask: Task<Void, Never>?
+    private var isLoading = false
 
     init(service: MainHomeServicing = MainHomeService()) {
         self.service = service
     }
 
-    var screenState: HomeRecommendedAnimeScreenState {
-        if isLoading {
-            return .loading
+    private var allItems: [HomeRecommendedAnimeCardItem] {
+        switch screenState {
+        case .content(let items):
+            return items
+        case .loading, .error, .empty:
+            return []
         }
-        if let errorMessage {
-            return .error(errorMessage)
-        }
-        if items.isEmpty {
-            return .empty
-        }
-        return .content
     }
 
     var displayedItems: [HomeRecommendedAnimeCardItem] {
-        Array(items.prefix(visibleCount))
+        Array(allItems.prefix(visibleCount))
     }
 
     var canLoadMore: Bool {
-        visibleCount < items.count
+        visibleCount < allItems.count
     }
 
     func loadIfNeeded() {
-        guard items.isEmpty, !isLoading else { return }
+        guard allItems.isEmpty, !isLoading else { return }
         load()
     }
 
@@ -66,7 +61,7 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
         loadTask?.cancel()
         titleEnrichmentTask?.cancel()
         isLoading = true
-        errorMessage = nil
+        screenState = .loading
         visibleCount = Self.initialVisibleCards
 
         loadTask = Task { [weak self] in
@@ -98,13 +93,13 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
                 }
 
                 var seenRecommendationIDs = Set<String>()
-                self.items = mapped.filter { seenRecommendationIDs.insert($0.id).inserted }
+                let items = mapped.filter { seenRecommendationIDs.insert($0.id).inserted }
                 self.isLoading = false
+                self.screenState = items.isEmpty ? .empty : .content(items)
                 self.startTitleEnrichmentIfNeeded()
             } catch {
-                self.errorMessage = error.localizedDescription
-                self.items = []
                 self.isLoading = false
+                self.screenState = .error(error.localizedDescription)
             }
         }
     }
@@ -117,12 +112,12 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
     }
 
     func loadMore() {
-        visibleCount = min(visibleCount + Self.loadMoreStep, items.count)
+        visibleCount = min(visibleCount + Self.loadMoreStep, allItems.count)
     }
 
     private func startTitleEnrichmentIfNeeded() {
         titleEnrichmentTask?.cancel()
-        let uncachedIDs = items.compactMap { item in
+        let uncachedIDs = allItems.compactMap { item in
             Self.titleCache[item.detailMalId] == nil ? item.detailMalId : nil
         }
         guard !uncachedIDs.isEmpty else { return }
@@ -150,7 +145,7 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
     }
 
     private func replaceRecommendedTitle(for malId: Int, with title: String) {
-        items = items.map { item in
+        let updatedItems = allItems.map { item in
             guard item.detailMalId == malId else { return item }
             return HomeRecommendedAnimeCardItem(
                 id: item.id,
@@ -161,6 +156,7 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
                 imageURL: item.imageURL
             )
         }
+        screenState = updatedItems.isEmpty ? .empty : .content(updatedItems)
     }
 
     private nonisolated static func preferredTitle(japanese: String?, english: String?, fallback: String?) -> String {

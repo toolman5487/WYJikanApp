@@ -16,9 +16,8 @@ final class AnimeDetailViewModel: ObservableObject {
         case error(String)
     }
 
-    @Published private(set) var detail: AnimeDetailDTO?
+    @Published private(set) var screenState: ScreenState = .loading
     @Published private(set) var pictureItems: [AnimeDetailPictureItem] = []
-    @Published private(set) var errorMessage: String?
     @Published private(set) var isLoading = false
 
     private let malId: Int
@@ -29,48 +28,50 @@ final class AnimeDetailViewModel: ObservableObject {
         self.service = service
     }
 
-    var screenState: ScreenState {
-        if let detail {
-            return .loaded(detail)
+    var detail: AnimeDetailDTO? {
+        switch screenState {
+        case .loaded(let detail):
+            return detail
+        case .loading, .error:
+            return nil
         }
-        if let errorMessage, !errorMessage.isEmpty {
-            return .error(errorMessage)
-        }
-        return .loading
     }
 
     // MARK: - Load
 
     func load(forceRefresh: Bool = false) async {
-        guard forceRefresh || detail == nil else { return }
+        let existingDetail = detail
+        guard forceRefresh || existingDetail == nil else { return }
         guard !isLoading else { return }
 
         isLoading = true
-        errorMessage = nil
-        if !forceRefresh {
+        if existingDetail == nil {
+            screenState = .loading
             pictureItems = []
         }
         defer { isLoading = false }
 
         do {
             let resolvedDetail = try await service.fetchAnimeDetail(malId: malId)
-            detail = resolvedDetail.data
+            let detail = resolvedDetail.data
+            screenState = .loaded(detail)
             do {
                 let resolvedPictures = try await service.fetchAnimePictures(malId: malId)
                 pictureItems = AnimeDetailPictureMapping.items(from: resolvedPictures)
             } catch is CancellationError {
                 return
             } catch {
-                if !forceRefresh {
+                if existingDetail == nil {
                     pictureItems = []
                 }
             }
         } catch is CancellationError {
             return
         } catch {
-            errorMessage = error.localizedDescription
-            if !forceRefresh {
-                detail = nil
+            if let existingDetail, forceRefresh {
+                screenState = .loaded(existingDetail)
+            } else {
+                screenState = .error(error.localizedDescription)
                 pictureItems = []
             }
         }

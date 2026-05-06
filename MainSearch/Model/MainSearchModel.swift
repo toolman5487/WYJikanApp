@@ -335,18 +335,11 @@ enum MainSearchScreenState: Equatable {
     case error(String)
     case emptyResults(query: String)
     case content([MainSearchResultRow])
+}
 
-    static func resolve(
-        trimmedQuery: String,
-        query: String,
-        isLoading: Bool,
-        errorMessage: String?,
-        rows: [MainSearchResultRow]
-    ) -> MainSearchScreenState {
-        if trimmedQuery.isEmpty { return .emptyPrompt }
-        if isLoading, rows.isEmpty { return .loading }
-        if let message = errorMessage, rows.isEmpty { return .error(message) }
-        if rows.isEmpty { return .emptyResults(query: query) }
-        return .content(rows)
-    }
+enum MainSearchLoadMoreState: Equatable {
+    case hidden
+    case available
+    case loading
+    case error(String)
 }

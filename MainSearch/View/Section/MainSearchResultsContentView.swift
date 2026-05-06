@@ -10,8 +10,7 @@ import SwiftUI
 struct MainSearchResultsContentView: View {
 
     let screenState: MainSearchScreenState
-    let isLoadingMore: Bool
-    let loadMoreErrorMessage: String?
+    let loadMoreState: MainSearchLoadMoreState
     let onRowAppear: (MainSearchResultRow) -> Void
     let onRetryLoadMore: () -> Void
 
@@ -53,10 +52,13 @@ struct MainSearchResultsContentView: View {
                     .listRowSeparator(.visible)
                 }
                 .overlay(alignment: .bottom) {
-                    if isLoadingMore {
+                    switch loadMoreState {
+                    case .hidden, .available:
+                        EmptyView()
+                    case .loading:
                         ProgressView()
                             .padding(.bottom, 12)
-                    } else if let loadMoreErrorMessage {
+                    case .error(let loadMoreErrorMessage):
                         VStack(spacing: 8) {
                             Text(loadMoreErrorMessage)
                                 .font(.footnote)
