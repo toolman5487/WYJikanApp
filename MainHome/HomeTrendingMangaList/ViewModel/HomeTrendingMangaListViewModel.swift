@@ -43,11 +43,11 @@ final class HomeTrendingMangaListViewModel: ObservableObject {
     }
 
     var headerTitle: String {
-        "本週熱門漫畫"
+        headerTitle(sort: selectedSort, format: selectedFormat)
     }
 
     var headerSubtitle: String {
-        "把現在榜上最受關注的漫畫一次展開，依照人氣、評分或作品形式慢慢篩。"
+        headerSubtitle(sort: selectedSort, format: selectedFormat)
     }
 
     var loadedCountText: String {
@@ -236,6 +236,48 @@ final class HomeTrendingMangaListViewModel: ObservableObject {
             return .error(message: message)
         }
         return hasNextPage ? .available : .hidden
+    }
+
+    private func headerTitle(sort: HomeTrendingMangaListSort, format: HomeTrendingMangaListFormat) -> String {
+        let baseTitle: String
+        switch sort {
+        case .apiDefault:
+            baseTitle = "本週熱門漫畫"
+        case .rank:
+            baseTitle = "排名漫畫榜"
+        case .popularity:
+            baseTitle = "人氣漫畫榜"
+        case .score:
+            baseTitle = "高分漫畫榜"
+        }
+
+        switch format {
+        case .all:
+            return baseTitle
+        default:
+            return "\(format.title)\(baseTitle)"
+        }
+    }
+
+    private func headerSubtitle(sort: HomeTrendingMangaListSort, format: HomeTrendingMangaListFormat) -> String {
+        switch (sort, format) {
+        case (.apiDefault, .all):
+            return "把現在榜上最受關注的漫畫一次展開，先看榜首，再慢慢往下挖完整熱門清單。"
+        case (.rank, .all):
+            return "從榜單名次一路往下看，先鎖定站上前段班、討論度高的漫畫作品。"
+        case (.popularity, .all):
+            return "依人氣熱度重新整理，適合先找現在最多人追、最常被提起的熱門作品。"
+        case (.score, .all):
+            return "把評價表現突出的作品拉到前面，想先看口碑穩、分數亮眼的漫畫可以從這裡開始。"
+        case (.apiDefault, _):
+            return "整理目前最受關注的\(format.title)作品，讓你快速找到這個類型裡最值得先看的熱門選擇。"
+        case (.rank, _):
+            return "從名次往下看這批\(format.title)作品，先鎖定榜上前段班與討論度高的焦點名單。"
+        case (.popularity, _):
+            return "依人氣熱度重新整理這批\(format.title)作品，適合先找現在最多人追的熱門選擇。"
+        case (.score, _):
+            return "把高評價的\(format.title)作品拉到前面，想先看口碑穩、分數亮眼的類型可以從這裡開始。"
+        }
     }
 
     private func resetPagination() {

@@ -16,23 +16,22 @@ struct HomeTrendingAnimeListView: View {
     }
 
     var body: some View {
-        ZStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 22) {
-                    let header = viewModel.headerContent
-                    HomeTrendingAnimeListHeaderView(
-                        title: header.title,
-                        subtitle: header.subtitle,
-                        loadedCountText: header.loadedCountText
-                    )
-                    stateContentView
-                }
-                .padding(.horizontal, 16)
-                .padding(.top, 16)
-                .padding(.bottom, 28)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 22) {
+                let header = viewModel.headerContent
+                HomeTrendingAnimeListHeaderView(
+                    title: header.title,
+                    subtitle: header.subtitle,
+                    loadedCountText: header.loadedCountText
+                )
+                stateContentView
             }
-            .allowsHitTesting(!viewModel.isApplyingMenuSelection)
-
+            .padding(.horizontal, 16)
+            .padding(.top, 16)
+            .padding(.bottom, 28)
+        }
+        .allowsHitTesting(!viewModel.isApplyingMenuSelection)
+        .overlay {
             if viewModel.isApplyingMenuSelection {
                 applyingSelectionOverlay
                     .transition(.opacity.combined(with: .scale(scale: 0.98)))
@@ -115,7 +114,6 @@ struct HomeTrendingAnimeListView: View {
         ZStack {
             Color(.systemBackground)
                 .opacity(0.92)
-                .ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: 18) {
                 Text("更新榜單中...")
@@ -130,5 +128,6 @@ struct HomeTrendingAnimeListView: View {
             .shadow(color: Color.black.opacity(0.06), radius: 16, y: 8)
             .padding(.horizontal, 16)
         }
+        .safeAreaPadding(.top)
     }
 }

@@ -48,8 +48,8 @@ final class HomeTrendingAnimeListViewModel: ObservableObject {
 
     var headerContent: HomeTrendingAnimeListHeaderContent {
         HomeTrendingAnimeListHeaderContent(
-            title: "本週熱門動畫",
-            subtitle: "整理現在最多人關注的動畫作品，先看榜首，再一路往下挖熱門清單。",
+            title: headerTitle(for: selectedSort),
+            subtitle: headerSubtitle(for: selectedSort),
             loadedCountText: "已載入 \(sourceItems.count) 部"
         )
     }
@@ -271,6 +271,32 @@ final class HomeTrendingAnimeListViewModel: ObservableObject {
             return "人氣焦點"
         case .score:
             return "高分焦點"
+        }
+    }
+
+    private func headerTitle(for sort: HomeTrendingAnimeListSort) -> String {
+        switch sort {
+        case .apiDefault:
+            return "本週熱門動畫"
+        case .rank:
+            return "排名動畫榜"
+        case .popularity:
+            return "人氣動畫榜"
+        case .score:
+            return "高分動畫榜"
+        }
+    }
+
+    private func headerSubtitle(for sort: HomeTrendingAnimeListSort) -> String {
+        switch sort {
+        case .apiDefault:
+            return "整理現在最多人關注的動畫作品，先看榜首，再一路往下挖熱門清單。"
+        case .rank:
+            return "從榜單名次一路往下看，先鎖定站上前段班、討論度最高的動畫作品。"
+        case .popularity:
+            return "依人氣熱度重新整理，適合先找現在最多人追、最常被提起的熱門作品。"
+        case .score:
+            return "把評價表現突出的作品拉到前面，想先看口碑穩、分數亮眼的動畫可以從這裡開始。"
         }
     }
 
