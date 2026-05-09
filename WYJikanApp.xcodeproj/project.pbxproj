@@ -226,6 +226,14 @@
 		16F200042FAB400000000004 /* HomeTodayAnimeScheduleListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F200032FAB400000000003 /* HomeTodayAnimeScheduleListView.swift */; };
 		16F2000A2FAB40000000000A /* HomeTodayAnimeScheduleListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F2000B2FAB40000000000B /* HomeTodayAnimeScheduleListModel.swift */; };
 		16F2000C2FAB40000000000C /* HomeTodayAnimeScheduleListService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F2000D2FAB40000000000D /* HomeTodayAnimeScheduleListService.swift */; };
+		16F200242FAB400000000024 /* HomeTodayAnimeNotificationScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F200232FAB400000000023 /* HomeTodayAnimeNotificationScheduler.swift */; };
+		16F200262FAB400000000026 /* HomeTodayAnimeNotificationConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F200252FAB400000000025 /* HomeTodayAnimeNotificationConfig.swift */; };
+		16F200282FAB400000000028 /* HomeTodayAnimeNotificationFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F200272FAB400000000027 /* HomeTodayAnimeNotificationFeedback.swift */; };
+		16F2002A2FAB40000000002A /* HomeTodayAnimeBroadcastReminder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F200292FAB400000000029 /* HomeTodayAnimeBroadcastReminder.swift */; };
+		16F2002C2FAB40000000002C /* HomeTodayAnimeBroadcastReminderFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F2002B2FAB40000000002B /* HomeTodayAnimeBroadcastReminderFactory.swift */; };
+		16F2002E2FAB40000000002E /* HomeTodayAnimeNotificationRequestFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F2002D2FAB40000000002D /* HomeTodayAnimeNotificationRequestFactory.swift */; };
+		16F200302FAB400000000030 /* HomeTodayAnimeNotificationExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F2002F2FAB40000000002F /* HomeTodayAnimeNotificationExtensions.swift */; };
+		16F200332FAB400000000033 /* HomeTodayAnimeNotificationState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F200322FAB400000000032 /* HomeTodayAnimeNotificationState.swift */; };
 		16F200102FAB400000000010 /* HomeTodayAnimeScheduleListHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F200112FAB400000000011 /* HomeTodayAnimeScheduleListHeaderView.swift */; };
 		16F200122FAB400000000012 /* HomeTodayAnimeScheduleListDayFilterContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F200132FAB400000000013 /* HomeTodayAnimeScheduleListDayFilterContainerView.swift */; };
 		16F200142FAB400000000014 /* HomeTodayAnimeScheduleListDayFilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F200152FAB400000000015 /* HomeTodayAnimeScheduleListDayFilterView.swift */; };
@@ -468,6 +476,14 @@
 		16F200032FAB400000000003 /* HomeTodayAnimeScheduleListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeScheduleListView.swift; sourceTree = "<group>"; };
 		16F2000B2FAB40000000000B /* HomeTodayAnimeScheduleListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeScheduleListModel.swift; sourceTree = "<group>"; };
 		16F2000D2FAB40000000000D /* HomeTodayAnimeScheduleListService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeScheduleListService.swift; sourceTree = "<group>"; };
+		16F200232FAB400000000023 /* HomeTodayAnimeNotificationScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeNotificationScheduler.swift; sourceTree = "<group>"; };
+		16F200252FAB400000000025 /* HomeTodayAnimeNotificationConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeNotificationConfig.swift; sourceTree = "<group>"; };
+		16F200272FAB400000000027 /* HomeTodayAnimeNotificationFeedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeNotificationFeedback.swift; sourceTree = "<group>"; };
+		16F200292FAB400000000029 /* HomeTodayAnimeBroadcastReminder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeBroadcastReminder.swift; sourceTree = "<group>"; };
+		16F2002B2FAB40000000002B /* HomeTodayAnimeBroadcastReminderFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeBroadcastReminderFactory.swift; sourceTree = "<group>"; };
+		16F2002D2FAB40000000002D /* HomeTodayAnimeNotificationRequestFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeNotificationRequestFactory.swift; sourceTree = "<group>"; };
+		16F2002F2FAB40000000002F /* HomeTodayAnimeNotificationExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeNotificationExtensions.swift; sourceTree = "<group>"; };
+		16F200322FAB400000000032 /* HomeTodayAnimeNotificationState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeNotificationState.swift; sourceTree = "<group>"; };
 		16F200112FAB400000000011 /* HomeTodayAnimeScheduleListHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeScheduleListHeaderView.swift; sourceTree = "<group>"; };
 		16F200132FAB400000000013 /* HomeTodayAnimeScheduleListDayFilterContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeScheduleListDayFilterContainerView.swift; sourceTree = "<group>"; };
 		16F200152FAB400000000015 /* HomeTodayAnimeScheduleListDayFilterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeScheduleListDayFilterView.swift; sourceTree = "<group>"; };
@@ -2157,8 +2173,24 @@
 			isa = PBXGroup;
 			children = (
 				16F2000D2FAB40000000000D /* HomeTodayAnimeScheduleListService.swift */,
+				16F200312FAB400000000031 /* Notification */,
 			);
 			path = Service;
+			sourceTree = "<group>";
+		};
+		16F200312FAB400000000031 /* Notification */ = {
+			isa = PBXGroup;
+			children = (
+				16F200232FAB400000000023 /* HomeTodayAnimeNotificationScheduler.swift */,
+				16F200252FAB400000000025 /* HomeTodayAnimeNotificationConfig.swift */,
+				16F200272FAB400000000027 /* HomeTodayAnimeNotificationFeedback.swift */,
+				16F200292FAB400000000029 /* HomeTodayAnimeBroadcastReminder.swift */,
+				16F2002B2FAB40000000002B /* HomeTodayAnimeBroadcastReminderFactory.swift */,
+				16F2002D2FAB40000000002D /* HomeTodayAnimeNotificationRequestFactory.swift */,
+				16F2002F2FAB40000000002F /* HomeTodayAnimeNotificationExtensions.swift */,
+				16F200322FAB400000000032 /* HomeTodayAnimeNotificationState.swift */,
+			);
+			path = Notification;
 			sourceTree = "<group>";
 		};
 		16F200082FAB400000000008 /* View */ = {
@@ -2381,6 +2413,14 @@
 				1572FE052F762D7000756CBA /* HomeTodayAnimeViewModel.swift in Sources */,
 				16F2000A2FAB40000000000A /* HomeTodayAnimeScheduleListModel.swift in Sources */,
 				16F2000C2FAB40000000000C /* HomeTodayAnimeScheduleListService.swift in Sources */,
+				16F200242FAB400000000024 /* HomeTodayAnimeNotificationScheduler.swift in Sources */,
+				16F200262FAB400000000026 /* HomeTodayAnimeNotificationConfig.swift in Sources */,
+				16F200282FAB400000000028 /* HomeTodayAnimeNotificationFeedback.swift in Sources */,
+				16F2002A2FAB40000000002A /* HomeTodayAnimeBroadcastReminder.swift in Sources */,
+				16F2002C2FAB40000000002C /* HomeTodayAnimeBroadcastReminderFactory.swift in Sources */,
+				16F2002E2FAB40000000002E /* HomeTodayAnimeNotificationRequestFactory.swift in Sources */,
+				16F200302FAB400000000030 /* HomeTodayAnimeNotificationExtensions.swift in Sources */,
+				16F200332FAB400000000033 /* HomeTodayAnimeNotificationState.swift in Sources */,
 				16F200022FAB400000000002 /* HomeTodayAnimeScheduleListViewModel.swift in Sources */,
 				16F200102FAB400000000010 /* HomeTodayAnimeScheduleListHeaderView.swift in Sources */,
 				16F200122FAB400000000012 /* HomeTodayAnimeScheduleListDayFilterContainerView.swift in Sources */,

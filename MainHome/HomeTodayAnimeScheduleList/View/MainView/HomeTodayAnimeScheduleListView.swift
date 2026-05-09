@@ -10,6 +10,7 @@ import SwiftUI
 struct HomeTodayAnimeScheduleListView: View {
     @StateObject private var viewModel: HomeTodayAnimeScheduleListViewModel
     @EnvironmentObject private var router: MainHomeRouter
+    @EnvironmentObject private var notificationScheduler: HomeTodayAnimeNotificationScheduler
 
     init(viewModel: HomeTodayAnimeScheduleListViewModel = HomeTodayAnimeScheduleListViewModel()) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -39,7 +40,9 @@ struct HomeTodayAnimeScheduleListView: View {
         .navigationBarTitleDisplayMode(.inline)
         .background(Color(.systemBackground))
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                notificationButton
+
                 Button {
                     Task { await viewModel.reload() }
                 } label: {
@@ -50,10 +53,69 @@ struct HomeTodayAnimeScheduleListView: View {
                 }
             }
         }
+        .alert(item: $notificationScheduler.feedback) { feedback in
+            Alert(
+                title: Text(feedback.title),
+                message: Text(feedback.message),
+                dismissButton: .default(Text("知道了"))
+            )
+        }
         .task {
             await viewModel.loadIfNeeded()
+            await notificationScheduler.refreshAuthorizationStatus()
         }
         .animation(.easeInOut(duration: 0.22), value: viewModel.selectedDay)
+    }
+
+    private var notificationButton: some View {
+        Button {
+            Task {
+                await notificationScheduler.toggleBroadcastReminders()
+            }
+        } label: {
+            Image(systemName: notificationIconName)
+                .font(.body.weight(.bold))
+                .foregroundStyle(notificationColor)
+                .frame(width: 44, height: 44)
+                .scaleEffect(notificationScheduler.state.isProcessing ? 1.12 : 1)
+                .animation(
+                    notificationScheduler.state.isProcessing
+                    ? .easeInOut(duration: 0.48).repeatForever(autoreverses: true)
+                    : .easeOut(duration: 0.18),
+                    value: notificationScheduler.state.isProcessing
+                )
+        }
+        .disabled(notificationScheduler.state.isProcessing)
+        .accessibilityLabel(notificationAccessibilityLabel)
+    }
+
+    private var notificationIconName: String {
+        switch notificationScheduler.state {
+        case .processing:
+            return "bell.and.waves.left.and.right.fill"
+        case .enabled:
+            return "bell.fill"
+        case .disabled:
+            return "bell"
+        }
+    }
+
+    private var notificationColor: some ShapeStyle {
+        switch notificationScheduler.state {
+        case .enabled:
+            return ThemeColor.sakura
+        case .disabled, .processing:
+            return Color.secondary
+        }
+    }
+
+    private var notificationAccessibilityLabel: String {
+        switch notificationScheduler.state {
+        case .enabled:
+            return "關閉播出提醒"
+        case .disabled, .processing:
+            return "開啟播出提醒"
+        }
     }
 
     @ViewBuilder
@@ -120,5 +182,6 @@ struct HomeTodayAnimeScheduleListView: View {
     NavigationStack {
         HomeTodayAnimeScheduleListView()
             .environmentObject(MainHomeRouter())
+            .environmentObject(HomeTodayAnimeNotificationScheduler())
     }
 }
