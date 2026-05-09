@@ -9,6 +9,8 @@ import SwiftUI
 
 struct HomeTrendingAnimeListRowView: View {
     let item: HomeTrendingAnimeListItem
+    let sort: HomeTrendingAnimeListSort
+    let isFavorite: Bool
     let onTap: () -> Void
 
     var body: some View {
@@ -17,40 +19,22 @@ struct HomeTrendingAnimeListRowView: View {
                 posterView
 
                 VStack(alignment: .leading, spacing: 8) {
-                    HStack(alignment: .top, spacing: 8) {
-                        if let rank = item.rank {
-                            Text("#\(rank)")
-                                .font(.caption.weight(.bold))
-                                .foregroundStyle(ThemeColor.textPrimary)
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 4)
-                                .background(ThemeColor.sakura.opacity(0.72))
-                                .clipShape(Capsule())
-                        }
+                    Text(item.title)
+                        .font(.headline)
+                        .foregroundStyle(ThemeColor.textPrimary)
+                        .lineLimit(2)
 
-                        Text(item.title)
-                            .font(.headline)
-                            .foregroundStyle(ThemeColor.textPrimary)
-                            .lineLimit(2)
+                    if let highlightText {
+                        Text(highlightText)
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(ThemeColor.sakura)
+                            .lineLimit(1)
                     }
 
-                    ViewThatFits(in: .horizontal) {
-                        HStack(spacing: 6) {
-                            chips
-                        }
+                    metadataView
 
-                        HStack(spacing: 6) {
-                            if let typeText = item.typeText {
-                                chip(typeText)
-                            }
-                            if let scoreText = item.scoreText {
-                                chip("★ \(scoreText)")
-                            }
-                        }
-                    }
-
-                    if let seasonText = item.seasonText {
-                        Text(seasonText)
+                    if let detailLineText {
+                        Text(detailLineText)
                             .font(.caption)
                             .foregroundStyle(ThemeColor.textSecondary)
                             .lineLimit(1)
@@ -60,7 +44,7 @@ struct HomeTrendingAnimeListRowView: View {
                         Text(synopsisPreview)
                             .font(.caption)
                             .foregroundStyle(ThemeColor.textSecondary)
-                            .lineLimit(3)
+                            .lineLimit(2)
                     }
                 }
 
@@ -70,7 +54,7 @@ struct HomeTrendingAnimeListRowView: View {
             .background(Color(.secondarySystemBackground))
             .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
             .overlay(alignment: .topTrailing) {
-                MyListCollectionStatusBadgeView(malId: item.id, mediaKind: .anime)
+                MyListCollectionStatusBadgeView(isFavorite: isFavorite)
                     .padding(8)
             }
         }
@@ -94,19 +78,64 @@ struct HomeTrendingAnimeListRowView: View {
         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 
+    private var metadataView: some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 6) {
+                metadataChips
+            }
+
+            HStack(spacing: 6) {
+                if let typeText = item.typeText {
+                    chip(typeText)
+                }
+                if let scoreText = item.scoreText {
+                    chip("★ \(scoreText)")
+                }
+            }
+        }
+    }
+
     @ViewBuilder
-    private var chips: some View {
+    private var metadataChips: some View {
         if let typeText = item.typeText {
             chip(typeText)
         }
         if let scoreText = item.scoreText {
             chip("★ \(scoreText)")
         }
-        if let popularityText = item.popularityText {
-            chip(popularityText)
+        if let episodeText = item.episodeText {
+            chip(episodeText)
         }
-        if let membersText = item.membersText {
-            chip(membersText)
+        if let statusText = item.statusText {
+            chip(statusText)
+        }
+    }
+
+    private var highlightText: String? {
+        switch sort {
+        case .apiDefault, .rank:
+            return item.rank.map { "榜單排名 #\($0)" }
+        case .popularity:
+            return item.popularityText
+        case .score:
+            return item.scoreText.map { "口碑評分 ★ \($0)" }
+        }
+    }
+
+    private var detailLineText: String? {
+        [item.seasonText, item.membersText, secondaryMetricText]
+            .compactMap { $0 }
+            .first(where: { !$0.isEmpty })
+    }
+
+    private var secondaryMetricText: String? {
+        switch sort {
+        case .apiDefault, .rank:
+            return item.popularityText
+        case .popularity:
+            return item.scoreText.map { "評分 \($0)" }
+        case .score:
+            return item.popularityText
         }
     }
 

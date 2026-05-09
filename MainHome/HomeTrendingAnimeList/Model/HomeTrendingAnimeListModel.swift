@@ -95,18 +95,14 @@ struct HomeTrendingAnimeListSortChipItem: Identifiable, Hashable, Sendable {
     var systemImageName: String { sort.systemImageName }
 }
 
-struct HomeTrendingAnimeListFeaturedSectionContent: Hashable, Sendable {
+struct HomeTrendingAnimeListSectionContent: Identifiable, Hashable, Sendable {
+    let id: String
     let title: String
-    let items: [HomeTrendingAnimeListItem]
-}
-
-struct HomeTrendingAnimeListRankedSectionContent: Hashable, Sendable {
-    let title: String
+    let subtitle: String
     let countText: String
     let items: [HomeTrendingAnimeListItem]
 }
 
 struct HomeTrendingAnimeListContent: Hashable, Sendable {
-    let featuredSection: HomeTrendingAnimeListFeaturedSectionContent?
-    let rankedSection: HomeTrendingAnimeListRankedSectionContent
+    let sections: [HomeTrendingAnimeListSectionContent]
 }

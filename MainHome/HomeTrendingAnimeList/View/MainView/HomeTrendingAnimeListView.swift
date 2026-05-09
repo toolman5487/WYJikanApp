@@ -6,18 +6,26 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct HomeTrendingAnimeListView: View {
     @StateObject private var viewModel: HomeTrendingAnimeListViewModel
     @EnvironmentObject private var router: MainHomeRouter
+    @Query private var animeFavorites: [MyListCollectionItem]
 
     init(viewModel: HomeTrendingAnimeListViewModel = HomeTrendingAnimeListViewModel()) {
+        let mediaKindRawValue = MyListMediaKind.anime.rawValue
         _viewModel = StateObject(wrappedValue: viewModel)
+        _animeFavorites = Query(
+            filter: #Predicate<MyListCollectionItem> {
+                $0.mediaKindRawValue == mediaKindRawValue
+            }
+        )
     }
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 22) {
+            LazyVStack(alignment: .leading, spacing: 22, pinnedViews: [.sectionHeaders]) {
                 let header = viewModel.headerContent
                 HomeTrendingAnimeListHeaderView(
                     title: header.title,
@@ -70,44 +78,80 @@ struct HomeTrendingAnimeListView: View {
         switch viewModel.screenState {
         case .loading:
             HomeTrendingAnimeListLoadingView()
+                .transition(.opacity.combined(with: .move(edge: .bottom)))
         case .empty:
             HomeTrendingAnimeListEmptyStateView()
+                .transition(.opacity.combined(with: .move(edge: .bottom)))
         case .error(let message):
             HomeTrendingAnimeListErrorStateView(message: message) {
                 Task { await viewModel.reload() }
             }
+            .transition(.opacity.combined(with: .move(edge: .bottom)))
         case .content(let content):
-            VStack(alignment: .leading, spacing: 22) {
-                if let featuredSection = content.featuredSection {
-                    HomeTrendingAnimeListFeaturedSectionView(
-                        title: featuredSection.title,
-                        items: featuredSection.items,
-                        onTap: { item in
-                            router.push(.animeDetail(malId: item.id))
-                        }
-                    )
-                }
-
-                HomeTrendingAnimeListRankedSectionView(
-                    title: content.rankedSection.title,
-                    countText: content.rankedSection.countText,
-                    items: content.rankedSection.items,
-                    loadMoreState: viewModel.loadMoreState,
-                    onItemAppear: { item in
-                        Task { await viewModel.loadMoreIfNeeded(currentItem: item) }
-                    },
-                    onTapItem: { item in
-                        router.push(.animeDetail(malId: item.id))
-                    },
-                    onLoadMore: {
-                        Task { await viewModel.loadMore() }
-                    },
-                    onRetryLoadMore: {
-                        Task { await viewModel.retryLoadMore() }
-                    }
-                )
-            }
+            sectionListView(sections: content.sections)
+                .transition(.opacity.combined(with: .move(edge: .bottom)))
         }
+    }
+
+    private func sectionListView(sections: [HomeTrendingAnimeListSectionContent]) -> some View {
+        let favoriteIDs = Set(animeFavorites.map(\.malId))
+
+        return LazyVStack(alignment: .leading, spacing: 18, pinnedViews: [.sectionHeaders]) {
+            ForEach(sections) { section in
+                Section {
+                    VStack(spacing: 12) {
+                        ForEach(section.items) { item in
+                            HomeTrendingAnimeListRowView(
+                                item: item,
+                                sort: viewModel.selectedSort,
+                                isFavorite: favoriteIDs.contains(item.id)
+                            ) {
+                                router.push(.animeDetail(malId: item.id))
+                            }
+                            .onAppear {
+                                Task { await viewModel.loadMoreIfNeeded(currentItem: item) }
+                            }
+                        }
+                    }
+                } header: {
+                    sectionHeaderView(section)
+                }
+            }
+
+            HomeTrendingAnimeListLoadMoreFooterView(
+                state: viewModel.loadMoreState,
+                onLoadMore: {
+                    Task { await viewModel.loadMore() }
+                },
+                onRetry: {
+                    Task { await viewModel.retryLoadMore() }
+                }
+            )
+        }
+    }
+
+    private func sectionHeaderView(_ section: HomeTrendingAnimeListSectionContent) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 8) {
+                Text(section.title)
+                    .font(.headline.weight(.bold))
+                    .foregroundStyle(ThemeColor.sakura)
+
+                Text(section.countText)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(ThemeColor.textSecondary)
+
+                Spacer()
+            }
+
+            Text(section.subtitle)
+                .font(.caption)
+                .foregroundStyle(ThemeColor.textSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(.top, 2)
+        .padding(.bottom, 8)
+        .background(Color(.systemBackground))
     }
 
     private var applyingSelectionOverlay: some View {

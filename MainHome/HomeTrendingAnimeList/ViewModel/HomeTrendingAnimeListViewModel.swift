@@ -168,25 +168,11 @@ final class HomeTrendingAnimeListViewModel: ObservableObject {
         }
 
         let rankedItems = sortedItems(from: sourceItems)
-
-        let featured = Array(rankedItems.prefix(3))
-        let remaining = Array(rankedItems.dropFirst(3))
-        let featuredSection = featured.isEmpty
-            ? nil
-            : HomeTrendingAnimeListFeaturedSectionContent(
-                title: featuredSectionTitle(for: selectedSort),
-                items: featured
-            )
-        let rankedSection = HomeTrendingAnimeListRankedSectionContent(
-            title: rankedSectionTitle(for: selectedSort),
-            countText: "\(remaining.count) 部",
-            items: remaining
-        )
+        let sections = buildSections(from: rankedItems, sort: selectedSort)
 
         screenState = .content(
             HomeTrendingAnimeListContent(
-                featuredSection: featuredSection,
-                rankedSection: rankedSection
+                sections: sections
             )
         )
         loadMoreState = resolvedLoadMoreState()
@@ -257,20 +243,9 @@ final class HomeTrendingAnimeListViewModel: ObservableObject {
     private func visibleItemsForPagination() -> [HomeTrendingAnimeListItem] {
         switch screenState {
         case .content(let content):
-            return (content.featuredSection?.items ?? []) + content.rankedSection.items
+            return content.sections.flatMap(\.items)
         case .loading, .empty, .error:
             return sourceItems
-        }
-    }
-
-    private func featuredSectionTitle(for sort: HomeTrendingAnimeListSort) -> String {
-        switch sort {
-        case .apiDefault, .rank:
-            return "榜單焦點"
-        case .popularity:
-            return "人氣焦點"
-        case .score:
-            return "高分焦點"
         }
     }
 
@@ -300,16 +275,47 @@ final class HomeTrendingAnimeListViewModel: ObservableObject {
         }
     }
 
-    private func rankedSectionTitle(for sort: HomeTrendingAnimeListSort) -> String {
+    private func buildSections(
+        from items: [HomeTrendingAnimeListItem],
+        sort: HomeTrendingAnimeListSort
+    ) -> [HomeTrendingAnimeListSectionContent] {
+        let definitions = sectionDefinitions(for: sort)
+        return definitions.compactMap { definition in
+            let sectionItems = items[safe: definition.range]
+            guard !sectionItems.isEmpty else { return nil }
+            return HomeTrendingAnimeListSectionContent(
+                id: definition.id,
+                title: definition.title,
+                subtitle: definition.subtitle,
+                countText: "\(sectionItems.count) 部",
+                items: sectionItems
+            )
+        }
+    }
+
+    private func sectionDefinitions(for sort: HomeTrendingAnimeListSort) -> [TrendingSectionDefinition] {
         switch sort {
-        case .apiDefault:
-            return "完整榜單"
-        case .rank:
-            return "排名整理"
+        case .apiDefault, .rank:
+            return [
+                TrendingSectionDefinition(id: "top3", title: "TOP 3 焦點", subtitle: "先看榜單最前排，快速掌握這輪討論熱度最高的作品。", range: 0..<3),
+                TrendingSectionDefinition(id: "top10", title: "TOP 10 延伸", subtitle: "把榜單前段班一路展開，適合接著往下找下一部想追的熱門作。", range: 3..<10),
+                TrendingSectionDefinition(id: "top25", title: "TOP 25 完整段", subtitle: "更完整的熱門清單會從這裡開始，方便慢慢比對題材和口味。", range: 10..<25),
+                TrendingSectionDefinition(id: "more", title: "更多熱門", subtitle: "繼續往下挖還在榜上的作品，適合找下一層被忽略的好選擇。", range: 25..<Int.max)
+            ]
         case .popularity:
-            return "人氣整理"
+            return [
+                TrendingSectionDefinition(id: "trend3", title: "人氣風向", subtitle: "先看現在最常被提起的作品，快速掌握整體追番風向。", range: 0..<3),
+                TrendingSectionDefinition(id: "buzz10", title: "高討論帶", subtitle: "這段作品通常熱度穩、討論多，適合優先挑想跟上的話題作。", range: 3..<10),
+                TrendingSectionDefinition(id: "steady25", title: "穩定熱區", subtitle: "人氣持續在線的作品集中在這裡，慢慢挑也比較不容易踩空。", range: 10..<25),
+                TrendingSectionDefinition(id: "more", title: "延伸熱門", subtitle: "繼續往下看還有不少被持續關注的作品，適合往更深的熱度帶探索。", range: 25..<Int.max)
+            ]
         case .score:
-            return "高分整理"
+            return [
+                TrendingSectionDefinition(id: "premium3", title: "高分焦點", subtitle: "先看最突出的口碑作品，快速抓到這批名單裡最穩的推薦。", range: 0..<3),
+                TrendingSectionDefinition(id: "strong10", title: "口碑前段", subtitle: "分數表現亮眼的作品一路排開，適合想優先看評價派名單時使用。", range: 3..<10),
+                TrendingSectionDefinition(id: "wide25", title: "高分延伸", subtitle: "再往下依然是表現穩定的高分作品，適合慢慢比較世界觀與題材。", range: 10..<25),
+                TrendingSectionDefinition(id: "more", title: "持續推薦", subtitle: "更完整的高分清單會從這裡開始，方便你一路往下補完口碑作。", range: 25..<Int.max)
+            ]
         }
     }
 
@@ -503,5 +509,22 @@ final class HomeTrendingAnimeListViewModel: ObservableObject {
 
         let index = trimmed.index(trimmed.startIndex, offsetBy: limit)
         return String(trimmed[..<index]) + "..."
+    }
+
+    private struct TrendingSectionDefinition {
+        let id: String
+        let title: String
+        let subtitle: String
+        let range: Range<Int>
+    }
+}
+
+private extension Array {
+    subscript(safe range: Range<Int>) -> [Element] {
+        guard !isEmpty else { return [] }
+        let lowerBound = Swift.max(0, range.lowerBound)
+        let upperBound = Swift.min(count, range.upperBound)
+        guard lowerBound < upperBound else { return [] }
+        return Array(self[lowerBound..<upperBound])
     }
 }

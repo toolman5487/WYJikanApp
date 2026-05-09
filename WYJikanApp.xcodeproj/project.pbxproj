@@ -240,8 +240,6 @@
 		16F300062FAB500000000006 /* HomeTrendingAnimeListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F300052FAB500000000005 /* HomeTrendingAnimeListViewModel.swift */; };
 		16F300082FAB500000000008 /* HomeTrendingAnimeListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F300072FAB500000000007 /* HomeTrendingAnimeListView.swift */; };
 		16F3000A2FAB50000000000A /* HomeTrendingAnimeListHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F300092FAB500000000009 /* HomeTrendingAnimeListHeaderView.swift */; };
-		16F3000C2FAB50000000000C /* HomeTrendingAnimeListFeaturedSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F3000B2FAB50000000000B /* HomeTrendingAnimeListFeaturedSectionView.swift */; };
-		16F3000E2FAB50000000000E /* HomeTrendingAnimeListRankedSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F3000D2FAB50000000000D /* HomeTrendingAnimeListRankedSectionView.swift */; };
 		16F300102FAB500000000010 /* HomeTrendingAnimeListRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F3000F2FAB50000000000F /* HomeTrendingAnimeListRowView.swift */; };
 		16F300122FAB500000000012 /* HomeTrendingAnimeListLoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F300112FAB500000000011 /* HomeTrendingAnimeListLoadingView.swift */; };
 		16F300142FAB500000000014 /* HomeTrendingAnimeListEmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F300132FAB500000000013 /* HomeTrendingAnimeListEmptyStateView.swift */; };
@@ -484,8 +482,6 @@
 		16F300052FAB500000000005 /* HomeTrendingAnimeListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTrendingAnimeListViewModel.swift; sourceTree = "<group>"; };
 		16F300072FAB500000000007 /* HomeTrendingAnimeListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTrendingAnimeListView.swift; sourceTree = "<group>"; };
 		16F300092FAB500000000009 /* HomeTrendingAnimeListHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTrendingAnimeListHeaderView.swift; sourceTree = "<group>"; };
-		16F3000B2FAB50000000000B /* HomeTrendingAnimeListFeaturedSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTrendingAnimeListFeaturedSectionView.swift; sourceTree = "<group>"; };
-		16F3000D2FAB50000000000D /* HomeTrendingAnimeListRankedSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTrendingAnimeListRankedSectionView.swift; sourceTree = "<group>"; };
 		16F3000F2FAB50000000000F /* HomeTrendingAnimeListRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTrendingAnimeListRowView.swift; sourceTree = "<group>"; };
 		16F300112FAB500000000011 /* HomeTrendingAnimeListLoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTrendingAnimeListLoadingView.swift; sourceTree = "<group>"; };
 		16F300132FAB500000000013 /* HomeTrendingAnimeListEmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTrendingAnimeListEmptyStateView.swift; sourceTree = "<group>"; };
@@ -2254,8 +2250,6 @@
 			isa = PBXGroup;
 			children = (
 				16F300092FAB500000000009 /* HomeTrendingAnimeListHeaderView.swift */,
-				16F3000B2FAB50000000000B /* HomeTrendingAnimeListFeaturedSectionView.swift */,
-				16F3000D2FAB50000000000D /* HomeTrendingAnimeListRankedSectionView.swift */,
 				16F3000F2FAB50000000000F /* HomeTrendingAnimeListRowView.swift */,
 				16F300112FAB500000000011 /* HomeTrendingAnimeListLoadingView.swift */,
 				16F300132FAB500000000013 /* HomeTrendingAnimeListEmptyStateView.swift */,
@@ -2401,8 +2395,6 @@
 				16F300042FAB500000000004 /* HomeTrendingAnimeListService.swift in Sources */,
 				16F300062FAB500000000006 /* HomeTrendingAnimeListViewModel.swift in Sources */,
 				16F3000A2FAB50000000000A /* HomeTrendingAnimeListHeaderView.swift in Sources */,
-				16F3000C2FAB50000000000C /* HomeTrendingAnimeListFeaturedSectionView.swift in Sources */,
-				16F3000E2FAB50000000000E /* HomeTrendingAnimeListRankedSectionView.swift in Sources */,
 				16F300102FAB500000000010 /* HomeTrendingAnimeListRowView.swift in Sources */,
 				16F300122FAB500000000012 /* HomeTrendingAnimeListLoadingView.swift in Sources */,
 				16F300142FAB500000000014 /* HomeTrendingAnimeListEmptyStateView.swift in Sources */,
