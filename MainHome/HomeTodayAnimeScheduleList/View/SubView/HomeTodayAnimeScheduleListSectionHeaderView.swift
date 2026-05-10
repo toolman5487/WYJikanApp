@@ -11,18 +11,10 @@ struct HomeTodayAnimeScheduleListSectionHeaderView: View {
     let section: HomeTodayAnimeTimeSection
 
     var body: some View {
-        HStack {
-            Text(section.title)
-                .font(.headline.weight(.bold))
-                .foregroundStyle(ThemeColor.sakura)
-
-            Text("\(section.items.count) 部")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(ThemeColor.textSecondary)
-
-            Spacer()
-        }
-        .padding(.vertical, 8)
+        GlassSectionHeaderView(
+            title: section.title,
+            state: .accessoryText("\(section.items.count) 部")
+        )
         .background(Color(.systemBackground))
     }
 }

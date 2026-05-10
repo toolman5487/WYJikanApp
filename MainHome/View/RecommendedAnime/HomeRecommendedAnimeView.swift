@@ -10,6 +10,7 @@ import SwiftUI
 struct HomeRecommendedAnimeView: View {
     @StateObject private var viewModel = HomeRecommendedAnimeViewModel()
     @EnvironmentObject private var router: MainHomeRouter
+    let showsHeader: Bool
 
     private static let gridSpacing: CGFloat = 16
     private static let horizontalPadding: CGFloat = 16
@@ -21,12 +22,15 @@ struct HomeRecommendedAnimeView: View {
         count: Self.columnCount
     )
 
+    init(showsHeader: Bool = true) {
+        self.showsHeader = showsHeader
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text("推薦作品")
-                .padding()
-                .font(.title3.weight(.bold))
-                .foregroundStyle(ThemeColor.sakura)
+            if showsHeader {
+                GlassSectionHeaderView(title: "作品推薦")
+            }
 
             VStack(alignment: .leading, spacing: 0) {
                 switch viewModel.screenState {

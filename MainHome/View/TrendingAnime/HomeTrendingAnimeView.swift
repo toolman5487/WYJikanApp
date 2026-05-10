@@ -10,6 +10,7 @@ import SwiftUI
 struct HomeTrendingAnimeView: View {
     @StateObject private var viewModel = HomeTrendingAnimeViewModel()
     @EnvironmentObject private var router: MainHomeRouter
+    let showsHeader: Bool
     
     private static let cardHeight: CGFloat = 240
     private static let posterAspectRatio: CGFloat = 2.0 / 3.0
@@ -20,23 +21,19 @@ struct HomeTrendingAnimeView: View {
     private static var cardWidth: CGFloat {
         cardHeight * Self.posterAspectRatio
     }
+
+    init(showsHeader: Bool = true) {
+        self.showsHeader = showsHeader
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Button {
-                router.push(.trendingAnimeList)
-            } label: {
-                HStack(spacing: 6) {
-                    Text("熱門動畫")
-                        .font(.title3.weight(.bold))
-
-                    Image(systemName: "chevron.right")
-                        .font(.footnote.weight(.semibold))
-                }
-                .foregroundStyle(ThemeColor.sakura)
-                .padding()
+            if showsHeader {
+                GlassSectionHeaderView(
+                    title: "熱門動畫",
+                    state: .navigable(action: { router.push(.trendingAnimeList) })
+                )
             }
-            .buttonStyle(.plain)
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: Self.cardSpacing) {

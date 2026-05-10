@@ -108,9 +108,6 @@ struct HomeTrendingAnimeListView: View {
                             ) {
                                 router.push(.animeDetail(malId: item.id))
                             }
-                            .onAppear {
-                                Task { await viewModel.loadMoreIfNeeded(currentItem: item) }
-                            }
                         }
                     }
                 } header: {
@@ -131,27 +128,7 @@ struct HomeTrendingAnimeListView: View {
     }
 
     private func sectionHeaderView(_ section: HomeTrendingAnimeListSectionContent) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack(spacing: 8) {
-                Text(section.title)
-                    .font(.headline.weight(.bold))
-                    .foregroundStyle(ThemeColor.sakura)
-
-                Text(section.countText)
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(ThemeColor.textSecondary)
-
-                Spacer()
-            }
-
-            Text(section.subtitle)
-                .font(.caption)
-                .foregroundStyle(ThemeColor.textSecondary)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-        .padding(.top, 2)
-        .padding(.bottom, 8)
-        .background(Color(.systemBackground))
+        GlassSectionHeaderView(title: section.title)
     }
 
     private var applyingSelectionOverlay: some View {

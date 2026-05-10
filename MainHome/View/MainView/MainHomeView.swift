@@ -10,8 +10,7 @@ import SwiftUI
 struct MainHomeView: View {
     @StateObject private var router = MainHomeRouter()
     
-    enum Section: Identifiable {
-        case banner
+    enum HomeSection: Identifiable {
         case todayAnime
         case trendingAnime
         case trendingManga
@@ -19,17 +18,24 @@ struct MainHomeView: View {
         
         var id: String {
             switch self {
-            case .banner: return "banner"
             case .todayAnime: return "todayAnime"
             case .trendingAnime: return "trendingAnime"
             case .trendingManga: return "trendingManga"
             case .recommendedAnime: return "recommendedAnime"
             }
         }
+
+        var title: String {
+            switch self {
+            case .todayAnime: return "今日動畫"
+            case .trendingAnime: return "熱門動畫"
+            case .trendingManga: return "熱門漫畫"
+            case .recommendedAnime: return "作品推薦"
+            }
+        }
     }
     
-    private let sections: [Section] = [
-        .banner,
+    private let sections: [HomeSection] = [
         .todayAnime,
         .trendingAnime,
         .trendingManga,
@@ -38,31 +44,53 @@ struct MainHomeView: View {
     
     
     @ViewBuilder
-    private func sectionView(_ section: Section) -> some View {
+    private func sectionView(_ section: HomeSection) -> some View {
         switch section {
-        case .banner:
-            HeroBannerView()
         case .todayAnime:
-            HomeTodayAnimeView()
+            HomeTodayAnimeView(showsHeader: false)
         case .trendingAnime:
-            HomeTrendingAnimeView()
+            HomeTrendingAnimeView(showsHeader: false)
         case .trendingManga:
-            HomeTrendingMangaView()
+            HomeTrendingMangaView(showsHeader: false)
         case .recommendedAnime:
-            HomeRecommendedAnimeView()
+            HomeRecommendedAnimeView(showsHeader: false)
+        }
+    }
+
+    private func sectionHeaderView(_ section: HomeSection) -> some View {
+        GlassSectionHeaderView(title: section.title, state: state(for: section))
+            .background(Color(.systemBackground).opacity(0.001))
+    }
+
+    private func state(for section: HomeSection) -> GlassSectionHeaderView.State {
+        switch section {
+        case .todayAnime:
+            return .navigable(action: { router.push(.todayAnimeSchedule) })
+        case .trendingAnime:
+            return .navigable(action: { router.push(.trendingAnimeList) })
+        case .trendingManga:
+            return .navigable(action: { router.push(.trendingMangaList) })
+        case .recommendedAnime:
+            return .plain
         }
     }
     
     var body: some View {
         NavigationStack(path: $router.path) {
             ScrollView {
-                LazyVStack {
+                LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
+                    HeroBannerView()
+                        .ignoresSafeArea(edges: .top)
+
                     ForEach(sections) { section in
-                        sectionView(section)
+                        Section {
+                            sectionView(section)
+                        } header: {
+                            sectionHeaderView(section)
+                        }
                     }
                 }
             }
-            .ignoresSafeArea(edges: .top)
             .toolbarBackground(.hidden, for: .navigationBar)
             .navigationDestination(for: MainHomeRoute.self) { route in
                 switch route {
