@@ -7,6 +7,12 @@
 
 import Foundation
 
+struct AnimeLocalBroadcastPresentation: Equatable {
+    let sectionTitle: String
+    let sortValue: Int
+    let displayText: String
+}
+
 enum AnimeDetailDateFormatting {
 
     // MARK: - Aired Period
@@ -88,6 +94,39 @@ enum AnimeDetailDateFormatting {
         timeHHMM: String,
         sourceTimeZoneIdentifier: String
     ) -> String? {
+        localBroadcastPresentation(
+            dayEnglish: dayEnglish,
+            timeHHMM: timeHHMM,
+            sourceTimeZoneIdentifier: sourceTimeZoneIdentifier
+        )?.displayText
+    }
+
+    static func localBroadcastPresentation(from broadcast: AnimeBroadcastDTO?) -> AnimeLocalBroadcastPresentation? {
+        guard let broadcast else { return nil }
+
+        let day = broadcast.day?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let time = broadcast.time?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+
+        if !day.isEmpty, !time.isEmpty {
+            return localBroadcastPresentation(
+                dayEnglish: day,
+                timeHHMM: time,
+                sourceTimeZoneIdentifier: sourceTimeZoneIdentifier(for: broadcast)
+            )
+        }
+
+        if let raw = broadcast.string?.trimmingCharacters(in: .whitespacesAndNewlines), !raw.isEmpty {
+            return localBroadcastPresentation(fromEnglishString: raw)
+        }
+
+        return nil
+    }
+
+    static func localBroadcastPresentation(
+        dayEnglish: String,
+        timeHHMM: String,
+        sourceTimeZoneIdentifier: String
+    ) -> AnimeLocalBroadcastPresentation? {
         guard let weekday = calendarWeekdayComponent(fromEnglishDay: dayEnglish),
               let (hour, minute) = parseHourMinute(timeHHMM),
               let sourceTZ = TimeZone(identifier: sourceTimeZoneIdentifier) else { return nil }
@@ -109,10 +148,14 @@ enum AnimeDetailDateFormatting {
             direction: .forward
         ) else { return nil }
 
-        return localizedWeekdayAndTime(from: occurrence)
+        return makeLocalBroadcastPresentation(from: occurrence)
     }
 
     static func localBroadcastFromEnglishString(_ raw: String) -> String? {
+        localBroadcastPresentation(fromEnglishString: raw)?.displayText
+    }
+
+    static func localBroadcastPresentation(fromEnglishString raw: String) -> AnimeLocalBroadcastPresentation? {
         let pattern =
             #"(?i)(Monday|Mondays|Tuesday|Tuesdays|Wednesday|Wednesdays|Thursday|Thursdays|Friday|Fridays|Saturday|Saturdays|Sunday|Sundays)\s+at\s+(\d{1,2}:\d{2})"#
         guard let regex = try? NSRegularExpression(pattern: pattern) else { return nil }
@@ -127,7 +170,11 @@ enum AnimeDetailDateFormatting {
         let tzId = sourceTimeZoneIdentifier(
             for: AnimeBroadcastDTO(day: dayStr, time: timeStr, timezone: nil, string: raw)
         )
-        return localBroadcastString(dayEnglish: dayStr, timeHHMM: timeStr, sourceTimeZoneIdentifier: tzId)
+        return localBroadcastPresentation(
+            dayEnglish: dayStr,
+            timeHHMM: timeStr,
+            sourceTimeZoneIdentifier: tzId
+        )
     }
 
     static func weekdayChinese(from english: String) -> String {
@@ -307,5 +354,27 @@ enum AnimeDetailDateFormatting {
             return timePart
         }
         return "\(weekdayPart) \(timePart)"
+    }
+
+    private static func localTimeString(from date: Date) -> String {
+        let timeFormatter = DateFormatter()
+        timeFormatter.locale = Locale.current
+        timeFormatter.timeZone = TimeZone.current
+        timeFormatter.dateFormat = "HH:mm"
+        return timeFormatter.string(from: date)
+    }
+
+    private static func makeLocalBroadcastPresentation(from date: Date) -> AnimeLocalBroadcastPresentation {
+        var calendar = Calendar.current
+        calendar.timeZone = TimeZone.current
+
+        let hour = calendar.component(.hour, from: date)
+        let minute = calendar.component(.minute, from: date)
+
+        return AnimeLocalBroadcastPresentation(
+            sectionTitle: localTimeString(from: date),
+            sortValue: hour * 60 + minute,
+            displayText: localizedWeekdayAndTime(from: date)
+        )
     }
 }

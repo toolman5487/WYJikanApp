@@ -270,29 +270,33 @@ final class HomeTodayAnimeScheduleListViewModel: ObservableObject {
         sortValue: Int,
         displayText: String
     ) {
-        let rawTime = broadcast?.time?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        if let sortValue = sortValue(from: rawTime) {
-            let displayText = broadcastDisplayText(from: broadcast) ?? "\(rawTime) JST"
-            return (rawTime, sortValue, displayText)
+        if let presentation = AnimeDetailDateFormatting.localBroadcastPresentation(from: broadcast) {
+            return (
+                presentation.sectionTitle,
+                presentation.sortValue,
+                presentation.displayText
+            )
         }
-        return ("播出時間未定", Int.max, broadcastDisplayText(from: broadcast) ?? "播出時間未定")
-    }
 
-    private static func sortValue(from time: String) -> Int? {
-        let parts = time.split(separator: ":")
-        guard parts.count >= 2,
-              let hour = Int(parts[0]),
-              let minute = Int(parts[1]) else { return nil }
-        return hour * 60 + minute
+        return ("播出時間未定", Int.max, broadcastDisplayText(from: broadcast) ?? "播出時間未定")
     }
 
     private static func broadcastDisplayText(from broadcast: AnimeBroadcastDTO?) -> String? {
         guard let broadcast else { return nil }
         if let raw = broadcast.string?.trimmingCharacters(in: .whitespacesAndNewlines), !raw.isEmpty {
-            return AnimeDetailDateFormatting.translateBroadcastEnglishString(raw)
+            return AnimeDetailDateFormatting.localBroadcastFromEnglishString(raw)
+                ?? AnimeDetailDateFormatting.translateBroadcastEnglishString(raw)
         }
+
+        let day = broadcast.day?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         let time = broadcast.time?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        return time.isEmpty ? nil : "\(time) JST"
+        guard !day.isEmpty, !time.isEmpty else { return nil }
+
+        return AnimeDetailDateFormatting.localBroadcastString(
+            dayEnglish: day,
+            timeHHMM: time,
+            sourceTimeZoneIdentifier: AnimeDetailDateFormatting.sourceTimeZoneIdentifier(for: broadcast)
+        ) ?? "\(AnimeDetailDateFormatting.weekdayChinese(from: day)) \(time)"
     }
 
     private static func displayTitle(japanese: String?, english: String?, fallback: String?) -> String {

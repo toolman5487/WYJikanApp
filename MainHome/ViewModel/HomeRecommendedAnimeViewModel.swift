@@ -159,6 +159,7 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
         screenState = updatedItems.isEmpty ? .empty : .content(updatedItems)
     }
 
+
     private nonisolated static func preferredTitle(japanese: String?, english: String?, fallback: String?) -> String {
         if let japanese, !japanese.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             return japanese

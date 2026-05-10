@@ -210,27 +210,19 @@ extension AnimeDetailViewModel {
     }
 
     func weeklyBroadcastScheduleText(for anime: AnimeDetailDTO) -> String? {
-        guard let broadcast = anime.broadcast else { return nil }
-        let day = broadcast.day?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        let time = broadcast.time?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        if !day.isEmpty, !time.isEmpty {
-            let tzId = AnimeDetailDateFormatting.sourceTimeZoneIdentifier(for: broadcast)
-            if let local = AnimeDetailDateFormatting.localBroadcastString(
-                dayEnglish: day,
-                timeHHMM: time,
-                sourceTimeZoneIdentifier: tzId
-            ) {
-                return local
-            }
-            return "\(AnimeDetailDateFormatting.weekdayChinese(from: day)) \(time)"
+        if let presentation = AnimeDetailDateFormatting.localBroadcastPresentation(from: anime.broadcast) {
+            return presentation.displayText
         }
+
+        guard let broadcast = anime.broadcast else { return nil }
         if let string = broadcast.string?.trimmingCharacters(in: .whitespacesAndNewlines), !string.isEmpty {
-            if let local = AnimeDetailDateFormatting.localBroadcastFromEnglishString(string) {
-                return local
-            }
             return AnimeDetailDateFormatting.translateBroadcastEnglishString(string)
         }
-        return nil
+
+        let day = broadcast.day?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let time = broadcast.time?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        guard !day.isEmpty, !time.isEmpty else { return nil }
+        return "\(AnimeDetailDateFormatting.weekdayChinese(from: day)) \(time)"
     }
 
     func airedPeriodDisplayText(for anime: AnimeDetailDTO) -> String? {

@@ -26,7 +26,3 @@ enum HomeTodayAnimeNotificationFeedbackMessage {
         return "會依你的本機時區，在動畫播出前 1 小時提醒。目前已安排 \(scheduledCount) 則通知。"
     }
 }
-
-enum HomeTodayAnimeNotificationError: LocalizedError {
-    case permissionDenied
-}

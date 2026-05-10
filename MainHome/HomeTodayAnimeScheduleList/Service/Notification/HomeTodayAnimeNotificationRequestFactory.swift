@@ -43,15 +43,6 @@ struct HomeTodayAnimeNotificationRequestFactory {
         )
     }
 
-    func managedIdentifiers(from pendingRequests: [UNNotificationRequest]) -> [String] {
-        pendingRequests
-            .map(\.identifier)
-            .filter { identifier in
-                identifier.hasPrefix(HomeTodayAnimeNotificationConfig.legacySummaryIdentifierPrefix) ||
-                identifier.hasPrefix(HomeTodayAnimeNotificationConfig.reminderIdentifierPrefix)
-            }
-    }
-
     private func identifier(for reminder: HomeTodayAnimeBroadcastReminder) -> String {
         let timestamp = Int(reminder.notificationDate.timeIntervalSince1970)
         return "\(HomeTodayAnimeNotificationConfig.reminderIdentifierPrefix)\(reminder.animeID).\(timestamp)"

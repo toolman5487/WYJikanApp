@@ -11,15 +11,11 @@ import OSLog
 import UserNotifications
 
 @MainActor
-final class HomeTodayAnimeNotificationScheduler: ObservableObject {
+final class HomeTodayAnimeNotificationScheduler: BaseUserNotificationManager {
     static let shared = HomeTodayAnimeNotificationScheduler()
 
-    @Published private(set) var state: HomeTodayAnimeNotificationState
-    @Published private(set) var authorizationState: HomeTodayAnimeNotificationAuthorizationState = .notDetermined
     @Published var feedback: HomeTodayAnimeNotificationFeedback?
 
-    private let notificationCenter: UNUserNotificationCenter
-    private let userDefaults: UserDefaults
     private let reminderFactory: HomeTodayAnimeBroadcastReminderFactory
     private let requestFactory: HomeTodayAnimeNotificationRequestFactory
 
@@ -29,11 +25,17 @@ final class HomeTodayAnimeNotificationScheduler: ObservableObject {
         userDefaults: UserDefaults = .standard,
         calendar: Calendar = .autoupdatingCurrent
     ) {
-        self.notificationCenter = notificationCenter
-        self.userDefaults = userDefaults
         self.reminderFactory = HomeTodayAnimeBroadcastReminderFactory(service: service)
         self.requestFactory = HomeTodayAnimeNotificationRequestFactory(calendar: calendar)
-        self.state = userDefaults.bool(forKey: HomeTodayAnimeNotificationConfig.enabledKey) ? .enabled : .disabled
+        super.init(
+            enabledKey: HomeTodayAnimeNotificationConfig.enabledKey,
+            managedIdentifierPrefixes: [
+                HomeTodayAnimeNotificationConfig.legacySummaryIdentifierPrefix,
+                HomeTodayAnimeNotificationConfig.reminderIdentifierPrefix
+            ],
+            notificationCenter: notificationCenter,
+            userDefaults: userDefaults
+        )
     }
 
     var reminderLeadTimeText: String {
@@ -41,17 +43,23 @@ final class HomeTodayAnimeNotificationScheduler: ObservableObject {
     }
 
     func refreshAuthorizationStatus() async {
-        let settings = await notificationCenter.notificationSettings()
-        authorizationState = HomeTodayAnimeNotificationAuthorizationState(settings.authorizationStatus)
+        let authorizationState = await refreshAuthorizationState()
 
         switch (authorizationState, state) {
         case (.denied, .enabled):
-            await removeScheduledAnimeNotifications()
+            await removeManagedPendingNotificationRequests()
             setState(.disabled)
         case (.denied, .processing(.refreshing)):
-            await removeScheduledAnimeNotifications()
+            await removeManagedPendingNotificationRequests()
             setState(.disabled)
-        case (.notDetermined, _), (.allowed, _), (.denied, .disabled), (.denied, .processing(.enabling)), (.denied, .processing(.disabling)):
+        case (.notDetermined, _),
+             (.allowed, _),
+             (.denied, .disabled),
+             (.denied, .processing(.enabling)),
+             (.denied, .processing(.disabling)),
+             (.denied, .processing(.requestingAuthorization)),
+             (.denied, .processing(.scheduling)),
+             (.denied, .processing(.removingPendingRequests)):
             break
         }
     }
@@ -90,15 +98,8 @@ final class HomeTodayAnimeNotificationScheduler: ObservableObject {
     }
 
     private func enableBroadcastReminders() async {
-        guard !state.isProcessing else { return }
-
-        let previousState = state
-        setState(.processing(.enabling))
-        defer {
-            if case .processing(.enabling) = state {
-                setState(previousState)
-            }
-        }
+        guard let previousState = beginProcessing(.enabling) else { return }
+        defer { restoreStateIfProcessing(previousState, expected: .enabling) }
 
         do {
             try await ensureAuthorization()
@@ -108,7 +109,7 @@ final class HomeTodayAnimeNotificationScheduler: ObservableObject {
                 title: "已開啟播出提醒",
                 message: HomeTodayAnimeNotificationFeedbackMessage.enabled(scheduledCount: scheduledCount)
             )
-        } catch HomeTodayAnimeNotificationError.permissionDenied {
+        } catch BaseUserNotificationError.permissionDenied {
             setState(.disabled)
             feedback = HomeTodayAnimeNotificationFeedback(
                 title: "無法開啟通知",
@@ -125,8 +126,8 @@ final class HomeTodayAnimeNotificationScheduler: ObservableObject {
     }
 
     private func disableBroadcastReminders(showFeedback: Bool) async {
-        setState(.processing(.disabling))
-        await removeScheduledAnimeNotifications()
+        guard beginProcessing(.disabling) != nil else { return }
+        await removeManagedPendingNotificationRequests()
         setState(.disabled)
 
         if showFeedback {
@@ -137,45 +138,21 @@ final class HomeTodayAnimeNotificationScheduler: ObservableObject {
         }
     }
 
-    private func ensureAuthorization() async throws {
-        let settings = await notificationCenter.notificationSettings()
-        authorizationState = HomeTodayAnimeNotificationAuthorizationState(settings.authorizationStatus)
-
-        switch authorizationState {
-        case .allowed:
-            return
-        case .notDetermined:
-            let granted = try await notificationCenter.requestAuthorization(options: [.alert, .sound])
-            await refreshAuthorizationStatus()
-            guard granted else { throw HomeTodayAnimeNotificationError.permissionDenied }
-        case .denied:
-            throw HomeTodayAnimeNotificationError.permissionDenied
-        }
-    }
-
     private func scheduleBroadcastReminderNotifications() async throws -> Int {
-        await removeScheduledAnimeNotifications()
+        await removeManagedPendingNotificationRequests()
 
         let reminders = try await reminderFactory.makeReminders()
             .sorted { $0.notificationDate < $1.notificationDate }
             .prefix(HomeTodayAnimeNotificationConfig.maxScheduledNotifications)
+        let requests = reminders.map(requestFactory.makeRequest(for:))
 
-        for reminder in reminders {
-            try await notificationCenter.add(requestFactory.makeRequest(for: reminder))
+        switch try await addNotificationRequests(requests) {
+        case .completed(let count):
+            return count
+        case .skipped(.emptyRequests):
+            return 0
+        case .skipped:
+            return 0
         }
-
-        return reminders.count
-    }
-
-    private func removeScheduledAnimeNotifications() async {
-        let pendingRequests = await notificationCenter.pendingNotificationRequests()
-        notificationCenter.removePendingNotificationRequests(
-            withIdentifiers: requestFactory.managedIdentifiers(from: pendingRequests)
-        )
-    }
-
-    private func setState(_ newState: HomeTodayAnimeNotificationState) {
-        state = newState
-        userDefaults.set(newState.isEnabled, forKey: HomeTodayAnimeNotificationConfig.enabledKey)
     }
 }
