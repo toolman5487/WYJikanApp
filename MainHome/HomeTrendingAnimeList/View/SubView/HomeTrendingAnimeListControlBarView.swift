@@ -31,7 +31,7 @@ struct HomeTrendingAnimeListControlBarView: View {
     let onSelectSort: (HomeTrendingAnimeListSort) -> Void
     
     var body: some View {
-        CapsuleTagScrollView(
+        CapsuleFilterBarView(
             tags: items,
             title: { $0.title },
             systemImageName: { $0.systemImageName },

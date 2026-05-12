@@ -23,7 +23,7 @@ struct MainSearchView: View {
             }
             .safeAreaInset(edge: .top, spacing: 0) {
                 HStack(alignment: .center, spacing: 12) {
-                    CapsuleTagScrollView(
+                    CapsuleFilterBarView(
                         tags: MainSearchKind.allCases,
                         title: { $0.title },
                         selection: $viewModel.kind

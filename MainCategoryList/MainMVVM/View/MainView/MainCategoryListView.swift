@@ -27,7 +27,7 @@ struct MainCategoryListView: View {
                         .id(viewModel.selectedKind)
                 }
                 .safeAreaInset(edge: .top, spacing: 0) {
-                    CapsuleTagScrollView(
+                    CapsuleFilterBarView(
                         tags: MainListKind.categoryTags,
                         title: { $0.title },
                         selection: $viewModel.selectedKind

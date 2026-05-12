@@ -52,7 +52,7 @@ struct MainMyListView: View {
     }
     
     private var filterView: some View {
-        CapsuleTagScrollView(
+        CapsuleFilterBarView(
             tags: MainMyListViewModel.Filter.allCases,
             title: { $0.title },
             selection: $viewModel.selectedFilter

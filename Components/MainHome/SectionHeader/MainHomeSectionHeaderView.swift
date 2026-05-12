@@ -17,6 +17,7 @@ struct GlassSectionHeaderView: View {
     let title: String
     let state: State
     let showsDisclosureIndicator: Bool
+    let outerVerticalPadding: CGFloat
 
     var body: some View {
         Group {
@@ -31,17 +32,19 @@ struct GlassSectionHeaderView: View {
             }
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, 12)
+        .padding(.vertical, outerVerticalPadding)
     }
 
     init(
         title: String,
         state: State = .plain,
-        showsDisclosureIndicator: Bool = false
+        showsDisclosureIndicator: Bool = false,
+        outerVerticalPadding: CGFloat = 12
     ) {
         self.title = title
         self.state = state
         self.showsDisclosureIndicator = showsDisclosureIndicator
+        self.outerVerticalPadding = outerVerticalPadding
     }
 
     @ViewBuilder
