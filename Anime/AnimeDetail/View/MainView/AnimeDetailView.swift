@@ -110,7 +110,7 @@ struct AnimeDetailView: View {
     var body: some View {
         Group {
             switch viewModel.screenState {
-            case let .loaded(anime):
+            case let .refreshing(anime), let .loaded(anime):
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 20) {
                         ForEach(viewModel.sections(for: anime)) { section in
@@ -183,8 +183,8 @@ struct AnimeDetailView: View {
                 } label: {
                     Image(systemName: "arrow.trianglehead.counterclockwise")
                         .font(.body.weight(.bold))
-                        .symbolEffect(.rotate, options: .repeating, isActive: viewModel.isLoading)
-                        .opacity(viewModel.isLoading ? 0.7 : 1)
+                        .symbolEffect(.rotate, options: .repeating, isActive: viewModel.isRefreshing)
+                        .opacity(viewModel.isRefreshing ? 0.7 : 1)
                         .frame(minWidth: 44, minHeight: 44)
                         .contentShape(Rectangle())
                 }

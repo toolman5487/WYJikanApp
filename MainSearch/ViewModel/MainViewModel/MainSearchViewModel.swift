@@ -28,8 +28,7 @@ final class MainSearchViewModel: ObservableObject {
     private var unsortedRows: [MainSearchResultRow] = []
     private var currentPage = 0
     private var hasNextPage = false
-    private var isLoading = false
-    private var isLoadingMore = false
+    private var requestState: RequestState = .idle
     private var activeIntent: SearchIntent?
     private var loadMoreTask: Task<Void, Never>?
 
@@ -50,6 +49,13 @@ final class MainSearchViewModel: ObservableObject {
         let trimmedQuery: String
         let kind: MainSearchKind
         let event: SearchEvent
+    }
+
+    private enum RequestState: Equatable {
+        case idle
+        case searching
+        case loadingMore
+        case loadMoreError(String)
     }
 
     private enum SearchOutput {
@@ -107,52 +113,11 @@ final class MainSearchViewModel: ObservableObject {
                 guard let self else { return }
                 switch output {
                 case .reset:
-                    self.loadMoreTask?.cancel()
-                    self.activeIntent = nil
-                    self.currentPage = 0
-                    self.hasNextPage = false
-                    self.unsortedRows = []
-                    self.isLoading = false
-                    self.isLoadingMore = false
-                    self.screenState = .emptyPrompt
-                    self.loadMoreState = .hidden
+                    self.resetSearchState()
                 case .loading(let clearExistingRows):
-                    self.loadMoreTask?.cancel()
-                    if clearExistingRows {
-                        self.activeIntent = nil
-                        self.currentPage = 0
-                        self.hasNextPage = false
-                        self.unsortedRows = []
-                    }
-                    self.isLoading = true
-                    self.isLoadingMore = false
-                    self.loadMoreState = .hidden
-                    if clearExistingRows || self.visibleRows.isEmpty {
-                        self.screenState = .loading
-                    }
+                    self.startSearching(clearExistingRows: clearExistingRows)
                 case .result(let page, let error):
-                    if let error {
-                        self.activeIntent = nil
-                        self.currentPage = 0
-                        self.hasNextPage = false
-                        self.unsortedRows = []
-                        self.isLoading = false
-                        self.isLoadingMore = false
-                        self.screenState = .error(error)
-                        self.loadMoreState = .hidden
-                    } else {
-                        self.activeIntent = SearchIntent(
-                            trimmedQuery: Self.trim(self.query),
-                            kind: self.kind,
-                            event: .queryAdjusted
-                        )
-                        self.currentPage = page.currentPage
-                        self.hasNextPage = page.hasNextPage
-                        self.unsortedRows = page.rows
-                        self.isLoading = false
-                        self.isLoadingMore = false
-                        self.applySortedResults()
-                    }
+                    self.finishSearch(page: page, error: error)
                 }
             }
             .store(in: &cancellables)
@@ -186,7 +151,7 @@ final class MainSearchViewModel: ObservableObject {
     }
 
     func loadMoreIfNeeded(currentRow: MainSearchResultRow) {
-        guard hasNextPage, !isLoading, !isLoadingMore else { return }
+        guard hasNextPage, canStartLoadMore else { return }
         if case .error = loadMoreState { return }
         guard let currentIndex = visibleRows.firstIndex(where: { $0.id == currentRow.id }) else { return }
         let thresholdIndex = max(visibleRows.count - 5, 0)
@@ -195,7 +160,7 @@ final class MainSearchViewModel: ObservableObject {
     }
 
     func retryLoadMore() {
-        guard hasNextPage, !isLoading, !isLoadingMore else { return }
+        guard hasNextPage, canStartLoadMore else { return }
         loadMore()
     }
 
@@ -262,7 +227,7 @@ final class MainSearchViewModel: ObservableObject {
     private func loadMore() {
         guard let activeIntent else { return }
 
-        isLoadingMore = true
+        requestState = .loadingMore
         loadMoreState = .loading
         loadMoreTask?.cancel()
         let nextPage = currentPage + 1
@@ -282,12 +247,12 @@ final class MainSearchViewModel: ObservableObject {
                 self.currentPage = page.currentPage
                 self.hasNextPage = page.hasNextPage
                 self.unsortedRows += page.rows
-                self.isLoadingMore = false
+                self.requestState = .idle
                 self.applySortedResults()
             } catch {
                 guard !Task.isCancelled else { return }
-                self.isLoadingMore = false
-                self.loadMoreState = .error(error.localizedDescription)
+                self.requestState = .loadMoreError(error.localizedDescription)
+                self.loadMoreState = self.resolvedLoadMoreState()
             }
         }
     }
@@ -315,13 +280,73 @@ final class MainSearchViewModel: ObservableObject {
     }
 
     private func resolvedLoadMoreState() -> MainSearchLoadMoreState {
-        if isLoadingMore {
+        switch requestState {
+        case .loadingMore:
             return .loading
-        }
-        if case .error(let message) = loadMoreState {
+        case .loadMoreError(let message):
             return .error(message)
+        case .idle, .searching:
+            return hasNextPage ? .available : .hidden
         }
-        return hasNextPage ? .available : .hidden
+    }
+
+    private var canStartLoadMore: Bool {
+        switch requestState {
+        case .idle, .loadMoreError:
+            return true
+        case .searching, .loadingMore:
+            return false
+        }
+    }
+
+    private func resetSearchState() {
+        loadMoreTask?.cancel()
+        activeIntent = nil
+        currentPage = 0
+        hasNextPage = false
+        unsortedRows = []
+        requestState = .idle
+        screenState = .emptyPrompt
+        loadMoreState = .hidden
+    }
+
+    private func startSearching(clearExistingRows: Bool) {
+        loadMoreTask?.cancel()
+        if clearExistingRows {
+            activeIntent = nil
+            currentPage = 0
+            hasNextPage = false
+            unsortedRows = []
+        }
+        requestState = .searching
+        loadMoreState = .hidden
+        if clearExistingRows || visibleRows.isEmpty {
+            screenState = .loading
+        }
+    }
+
+    private func finishSearch(page: MainSearchPage, error: String?) {
+        guard let error else {
+            activeIntent = SearchIntent(
+                trimmedQuery: Self.trim(query),
+                kind: kind,
+                event: .queryAdjusted
+            )
+            currentPage = page.currentPage
+            hasNextPage = page.hasNextPage
+            unsortedRows = page.rows
+            requestState = .idle
+            applySortedResults()
+            return
+        }
+
+        activeIntent = nil
+        currentPage = 0
+        hasNextPage = false
+        unsortedRows = []
+        requestState = .idle
+        screenState = .error(error)
+        loadMoreState = .hidden
     }
 
     private func sortedRows(

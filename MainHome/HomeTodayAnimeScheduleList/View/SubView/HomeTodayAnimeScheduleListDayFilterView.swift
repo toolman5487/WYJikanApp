@@ -15,7 +15,8 @@ struct HomeTodayAnimeScheduleListDayFilterView: View {
         CapsuleFilterBarView(
             tags: HomeScheduleDay.allCases,
             title: { $0.title },
-            selection: selectedDayBinding
+            selection: selectedDayBinding,
+            selectionAnimation: nil
         )
     }
 

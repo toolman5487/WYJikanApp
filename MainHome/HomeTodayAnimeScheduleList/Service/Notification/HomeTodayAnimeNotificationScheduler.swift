@@ -42,6 +42,19 @@ final class HomeTodayAnimeNotificationScheduler: BaseUserNotificationManager {
         HomeTodayAnimeNotificationConfig.reminderLeadTimeText
     }
 
+    func requestAuthorizationOnLaunchIfNeeded() async {
+        let authorizationState = await refreshAuthorizationState()
+        guard authorizationState == .notDetermined else { return }
+
+        do {
+            try await ensureAuthorization()
+        } catch BaseUserNotificationError.permissionDenied {
+            setState(.disabled)
+        } catch {
+            AppLogger.notifications.error("Launch notification authorization failed: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
     func refreshAuthorizationStatus() async {
         let authorizationState = await refreshAuthorizationState()
 

@@ -64,7 +64,6 @@ struct HomeTodayAnimeScheduleListView: View {
             await viewModel.loadIfNeeded()
             await notificationScheduler.refreshAuthorizationStatus()
         }
-        .animation(.easeInOut(duration: 0.22), value: viewModel.selectedDay)
     }
 
     private var notificationButton: some View {
@@ -172,9 +171,8 @@ struct HomeTodayAnimeScheduleListView: View {
     }
 
     private func handleDaySelection(_ day: HomeScheduleDay) {
-        withAnimation(.spring(response: 0.32, dampingFraction: 0.86)) {
-            viewModel.selectedDay = day
-        }
+        guard viewModel.selectedDay != day else { return }
+        viewModel.selectedDay = day
     }
 }
 

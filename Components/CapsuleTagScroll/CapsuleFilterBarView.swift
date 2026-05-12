@@ -8,12 +8,13 @@
 import SwiftUI
 
 struct CapsuleFilterBarView<Tag: Hashable>: View {
-    @Namespace private var selectionAnimation
+    @Namespace private var selectionAnimationNamespace
 
     let tags: [Tag]
     let title: (Tag) -> String
     var systemImageName: ((Tag) -> String?)? = nil
     var selection: Binding<Tag>
+    var selectionAnimation: Animation? = .easeInOut(duration: 0.22)
     var onTap: ((Tag) -> Void)? = nil
 
     var body: some View {
@@ -21,7 +22,11 @@ struct CapsuleFilterBarView<Tag: Hashable>: View {
             HStack(spacing: 12) {
                 ForEach(tags, id: \.self) { tag in
                     Button {
-                        withAnimation(.spring(response: 0.28, dampingFraction: 0.84)) {
+                        if let selectionAnimation {
+                            withAnimation(selectionAnimation) {
+                                selection.wrappedValue = tag
+                            }
+                        } else {
                             selection.wrappedValue = tag
                         }
                         onTap?(tag)
@@ -50,13 +55,6 @@ struct CapsuleFilterBarView<Tag: Hashable>: View {
                 .tracking(0.4)
                 .lineLimit(1)
                 .foregroundStyle(titleStyle(isSelected: isSelected))
-
-            if isSelected {
-                Image(systemName: "checkmark")
-                    .font(.footnote.weight(.bold))
-                    .foregroundStyle(ThemeColor.sakura.opacity(0.78))
-                    .transition(.scale.combined(with: .opacity))
-            }
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 8)
@@ -65,7 +63,7 @@ struct CapsuleFilterBarView<Tag: Hashable>: View {
             if isSelected {
                 Capsule()
                     .fill(backgroundStyle(isSelected: true))
-                    .matchedGeometryEffect(id: "capsuleFilterSelection", in: selectionAnimation)
+                    .matchedGeometryEffect(id: "capsuleFilterSelection", in: selectionAnimationNamespace)
             } else {
                 Capsule()
                     .fill(backgroundStyle(isSelected: false))
