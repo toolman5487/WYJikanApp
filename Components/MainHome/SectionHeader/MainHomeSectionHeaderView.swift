@@ -16,6 +16,7 @@ struct GlassSectionHeaderView: View {
 
     let title: String
     let state: State
+    let showsDisclosureIndicator: Bool
 
     var body: some View {
         Group {
@@ -33,16 +34,27 @@ struct GlassSectionHeaderView: View {
         .padding(.vertical, 12)
     }
 
-    init(title: String, state: State = .plain) {
+    init(
+        title: String,
+        state: State = .plain,
+        showsDisclosureIndicator: Bool = false
+    ) {
         self.title = title
         self.state = state
+        self.showsDisclosureIndicator = showsDisclosureIndicator
     }
 
     @ViewBuilder
     private var trailingContent: some View {
         switch state {
         case .plain:
-            EmptyView()
+            if showsDisclosureIndicator {
+                Image(systemName: "chevron.right")
+                    .font(.footnote.weight(.bold))
+                    .foregroundStyle(ThemeColor.sakura.opacity(0.78))
+            } else {
+                EmptyView()
+            }
         case let .accessoryText(text):
             Text(text)
                 .font(.caption.weight(.semibold))
@@ -57,8 +69,8 @@ struct GlassSectionHeaderView: View {
     private var headerContent: some View {
         HStack(spacing: 10) {
             Text(title)
-                .font(.caption.weight(.black))
-                .tracking(0.8)
+                .font(.headline.weight(.black))
+                .tracking(0.4)
                 .foregroundStyle(
                     LinearGradient(
                         colors: [

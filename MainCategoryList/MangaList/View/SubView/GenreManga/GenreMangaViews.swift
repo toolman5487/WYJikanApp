@@ -39,7 +39,11 @@ struct GenreMangaListContainerView: View {
                 }
 
                 ForEach(sections) { section in
-                    GenreMangaSectionView(section: section)
+                    Section {
+                        GenreMangaSectionView(section: section)
+                    } header: {
+                        GenreMangaSectionHeaderView(section: section)
+                    }
                 }
 
                 switch loadMoreState {
@@ -80,14 +84,8 @@ private struct GenreMangaSectionView: View {
         cardHeight * posterAspectRatio
     }
 
-    private var titleText: String {
-        section.genre.name ?? "未分類"
-    }
-
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            titleView
-
+        Group {
             if section.items.isEmpty {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: Self.cardSpacing) {
@@ -116,21 +114,23 @@ private struct GenreMangaSectionView: View {
             }
         }
     }
+}
 
-    private var titleView: some View {
+private struct GenreMangaSectionHeaderView: View {
+    let section: MangaGenreSection
+
+    private var titleText: String {
+        section.genre.name ?? "未分類"
+    }
+
+    var body: some View {
         NavigationLink {
             MangaCategoryDetailView(genre: section.genre)
         } label: {
-            HStack(spacing: 6) {
-                Text(titleText)
-                    .font(.title3.weight(.bold))
-
-                Image(systemName: "chevron.right")
-                    .font(.footnote.weight(.semibold))
-            }
-            .foregroundStyle(ThemeColor.sakura)
+            GlassSectionHeaderView(title: titleText, showsDisclosureIndicator: true)
         }
         .buttonStyle(.plain)
+        .background(Color(.systemBackground).opacity(0.001))
     }
 }
 

@@ -22,7 +22,7 @@ private struct MainView: View {
     @ObservedObject var viewModel: MangaListViewModel
 
     var body: some View {
-        LazyVStack(alignment: .leading, spacing: 20) {
+        LazyVStack(alignment: .leading, spacing: 20, pinnedViews: [.sectionHeaders]) {
             RandomMangaSectionView(viewModel: viewModel.randomHeroViewModel)
             GenreMangaListContainerView(viewModel: viewModel.genreMangaViewModel)
         }

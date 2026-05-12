@@ -15,6 +15,6 @@ struct HomeTodayAnimeScheduleListSectionHeaderView: View {
             title: section.title,
             state: .accessoryText("\(section.items.count) 部")
         )
-        .background(Color(.systemBackground))
+        .background(Color(.systemBackground).opacity(0.001))
     }
 }

@@ -18,7 +18,7 @@ struct RandomHeroCardView: View {
     let detailMalId: Int?
     let onDrawTap: () -> Void
 
-    private static let heroHeight: CGFloat = 370
+    private static let heroHeight: CGFloat = 320
     private static let horizontalPadding: CGFloat = 16
     private static let verticalPadding: CGFloat = 16
 

@@ -14,7 +14,6 @@ struct GenreAnimeSectionView: View {
     private static let posterAspectRatio: CGFloat = 2.0 / 3.0
     private static let cardCornerRadius: CGFloat = 16
     private static let cardSpacing: CGFloat = 12
-    private static let horizontalPadding: CGFloat = 16
 
     // MARK: - Properties
 
@@ -24,37 +23,16 @@ struct GenreAnimeSectionView: View {
         cardHeight * posterAspectRatio
     }
 
-    private var titleText: String {
-        section.genre.name ?? "未分類"
-    }
-
     // MARK: - View
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            titleView
+        Group {
             if section.items.isEmpty {
                 contentSkeletonView
             } else {
                 contentView
             }
         }
-    }
-
-    private var titleView: some View {
-        NavigationLink {
-            AnimeCategoryDetailView(genre: section.genre)
-        } label: {
-            HStack(spacing: 6) {
-                Text(titleText)
-                    .font(.title3.weight(.bold))
-
-                Image(systemName: "chevron.right")
-                    .font(.footnote.weight(.semibold))
-            }
-            .foregroundStyle(ThemeColor.sakura)
-        }
-        .buttonStyle(.plain)
     }
 
     private var contentView: some View {
@@ -69,7 +47,7 @@ struct GenreAnimeSectionView: View {
                     )
                 }
             }
-            .padding(.horizontal, Self.horizontalPadding)
+            .padding(.horizontal, 16)
         }
     }
 
@@ -82,8 +60,30 @@ struct GenreAnimeSectionView: View {
                         .frame(width: Self.cardWidth, height: Self.cardHeight)
                 }
             }
-            .padding(.horizontal, Self.horizontalPadding)
+            .padding(.horizontal, 16)
         }
+    }
+}
+
+struct GenreAnimeSectionHeaderView: View {
+    let section: AnimeGenreSection
+
+    private var titleText: String {
+        section.genre.name ?? "未分類"
+    }
+
+    var body: some View {
+        NavigationLink {
+            AnimeCategoryDetailView(genre: section.genre)
+        } label: {
+            GlassSectionHeaderView(
+                title: titleText,
+                showsDisclosureIndicator: true,
+                outerVerticalPadding: 6
+            )
+        }
+        .buttonStyle(.plain)
+        .background(Color(.systemBackground).opacity(0.001))
     }
 }
 

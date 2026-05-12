@@ -43,7 +43,11 @@ struct GenreAnimeListContainerView: View {
                 }
 
                 ForEach(sections) { section in
-                    GenreAnimeSectionView(section: section)
+                    Section {
+                        GenreAnimeSectionView(section: section)
+                    } header: {
+                        GenreAnimeSectionHeaderView(section: section)
+                    }
                 }
 
                 switch loadMoreState {
