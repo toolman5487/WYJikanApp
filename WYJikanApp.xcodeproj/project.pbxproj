@@ -2247,11 +2247,35 @@
 		16F200382FAB400000000038 /* Notification */ = {
 			isa = PBXGroup;
 			children = (
-				156E5D302FB368B300EBA27F /* AppNotificationDelegate.swift */,
-				16F200342FAB400000000034 /* BaseUserNotificationManager.swift */,
-				16F200362FAB400000000036 /* BaseUserNotificationState.swift */,
+				16F200392FAB400000000039 /* Delegates */,
+				16F2003A2FAB40000000003A /* Managers */,
+				16F2003B2FAB40000000003B /* Models */,
 			);
 			path = Notification;
+			sourceTree = "<group>";
+		};
+		16F200392FAB400000000039 /* Delegates */ = {
+			isa = PBXGroup;
+			children = (
+				156E5D302FB368B300EBA27F /* AppNotificationDelegate.swift */,
+			);
+			path = Delegates;
+			sourceTree = "<group>";
+		};
+		16F2003A2FAB40000000003A /* Managers */ = {
+			isa = PBXGroup;
+			children = (
+				16F200342FAB400000000034 /* BaseUserNotificationManager.swift */,
+			);
+			path = Managers;
+			sourceTree = "<group>";
+		};
+		16F2003B2FAB40000000003B /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				16F200362FAB400000000036 /* BaseUserNotificationState.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 		16F300192FAB500000000019 /* HomeTrendingAnimeList */ = {

@@ -11,18 +11,18 @@ import SwiftData
 @main
 struct WYJikanAppApp: App {
     @UIApplicationDelegateAdaptor(AppNotificationDelegate.self) private var appDelegate
-    @StateObject private var todayAnimeNotificationScheduler = HomeTodayAnimeNotificationScheduler.shared
+    @StateObject private var todayAnimeNotificationScheduler: HomeTodayAnimeNotificationScheduler
+
+    init() {
+        _todayAnimeNotificationScheduler = StateObject(
+            wrappedValue: HomeTodayAnimeNotificationScheduler()
+        )
+    }
 
     var body: some Scene {
         WindowGroup {
-            MainTabBarView()
+            AppRootView()
                 .environmentObject(todayAnimeNotificationScheduler)
-                .preferredColorScheme(.dark)
-                .dynamicTypeSize(.medium)
-                .task {
-                    await todayAnimeNotificationScheduler.requestAuthorizationOnLaunchIfNeeded()
-                    await todayAnimeNotificationScheduler.refreshScheduledNotificationIfNeeded()
-                }
         }
         .modelContainer(for: [MyListCollectionItem.self])
     }

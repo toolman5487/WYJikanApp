@@ -12,8 +12,6 @@ import UserNotifications
 
 @MainActor
 final class HomeTodayAnimeNotificationScheduler: BaseUserNotificationManager {
-    static let shared = HomeTodayAnimeNotificationScheduler()
-
     @Published var feedback: HomeTodayAnimeNotificationFeedback?
 
     private let reminderFactory: HomeTodayAnimeBroadcastReminderFactory
