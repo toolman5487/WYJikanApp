@@ -123,7 +123,7 @@ struct AnimeDetailView: View {
             case let .error(message):
                 ErrorMessageView(message: message, height: 200)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-            case .loading:
+            case .idle, .loading:
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 20) {
                         AnimeDetailHeaderSectionSkeletonView()
