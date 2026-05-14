@@ -13,7 +13,7 @@ struct HomeTrendingAnimeListHeaderView: View {
     let loadedCountText: String
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 16) {
             Text(title)
                 .font(.system(size: 32, weight: .bold, design: .rounded))
                 .foregroundStyle(ThemeColor.sakura)
@@ -26,13 +26,13 @@ struct HomeTrendingAnimeListHeaderView: View {
             Text(loadedCountText)
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(ThemeColor.textPrimary)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
                 .background(Color(.systemBackground).opacity(0.74))
                 .clipShape(Capsule())
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(22)
+        .padding(24)
         .background(headerBackground)
         .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
     }

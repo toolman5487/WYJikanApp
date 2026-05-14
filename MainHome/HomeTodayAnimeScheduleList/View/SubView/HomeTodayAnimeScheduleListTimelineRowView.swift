@@ -17,7 +17,7 @@ struct HomeTodayAnimeScheduleListTimelineRowView: View {
             HStack(alignment: .top, spacing: 12) {
                 posterView
 
-                VStack(alignment: .leading, spacing: 7) {
+                VStack(alignment: .leading, spacing: 8) {
                     Text(item.title)
                         .font(.headline)
                         .foregroundStyle(ThemeColor.textPrimary)
@@ -47,7 +47,7 @@ struct HomeTodayAnimeScheduleListTimelineRowView: View {
 
                 Spacer(minLength: 0)
             }
-            .padding(10)
+            .padding(12)
             .background(Color(.secondarySystemBackground))
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             .overlay(alignment: .topTrailing) {
@@ -77,11 +77,11 @@ struct HomeTodayAnimeScheduleListTimelineRowView: View {
 
     private var metadataView: some View {
         ViewThatFits(in: .horizontal) {
-            HStack(spacing: 6) {
+            HStack(spacing: 8) {
                 metadataChips
             }
 
-            HStack(spacing: 6) {
+            HStack(spacing: 8) {
                 if let type = item.typeText {
                     metadataChip(type)
                 }

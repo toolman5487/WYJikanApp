@@ -18,7 +18,7 @@ struct HomeTrendingAnimeListView: View {
 
     var body: some View {
         ScrollView {
-            LazyVStack(alignment: .leading, spacing: 22, pinnedViews: [.sectionHeaders]) {
+            LazyVStack(alignment: .leading, spacing: 24, pinnedViews: [.sectionHeaders]) {
                 let header = viewModel.headerContent
                 HomeTrendingAnimeListHeaderView(
                     title: header.title,
@@ -89,7 +89,7 @@ struct HomeTrendingAnimeListView: View {
     private func sectionListView(sections: [HomeTrendingAnimeListSectionContent]) -> some View {
         let favoriteIDs = favoriteStatusStore.favoriteIDs(for: .anime)
 
-        return LazyVStack(alignment: .leading, spacing: 18, pinnedViews: [.sectionHeaders]) {
+        return LazyVStack(alignment: .leading, spacing: 20, pinnedViews: [.sectionHeaders]) {
             ForEach(sections) { section in
                 Section {
                     VStack(spacing: 12) {
@@ -129,7 +129,7 @@ struct HomeTrendingAnimeListView: View {
             Color(.systemBackground)
                 .opacity(0.92)
 
-            VStack(alignment: .leading, spacing: 18) {
+            VStack(alignment: .leading, spacing: 20) {
                 Text("更新榜單中...")
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(ThemeColor.textSecondary)

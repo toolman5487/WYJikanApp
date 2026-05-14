@@ -9,8 +9,8 @@ import SwiftUI
 
 struct AnimeCategoryDetailLoadingView: View {
     private let gridColumns = [
-        GridItem(.flexible(), spacing: 14),
-        GridItem(.flexible(), spacing: 14)
+        GridItem(.flexible(), spacing: 16),
+        GridItem(.flexible(), spacing: 16)
     ]
 
     var body: some View {
@@ -20,10 +20,10 @@ struct AnimeCategoryDetailLoadingView: View {
                 SkeletonBar(width: 220, height: 16, cornerRadius: 8)
             }
 
-            LazyVGrid(columns: gridColumns, spacing: 18) {
+            LazyVGrid(columns: gridColumns, spacing: 20) {
                 ForEach(0..<4, id: \.self) { _ in
-                    VStack(alignment: .leading, spacing: 10) {
-                        RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    VStack(alignment: .leading, spacing: 12) {
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
                             .fill(Color(.systemGray5))
                             .frame(height: 220)
 

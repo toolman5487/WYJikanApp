@@ -11,9 +11,9 @@ struct HomeTrendingAnimeListLoadingView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             ForEach(0..<3, id: \.self) { section in
-                VStack(alignment: .leading, spacing: 10) {
-                    SkeletonBar(width: section == 0 ? 92 : 104, height: 22, cornerRadius: 8)
-                    SkeletonBar(width: 220, height: 12, cornerRadius: 6)
+                VStack(alignment: .leading, spacing: 12) {
+                    SkeletonBar(width: section == 0 ? 92 : 104, height: 24, cornerRadius: 8)
+                    SkeletonBar(width: 220, height: 12, cornerRadius: 8)
 
                     ForEach(0..<2, id: \.self) { _ in
                         HStack(spacing: 12) {
@@ -21,16 +21,16 @@ struct HomeTrendingAnimeListLoadingView: View {
                                 .fill(Color(.systemGray5))
                                 .frame(width: 76, height: 112)
 
-                            VStack(alignment: .leading, spacing: 10) {
-                                SkeletonBar(width: 164, height: 18, cornerRadius: 8)
-                                SkeletonBar(width: 122, height: 14, cornerRadius: 8)
+                            VStack(alignment: .leading, spacing: 12) {
+                                SkeletonBar(width: 164, height: 16, cornerRadius: 8)
+                                SkeletonBar(width: 122, height: 16, cornerRadius: 8)
                                 SkeletonBar(width: 196, height: 12, cornerRadius: 8)
                                 SkeletonBar(width: 176, height: 12, cornerRadius: 8)
                             }
 
                             Spacer()
                         }
-                        .padding(10)
+                        .padding(12)
                         .background(Color(.secondarySystemBackground))
                         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                     }

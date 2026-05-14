@@ -65,7 +65,7 @@ struct HeroBannerView: View {
                 }
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(ThemeColor.textPrimary)
-                .padding(.vertical, 10)
+                .padding(.vertical, 12)
                 .padding(.horizontal, 16)
                 .background(ThemeColor.sakura)
                 .clipShape(Capsule())

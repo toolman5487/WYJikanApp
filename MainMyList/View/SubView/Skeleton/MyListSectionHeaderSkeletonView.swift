@@ -14,13 +14,13 @@ struct MyListSectionHeaderSkeletonView: View {
     var body: some View {
         HStack(alignment: .lastTextBaseline) {
             VStack(alignment: .leading, spacing: 8) {
-                SkeletonBar(width: titleWidth, height: 20, cornerRadius: 7)
+                SkeletonBar(width: titleWidth, height: 20, cornerRadius: 8)
                 SkeletonBar(width: subtitleWidth, height: 12, cornerRadius: 4)
             }
 
             Spacer()
 
-            SkeletonBar(width: 48, height: 14, cornerRadius: 5)
+            SkeletonBar(width: 48, height: 16, cornerRadius: 4)
         }
     }
 }

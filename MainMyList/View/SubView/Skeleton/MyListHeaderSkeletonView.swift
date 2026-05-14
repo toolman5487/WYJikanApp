@@ -10,19 +10,19 @@ import SwiftUI
 struct MyListHeaderSkeletonView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            HStack(alignment: .center, spacing: 14) {
+            HStack(alignment: .center, spacing: 16) {
                 Circle()
                     .fill(ThemeColor.sakuraGlass)
-                    .frame(width: 58, height: 58)
+                    .frame(width: 56, height: 56)
                     .overlay {
                         Image(systemName: "heart.fill")
                             .font(.title2.weight(.semibold))
                             .foregroundStyle(ThemeColor.sakura)
                     }
 
-                VStack(alignment: .leading, spacing: 10) {
+                VStack(alignment: .leading, spacing: 12) {
                     SkeletonBar(width: 156, height: 24, cornerRadius: 8)
-                    SkeletonBar(width: 220, height: 14, cornerRadius: 5)
+                    SkeletonBar(width: 220, height: 16, cornerRadius: 4)
                 }
 
                 Spacer()
@@ -44,11 +44,11 @@ private struct MyListHeroCardSkeletonView: View {
                 }
 
             VStack(alignment: .leading, spacing: 12) {
-                SkeletonBar(width: 92, height: 16, cornerRadius: 6)
+                SkeletonBar(width: 92, height: 16, cornerRadius: 8)
                 SkeletonBar(width: 220, height: 28, cornerRadius: 8)
-                SkeletonBar(width: 164, height: 14, cornerRadius: 5)
+                SkeletonBar(width: 164, height: 16, cornerRadius: 4)
             }
-            .padding(22)
+            .padding(24)
         }
         .frame(height: 168)
         .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))

@@ -14,7 +14,7 @@ struct MyListItemRowView: View {
         HStack(spacing: 12) {
             posterView
             VStack(alignment: .leading, spacing: 8) {
-                HStack(spacing: 6) {
+                HStack(spacing: 8) {
                     Image(systemName: item.mediaKind.iconName)
                     Text(item.mediaKind.title)
                 }
@@ -38,21 +38,21 @@ struct MyListItemRowView: View {
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(ThemeColor.textTertiary)
         }
-        .padding(10)
+        .padding(12)
         .background(Color(.secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 
     @ViewBuilder
     private var posterView: some View {
         if let url = item.imageURL {
             RemotePosterImageView(url: url)
-                .frame(width: 58, height: 84)
-                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                .frame(width: 56, height: 84)
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         } else {
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .fill(Color(.tertiarySystemBackground))
-                .frame(width: 58, height: 84)
+                .frame(width: 56, height: 84)
                 .overlay {
                     Image(systemName: "photo")
                         .foregroundStyle(ThemeColor.textTertiary)

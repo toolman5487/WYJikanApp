@@ -28,12 +28,12 @@ struct HeroBannerSlideView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
 
             HStack(alignment: .center) {
-                VStack(alignment: .leading, spacing: 10) {
+                VStack(alignment: .leading, spacing: 12) {
                     HStack(spacing: 8) {
                         Text("本季焦點")
                             .font(.caption.weight(.semibold))
-                            .padding(.vertical, 6)
-                            .padding(.horizontal, 10)
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 12)
                             .background(ThemeColor.sakura.opacity(0.95))
                             .clipShape(Capsule())
 
@@ -50,8 +50,8 @@ struct HeroBannerSlideView: View {
                         Text(pageLabel)
                             .font(.caption.monospacedDigit())
                             .foregroundStyle(ThemeColor.textPrimary.opacity(0.9))
-                            .padding(.vertical, 6)
-                            .padding(.horizontal, 10)
+                            .padding(.vertical, 8)
+                            .padding(.horizontal, 12)
                             .background(.ultraThinMaterial.opacity(0.55))
                             .clipShape(Capsule())
                     }
@@ -73,8 +73,8 @@ struct HeroBannerSlideView: View {
         Text(text)
             .font(.caption.weight(.semibold))
             .foregroundStyle(ThemeColor.textPrimary)
-            .padding(.vertical, 6)
-            .padding(.horizontal, 10)
+            .padding(.vertical, 8)
+            .padding(.horizontal, 12)
             .background(.ultraThinMaterial.opacity(0.55))
             .clipShape(Capsule())
     }

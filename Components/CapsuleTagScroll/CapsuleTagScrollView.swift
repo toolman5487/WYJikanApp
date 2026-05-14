@@ -20,7 +20,7 @@ struct CapsuleTagScrollView<Tag: Hashable>: View {
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 10) {
+            HStack(spacing: 12) {
                 ForEach(tags, id: \.self) { tag in
                     Button {
                         if let selection {
@@ -39,7 +39,7 @@ struct CapsuleTagScrollView<Tag: Hashable>: View {
                     .buttonStyle(.plain)
                 }
             }
-            .padding(.vertical, 2)
+            .padding(.vertical, 4)
         }
     }
 
@@ -65,8 +65,8 @@ struct CapsuleTagScrollView<Tag: Hashable>: View {
                 .lineLimit(1)
         }
         .foregroundStyle(isSelected ? ThemeColor.textPrimary : ThemeColor.textSecondary)
-        .padding(.horizontal, 14)
-        .padding(.vertical, 10)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
         .frame(minHeight: 44)
         .background {
             ZStack {

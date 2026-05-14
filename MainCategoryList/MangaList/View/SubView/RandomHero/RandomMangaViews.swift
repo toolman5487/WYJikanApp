@@ -114,7 +114,7 @@ private struct RandomMangaCardView: View {
 
                     Spacer(minLength: 0)
 
-                    HStack(alignment: .bottom, spacing: 14) {
+                    HStack(alignment: .bottom, spacing: 16) {
                         posterPanel(width: posterWidth(for: proxy.size.width))
 
                         VStack(alignment: .leading, spacing: 8) {
@@ -158,7 +158,7 @@ private struct RandomMangaCardView: View {
                 RoundedRectangle(cornerRadius: 20, style: .continuous)
                     .fill(.ultraThinMaterial)
 
-                VStack(spacing: 10) {
+                VStack(spacing: 12) {
                     ProgressView()
                         .tint(ThemeColor.sakura)
 
@@ -214,7 +214,7 @@ private struct RandomMangaCardView: View {
             .kerning(0.8)
             .foregroundStyle(ThemeColor.textPrimary)
             .padding(.horizontal, 12)
-            .padding(.vertical, 7)
+            .padding(.vertical, 8)
             .background(ThemeColor.sakura.opacity(0.84))
             .clipShape(Capsule())
     }
@@ -250,7 +250,7 @@ private struct RandomMangaCardView: View {
     }
 
     private var heroHeadline: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 8) {
             if let pick {
                 Text(pick.displayTitle)
                     .font(.system(.title2, design: .rounded).weight(.bold))
@@ -358,7 +358,7 @@ private struct RandomMangaActionButtonsView: View {
                 NavigationLink {
                     MangaDetailView(malId: id)
                 } label: {
-                    HStack(spacing: 6) {
+                    HStack(spacing: 8) {
                         Text("查看詳情")
                         Image(systemName: "arrow.right")
                             .font(.caption.weight(.bold))
@@ -385,6 +385,6 @@ private struct RandomMangaSkeletonView: View {
     var body: some View {
         BannerSkeletonView()
             .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-            .frame(height: 370)
+            .frame(height: 368)
     }
 }

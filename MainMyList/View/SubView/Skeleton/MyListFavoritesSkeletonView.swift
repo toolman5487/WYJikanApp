@@ -9,15 +9,15 @@ import SwiftUI
 
 struct MyListFavoritesSkeletonView: View {
     private let columns: [GridItem] = Array(
-        repeating: GridItem(.flexible(), spacing: 14),
+        repeating: GridItem(.flexible(), spacing: 16),
         count: 3
     )
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 16) {
             MyListSectionHeaderSkeletonView(titleWidth: 112, subtitleWidth: 188)
 
-            LazyVGrid(columns: columns, spacing: 18) {
+            LazyVGrid(columns: columns, spacing: 20) {
                 ForEach(0..<9, id: \.self) { _ in
                     MyListFavoriteItemSkeletonView()
                 }
@@ -29,17 +29,17 @@ struct MyListFavoritesSkeletonView: View {
 
 private struct MyListFavoriteItemSkeletonView: View {
     var body: some View {
-        VStack(alignment: .leading, spacing: 9) {
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
+        VStack(alignment: .leading, spacing: 8) {
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .fill(Color(.systemGray5))
                 .aspectRatio(0.72, contentMode: .fit)
                 .overlay {
                     ShimmerView()
                 }
-                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
 
-            SkeletonBar(width: nil, height: 13, cornerRadius: 5)
-            SkeletonBar(width: 58, height: 11, cornerRadius: 4)
+            SkeletonBar(width: nil, height: 12, cornerRadius: 4)
+            SkeletonBar(width: 56, height: 12, cornerRadius: 4)
         }
     }
 }

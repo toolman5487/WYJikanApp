@@ -52,7 +52,7 @@ struct HomeTrendingAnimeListRowView: View {
             }
             .padding(12)
             .background(Color(.secondarySystemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             .overlay(alignment: .topTrailing) {
                 MyListCollectionStatusBadgeView(isFavorite: isFavorite)
                     .padding(8)
@@ -75,16 +75,16 @@ struct HomeTrendingAnimeListRowView: View {
             }
         }
         .frame(width: 82, height: 120)
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 
     private var metadataView: some View {
         ViewThatFits(in: .horizontal) {
-            HStack(spacing: 6) {
+            HStack(spacing: 8) {
                 metadataChips
             }
 
-            HStack(spacing: 6) {
+            HStack(spacing: 8) {
                 if let typeText = item.typeText {
                     chip(typeText)
                 }

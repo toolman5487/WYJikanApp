@@ -16,7 +16,7 @@ struct HomeTrendingMangaListView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 22) {
+            VStack(alignment: .leading, spacing: 24) {
                 HomeTrendingAnimeListHeaderView(
                     title: viewModel.headerTitle,
                     subtitle: viewModel.headerSubtitle,
@@ -102,7 +102,7 @@ struct HomeTrendingMangaListView: View {
     }
 
     private var emptyStateCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 12) {
             Text(emptyStateTitle)
                 .font(.title3.weight(.bold))
                 .foregroundStyle(ThemeColor.textPrimary)
@@ -119,7 +119,7 @@ struct HomeTrendingMangaListView: View {
     }
 
     private func errorStateCard(message: String) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 12) {
             Text("熱門漫畫榜單暫時讀不到")
                 .font(.title3.weight(.bold))
                 .foregroundStyle(ThemeColor.textPrimary)
@@ -159,7 +159,7 @@ struct HomeTrendingMangaListView: View {
             Color(.systemBackground)
                 .opacity(0.92)
 
-            VStack(alignment: .leading, spacing: 18) {
+            VStack(alignment: .leading, spacing: 20) {
                 Text("更新榜單中...")
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(ThemeColor.textSecondary)

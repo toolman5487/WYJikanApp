@@ -26,7 +26,7 @@ struct HomeTodayAnimeScheduleListLoadMoreFooterView: View {
             ProgressView()
                 .frame(maxWidth: .infinity, minHeight: 44)
         case .error(let message):
-            VStack(alignment: .leading, spacing: 10) {
+            VStack(alignment: .leading, spacing: 12) {
                 Text(message)
                     .font(.footnote)
                     .foregroundStyle(ThemeColor.textSecondary)

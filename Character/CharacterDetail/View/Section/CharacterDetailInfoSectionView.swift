@@ -13,7 +13,7 @@ struct CharacterDetailInfoSectionView: View {
 
     var body: some View {
         AnimeDetailSectionCard("角色資訊") {
-            VStack(alignment: .leading, spacing: 10) {
+            VStack(alignment: .leading, spacing: 12) {
                 AnimeDetailInfoRow(title: "日文名", value: character.nameKanji ?? "-")
                 AnimeDetailInfoRow(title: "英文名", value: character.name ?? "-")
                 AnimeDetailInfoRow(title: "收藏", value: viewModel.favoritesText(for: character))

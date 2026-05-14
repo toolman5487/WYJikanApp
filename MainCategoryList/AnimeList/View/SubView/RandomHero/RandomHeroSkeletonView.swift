@@ -11,7 +11,7 @@ struct RandomHeroSkeletonView: View {
     var body: some View {
         BannerSkeletonView()
             .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-            .frame(height: 370)
+            .frame(height: 368)
     }
 }
 

@@ -12,7 +12,7 @@ struct HomeTrendingAnimeListControlBarContainerView: View {
     let onSelectSort: (HomeTrendingAnimeListSort) -> Void
     
     var body: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 12) {
             HomeTrendingAnimeListControlBarView(
                 items: items,
                 onSelectSort: onSelectSort

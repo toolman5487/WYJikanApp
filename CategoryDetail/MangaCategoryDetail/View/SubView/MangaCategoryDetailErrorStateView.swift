@@ -12,7 +12,7 @@ struct MangaCategoryDetailErrorStateView: View {
     let onRetry: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 12) {
             Text("這個分類暫時打不開")
                 .font(.title3.weight(.bold))
                 .foregroundStyle(ThemeColor.textPrimary)

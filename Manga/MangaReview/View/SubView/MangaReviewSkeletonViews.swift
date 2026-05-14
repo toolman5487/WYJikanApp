@@ -55,26 +55,26 @@ struct MangaReviewRowSkeletonView: View {
                 }
                 .clipShape(Circle())
             VStack(alignment: .leading, spacing: 4) {
-                SkeletonBar(width: 140, height: 15, cornerRadius: 6)
+                SkeletonBar(width: 140, height: 16, cornerRadius: 8)
                 SkeletonBar(width: 96, height: 12, cornerRadius: 4)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            SkeletonBar(width: 40, height: 22, cornerRadius: 6)
+            SkeletonBar(width: 40, height: 24, cornerRadius: 8)
         }
     }
 
     private var tagsPlaceholder: some View {
-        HStack(spacing: 10) {
-            SkeletonBar(width: 72, height: 36, cornerRadius: 18)
-            SkeletonBar(width: 96, height: 36, cornerRadius: 18)
-            SkeletonBar(width: 64, height: 36, cornerRadius: 18)
+        HStack(spacing: 12) {
+            SkeletonBar(width: 72, height: 36, cornerRadius: 16)
+            SkeletonBar(width: 96, height: 36, cornerRadius: 16)
+            SkeletonBar(width: 64, height: 36, cornerRadius: 16)
         }
     }
 
     private var bodyPlaceholder: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            SkeletonBar(width: nil, height: 14, cornerRadius: 4)
-            SkeletonBar(width: 160, height: 14, cornerRadius: 4)
+        VStack(alignment: .leading, spacing: 8) {
+            SkeletonBar(width: nil, height: 16, cornerRadius: 4)
+            SkeletonBar(width: 160, height: 16, cornerRadius: 4)
         }
     }
 

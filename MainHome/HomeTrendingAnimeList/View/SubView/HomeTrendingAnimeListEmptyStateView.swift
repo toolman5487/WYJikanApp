@@ -9,7 +9,7 @@ import SwiftUI
 
 struct HomeTrendingAnimeListEmptyStateView: View {
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 12) {
             Text("目前還沒有熱門動畫資料")
                 .font(.title3.weight(.bold))
                 .foregroundStyle(ThemeColor.textPrimary)

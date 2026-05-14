@@ -188,7 +188,7 @@ private struct GenreMangaListSkeletonView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             ForEach(0..<Self.sectionCount, id: \.self) { _ in
-                VStack(alignment: .leading, spacing: 10) {
+                VStack(alignment: .leading, spacing: 12) {
                     SkeletonBar(width: 120, height: 24, cornerRadius: 8)
                         .padding(.horizontal, Self.horizontalPadding)
 

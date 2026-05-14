@@ -70,7 +70,7 @@ struct PosterCardMetadataOverlayView: View {
                     .lineLimit(2)
             }
 
-            HStack(spacing: 6) {
+            HStack(spacing: 8) {
                 if let type, !type.isEmpty {
                     chip(text: type)
                 }
@@ -80,7 +80,7 @@ struct PosterCardMetadataOverlayView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(10)
+        .padding(12)
     }
 
     private func chip(text: String) -> some View {

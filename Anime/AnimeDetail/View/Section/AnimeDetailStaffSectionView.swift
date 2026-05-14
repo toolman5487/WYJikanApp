@@ -18,7 +18,7 @@ struct AnimeDetailStaffSectionView: View {
                 let producerText = viewModel.joinedNames(from: anime.producers)
                 let genreText = viewModel.joinedNames(from: anime.genres)
                 AnimeDetailSectionCard("製作資訊") {
-                    VStack(spacing: 10) {
+                    VStack(spacing: 12) {
                         AnimeDetailInfoRow(title: "工作室", value: studioText)
                         AnimeDetailInfoRow(title: "製作", value: producerText)
                         AnimeDetailInfoRow(title: "類型", value: genreText)

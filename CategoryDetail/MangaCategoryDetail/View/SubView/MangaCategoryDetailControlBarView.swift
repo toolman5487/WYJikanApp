@@ -17,7 +17,7 @@ struct MangaCategoryDetailControlBarView: View {
                 .font(.headline)
                 .foregroundStyle(ThemeColor.textPrimary)
 
-            HStack(spacing: 10) {
+            HStack(spacing: 12) {
                 Menu {
                     ForEach(MangaCategoryFilter.Sort.allCases) { option in
                         Button(option.title) {
@@ -55,8 +55,8 @@ struct MangaCategoryDetailControlBarView: View {
                 .font(.subheadline.weight(.semibold))
         }
         .foregroundStyle(ThemeColor.textPrimary)
-        .padding(.horizontal, 14)
-        .padding(.vertical, 10)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
         .background(Color(.secondarySystemBackground))
         .clipShape(Capsule())
     }

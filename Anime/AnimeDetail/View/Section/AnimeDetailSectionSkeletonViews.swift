@@ -86,7 +86,7 @@ struct AnimeDetailStaffSectionSkeletonView: View {
         VStack(alignment: .leading, spacing: 20) {
             SectionCardSkeleton(rowCount: 3)
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 10) {
+                HStack(spacing: 12) {
                     ForEach(0..<5, id: \.self) { _ in
                         SkeletonBar(width: 88, height: 40, cornerRadius: 20)
                     }
@@ -111,9 +111,9 @@ struct AnimeDetailPicturesSectionSkeletonView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            RoundedRectangle(cornerRadius: 6, style: .continuous)
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
                 .fill(Color(.systemGray4))
-                .frame(width: 56, height: 22)
+                .frame(width: 56, height: 24)
             LazyVGrid(columns: gridColumns, alignment: .center, spacing: 12) {
                 ForEach(0..<6, id: \.self) { _ in
                     RoundedRectangle(cornerRadius: 12, style: .continuous)

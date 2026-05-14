@@ -12,7 +12,7 @@ struct HomeTodayAnimeScheduleListDayFilterContainerView: View {
     let onSelectDay: (HomeScheduleDay) -> Void
 
     var body: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 12) {
             HomeTodayAnimeScheduleListDayFilterView(
                 selectedDay: selectedDay,
                 onSelectDay: onSelectDay

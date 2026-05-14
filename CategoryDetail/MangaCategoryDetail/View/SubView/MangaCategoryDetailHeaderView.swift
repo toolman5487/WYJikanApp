@@ -13,7 +13,7 @@ struct MangaCategoryDetailHeaderView: View {
     let loadedCountText: String
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 16) {
             Text(title)
                 .font(.system(size: 34, weight: .bold, design: .rounded))
                 .foregroundStyle(ThemeColor.sakura)
@@ -23,7 +23,7 @@ struct MangaCategoryDetailHeaderView: View {
                 .foregroundStyle(ThemeColor.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
 
-            HStack(spacing: 10) {
+            HStack(spacing: 12) {
                 headerPill(title: "分類探索")
                 headerPill(title: "重新篩選")
                 headerPill(title: loadedCountText)
@@ -32,7 +32,7 @@ struct MangaCategoryDetailHeaderView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(20)
         .background(headerBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
     }
 
     private var headerBackground: some View {
@@ -58,8 +58,8 @@ struct MangaCategoryDetailHeaderView: View {
         Text(title)
             .font(.caption.weight(.semibold))
             .foregroundStyle(ThemeColor.textPrimary)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 6)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
             .background(Color(.systemBackground).opacity(0.72))
             .clipShape(Capsule())
     }

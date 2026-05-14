@@ -11,7 +11,7 @@ struct PeopleListContentView: View {
     @ObservedObject var viewModel: PeopleListViewModel
 
     var body: some View {
-        LazyVStack(alignment: .leading, spacing: 14) {
+        LazyVStack(alignment: .leading, spacing: 16) {
             switch viewModel.screenState {
             case .loading:
                 PeopleListLoadingView()

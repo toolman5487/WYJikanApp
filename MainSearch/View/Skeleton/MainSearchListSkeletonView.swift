@@ -27,17 +27,17 @@ struct MainSearchRowSkeletonView: View {
 
     var body: some View {
         HStack(alignment: .center, spacing: 12) {
-            RoundedRectangle(cornerRadius: 6, style: .continuous)
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
                 .fill(Color(.systemGray5))
                 .frame(width: 48, height: 64)
                 .overlay {
                     ShimmerView()
                 }
-                .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
 
             VStack(alignment: .leading, spacing: 4) {
                 SkeletonBar(width: nil, height: 16, cornerRadius: 4)
-                SkeletonBar(width: 180, height: 13, cornerRadius: 4)
+                SkeletonBar(width: 180, height: 12, cornerRadius: 4)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }

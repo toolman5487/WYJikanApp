@@ -14,7 +14,7 @@ struct MainSearchResultRowView: View {
         HStack(alignment: .center, spacing: 12) {
             poster
                 .frame(width: 48, height: 64)
-                .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(row.title)

@@ -31,7 +31,7 @@ struct RandomHeroActionButtonsView: View {
                 NavigationLink {
                     AnimeDetailView(malId: id)
                 } label: {
-                    HStack(spacing: 6) {
+                    HStack(spacing: 8) {
                         Text("查看詳情")
                         Image(systemName: "arrow.right")
                             .font(.caption.weight(.bold))

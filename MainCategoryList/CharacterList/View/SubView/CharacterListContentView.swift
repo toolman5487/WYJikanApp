@@ -11,7 +11,7 @@ struct CharacterListContentView: View {
     @ObservedObject var viewModel: CharacterListViewModel
 
     var body: some View {
-        LazyVStack(alignment: .leading, spacing: 14) {
+        LazyVStack(alignment: .leading, spacing: 16) {
             switch viewModel.screenState {
             case .loading:
                 CharacterListLoadingView()

@@ -25,7 +25,7 @@ struct CharacterLoadMoreButton: View {
                         .font(.headline)
                 }
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 14)
+                .padding(.vertical, 16)
             }
             .buttonStyle(.borderedProminent)
             .disabled(isLoading)

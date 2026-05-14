@@ -36,14 +36,14 @@ struct CapsuleFilterBarView<Tag: Hashable>: View {
                     .buttonStyle(.plain)
                 }
             }
-            .padding(.vertical, 2)
+            .padding(.vertical, 4)
         }
     }
 
     private func filterItem(for tag: Tag) -> some View {
         let isSelected = selection.wrappedValue == tag
 
-        return HStack(spacing: 10) {
+        return HStack(spacing: 12) {
             if let systemImageName = systemImageName?(tag) {
                 Image(systemName: systemImageName)
                     .font(.footnote.weight(.semibold))
@@ -56,7 +56,7 @@ struct CapsuleFilterBarView<Tag: Hashable>: View {
                 .lineLimit(1)
                 .foregroundStyle(titleStyle(isSelected: isSelected))
         }
-        .padding(.horizontal, 14)
+        .padding(.horizontal, 16)
         .padding(.vertical, 8)
         .frame(minHeight: 38)
         .background {

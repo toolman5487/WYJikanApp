@@ -72,7 +72,7 @@ struct MainSearchResultsContentView: View {
                         }
                         .padding(12)
                         .background(
-                            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
                                 .fill(Color(.systemBackground))
                         )
                         .shadow(color: Color.black.opacity(0.08), radius: 12, y: 4)

@@ -9,7 +9,7 @@ import SwiftUI
 
 struct AnimeCategoryDetailEmptyStateView: View {
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 12) {
             Text("這個分類目前還沒有作品")
                 .font(.title3.weight(.bold))
                 .foregroundStyle(ThemeColor.textPrimary)

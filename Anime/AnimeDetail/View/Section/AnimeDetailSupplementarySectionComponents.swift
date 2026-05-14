@@ -58,7 +58,7 @@ struct AnimeDetailCharacterCardView: View {
     let imageURL: URL?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 12) {
             portraitView
                 .frame(width: 124, height: 156)
                 .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
@@ -104,22 +104,22 @@ struct AnimeDetailRecommendationCardView: View {
     let imageURL: URL?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 12) {
             posterView
-                .frame(width: 138, height: 196)
+                .frame(width: 136, height: 196)
                 .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
 
             Text(title)
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(ThemeColor.textPrimary)
                 .lineLimit(2)
-                .frame(width: 138, alignment: .leading)
+                .frame(width: 136, alignment: .leading)
 
             Text(summary)
                 .font(.caption2)
                 .foregroundStyle(ThemeColor.textSecondary)
                 .lineLimit(3)
-                .frame(width: 138, alignment: .leading)
+                .frame(width: 136, alignment: .leading)
         }
     }
 

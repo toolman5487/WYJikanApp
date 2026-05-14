@@ -14,7 +14,7 @@ struct AnimeReviewRowTagsView: View {
     var body: some View {
         if !labels.isEmpty {
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 10) {
+                HStack(spacing: 12) {
                     ForEach(Array(labels.enumerated()), id: \.offset) { _, tag in
                         Text(tag)
                             .font(.subheadline.weight(.medium))

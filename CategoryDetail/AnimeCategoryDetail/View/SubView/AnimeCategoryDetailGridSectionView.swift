@@ -15,13 +15,13 @@ struct AnimeCategoryDetailGridSectionView: View {
     let onRetryLoadMore: () -> Void
 
     private let gridColumns = [
-        GridItem(.flexible(), spacing: 14),
-        GridItem(.flexible(), spacing: 14)
+        GridItem(.flexible(), spacing: 16),
+        GridItem(.flexible(), spacing: 16)
     ]
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            LazyVGrid(columns: gridColumns, spacing: 18) {
+            LazyVGrid(columns: gridColumns, spacing: 20) {
                 ForEach(items) { item in
                     NavigationLink {
                         AnimeDetailView(malId: item.id)

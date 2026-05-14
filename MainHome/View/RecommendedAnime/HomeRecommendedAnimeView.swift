@@ -87,7 +87,7 @@ struct HomeRecommendedAnimeView: View {
                         .foregroundStyle(ThemeColor.textPrimary)
                         .frame(maxWidth: .infinity, minHeight: 44)
                         .background(ThemeColor.sakura)
-                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                         .padding(.top, Self.loadMoreTopPadding)
                         .padding(.horizontal, Self.horizontalPadding)
                     }

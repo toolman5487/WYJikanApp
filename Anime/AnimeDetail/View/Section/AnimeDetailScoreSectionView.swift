@@ -16,7 +16,7 @@ struct AnimeDetailScoreSectionView: View {
             AnimeReviewView(malId: anime.malId, animeTitle: viewModel.displayTitle(for: anime))
         } label: {
             AnimeDetailSectionCard("評分與人氣") {
-                VStack(spacing: 10) {
+                VStack(spacing: 12) {
                     AnimeDetailInfoRow(
                         title: "分數",
                         value: viewModel.scoreDisplayText(for: anime)

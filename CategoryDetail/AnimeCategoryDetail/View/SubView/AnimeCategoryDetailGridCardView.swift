@@ -11,7 +11,7 @@ struct AnimeCategoryDetailGridCardView: View {
     let item: AnimeCategoryItemDTO
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 12) {
             PosterCardView(rank: item.rank) {
                 Group {
                     if let posterURL = item.posterURL {
@@ -27,7 +27,7 @@ struct AnimeCategoryDetailGridCardView: View {
                 }
             }
             .frame(height: 220)
-            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
 
             Text(item.displayTitle)
                 .font(.headline)

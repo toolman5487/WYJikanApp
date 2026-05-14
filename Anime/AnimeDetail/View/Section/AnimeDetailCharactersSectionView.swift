@@ -41,7 +41,7 @@ struct AnimeDetailCharactersSectionView: View {
                         }
                     }
                 }
-                .padding(.vertical, 2)
+                .padding(.vertical, 4)
             }
         }
     }
@@ -54,18 +54,18 @@ private struct AnimeDetailCharactersListView: View {
 
     var body: some View {
         ScrollView {
-            LazyVStack(alignment: .leading, spacing: 14) {
+            LazyVStack(alignment: .leading, spacing: 16) {
                 ForEach(roles) { role in
                     if let character = role.character {
                         NavigationLink {
                             CharacterDetailView(malId: character.malId)
                         } label: {
-                            HStack(alignment: .top, spacing: 14) {
+                            HStack(alignment: .top, spacing: 16) {
                                 characterImage(character)
                                     .frame(width: 82, height: 104)
-                                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
 
-                                VStack(alignment: .leading, spacing: 6) {
+                                VStack(alignment: .leading, spacing: 8) {
                                     Text(viewModel.characterName(character))
                                         .font(.headline)
                                         .foregroundStyle(ThemeColor.textPrimary)
@@ -83,9 +83,9 @@ private struct AnimeDetailCharactersListView: View {
 
                                 Spacer(minLength: 0)
                             }
-                            .padding(14)
+                            .padding(16)
                             .background(Color(.secondarySystemBackground))
-                            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                         }
                         .buttonStyle(.plain)
                     }
@@ -102,7 +102,7 @@ private struct AnimeDetailCharactersListView: View {
         if let imageURL = viewModel.characterImageURL(character) {
             RemotePosterImageView(url: imageURL)
         } else {
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .fill(Color(.systemGray5))
                 .overlay {
                     Image(systemName: "person.fill")

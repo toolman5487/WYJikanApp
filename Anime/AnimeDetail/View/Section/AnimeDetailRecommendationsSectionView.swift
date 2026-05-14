@@ -40,7 +40,7 @@ struct AnimeDetailRecommendationsSectionView: View {
                         }
                     }
                 }
-                .padding(.vertical, 2)
+                .padding(.vertical, 4)
             }
         }
     }
@@ -58,13 +58,13 @@ private struct AnimeDetailRecommendationsListView: View {
 
     var body: some View {
         ScrollView {
-            LazyVGrid(columns: columns, alignment: .leading, spacing: 18) {
+            LazyVGrid(columns: columns, alignment: .leading, spacing: 20) {
                 ForEach(recommendations) { recommendation in
                     if let entry = recommendation.entry {
                         NavigationLink {
                             AnimeDetailView(malId: entry.malId)
                         } label: {
-                            VStack(alignment: .leading, spacing: 10) {
+                            VStack(alignment: .leading, spacing: 12) {
                                 recommendationPoster(recommendation)
                                     .aspectRatio(2.0 / 3.0, contentMode: .fit)
                                     .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))

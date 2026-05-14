@@ -12,7 +12,7 @@ struct HomeTodayAnimeScheduleListErrorStateView: View {
     let onRetry: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 12) {
             Text("播出表暫時讀不到")
                 .font(.title3.weight(.bold))
                 .foregroundStyle(ThemeColor.textPrimary)

@@ -25,10 +25,10 @@ struct CharacterDetailInfoSectionSkeletonView: View {
 struct CharacterDetailAboutSectionSkeletonView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            SkeletonBar(width: 84, height: 22, cornerRadius: 6)
-            SkeletonBar(width: nil, height: 14, cornerRadius: 4)
-            SkeletonBar(width: nil, height: 14, cornerRadius: 4)
-            SkeletonBar(width: 220, height: 14, cornerRadius: 4)
+            SkeletonBar(width: 84, height: 24, cornerRadius: 8)
+            SkeletonBar(width: nil, height: 16, cornerRadius: 4)
+            SkeletonBar(width: nil, height: 16, cornerRadius: 4)
+            SkeletonBar(width: 220, height: 16, cornerRadius: 4)
         }
     }
 }
@@ -36,15 +36,15 @@ struct CharacterDetailAboutSectionSkeletonView: View {
 struct CharacterDetailHorizontalCardsSkeletonView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            SkeletonBar(width: 84, height: 22, cornerRadius: 6)
+            SkeletonBar(width: 84, height: 24, cornerRadius: 8)
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
                     ForEach(0..<4, id: \.self) { _ in
                         VStack(alignment: .leading, spacing: 8) {
-                            SkeletonBar(width: 112, height: 156, cornerRadius: 14)
+                            SkeletonBar(width: 112, height: 156, cornerRadius: 16)
                             SkeletonBar(width: 112, height: 12, cornerRadius: 4)
-                            SkeletonBar(width: 64, height: 10, cornerRadius: 4)
+                            SkeletonBar(width: 64, height: 8, cornerRadius: 4)
                         }
                     }
                 }

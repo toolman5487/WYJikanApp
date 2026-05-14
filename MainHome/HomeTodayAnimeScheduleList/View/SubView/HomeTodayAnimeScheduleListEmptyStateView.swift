@@ -9,7 +9,7 @@ import SwiftUI
 
 struct HomeTodayAnimeScheduleListEmptyStateView: View {
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 12) {
             Text("這天目前沒有可顯示的 TV 動畫")
                 .font(.title3.weight(.bold))
                 .foregroundStyle(ThemeColor.textPrimary)

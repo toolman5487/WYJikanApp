@@ -26,8 +26,8 @@ struct HomeTodayAnimeScheduleListHeaderView: View {
             Text(loadedCountText)
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(ThemeColor.textPrimary)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
                 .background(Color(.systemBackground).opacity(0.74))
                 .clipShape(Capsule())
         }

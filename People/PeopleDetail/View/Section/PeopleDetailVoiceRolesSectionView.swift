@@ -43,7 +43,7 @@ private struct PeopleDetailVoiceRoleCardView: View {
         VStack(alignment: .leading, spacing: 8) {
             posterView
                 .frame(width: 112, height: 156)
-                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
 
             Text(characterName)
                 .font(.caption.weight(.semibold))
@@ -70,7 +70,7 @@ private struct PeopleDetailVoiceRoleCardView: View {
         if let imageURL {
             RemotePosterImageView(url: imageURL)
         } else {
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .fill(Color(.systemGray5))
                 .overlay {
                     Image(systemName: "person.crop.rectangle")

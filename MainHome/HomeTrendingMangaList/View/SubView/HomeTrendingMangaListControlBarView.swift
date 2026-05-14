@@ -12,7 +12,7 @@ struct HomeTrendingMangaListControlBarContainerView: View {
     @Binding var selectedFormat: HomeTrendingMangaListFormat
 
     var body: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 12) {
             HomeTrendingMangaListControlBarView(
                 selectedSort: $selectedSort,
                 selectedFormat: $selectedFormat
@@ -31,7 +31,7 @@ struct HomeTrendingMangaListControlBarView: View {
     @Binding var selectedFormat: HomeTrendingMangaListFormat
 
     var body: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 12) {
             Menu {
                 ForEach(HomeTrendingMangaListSort.allCases) { option in
                     Button(option.title) {
@@ -70,8 +70,8 @@ struct HomeTrendingMangaListControlBarView: View {
                 .font(.subheadline.weight(.semibold))
         }
         .foregroundStyle(ThemeColor.textPrimary)
-        .padding(.horizontal, 14)
-        .padding(.vertical, 10)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
         .background(Color(.secondarySystemBackground))
         .clipShape(Capsule())
     }

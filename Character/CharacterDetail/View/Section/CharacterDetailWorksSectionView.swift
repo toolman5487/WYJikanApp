@@ -66,7 +66,7 @@ private struct CharacterDetailWorkCardView: View {
         VStack(alignment: .leading, spacing: 8) {
             posterView
                 .frame(width: 112, height: 156)
-                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
 
             Text(title)
                 .font(.caption.weight(.semibold))
@@ -87,7 +87,7 @@ private struct CharacterDetailWorkCardView: View {
         if let imageURL {
             RemotePosterImageView(url: imageURL)
         } else {
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .fill(Color(.systemGray5))
                 .overlay {
                     Image(systemName: "photo")
@@ -112,7 +112,7 @@ struct CharacterDetailHorizontalSection<Content: View>: View {
                 HStack(alignment: .top, spacing: 12) {
                     content
                 }
-                .padding(.vertical, 2)
+                .padding(.vertical, 4)
             }
         }
     }

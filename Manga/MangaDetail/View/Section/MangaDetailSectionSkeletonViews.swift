@@ -15,17 +15,17 @@ struct MangaDetailHeaderSectionSkeletonView: View {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .fill(Color(.systemGray5))
                 .frame(width: 132, height: 196)
-            VStack(alignment: .leading, spacing: 10) {
-                RoundedRectangle(cornerRadius: 6, style: .continuous)
+            VStack(alignment: .leading, spacing: 12) {
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
                     .fill(Color(.systemGray5))
                     .frame(height: 24)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                RoundedRectangle(cornerRadius: 6, style: .continuous)
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
                     .fill(Color(.systemGray5))
                     .frame(width: 160, height: 16)
-                RoundedRectangle(cornerRadius: 6, style: .continuous)
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
                     .fill(Color(.systemGray5))
-                    .frame(width: 88, height: 14)
+                    .frame(width: 88, height: 16)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
@@ -81,7 +81,7 @@ struct MangaDetailPublicationSectionSkeletonView: View {
         VStack(alignment: .leading, spacing: 20) {
             SectionCardSkeleton(rowCount: 4)
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 10) {
+                HStack(spacing: 12) {
                     ForEach(0..<5, id: \.self) { _ in
                         SkeletonBar(width: 88, height: 40, cornerRadius: 20)
                     }

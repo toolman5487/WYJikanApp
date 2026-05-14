@@ -70,7 +70,7 @@ struct GlassSectionHeaderView: View {
     }
 
     private var headerContent: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 12) {
             Text(title)
                 .font(.headline.weight(.black))
                 .tracking(0.4)
@@ -89,12 +89,12 @@ struct GlassSectionHeaderView: View {
 
             Spacer()
         }
-        .padding(.horizontal, 14)
+        .padding(.horizontal, 16)
         .padding(.vertical, 12)
         .frame(maxWidth: .infinity)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
         .overlay {
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .strokeBorder(
                     LinearGradient(
                         colors: [

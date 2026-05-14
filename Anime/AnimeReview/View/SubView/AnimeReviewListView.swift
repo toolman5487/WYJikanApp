@@ -49,7 +49,7 @@ struct AnimeReviewListView: View {
                         return false
                     }())
                 case .error(let message):
-                    VStack(spacing: 10) {
+                    VStack(spacing: 12) {
                         Text(message)
                             .font(.footnote)
                             .foregroundStyle(ThemeColor.textSecondary)

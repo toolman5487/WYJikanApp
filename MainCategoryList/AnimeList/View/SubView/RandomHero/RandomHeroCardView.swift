@@ -45,7 +45,7 @@ struct RandomHeroCardView: View {
 
                     Spacer(minLength: 0)
 
-                    HStack(alignment: .bottom, spacing: 14) {
+                    HStack(alignment: .bottom, spacing: 16) {
                         posterPanel(width: posterWidth(for: proxy.size.width))
 
                         VStack(alignment: .leading, spacing: 8) {
@@ -89,7 +89,7 @@ struct RandomHeroCardView: View {
                 RoundedRectangle(cornerRadius: 20, style: .continuous)
                     .fill(.ultraThinMaterial)
 
-                VStack(spacing: 10) {
+                VStack(spacing: 12) {
                     ProgressView()
                         .tint(ThemeColor.sakura)
 
@@ -145,7 +145,7 @@ struct RandomHeroCardView: View {
             .kerning(0.8)
             .foregroundStyle(ThemeColor.textPrimary)
             .padding(.horizontal, 12)
-            .padding(.vertical, 7)
+            .padding(.vertical, 8)
             .background(ThemeColor.sakura.opacity(0.84))
             .clipShape(Capsule())
     }
@@ -181,7 +181,7 @@ struct RandomHeroCardView: View {
     }
 
     private var heroHeadline: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 8) {
             if let pick {
                 Text(pick.displayTitle)
                     .font(.system(.title2, design: .rounded).weight(.bold))
@@ -293,7 +293,7 @@ struct RandomHeroCardView: View {
             isFavorite: true,
             onDrawTap: {}
         )
-        .frame(width: 343)
+        .frame(width: 344)
 
         RandomHeroCardView(
             pick: nil,
@@ -305,7 +305,7 @@ struct RandomHeroCardView: View {
             isFavorite: false,
             onDrawTap: {}
         )
-        .frame(width: 343)
+        .frame(width: 344)
     }
     .padding()
 }

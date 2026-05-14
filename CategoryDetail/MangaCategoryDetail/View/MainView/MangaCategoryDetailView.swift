@@ -21,7 +21,7 @@ struct MangaCategoryDetailView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 22) {
+            VStack(alignment: .leading, spacing: 24) {
                 MangaCategoryDetailHeaderView(
                     title: viewModel.genreTitle,
                     subtitle: viewModel.headerSubtitle,

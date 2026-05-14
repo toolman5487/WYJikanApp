@@ -13,7 +13,7 @@ struct AnimeDetailBasicInfoSectionView: View {
 
     var body: some View {
         AnimeDetailSectionCard("基本資訊") {
-            VStack(spacing: 10) {
+            VStack(spacing: 12) {
                 AnimeDetailInfoRow(title: "集數", value: anime.episodes.map(String.init) ?? "-")
                 AnimeDetailInfoRow(
                     title: viewModel.seasonInfoRowTitle(for: anime),

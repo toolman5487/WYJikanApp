@@ -19,7 +19,7 @@ struct MangaDetailPublicationSectionView: View {
                 let genresText = viewModel.joinedNames(from: manga.genres)
                 let demographicsText = viewModel.joinedNames(from: manga.demographics)
                 AnimeDetailSectionCard("出版資訊") {
-                    VStack(spacing: 10) {
+                    VStack(spacing: 12) {
                         AnimeDetailInfoRow(title: "作者", value: authorsText)
                         AnimeDetailInfoRow(title: "連載", value: serializationsText)
                         AnimeDetailInfoRow(title: "類型", value: genresText)
