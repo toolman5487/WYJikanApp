@@ -54,21 +54,18 @@ struct HomeTodayAnimeBroadcastReminderFactory {
         }
 
         var nextBroadcastDate = broadcastDate
-        var notificationDate = nextBroadcastDate.addingTimeInterval(-HomeTodayAnimeNotificationConfig.reminderLeadTime)
-
-        if notificationDate <= now {
+        if nextBroadcastDate <= now {
             nextBroadcastDate = nextBroadcastDate.addingTimeInterval(7 * 24 * 60 * 60)
-            notificationDate = nextBroadcastDate.addingTimeInterval(-HomeTodayAnimeNotificationConfig.reminderLeadTime)
         }
 
-        guard notificationDate > now else { return nil }
+        guard nextBroadcastDate > now else { return nil }
 
         return HomeTodayAnimeBroadcastReminder(
             animeID: dto.id,
             title: Self.displayTitle(from: dto),
             day: day,
             broadcastDate: nextBroadcastDate,
-            notificationDate: notificationDate
+            scheduledDate: nextBroadcastDate
         )
     }
 
@@ -106,7 +103,7 @@ struct HomeTodayAnimeBroadcastReminderFactory {
     ) -> [HomeTodayAnimeBroadcastReminder] {
         var seenIDs: Set<String> = []
         return reminders.filter { reminder in
-            let key = "\(reminder.animeID).\(Int(reminder.notificationDate.timeIntervalSince1970))"
+            let key = "\(reminder.animeID).\(Int(reminder.scheduledDate.timeIntervalSince1970))"
             return seenIDs.insert(key).inserted
         }
     }

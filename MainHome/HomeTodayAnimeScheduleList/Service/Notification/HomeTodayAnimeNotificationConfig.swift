@@ -9,11 +9,13 @@ import Foundation
 
 enum HomeTodayAnimeNotificationConfig {
     static let enabledKey = "homeTodayAnimeDailyNotificationEnabled"
+    static let lastRefreshDateKey = "homeTodayAnimeNotificationLastRefreshDate"
     static let legacySummaryIdentifierPrefix = "home.todayAnime.dailySummary."
     static let reminderIdentifierPrefix = "home.todayAnime.broadcastReminder."
-    static let reminderLeadTime: TimeInterval = 60 * 60
-    static let reminderLeadTimeText = "播出前 1 小時"
+    static let deliveryTimeText = "播出時間"
     static let pageSize = 25
     static let maxPagesPerDay = 4
     static let maxScheduledNotifications = 60
+    static let scheduleRefreshInterval: TimeInterval = 6 * 60 * 60
+    static let minimumHealthyPendingNotificationCount = 12
 }

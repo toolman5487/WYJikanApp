@@ -3,6 +3,7 @@
 //  WYJikanApp
 //
 
+import Combine
 import SwiftUI
 
 enum AppTab: Hashable {
@@ -13,7 +14,9 @@ enum AppTab: Hashable {
 }
 
 @MainActor
-@Observable
-final class MainTabBarViewModel {
+final class MainTabBarViewModel: ObservableObject {
+    static let shared = MainTabBarViewModel()
+
+    @Published
     var selectedTab: AppTab = .home
 }

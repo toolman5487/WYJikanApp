@@ -45,7 +45,7 @@ final class MainMyListViewModel: ObservableObject {
     @Published var selectedFilter: Filter = .all
     private let favoriteRepository: any FavoriteRepository
 
-    init(favoriteRepository: any FavoriteRepository = SwiftDataFavoriteRepository()) {
+    init(favoriteRepository: any FavoriteRepository = SwiftDataFavoriteRepository.shared) {
         self.favoriteRepository = favoriteRepository
     }
 

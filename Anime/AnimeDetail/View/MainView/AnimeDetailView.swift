@@ -22,14 +22,16 @@ struct AnimeDetailView: View {
     @EnvironmentObject private var favoriteStatusStore: FavoriteStatusStore
     @Environment(\.modelContext) private var modelContext
     @State private var imagePreviewSession: ImagePreviewSession?
+    private let detailService: any AnimeDetailServicing
     private let favoriteRepository: any FavoriteRepository
 
     init(
         malId: Int,
         service: AnimeDetailServicing = AnimeDetailService(),
-        favoriteRepository: any FavoriteRepository = SwiftDataFavoriteRepository()
+        favoriteRepository: any FavoriteRepository = SwiftDataFavoriteRepository.shared
     ) {
         self.malId = malId
+        self.detailService = service
         self.favoriteRepository = favoriteRepository
         _viewModel = StateObject(wrappedValue: AnimeDetailViewModel(malId: malId, service: service))
     }
@@ -55,6 +57,11 @@ struct AnimeDetailView: View {
             AnimeDetailTrailerSectionView(viewModel: viewModel, anime: anime)
         case .synopsis:
             AnimeDetailSynopsisSectionView(viewModel: viewModel, anime: anime)
+        case .characters:
+            AnimeDetailCharactersSectionView(
+                viewModel: viewModel,
+                animeTitle: viewModel.displayTitle(for: anime)
+            )
         case .staff:
             AnimeDetailStaffSectionView(viewModel: viewModel, anime: anime)
         case .pictures:
@@ -63,6 +70,17 @@ struct AnimeDetailView: View {
                 onTapImage: { index in
                     showImagePreview(for: anime, selectedPictureIndex: index)
                 }
+            )
+        case .recommendations:
+            AnimeDetailRecommendationsSectionView(
+                viewModel: viewModel,
+                animeTitle: viewModel.displayTitle(for: anime)
+            )
+        case .episodes:
+            AnimeDetailEpisodesEntrySectionView(
+                viewModel: viewModel,
+                anime: anime,
+                service: detailService
             )
         }
     }
@@ -92,21 +110,19 @@ struct AnimeDetailView: View {
     private func toggleFavorite() {
         do {
             if isFavorite {
-                let updatedIsFavorite = try favoriteRepository.toggleFavorite(
+                _ = try favoriteRepository.toggleFavorite(
                     malId: malId,
                     mediaKind: .anime,
                     modelContext: modelContext,
                     makeItem: nil
                 )
-                favoriteStatusStore.applyFavoriteStatus(updatedIsFavorite, malId: malId, mediaKind: .anime)
             } else if let anime = viewModel.detail {
-                let updatedIsFavorite = try favoriteRepository.toggleFavorite(
+                _ = try favoriteRepository.toggleFavorite(
                     malId: malId,
                     mediaKind: .anime,
                     modelContext: modelContext,
                     makeItem: { viewModel.favoriteItem(for: anime) }
                 )
-                favoriteStatusStore.applyFavoriteStatus(updatedIsFavorite, malId: malId, mediaKind: .anime)
             }
         } catch {
             AppLogger.persistence.error("Anime favorite update failed: \(error.localizedDescription, privacy: .public)")

@@ -6,7 +6,7 @@
 import SwiftUI
 
 struct MainTabBarView: View {
-    @State private var viewModel = MainTabBarViewModel()
+    @EnvironmentObject private var viewModel: MainTabBarViewModel
     @StateObject private var mainSearchViewModel = MainSearchViewModel()
     
     var body: some View {
@@ -48,4 +48,6 @@ struct MainTabBarView: View {
 
 #Preview {
     MainTabBarView()
+        .environmentObject(MainTabBarViewModel.shared)
+        .environmentObject(MainHomeRouter.shared)
 }

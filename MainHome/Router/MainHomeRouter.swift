@@ -19,9 +19,18 @@ enum MainHomeRoute: Hashable {
 
 @MainActor
 final class MainHomeRouter: ObservableObject {
+    static let shared = MainHomeRouter()
+
     @Published var path = NavigationPath()
 
     func push(_ route: MainHomeRoute) {
         path.append(route)
+    }
+
+    func replacePath(with routes: [MainHomeRoute]) {
+        path = NavigationPath()
+        for route in routes {
+            path.append(route)
+        }
     }
 }

@@ -12,5 +12,5 @@ struct HomeTodayAnimeBroadcastReminder: Hashable {
     let title: String
     let day: HomeScheduleDay
     let broadcastDate: Date
-    let notificationDate: Date
+    let scheduledDate: Date
 }

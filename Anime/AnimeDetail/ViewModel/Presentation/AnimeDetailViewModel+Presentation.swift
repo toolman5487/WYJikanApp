@@ -16,8 +16,11 @@ extension AnimeDetailViewModel {
         case score
         case trailer
         case synopsis
+        case characters
         case staff
         case pictures
+        case recommendations
+        case episodes
 
         var id: String {
             switch self {
@@ -27,8 +30,11 @@ extension AnimeDetailViewModel {
             case .score: return "score"
             case .trailer: return "trailer"
             case .synopsis: return "synopsis"
+            case .characters: return "characters"
             case .staff: return "staff"
             case .pictures: return "pictures"
+            case .recommendations: return "recommendations"
+            case .episodes: return "episodes"
             }
         }
     }
@@ -99,11 +105,20 @@ extension AnimeDetailViewModel {
         if hasSynopsis(for: anime) {
             result.append(.synopsis)
         }
+        if hasCharacters {
+            result.append(.characters)
+        }
         if hasStaffInfo(for: anime) || hasThemes(for: anime) {
             result.append(.staff)
         }
         if hasPictures {
             result.append(.pictures)
+        }
+        if hasRecommendations {
+            result.append(.recommendations)
+        }
+        if hasEpisodes(for: anime) {
+            result.append(.episodes)
         }
         return result
     }
@@ -378,6 +393,115 @@ extension AnimeDetailViewModel {
 
     var hasPictures: Bool {
         !pictureItems.isEmpty
+    }
+
+    var hasCharacters: Bool {
+        !allCharacterRoles.isEmpty
+    }
+
+    var hasRecommendations: Bool {
+        !allRecommendations.isEmpty
+    }
+
+    var previewCharacterRoles: [AnimeCharacterRoleDTO] {
+        Array(allCharacterRoles.prefix(8))
+    }
+
+    var allCharacterRoles: [AnimeCharacterRoleDTO] {
+        characterRoles.filter { $0.character != nil }
+    }
+
+    var previewRecommendations: [AnimeRecommendationDTO] {
+        Array(allRecommendations.prefix(6))
+    }
+
+    var allRecommendations: [AnimeRecommendationDTO] {
+        recommendationItems.filter { $0.entry != nil }
+    }
+
+    func hasEpisodes(for anime: AnimeDetailDTO) -> Bool {
+        anime.episodes != nil || anime.status != nil
+    }
+
+    func characterName(_ character: AnimeCharacterEntryDTO) -> String {
+        let trimmed = character.name?.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed?.isEmpty == false ? trimmed! : "未命名角色"
+    }
+
+    func characterImageURL(_ character: AnimeCharacterEntryDTO) -> URL? {
+        let urlString =
+            character.images?.webp?.largeImageUrl ??
+            character.images?.jpg?.largeImageUrl ??
+            character.images?.webp?.imageUrl ??
+            character.images?.jpg?.imageUrl
+        guard let urlString else { return nil }
+        return URL(string: urlString)
+    }
+
+    func characterRoleText(_ role: AnimeCharacterRoleDTO) -> String {
+        let trimmed = role.role?.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed?.isEmpty == false ? trimmed! : "未標示定位"
+    }
+
+    func voiceActorSummary(for role: AnimeCharacterRoleDTO) -> String {
+        guard let voiceActor = role.voiceActors?.first(where: { $0.person != nil }),
+              let person = voiceActor.person else {
+            return "暫無聲優資料"
+        }
+
+        let personName = person.name?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let resolvedName = personName?.isEmpty == false ? personName! : "未命名聲優"
+        let language = voiceActor.language?.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let language, !language.isEmpty else {
+            return resolvedName
+        }
+        return "\(resolvedName) · \(language)"
+    }
+
+    func recommendationTitle(_ recommendation: AnimeRecommendationDTO) -> String {
+        let title = recommendation.entry?.title?.trimmingCharacters(in: .whitespacesAndNewlines)
+        return title?.isEmpty == false ? title! : "未命名作品"
+    }
+
+    func recommendationImageURL(_ recommendation: AnimeRecommendationDTO) -> URL? {
+        let urlString =
+            recommendation.entry?.images?.webp?.largeImageUrl ??
+            recommendation.entry?.images?.jpg?.largeImageUrl ??
+            recommendation.entry?.images?.webp?.imageUrl ??
+            recommendation.entry?.images?.jpg?.imageUrl
+        guard let urlString else { return nil }
+        return URL(string: urlString)
+    }
+
+    func recommendationSummaryText(_ recommendation: AnimeRecommendationDTO) -> String {
+        if let content = recommendation.content?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .replacingOccurrences(of: "\n", with: " "),
+           !content.isEmpty {
+            return String(content.prefix(52))
+        }
+
+        if let votes = recommendation.votes {
+            return "\(formatNumber(votes)) 人推薦"
+        }
+
+        return "相似作品推薦"
+    }
+
+    func episodesSummaryTitle(for anime: AnimeDetailDTO) -> String {
+        if let episodeCount = anime.episodes {
+            return "共 \(episodeCount) 集"
+        }
+        return "查看播出集數"
+    }
+
+    func episodesSummarySubtitle(for anime: AnimeDetailDTO) -> String {
+        let status = statusDisplayText(for: anime)
+        let schedule = weeklyBroadcastScheduleText(for: anime) ?? airedPeriodDisplayText(for: anime)
+        if let schedule, schedule != "-" {
+            return "\(status) · \(schedule)"
+        }
+        return status
     }
 
     func imagePreviewItems(for anime: AnimeDetailDTO) -> [ImagePreviewItem] {

@@ -119,3 +119,66 @@ struct AnimeRelatedEntityDTO: Codable, Identifiable, Hashable {
 
     var id: Int { malId }
 }
+
+// MARK: - Characters
+
+struct AnimeCharactersResponse: Codable {
+    let data: [AnimeCharacterRoleDTO]
+}
+
+struct AnimeCharacterRoleDTO: Codable, Identifiable, Hashable {
+    let role: String?
+    let favorites: Int?
+    let character: AnimeCharacterEntryDTO?
+    let voiceActors: [AnimeCharacterVoiceActorDTO]?
+
+    var id: Int { character?.malId ?? role.hashValue }
+}
+
+struct AnimeCharacterEntryDTO: Codable, Identifiable, Hashable {
+    let malId: Int
+    let url: String?
+    let images: AnimeImagesDTO?
+    let name: String?
+
+    var id: Int { malId }
+}
+
+struct AnimeCharacterVoiceActorDTO: Codable, Identifiable, Hashable {
+    let language: String?
+    let person: AnimeCharacterVoicePersonDTO?
+
+    var id: Int { person?.malId ?? language.hashValue }
+}
+
+struct AnimeCharacterVoicePersonDTO: Codable, Identifiable, Hashable {
+    let malId: Int
+    let url: String?
+    let images: AnimeImagesDTO?
+    let name: String?
+
+    var id: Int { malId }
+}
+
+// MARK: - Recommendations
+
+struct AnimeRecommendationsResponse: Codable {
+    let data: [AnimeRecommendationDTO]
+}
+
+struct AnimeRecommendationDTO: Codable, Identifiable, Hashable {
+    let entry: AnimeRecommendationEntryDTO?
+    let content: String?
+    let votes: Int?
+
+    var id: Int { entry?.malId ?? content.hashValue }
+}
+
+struct AnimeRecommendationEntryDTO: Codable, Identifiable, Hashable {
+    let malId: Int
+    let url: String?
+    let images: AnimeImagesDTO?
+    let title: String?
+
+    var id: Int { malId }
+}

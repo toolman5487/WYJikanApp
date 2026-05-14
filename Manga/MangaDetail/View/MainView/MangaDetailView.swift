@@ -25,7 +25,7 @@ struct MangaDetailView: View {
     init(
         malId: Int,
         service: MangaDetailServicing = MangaDetailService(),
-        favoriteRepository: any FavoriteRepository = SwiftDataFavoriteRepository()
+        favoriteRepository: any FavoriteRepository = SwiftDataFavoriteRepository.shared
     ) {
         self.malId = malId
         self.favoriteRepository = favoriteRepository
@@ -55,21 +55,19 @@ struct MangaDetailView: View {
     private func toggleFavorite() {
         do {
             if isFavorite {
-                let updatedIsFavorite = try favoriteRepository.toggleFavorite(
+                _ = try favoriteRepository.toggleFavorite(
                     malId: malId,
                     mediaKind: .manga,
                     modelContext: modelContext,
                     makeItem: nil
                 )
-                favoriteStatusStore.applyFavoriteStatus(updatedIsFavorite, malId: malId, mediaKind: .manga)
             } else if let manga = viewModel.detail {
-                let updatedIsFavorite = try favoriteRepository.toggleFavorite(
+                _ = try favoriteRepository.toggleFavorite(
                     malId: malId,
                     mediaKind: .manga,
                     modelContext: modelContext,
                     makeItem: { viewModel.favoriteItem(for: manga) }
                 )
-                favoriteStatusStore.applyFavoriteStatus(updatedIsFavorite, malId: malId, mediaKind: .manga)
             }
         } catch {
             AppLogger.persistence.error("Manga favorite update failed: \(error.localizedDescription, privacy: .public)")

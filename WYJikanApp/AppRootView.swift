@@ -11,10 +11,7 @@ struct AppRootView: View {
     @EnvironmentObject private var todayAnimeNotificationScheduler: HomeTodayAnimeNotificationScheduler
 
     var body: some View {
-        ZStack {
-            MainTabBarView()
-            FavoriteStatusSyncBridge()
-        }
+        MainTabBarView()
         .preferredColorScheme(.dark)
         .dynamicTypeSize(.medium)
         .task {
@@ -32,4 +29,6 @@ struct AppRootView: View {
     AppRootView()
         .environmentObject(FavoriteStatusStore())
         .environmentObject(HomeTodayAnimeNotificationScheduler())
+        .environmentObject(MainTabBarViewModel.shared)
+        .environmentObject(MainHomeRouter.shared)
 }

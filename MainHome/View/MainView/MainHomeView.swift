@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct MainHomeView: View {
-    @StateObject private var router = MainHomeRouter()
+    @EnvironmentObject private var router: MainHomeRouter
     
     enum HomeSection: Identifiable {
         case todayAnime
@@ -107,10 +107,10 @@ struct MainHomeView: View {
                 }
             }
         }
-        .environmentObject(router)
     }
 }
 
 #Preview {
     MainHomeView()
+        .environmentObject(MainHomeRouter.shared)
 }

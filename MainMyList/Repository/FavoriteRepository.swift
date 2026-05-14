@@ -6,9 +6,19 @@
 //
 
 import Foundation
+import Combine
 import SwiftData
 
-protocol FavoriteRepository {
+struct FavoriteSnapshot: Equatable, Sendable {
+    let animeIDs: Set<Int>
+    let mangaIDs: Set<Int>
+}
+
+protocol FavoriteRepository: AnyObject {
+    var favoriteSnapshotPublisher: AnyPublisher<FavoriteSnapshot, Never> { get }
+
+    func reloadFavorites(from modelContext: ModelContext) throws
+
     func toggleFavorite(
         malId: Int,
         mediaKind: MyListMediaKind,
@@ -22,7 +32,25 @@ protocol FavoriteRepository {
     ) throws
 }
 
-struct SwiftDataFavoriteRepository: FavoriteRepository {
+final class SwiftDataFavoriteRepository: FavoriteRepository {
+    static let shared = SwiftDataFavoriteRepository()
+
+    var favoriteSnapshotPublisher: AnyPublisher<FavoriteSnapshot, Never> {
+        snapshotSubject
+            .removeDuplicates()
+            .eraseToAnyPublisher()
+    }
+
+    private let snapshotSubject = CurrentValueSubject<FavoriteSnapshot, Never>(
+        FavoriteSnapshot(animeIDs: [], mangaIDs: [])
+    )
+
+    private init() {}
+
+    func reloadFavorites(from modelContext: ModelContext) throws {
+        snapshotSubject.send(try makeSnapshot(from: modelContext))
+    }
+
     func toggleFavorite(
         malId: Int,
         mediaKind: MyListMediaKind,
@@ -38,6 +66,7 @@ struct SwiftDataFavoriteRepository: FavoriteRepository {
 
             do {
                 try modelContext.save()
+                try publishFavorites(from: modelContext)
                 return false
             } catch {
                 modelContext.rollback()
@@ -53,6 +82,7 @@ struct SwiftDataFavoriteRepository: FavoriteRepository {
 
         do {
             try modelContext.save()
+            try publishFavorites(from: modelContext)
             return true
         } catch {
             modelContext.rollback()
@@ -68,10 +98,36 @@ struct SwiftDataFavoriteRepository: FavoriteRepository {
 
         do {
             try modelContext.save()
+            try publishFavorites(from: modelContext)
         } catch {
             modelContext.rollback()
             throw error
         }
+    }
+
+    private func publishFavorites(from modelContext: ModelContext) throws {
+        snapshotSubject.send(try makeSnapshot(from: modelContext))
+    }
+
+    private func makeSnapshot(from modelContext: ModelContext) throws -> FavoriteSnapshot {
+        let items = try modelContext.fetch(
+            FetchDescriptor<MyListCollectionItem>(
+                sortBy: [SortDescriptor(\.addedAt, order: .reverse)]
+            )
+        )
+        var animeIDs: Set<Int> = []
+        var mangaIDs: Set<Int> = []
+
+        for item in items {
+            switch item.mediaKind {
+            case .anime:
+                animeIDs.insert(item.malId)
+            case .manga:
+                mangaIDs.insert(item.malId)
+            }
+        }
+
+        return FavoriteSnapshot(animeIDs: animeIDs, mangaIDs: mangaIDs)
     }
 
     private func fetchFavoriteItem(

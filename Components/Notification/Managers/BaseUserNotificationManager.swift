@@ -122,4 +122,16 @@ class BaseUserNotificationManager: ObservableObject {
         notificationCenter.removePendingNotificationRequests(withIdentifiers: identifiers)
         return identifiers.count
     }
+
+    @discardableResult
+    func removeManagedPendingNotificationRequests(
+        excluding retainedIdentifiers: Set<String>
+    ) async -> Int {
+        let pendingRequests = await pendingManagedNotificationRequests()
+        let identifiersToRemove = pendingRequests
+            .map(\.identifier)
+            .filter { !retainedIdentifiers.contains($0) }
+        notificationCenter.removePendingNotificationRequests(withIdentifiers: identifiersToRemove)
+        return identifiersToRemove.count
+    }
 }
