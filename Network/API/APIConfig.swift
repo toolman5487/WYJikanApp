@@ -18,6 +18,7 @@ enum APIConfig {
         static func detail(id: Int) -> String { "/anime/\(id)" }
         static func characters(id: Int) -> String { "/anime/\(id)/characters" }
         static func episodes(id: Int) -> String { "/anime/\(id)/episodes" }
+        static func episodeDetail(id: Int, episode: Int) -> String { "/anime/\(id)/episodes/\(episode)" }
         static func recommendations(id: Int) -> String { "/anime/\(id)/recommendations" }
         static func reviews(id: Int) -> String { "/anime/\(id)/reviews" }
         static func pictures(id: Int) -> String { "/anime/\(id)/pictures" }

@@ -13,6 +13,7 @@ protocol AnimeDetailServicing {
     func fetchAnimeCharacters(malId: Int) async throws -> AnimeCharactersResponse
     func fetchAnimeRecommendations(malId: Int) async throws -> AnimeRecommendationsResponse
     func fetchAnimeEpisodes(malId: Int, page: Int) async throws -> AnimeEpisodesResponse
+    func fetchAnimeEpisodeDetail(malId: Int, episodeNumber: Int) async throws -> AnimeEpisodeDetailResponse
 }
 
 final class AnimeDetailService: AnimeDetailServicing {
@@ -58,6 +59,13 @@ final class AnimeDetailService: AnimeDetailServicing {
             queryItems: [
                 URLQueryItem(name: "page", value: String(page))
             ]
+        )
+    }
+
+    func fetchAnimeEpisodeDetail(malId: Int, episodeNumber: Int) async throws -> AnimeEpisodeDetailResponse {
+        try await apiService.fetch(
+            endpoint: APIConfig.Anime.episodeDetail(id: malId, episode: episodeNumber),
+            cachePolicy: .cacheFirst(ttl: 600)
         )
     }
 }

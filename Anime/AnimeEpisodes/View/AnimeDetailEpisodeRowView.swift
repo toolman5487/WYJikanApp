@@ -1,0 +1,219 @@
+//
+//  AnimeDetailEpisodeRowView.swift
+//  WYJikanApp
+//
+//  Created by Codex on 2026/5/14.
+//
+
+import SwiftUI
+
+struct AnimeDetailEpisodeRowView: View {
+    @Environment(\.openURL) private var openURL
+
+    let row: AnimeDetailEpisodeRowPresentation
+    let onToggle: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Button(action: toggleIfNeeded) {
+                summaryContent
+            }
+            .buttonStyle(.plain)
+            .disabled(!row.canExpand)
+
+            if let detail = row.detail {
+                expandedContent(for: detail)
+                    .padding(.top, 16)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+        }
+        .padding(16)
+        .background(Color(.secondarySystemBackground))
+        .clipShape(
+            RoundedRectangle(
+                cornerRadius: 16,
+                style: .continuous
+            )
+        )
+        .animation(.easeInOut(duration: 0.2), value: row.isExpanded)
+    }
+
+    private var summaryContent: some View {
+        HStack(alignment: .center, spacing: 12) {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Text(row.summary.episodeNumberText)
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(ThemeColor.sakura)
+
+                    Text(row.summary.title)
+                        .font(.headline)
+                        .foregroundStyle(ThemeColor.textPrimary)
+                        .multilineTextAlignment(.leading)
+
+                    Spacer(minLength: 0)
+                }
+
+                if let airedText = row.summary.airedText {
+                    Text(airedText)
+                        .font(.caption)
+                        .foregroundStyle(ThemeColor.textSecondary)
+                }
+
+                if !row.summary.tagTexts.isEmpty {
+                    tagRow(row.summary.tagTexts)
+                }
+
+                if let synopsisText = row.summary.synopsisText {
+                    Text(synopsisText)
+                        .font(.caption)
+                        .foregroundStyle(ThemeColor.textPrimary.opacity(0.9))
+                        .lineLimit(2)
+                }
+            }
+
+            if row.canExpand {
+                Image(systemName: row.isExpanded ? "chevron.up" : "chevron.down")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(ThemeColor.textTertiary)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func expandedContent(for detail: AnimeDetailEpisodeDetailPresentation) -> some View {
+        switch detail {
+        case .loading(let content):
+            VStack(alignment: .leading, spacing: 16) {
+                HStack(spacing: 8) {
+                    ProgressView()
+                        .scaleEffect(0.8)
+                    Text("載入詳細資料")
+                        .font(.caption)
+                        .foregroundStyle(ThemeColor.textSecondary)
+                }
+                detailContent(content)
+            }
+
+        case .content(let content):
+            detailContent(content)
+
+        case .error(let message, let content):
+            VStack(alignment: .leading, spacing: 16) {
+                errorBanner(message: message)
+                detailContent(content)
+            }
+        }
+    }
+
+    private func detailContent(_ content: AnimeDetailEpisodeExpandedPresentation) -> some View {
+        VStack(alignment: .leading, spacing: 16) {
+            if let alternateTitle = content.alternateTitle {
+                detailLine(title: "別名", value: alternateTitle)
+            }
+
+            ForEach(content.infoItems) { item in
+                detailLine(title: item.title, value: item.value)
+            }
+
+            if let synopsis = content.synopsisText {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("劇情簡介")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(ThemeColor.textSecondary)
+
+                    Text(synopsis)
+                        .font(.callout)
+                        .foregroundStyle(ThemeColor.textPrimary.opacity(0.92))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+
+            if !content.externalLinks.isEmpty {
+                externalLinks(content.externalLinks)
+            }
+        }
+    }
+
+    private func detailLine(title: String, value: String) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            Text(title)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(ThemeColor.textSecondary)
+                .frame(width: 48, alignment: .leading)
+
+            Text(value)
+                .font(.callout)
+                .foregroundStyle(ThemeColor.textPrimary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    private func tagRow(_ tags: [String]) -> some View {
+        HStack(spacing: 8) {
+            ForEach(tags, id: \.self) { tag in
+                Text(tag)
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(ThemeColor.textSecondary)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color(.tertiarySystemBackground))
+                    .clipShape(Capsule())
+            }
+        }
+    }
+
+    private func errorBanner(message: String) -> some View {
+        HStack(alignment: .top, spacing: 8) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .foregroundStyle(ThemeColor.sakura)
+
+            Text(message)
+                .font(.footnote)
+                .foregroundStyle(ThemeColor.textSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(12)
+        .background(ThemeColor.sakura.opacity(0.12))
+        .clipShape(
+            RoundedRectangle(
+                cornerRadius: 12,
+                style: .continuous
+            )
+        )
+    }
+
+    private func externalLinks(_ links: [AnimeDetailEpisodeExternalLink]) -> some View {
+        HStack(spacing: 8) {
+            ForEach(links) { link in
+                externalLinkButton(link)
+            }
+        }
+    }
+
+    private func externalLinkButton(_ link: AnimeDetailEpisodeExternalLink) -> some View {
+        Button {
+            openURL(link.url)
+        } label: {
+            Label(link.title, systemImage: link.systemImage)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(ThemeColor.textPrimary)
+                .frame(maxWidth: .infinity)
+                .frame(minHeight: 44)
+        }
+        .buttonStyle(.plain)
+        .background(ThemeColor.sakura)
+        .clipShape(
+            RoundedRectangle(
+                cornerRadius: 12,
+                style: .continuous
+            )
+        )
+    }
+
+    private func toggleIfNeeded() {
+        guard row.canExpand else { return }
+        onToggle()
+    }
+}

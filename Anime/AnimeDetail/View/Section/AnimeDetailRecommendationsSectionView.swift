@@ -24,7 +24,7 @@ struct AnimeDetailRecommendationsSectionView: View {
             )
         } content: {
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(alignment: .top, spacing: 14) {
+                HStack(alignment: .top, spacing: 12) {
                     ForEach(viewModel.previewRecommendations) { recommendation in
                         if let entry = recommendation.entry {
                             NavigationLink {

@@ -43,9 +43,15 @@ struct AnimeDetailEpisodesListView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             case .content:
                 ScrollView {
-                    LazyVStack(alignment: .leading, spacing: 14) {
-                        ForEach(viewModel.episodes) { episode in
-                            AnimeDetailEpisodeRowView(episode: episode)
+                    LazyVStack(alignment: .leading, spacing: 16) {
+                        ForEach(viewModel.episodeRows) { row in
+                            AnimeDetailEpisodeRowView(
+                                row: row
+                            ) {
+                                Task {
+                                    await viewModel.toggleEpisodeDetail(for: row.id)
+                                }
+                            }
                         }
 
                         if viewModel.hasNextPage {
@@ -65,7 +71,12 @@ struct AnimeDetailEpisodesListView: View {
                                 .foregroundStyle(ThemeColor.textPrimary)
                                 .frame(minHeight: 44)
                                 .background(ThemeColor.sakura)
-                                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                                .clipShape(
+                                    RoundedRectangle(
+                                        cornerRadius: 16,
+                                        style: .continuous
+                                    )
+                                )
                             }
                             .buttonStyle(.plain)
                         }

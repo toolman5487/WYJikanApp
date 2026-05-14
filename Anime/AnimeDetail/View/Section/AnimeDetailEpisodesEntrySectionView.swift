@@ -22,8 +22,8 @@ struct AnimeDetailEpisodesEntrySectionView: View {
             )
         } label: {
             AnimeDetailSectionCard("集數") {
-                HStack(alignment: .center, spacing: 14) {
-                    VStack(alignment: .leading, spacing: 6) {
+                HStack(alignment: .center, spacing: 16) {
+                    VStack(alignment: .leading, spacing: 8) {
                         Text(viewModel.episodesSummaryTitle(for: anime))
                             .font(.headline)
                             .foregroundStyle(ThemeColor.textPrimary)
