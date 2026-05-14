@@ -11,13 +11,14 @@ import Foundation
 @MainActor
 final class MangaDetailViewModel: ObservableObject {
     enum ScreenState {
+        case idle
         case loading
         case refreshing(MangaDetailDTO)
         case loaded(MangaDetailDTO)
         case error(String)
     }
 
-    @Published private(set) var screenState: ScreenState = .loading
+    @Published private(set) var screenState: ScreenState = .idle
 
     private let malId: Int
     private let service: MangaDetailServicing
@@ -31,7 +32,7 @@ final class MangaDetailViewModel: ObservableObject {
         switch screenState {
         case let .refreshing(detail), let .loaded(detail):
             return detail
-        case .loading, .error:
+        case .idle, .loading, .error:
             return nil
         }
     }
