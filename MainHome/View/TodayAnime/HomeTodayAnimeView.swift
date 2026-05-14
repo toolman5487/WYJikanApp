@@ -9,6 +9,7 @@ import SwiftUI
 
 struct HomeTodayAnimeView: View {
     @StateObject private var viewModel = HomeTodayAnimeViewModel()
+    @EnvironmentObject private var favoriteStatusStore: FavoriteStatusStore
     @EnvironmentObject private var router: MainHomeRouter
     let showsHeader: Bool
     
@@ -28,6 +29,8 @@ struct HomeTodayAnimeView: View {
     }
     
     var body: some View {
+        let favoriteIDs = favoriteStatusStore.favoriteIDs(for: .anime)
+
         VStack(alignment: .leading, spacing: 0) {
             if showsHeader {
                 GlassSectionHeaderView(
@@ -68,7 +71,7 @@ struct HomeTodayAnimeView: View {
                                     )
                                 }
                                 .overlay(alignment: .topTrailing) {
-                                    MyListCollectionStatusBadgeView(malId: item.id, mediaKind: .anime)
+                                    MyListCollectionStatusBadgeView(isFavorite: favoriteIDs.contains(item.id))
                                         .padding(8)
                                 }
                             }
@@ -90,5 +93,6 @@ struct HomeTodayAnimeView: View {
 
 #Preview {
     HomeTodayAnimeView()
+        .environmentObject(FavoriteStatusStore())
         .environmentObject(MainHomeRouter())
 }

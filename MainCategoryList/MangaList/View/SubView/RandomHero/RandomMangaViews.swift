@@ -10,6 +10,7 @@ import SDWebImageSwiftUI
 
 struct RandomMangaSectionView: View {
     @ObservedObject var viewModel: RandomMangaViewModel
+    let favoriteIDs: Set<Int>
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -35,6 +36,7 @@ struct RandomMangaSectionView: View {
                     drawButtonTitle: viewModel.drawButtonTitle,
                     canDraw: viewModel.canDraw,
                     detailMalId: viewModel.randomPick?.malId,
+                    isFavorite: false,
                     onDrawTap: viewModel.drawRandomManga
                 )
             case .loading:
@@ -45,6 +47,7 @@ struct RandomMangaSectionView: View {
                     drawButtonTitle: viewModel.drawButtonTitle,
                     canDraw: viewModel.canDraw,
                     detailMalId: viewModel.randomPick?.malId,
+                    isFavorite: viewModel.randomPick.map { favoriteIDs.contains($0.id) } ?? false,
                     onDrawTap: viewModel.drawRandomManga
                 )
             case .ready, .cooldown:
@@ -55,6 +58,7 @@ struct RandomMangaSectionView: View {
                     drawButtonTitle: viewModel.drawButtonTitle,
                     canDraw: viewModel.canDraw,
                     detailMalId: viewModel.randomPick?.malId,
+                    isFavorite: viewModel.randomPick.map { favoriteIDs.contains($0.id) } ?? false,
                     onDrawTap: viewModel.drawRandomManga
                 )
             case .failure:
@@ -65,6 +69,7 @@ struct RandomMangaSectionView: View {
                     drawButtonTitle: viewModel.drawButtonTitle,
                     canDraw: viewModel.canDraw,
                     detailMalId: viewModel.randomPick?.malId,
+                    isFavorite: viewModel.randomPick.map { favoriteIDs.contains($0.id) } ?? false,
                     onDrawTap: viewModel.drawRandomManga
                 )
             }
@@ -80,6 +85,7 @@ private struct RandomMangaCardView: View {
     let drawButtonTitle: String
     let canDraw: Bool
     let detailMalId: Int?
+    let isFavorite: Bool
     let onDrawTap: () -> Void
 
     private static let heroHeight: CGFloat = 370
@@ -142,8 +148,8 @@ private struct RandomMangaCardView: View {
         .frame(maxWidth: .infinity)
         .frame(height: Self.heroHeight)
         .overlay(alignment: .topTrailing) {
-            if let malId = pick?.id {
-                MyListCollectionStatusBadgeView(malId: malId, mediaKind: .manga)
+            if pick != nil {
+                MyListCollectionStatusBadgeView(isFavorite: isFavorite)
                     .padding(12)
             }
         }

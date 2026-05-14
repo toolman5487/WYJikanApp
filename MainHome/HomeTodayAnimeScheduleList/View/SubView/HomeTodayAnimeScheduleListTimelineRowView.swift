@@ -9,6 +9,7 @@ import SwiftUI
 
 struct HomeTodayAnimeScheduleListTimelineRowView: View {
     let item: HomeTodayAnimeTimelineItem
+    let isFavorite: Bool
     let onTap: () -> Void
 
     var body: some View {
@@ -50,7 +51,7 @@ struct HomeTodayAnimeScheduleListTimelineRowView: View {
             .background(Color(.secondarySystemBackground))
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             .overlay(alignment: .topTrailing) {
-                MyListCollectionStatusBadgeView(malId: item.id, mediaKind: .anime)
+                MyListCollectionStatusBadgeView(isFavorite: isFavorite)
                     .padding(8)
             }
         }

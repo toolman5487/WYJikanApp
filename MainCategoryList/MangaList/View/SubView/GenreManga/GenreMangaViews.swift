@@ -9,6 +9,7 @@ import SwiftUI
 
 struct GenreMangaListContainerView: View {
     @ObservedObject var viewModel: GenreMangaViewModel
+    let favoriteIDs: Set<Int>
 
     var body: some View {
         Group {
@@ -40,7 +41,10 @@ struct GenreMangaListContainerView: View {
 
                 ForEach(sections) { section in
                     Section {
-                        GenreMangaSectionView(section: section)
+                        GenreMangaSectionView(
+                            section: section,
+                            favoriteIDs: favoriteIDs
+                        )
                     } header: {
                         GenreMangaSectionHeaderView(section: section)
                     }
@@ -79,6 +83,7 @@ private struct GenreMangaSectionView: View {
     private static let horizontalPadding: CGFloat = 16
 
     let section: MangaGenreSection
+    let favoriteIDs: Set<Int>
 
     private static var cardWidth: CGFloat {
         cardHeight * posterAspectRatio
@@ -105,7 +110,8 @@ private struct GenreMangaSectionView: View {
                                 item: item,
                                 cardWidth: Self.cardWidth,
                                 cardHeight: Self.cardHeight,
-                                cardCornerRadius: Self.cardCornerRadius
+                                cardCornerRadius: Self.cardCornerRadius,
+                                isFavorite: favoriteIDs.contains(item.id)
                             )
                         }
                     }
@@ -139,6 +145,7 @@ private struct GenreMangaPosterCardView: View {
     let cardWidth: CGFloat
     let cardHeight: CGFloat
     let cardCornerRadius: CGFloat
+    let isFavorite: Bool
 
     var body: some View {
         NavigationLink {
@@ -160,7 +167,7 @@ private struct GenreMangaPosterCardView: View {
             }
             .frame(width: cardWidth, height: cardHeight)
             .overlay(alignment: .topTrailing) {
-                MyListCollectionStatusBadgeView(malId: item.id, mediaKind: .manga)
+                MyListCollectionStatusBadgeView(isFavorite: isFavorite)
                     .padding(8)
             }
             .clipShape(RoundedRectangle(cornerRadius: cardCornerRadius, style: .continuous))

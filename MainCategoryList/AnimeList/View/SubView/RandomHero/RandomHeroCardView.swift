@@ -16,6 +16,7 @@ struct RandomHeroCardView: View {
     let drawButtonTitle: String
     let canDraw: Bool
     let detailMalId: Int?
+    let isFavorite: Bool
     let onDrawTap: () -> Void
 
     private static let heroHeight: CGFloat = 320
@@ -78,8 +79,8 @@ struct RandomHeroCardView: View {
         .frame(maxWidth: .infinity)
         .frame(height: Self.heroHeight)
         .overlay(alignment: .topTrailing) {
-            if let malId = pick?.id {
-                MyListCollectionStatusBadgeView(malId: malId, mediaKind: .anime)
+            if pick != nil {
+                MyListCollectionStatusBadgeView(isFavorite: isFavorite)
                     .padding(12)
             }
         }
@@ -289,6 +290,7 @@ struct RandomHeroCardView: View {
             drawButtonTitle: "再抽一次",
             canDraw: true,
             detailMalId: 1,
+            isFavorite: true,
             onDrawTap: {}
         )
         .frame(width: 343)
@@ -300,6 +302,7 @@ struct RandomHeroCardView: View {
             drawButtonTitle: "開始抽獎",
             canDraw: true,
             detailMalId: nil,
+            isFavorite: false,
             onDrawTap: {}
         )
         .frame(width: 343)

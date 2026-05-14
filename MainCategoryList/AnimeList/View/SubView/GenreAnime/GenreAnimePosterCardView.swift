@@ -12,6 +12,7 @@ struct GenreAnimePosterCardView: View {
     let cardWidth: CGFloat
     let cardHeight: CGFloat
     let cardCornerRadius: CGFloat
+    let isFavorite: Bool
 
     var body: some View {
         NavigationLink {
@@ -33,7 +34,7 @@ struct GenreAnimePosterCardView: View {
             }
             .frame(width: cardWidth, height: cardHeight)
             .overlay(alignment: .topTrailing) {
-                MyListCollectionStatusBadgeView(malId: item.id, mediaKind: .anime)
+                MyListCollectionStatusBadgeView(isFavorite: isFavorite)
                     .padding(8)
             }
             .clipShape(RoundedRectangle(cornerRadius: cardCornerRadius, style: .continuous))

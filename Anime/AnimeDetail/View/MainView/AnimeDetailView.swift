@@ -19,18 +19,19 @@ struct AnimeDetailView: View {
     
     let malId: Int
     @StateObject private var viewModel: AnimeDetailViewModel
+    @EnvironmentObject private var favoriteStatusStore: FavoriteStatusStore
     @Environment(\.modelContext) private var modelContext
-    @Query private var favorites: [MyListCollectionItem]
     @State private var imagePreviewSession: ImagePreviewSession?
-    init(malId: Int, service: AnimeDetailServicing = AnimeDetailService()) {
-        let mediaKindRawValue = MyListMediaKind.anime.rawValue
+    private let favoriteRepository: any FavoriteRepository
+
+    init(
+        malId: Int,
+        service: AnimeDetailServicing = AnimeDetailService(),
+        favoriteRepository: any FavoriteRepository = SwiftDataFavoriteRepository()
+    ) {
         self.malId = malId
+        self.favoriteRepository = favoriteRepository
         _viewModel = StateObject(wrappedValue: AnimeDetailViewModel(malId: malId, service: service))
-        _favorites = Query(
-            filter: #Predicate<MyListCollectionItem> {
-                $0.malId == malId && $0.mediaKindRawValue == mediaKindRawValue
-            }
-        )
     }
 
     @ViewBuilder
@@ -85,23 +86,28 @@ struct AnimeDetailView: View {
     }
 
     private var isFavorite: Bool {
-        !favorites.isEmpty
+        favoriteStatusStore.isFavorite(malId: malId, mediaKind: .anime)
     }
 
     private func toggleFavorite() {
-        withAnimation(.spring(response: 0.28, dampingFraction: 0.8)) {
-            if let existing = favorites.first {
-                modelContext.delete(existing)
-            } else if let anime = viewModel.detail {
-                let item = viewModel.favoriteItem(for: anime)
-                modelContext.insert(item)
-            } else {
-                return
-            }
-        }
-
         do {
-            try modelContext.save()
+            if isFavorite {
+                let updatedIsFavorite = try favoriteRepository.toggleFavorite(
+                    malId: malId,
+                    mediaKind: .anime,
+                    modelContext: modelContext,
+                    makeItem: nil
+                )
+                favoriteStatusStore.applyFavoriteStatus(updatedIsFavorite, malId: malId, mediaKind: .anime)
+            } else if let anime = viewModel.detail {
+                let updatedIsFavorite = try favoriteRepository.toggleFavorite(
+                    malId: malId,
+                    mediaKind: .anime,
+                    modelContext: modelContext,
+                    makeItem: { viewModel.favoriteItem(for: anime) }
+                )
+                favoriteStatusStore.applyFavoriteStatus(updatedIsFavorite, malId: malId, mediaKind: .anime)
+            }
         } catch {
             AppLogger.persistence.error("Anime favorite update failed: \(error.localizedDescription, privacy: .public)")
         }
@@ -210,5 +216,6 @@ struct AnimeDetailView: View {
 #Preview {
     NavigationStack {
         AnimeDetailView(malId: 52991)
+            .environmentObject(FavoriteStatusStore())
     }
 }

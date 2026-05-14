@@ -11,6 +11,7 @@ struct GenreAnimeListContainerView: View {
     // MARK: - Properties
 
     @ObservedObject var viewModel: GenreAnimeViewModel
+    let favoriteIDs: Set<Int>
 
     // MARK: - View
 
@@ -44,7 +45,10 @@ struct GenreAnimeListContainerView: View {
 
                 ForEach(sections) { section in
                     Section {
-                        GenreAnimeSectionView(section: section)
+                        GenreAnimeSectionView(
+                            section: section,
+                            favoriteIDs: favoriteIDs
+                        )
                     } header: {
                         GenreAnimeSectionHeaderView(section: section)
                     }

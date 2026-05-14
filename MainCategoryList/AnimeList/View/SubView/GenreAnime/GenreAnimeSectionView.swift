@@ -18,6 +18,7 @@ struct GenreAnimeSectionView: View {
     // MARK: - Properties
 
     let section: AnimeGenreSection
+    let favoriteIDs: Set<Int>
 
     private static var cardWidth: CGFloat {
         cardHeight * posterAspectRatio
@@ -43,7 +44,8 @@ struct GenreAnimeSectionView: View {
                         item: item,
                         cardWidth: Self.cardWidth,
                         cardHeight: Self.cardHeight,
-                        cardCornerRadius: Self.cardCornerRadius
+                        cardCornerRadius: Self.cardCornerRadius,
+                        isFavorite: favoriteIDs.contains(item.id)
                     )
                 }
             }
@@ -108,6 +110,7 @@ struct GenreAnimeSectionHeaderView: View {
                     genres: nil
                 )
             ]
-        )
+        ),
+        favoriteIDs: []
     )
 }

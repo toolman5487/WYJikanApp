@@ -11,6 +11,7 @@ struct RandomHeroSectionView: View {
     // MARK: - Properties
 
     @ObservedObject var viewModel: RandomHeroViewModel
+    let favoriteIDs: Set<Int>
 
     // MARK: - View
 
@@ -38,6 +39,7 @@ struct RandomHeroSectionView: View {
                     drawButtonTitle: viewModel.drawButtonTitle,
                     canDraw: viewModel.canDraw,
                     detailMalId: viewModel.randomPick?.malId,
+                    isFavorite: false,
                     onDrawTap: viewModel.drawRandomAnime
                 )
             case .loading:
@@ -48,6 +50,7 @@ struct RandomHeroSectionView: View {
                     drawButtonTitle: viewModel.drawButtonTitle,
                     canDraw: viewModel.canDraw,
                     detailMalId: viewModel.randomPick?.malId,
+                    isFavorite: viewModel.randomPick.map { favoriteIDs.contains($0.id) } ?? false,
                     onDrawTap: viewModel.drawRandomAnime
                 )
             case .ready, .cooldown:
@@ -58,6 +61,7 @@ struct RandomHeroSectionView: View {
                     drawButtonTitle: viewModel.drawButtonTitle,
                     canDraw: viewModel.canDraw,
                     detailMalId: viewModel.randomPick?.malId,
+                    isFavorite: viewModel.randomPick.map { favoriteIDs.contains($0.id) } ?? false,
                     onDrawTap: viewModel.drawRandomAnime
                 )
             case .failure:
@@ -68,6 +72,7 @@ struct RandomHeroSectionView: View {
                     drawButtonTitle: viewModel.drawButtonTitle,
                     canDraw: viewModel.canDraw,
                     detailMalId: viewModel.randomPick?.malId,
+                    isFavorite: viewModel.randomPick.map { favoriteIDs.contains($0.id) } ?? false,
                     onDrawTap: viewModel.drawRandomAnime
                 )
             }
@@ -77,6 +82,7 @@ struct RandomHeroSectionView: View {
 
 #Preview {
     RandomHeroSectionView(
-        viewModel: RandomHeroViewModel()
+        viewModel: RandomHeroViewModel(),
+        favoriteIDs: []
     )
 }

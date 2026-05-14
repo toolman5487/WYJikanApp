@@ -6,21 +6,14 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct HomeTrendingAnimeListView: View {
     @StateObject private var viewModel: HomeTrendingAnimeListViewModel
+    @EnvironmentObject private var favoriteStatusStore: FavoriteStatusStore
     @EnvironmentObject private var router: MainHomeRouter
-    @Query private var animeFavorites: [MyListCollectionItem]
 
     init(viewModel: HomeTrendingAnimeListViewModel = HomeTrendingAnimeListViewModel()) {
-        let mediaKindRawValue = MyListMediaKind.anime.rawValue
         _viewModel = StateObject(wrappedValue: viewModel)
-        _animeFavorites = Query(
-            filter: #Predicate<MyListCollectionItem> {
-                $0.mediaKindRawValue == mediaKindRawValue
-            }
-        )
     }
 
     var body: some View {
@@ -94,7 +87,7 @@ struct HomeTrendingAnimeListView: View {
     }
 
     private func sectionListView(sections: [HomeTrendingAnimeListSectionContent]) -> some View {
-        let favoriteIDs = Set(animeFavorites.map(\.malId))
+        let favoriteIDs = favoriteStatusStore.favoriteIDs(for: .anime)
 
         return LazyVStack(alignment: .leading, spacing: 18, pinnedViews: [.sectionHeaders]) {
             ForEach(sections) { section in

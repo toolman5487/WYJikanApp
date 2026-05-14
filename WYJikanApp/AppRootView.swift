@@ -11,12 +11,15 @@ struct AppRootView: View {
     @EnvironmentObject private var todayAnimeNotificationScheduler: HomeTodayAnimeNotificationScheduler
 
     var body: some View {
-        MainTabBarView()
-            .preferredColorScheme(.dark)
-            .dynamicTypeSize(.medium)
-            .task {
-                await bootstrap()
-            }
+        ZStack {
+            MainTabBarView()
+            FavoriteStatusSyncBridge()
+        }
+        .preferredColorScheme(.dark)
+        .dynamicTypeSize(.medium)
+        .task {
+            await bootstrap()
+        }
     }
 
     private func bootstrap() async {
@@ -27,5 +30,6 @@ struct AppRootView: View {
 
 #Preview {
     AppRootView()
+        .environmentObject(FavoriteStatusStore())
         .environmentObject(HomeTodayAnimeNotificationScheduler())
 }

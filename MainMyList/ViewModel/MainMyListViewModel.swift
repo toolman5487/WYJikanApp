@@ -11,6 +11,13 @@ import SwiftData
 
 @MainActor
 final class MainMyListViewModel: ObservableObject {
+    struct Presentation {
+        let filteredItems: [MyListCollectionItem]
+        let totalCount: Int
+        let animeCount: Int
+        let mangaCount: Int
+    }
+
     enum Filter: String, CaseIterable, Identifiable {
         case all
         case anime
@@ -36,20 +43,43 @@ final class MainMyListViewModel: ObservableObject {
     }
 
     @Published var selectedFilter: Filter = .all
+    private let favoriteRepository: any FavoriteRepository
 
-    func filteredItems(from items: [MyListCollectionItem]) -> [MyListCollectionItem] {
-        guard let mediaKind = selectedFilter.mediaKind else { return items }
-        return items.filter { $0.mediaKind == mediaKind }
+    init(favoriteRepository: any FavoriteRepository = SwiftDataFavoriteRepository()) {
+        self.favoriteRepository = favoriteRepository
     }
 
-    func count(for mediaKind: MyListMediaKind, in items: [MyListCollectionItem]) -> Int {
-        items.filter { $0.mediaKind == mediaKind }.count
+    func makePresentation(from items: [MyListCollectionItem]) -> Presentation {
+        let selectedMediaKind = selectedFilter.mediaKind
+        var animeCount = 0
+        var mangaCount = 0
+        var filteredItems: [MyListCollectionItem] = []
+        filteredItems.reserveCapacity(items.count)
+
+        for item in items {
+            switch item.mediaKind {
+            case .anime:
+                animeCount += 1
+            case .manga:
+                mangaCount += 1
+            }
+
+            if selectedMediaKind == nil || selectedMediaKind == item.mediaKind {
+                filteredItems.append(item)
+            }
+        }
+
+        return Presentation(
+            filteredItems: filteredItems,
+            totalCount: items.count,
+            animeCount: animeCount,
+            mangaCount: mangaCount
+        )
     }
 
     func remove(_ item: MyListCollectionItem, from modelContext: ModelContext) {
-        modelContext.delete(item)
         do {
-            try modelContext.save()
+            try favoriteRepository.remove(item, from: modelContext)
         } catch {
             AppLogger.persistence.error("MyList delete failed: \(error.localizedDescription, privacy: .public)")
         }

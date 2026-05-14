@@ -43,6 +43,7 @@ final class HomeTodayAnimeScheduleListViewModel: ObservableObject {
     private var hasLoaded = false
     private var isLoadingMore = false
     private var requestGeneration = 0
+    private var loadMoreTriggerIDs: Set<Int> = []
     private var cancellables: Set<AnyCancellable> = []
     private var dayRequestTask: Task<Void, Never>?
 
@@ -119,6 +120,7 @@ final class HomeTodayAnimeScheduleListViewModel: ObservableObject {
         currentPage = 0
         hasNextPage = false
         isLoadingMore = false
+        loadMoreTriggerIDs = []
         loadMoreState = .hidden
     }
 
@@ -191,14 +193,13 @@ final class HomeTodayAnimeScheduleListViewModel: ObservableObject {
         }
 
         screenState = .content(sections: groupedSections(from: sourceItems))
+        loadMoreTriggerIDs = Set(sourceItems.suffix(5).map(\.id))
         loadMoreState = resolvedLoadMoreState()
     }
 
     private func shouldLoadMore(after item: HomeTodayAnimeTimelineItem) -> Bool {
         guard hasLoaded, hasNextPage, !isLoadingMore else { return false }
-        let visibleItems = visibleTimelineItems()
-        guard let index = visibleItems.firstIndex(where: { $0.id == item.id }) else { return false }
-        return index >= max(visibleItems.count - 5, 0)
+        return loadMoreTriggerIDs.contains(item.id)
     }
 
     private func resolvedLoadMoreState() -> LoadMoreState {
@@ -209,15 +210,6 @@ final class HomeTodayAnimeScheduleListViewModel: ObservableObject {
             return .error(message: message)
         }
         return hasNextPage ? .available : .hidden
-    }
-
-    private func visibleTimelineItems() -> [HomeTodayAnimeTimelineItem] {
-        switch screenState {
-        case .content(let sections):
-            return sections.flatMap(\.items)
-        case .loading, .empty, .error:
-            return sourceItems
-        }
     }
 
     // MARK: - Presentation Mapping

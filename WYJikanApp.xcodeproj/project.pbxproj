@@ -218,6 +218,9 @@
 		16D1001D2FAA10000000001D /* ImagePreviewViewerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16D1001C2FAA10000000001C /* ImagePreviewViewerViewModel.swift */; };
 		16E200032FAA200000000003 /* MyListCollectionItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E200012FAA200000000001 /* MyListCollectionItem.swift */; };
 		16E200042FAA200000000004 /* MainMyListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E200022FAA200000000002 /* MainMyListViewModel.swift */; };
+		16E201022FAA210000000002 /* FavoriteRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E201012FAA210000000001 /* FavoriteRepository.swift */; };
+		16E201052FAA210000000005 /* FavoriteStatusStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E201042FAA210000000004 /* FavoriteStatusStore.swift */; };
+		16E201082FAA210000000008 /* FavoriteStatusSyncBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E201072FAA210000000007 /* FavoriteStatusSyncBridge.swift */; };
 		16E200072FAA200000000007 /* MyListSummaryTile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E200082FAA200000000008 /* MyListSummaryTile.swift */; };
 		16E200092FAA200000000009 /* MyListItemRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E2000A2FAA20000000000A /* MyListItemRowView.swift */; };
 		16E2000B2FAA20000000000B /* MyListEmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E2000C2FAA20000000000C /* MyListEmptyStateView.swift */; };
@@ -472,6 +475,9 @@
 		16D1001C2FAA10000000001C /* ImagePreviewViewerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePreviewViewerViewModel.swift; sourceTree = "<group>"; };
 		16E200012FAA200000000001 /* MyListCollectionItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListCollectionItem.swift; sourceTree = "<group>"; };
 		16E200022FAA200000000002 /* MainMyListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMyListViewModel.swift; sourceTree = "<group>"; };
+		16E201012FAA210000000001 /* FavoriteRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteRepository.swift; sourceTree = "<group>"; };
+		16E201042FAA210000000004 /* FavoriteStatusStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteStatusStore.swift; sourceTree = "<group>"; };
+		16E201072FAA210000000007 /* FavoriteStatusSyncBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteStatusSyncBridge.swift; sourceTree = "<group>"; };
 		16E200082FAA200000000008 /* MyListSummaryTile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListSummaryTile.swift; sourceTree = "<group>"; };
 		16E2000A2FAA20000000000A /* MyListItemRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListItemRowView.swift; sourceTree = "<group>"; };
 		16E2000C2FAA20000000000C /* MyListEmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListEmptyStateView.swift; sourceTree = "<group>"; };
@@ -1625,6 +1631,8 @@
 			isa = PBXGroup;
 			children = (
 				16E200052FAA200000000005 /* Model */,
+				16E201032FAA210000000003 /* Repository */,
+				16E201062FAA210000000006 /* Store */,
 				16E200062FAA200000000006 /* ViewModel */,
 				15FA49FE2F97C80500EC4C09 /* View */,
 			);
@@ -2153,6 +2161,23 @@
 			path = Model;
 			sourceTree = "<group>";
 		};
+		16E201032FAA210000000003 /* Repository */ = {
+			isa = PBXGroup;
+			children = (
+				16E201012FAA210000000001 /* FavoriteRepository.swift */,
+			);
+			path = Repository;
+			sourceTree = "<group>";
+		};
+		16E201062FAA210000000006 /* Store */ = {
+			isa = PBXGroup;
+			children = (
+				16E201042FAA210000000004 /* FavoriteStatusStore.swift */,
+				16E201072FAA210000000007 /* FavoriteStatusSyncBridge.swift */,
+			);
+			path = Store;
+			sourceTree = "<group>";
+		};
 		16E200062FAA200000000006 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
@@ -2550,6 +2575,9 @@
 				15FA4A002F97C81700EC4C09 /* MainMyListView.swift in Sources */,
 				16E200032FAA200000000003 /* MyListCollectionItem.swift in Sources */,
 				16E200042FAA200000000004 /* MainMyListViewModel.swift in Sources */,
+				16E201022FAA210000000002 /* FavoriteRepository.swift in Sources */,
+				16E201052FAA210000000005 /* FavoriteStatusStore.swift in Sources */,
+				16E201082FAA210000000008 /* FavoriteStatusSyncBridge.swift in Sources */,
 				16E200072FAA200000000007 /* MyListSummaryTile.swift in Sources */,
 				16E200092FAA200000000009 /* MyListItemRowView.swift in Sources */,
 				16E2000B2FAA20000000000B /* MyListEmptyStateView.swift in Sources */,

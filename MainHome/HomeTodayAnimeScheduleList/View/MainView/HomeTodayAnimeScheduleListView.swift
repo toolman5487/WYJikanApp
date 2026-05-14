@@ -9,6 +9,7 @@ import SwiftUI
 
 struct HomeTodayAnimeScheduleListView: View {
     @StateObject private var viewModel: HomeTodayAnimeScheduleListViewModel
+    @EnvironmentObject private var favoriteStatusStore: FavoriteStatusStore
     @EnvironmentObject private var router: MainHomeRouter
     @EnvironmentObject private var notificationScheduler: HomeTodayAnimeNotificationScheduler
 
@@ -138,12 +139,17 @@ struct HomeTodayAnimeScheduleListView: View {
     }
 
     private func timelineListView(sections: [HomeTodayAnimeTimeSection]) -> some View {
-        LazyVStack(alignment: .leading, spacing: 18, pinnedViews: [.sectionHeaders]) {
+        let favoriteIDs = favoriteStatusStore.favoriteIDs(for: .anime)
+
+        return LazyVStack(alignment: .leading, spacing: 18, pinnedViews: [.sectionHeaders]) {
             ForEach(sections) { section in
                 Section {
                     VStack(spacing: 12) {
                         ForEach(section.items) { item in
-                            HomeTodayAnimeScheduleListTimelineRowView(item: item) {
+                            HomeTodayAnimeScheduleListTimelineRowView(
+                                item: item,
+                                isFavorite: favoriteIDs.contains(item.id)
+                            ) {
                                 router.push(.animeDetail(malId: item.id))
                             }
                             .onAppear {
@@ -179,6 +185,7 @@ struct HomeTodayAnimeScheduleListView: View {
 #Preview {
     NavigationStack {
         HomeTodayAnimeScheduleListView()
+            .environmentObject(FavoriteStatusStore())
             .environmentObject(MainHomeRouter())
             .environmentObject(HomeTodayAnimeNotificationScheduler())
     }

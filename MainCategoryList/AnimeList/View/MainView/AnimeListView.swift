@@ -8,10 +8,14 @@
 import SwiftUI
 
 struct AnimeListView: View {
+    @EnvironmentObject private var favoriteStatusStore: FavoriteStatusStore
     @ObservedObject var viewModel: AnimeListViewModel
 
     var body: some View {
-        MainView(viewModel: viewModel)
+        MainView(
+            viewModel: viewModel,
+            favoriteIDs: favoriteStatusStore.favoriteIDs(for: .anime)
+        )
             .onAppear {
                 viewModel.loadIfNeeded()
             }
@@ -22,11 +26,18 @@ struct AnimeListView: View {
 
 private struct MainView: View {
     @ObservedObject var viewModel: AnimeListViewModel
+    let favoriteIDs: Set<Int>
 
     var body: some View {
         LazyVStack(alignment: .leading, spacing: 20, pinnedViews: [.sectionHeaders]) {
-            RandomHeroSectionView(viewModel: viewModel.randomHeroViewModel)
-            GenreAnimeListContainerView(viewModel: viewModel.genreAnimeViewModel)
+            RandomHeroSectionView(
+                viewModel: viewModel.randomHeroViewModel,
+                favoriteIDs: favoriteIDs
+            )
+            GenreAnimeListContainerView(
+                viewModel: viewModel.genreAnimeViewModel,
+                favoriteIDs: favoriteIDs
+            )
         }
         .padding(.top, 8)
     }
@@ -36,6 +47,7 @@ private struct MainView: View {
     NavigationStack {
         ScrollView {
             AnimeListView(viewModel: AnimeListViewModel())
+                .environmentObject(FavoriteStatusStore())
                 .padding(.horizontal)
         }
     }

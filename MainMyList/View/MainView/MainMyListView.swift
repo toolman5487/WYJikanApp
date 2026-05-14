@@ -14,26 +14,16 @@ struct MainMyListView: View {
     private var items: [MyListCollectionItem]
     @StateObject private var viewModel = MainMyListViewModel()
     
-    private var filteredItems: [MyListCollectionItem] {
-        viewModel.filteredItems(from: items)
-    }
-    
-    private var animeCount: Int {
-        viewModel.count(for: .anime, in: items)
-    }
-    
-    private var mangaCount: Int {
-        viewModel.count(for: .manga, in: items)
-    }
-    
     var body: some View {
+        let presentation = viewModel.makePresentation(from: items)
+
         NavigationStack {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 20) {
                     headerView
                     filterView
-                    summaryView
-                    contentView
+                    summaryView(presentation: presentation)
+                    contentView(presentation: presentation)
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 20)
@@ -60,21 +50,21 @@ struct MainMyListView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
     
-    private var summaryView: some View {
+    private func summaryView(presentation: MainMyListViewModel.Presentation) -> some View {
         HStack(spacing: 12) {
-            MyListSummaryTile(title: "全部", value: items.count, iconName: "heart.fill")
-            MyListSummaryTile(title: "動畫", value: animeCount, iconName: MyListMediaKind.anime.iconName)
-            MyListSummaryTile(title: "漫畫", value: mangaCount, iconName: MyListMediaKind.manga.iconName)
+            MyListSummaryTile(title: "全部", value: presentation.totalCount, iconName: "heart.fill")
+            MyListSummaryTile(title: "動畫", value: presentation.animeCount, iconName: MyListMediaKind.anime.iconName)
+            MyListSummaryTile(title: "漫畫", value: presentation.mangaCount, iconName: MyListMediaKind.manga.iconName)
         }
     }
     
     @ViewBuilder
-    private var contentView: some View {
-        if filteredItems.isEmpty {
+    private func contentView(presentation: MainMyListViewModel.Presentation) -> some View {
+        if presentation.filteredItems.isEmpty {
             MyListEmptyStateView(title: viewModel.emptyTitle(for: viewModel.selectedFilter))
         } else {
             LazyVStack(spacing: 12) {
-                ForEach(filteredItems, id: \.persistentModelID) { item in
+                ForEach(presentation.filteredItems, id: \.persistentModelID) { item in
                     NavigationLink {
                         destinationView(for: item)
                     } label: {

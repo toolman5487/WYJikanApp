@@ -28,6 +28,7 @@ final class MainSearchViewModel: ObservableObject {
     private var unsortedRows: [MainSearchResultRow] = []
     private var currentPage = 0
     private var hasNextPage = false
+    private var loadMoreTriggerIDs = Set<String>()
     private var requestState: RequestState = .idle
     private var activeIntent: SearchIntent?
     private var loadMoreTask: Task<Void, Never>?
@@ -153,9 +154,7 @@ final class MainSearchViewModel: ObservableObject {
     func loadMoreIfNeeded(currentRow: MainSearchResultRow) {
         guard hasNextPage, canStartLoadMore else { return }
         if case .error = loadMoreState { return }
-        guard let currentIndex = visibleRows.firstIndex(where: { $0.id == currentRow.id }) else { return }
-        let thresholdIndex = max(visibleRows.count - 5, 0)
-        guard currentIndex >= thresholdIndex else { return }
+        guard loadMoreTriggerIDs.contains(currentRow.id) else { return }
         loadMore()
     }
 
@@ -257,17 +256,9 @@ final class MainSearchViewModel: ObservableObject {
         }
     }
 
-    private var visibleRows: [MainSearchResultRow] {
-        switch screenState {
-        case .content(let rows):
-            return rows
-        case .emptyPrompt, .loading, .error, .emptyResults:
-            return []
-        }
-    }
-
     private func applySortedResults(using option: MainSearchSortOption? = nil) {
         let sorted = sortedRows(from: unsortedRows, using: option ?? sortOption)
+        loadMoreTriggerIDs = Set(sorted.suffix(5).map(\.id))
         if sorted.isEmpty {
             let trimmedQuery = Self.trim(query)
             screenState = trimmedQuery.isEmpty ? .emptyPrompt : .emptyResults(query: query)
@@ -304,6 +295,7 @@ final class MainSearchViewModel: ObservableObject {
         activeIntent = nil
         currentPage = 0
         hasNextPage = false
+        loadMoreTriggerIDs = []
         unsortedRows = []
         requestState = .idle
         screenState = .emptyPrompt
@@ -320,7 +312,7 @@ final class MainSearchViewModel: ObservableObject {
         }
         requestState = .searching
         loadMoreState = .hidden
-        if clearExistingRows || visibleRows.isEmpty {
+        if clearExistingRows || unsortedRows.isEmpty {
             screenState = .loading
         }
     }
