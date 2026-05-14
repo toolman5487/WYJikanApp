@@ -8,6 +8,7 @@
 import Combine
 import Foundation
 import OSLog
+import SwiftUI
 
 @MainActor
 final class AnimeDetailEpisodesListViewModel: ObservableObject {
@@ -20,15 +21,44 @@ final class AnimeDetailEpisodesListViewModel: ObservableObject {
 
     @Published private(set) var screenState: ScreenState = .loading
     @Published private(set) var episodes: [AnimeEpisodeDTO] = []
+    @Published private(set) var episodeRows: [AnimeDetailEpisodeRowPresentation] = []
     @Published private(set) var hasNextPage = false
     @Published private(set) var isLoadingMore = false
-    @Published private(set) var expandedEpisodeID: Int?
+    @Published private(set) var expandedEpisodeIDs: Set<Int> = []
     @Published private(set) var episodeDetailStates: [Int: AnimeDetailEpisodeDetailPresentation] = [:]
 
     private let malId: Int
     private let service: any AnimeDetailServicing
     private var currentPage = 0
     private var hasLoaded = false
+    private var episodesByRowID: [Int: AnimeEpisodeDTO] = [:]
+
+    private static let iso8601WithFractionalSecondsFormatter: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        return formatter
+    }()
+
+    private static let iso8601Formatter: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime]
+        return formatter
+    }()
+
+    private static let fullDateFormatter: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withFullDate]
+        return formatter
+    }()
+
+    private static let airedDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = .autoupdatingCurrent
+        formatter.timeZone = .autoupdatingCurrent
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .none
+        return formatter
+    }()
 
     init(
         malId: Int,
@@ -36,10 +66,6 @@ final class AnimeDetailEpisodesListViewModel: ObservableObject {
     ) {
         self.malId = malId
         self.service = service
-    }
-
-    var episodeRows: [AnimeDetailEpisodeRowPresentation] {
-        episodes.map(rowPresentation(for:))
     }
 
     func loadIfNeeded() async {
@@ -57,6 +83,8 @@ final class AnimeDetailEpisodesListViewModel: ObservableObject {
             currentPage += 1
             hasNextPage = response.pagination?.hasNextPage == true
             episodes.append(contentsOf: response.data)
+            refreshEpisodeCaches()
+            rebuildEpisodeRows()
         } catch is CancellationError {
         } catch {
             AppLogger.network.error(
@@ -66,20 +94,27 @@ final class AnimeDetailEpisodesListViewModel: ObservableObject {
     }
 
     func toggleEpisodeDetail(for rowID: Int) async {
-        guard let episode = episodes.first(where: { $0.id == rowID }),
+        guard let episode = episodesByRowID[rowID],
               let episodeNumber = episode.malId else {
             return
         }
 
-        if expandedEpisodeID == episodeNumber {
-            expandedEpisodeID = nil
+        if expandedEpisodeIDs.contains(episodeNumber) {
+            withAnimation(.easeInOut(duration: 0.18)) {
+                expandedEpisodeIDs.remove(episodeNumber)
+                rebuildEpisodeRows()
+            }
             return
         }
 
-        expandedEpisodeID = episodeNumber
+        withAnimation(.easeInOut(duration: 0.18)) {
+            expandedEpisodeIDs.insert(episodeNumber)
+            rebuildEpisodeRows()
+        }
         guard episodeDetailStates[episodeNumber] == nil else { return }
 
         episodeDetailStates[episodeNumber] = .loading(expandedPresentation(for: episode))
+        rebuildEpisodeRows()
 
         do {
             let response = try await service.fetchAnimeEpisodeDetail(
@@ -88,20 +123,23 @@ final class AnimeDetailEpisodesListViewModel: ObservableObject {
             )
             let detailEpisode = response.data.mergedWithFallback(episode)
             episodeDetailStates[episodeNumber] = .content(expandedPresentation(for: detailEpisode))
+            rebuildEpisodeRows()
         } catch is CancellationError {
             episodeDetailStates[episodeNumber] = .content(expandedPresentation(for: episode))
+            rebuildEpisodeRows()
         } catch {
             episodeDetailStates[episodeNumber] = .error(
                 error.localizedDescription,
                 expandedPresentation(for: episode)
             )
+            rebuildEpisodeRows()
         }
     }
 
     private func rowPresentation(for episode: AnimeEpisodeDTO) -> AnimeDetailEpisodeRowPresentation {
         let episodeID = episode.id
         let detail: AnimeDetailEpisodeDetailPresentation?
-        if let malId = episode.malId, expandedEpisodeID == malId {
+        if let malId = episode.malId, expandedEpisodeIDs.contains(malId) {
             detail = episodeDetailStates[malId] ?? .content(expandedPresentation(for: episode))
         } else {
             detail = nil
@@ -111,7 +149,7 @@ final class AnimeDetailEpisodesListViewModel: ObservableObject {
             id: episodeID,
             summary: summaryPresentation(for: episode),
             detail: detail,
-            isExpanded: episode.malId == expandedEpisodeID,
+            isExpanded: episode.malId.map(expandedEpisodeIDs.contains) ?? false,
             canExpand: episode.malId != nil
         )
     }
@@ -209,13 +247,7 @@ final class AnimeDetailEpisodesListViewModel: ObservableObject {
     private func airedDisplayText(for episode: AnimeEpisodeDTO) -> String? {
         guard let aired = trimmed(episode.aired) else { return nil }
         guard let date = dateFromISOString(aired) else { return aired }
-
-        let formatter = DateFormatter()
-        formatter.locale = Locale.current
-        formatter.timeZone = TimeZone.current
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .none
-        return formatter.string(from: date)
+        return Self.airedDateFormatter.string(from: date)
     }
 
     private func durationDisplayText(for episode: AnimeEpisodeDTO) -> String? {
@@ -269,6 +301,8 @@ final class AnimeDetailEpisodesListViewModel: ObservableObject {
             currentPage = 1
             hasNextPage = response.pagination?.hasNextPage == true
             episodes = response.data
+            refreshEpisodeCaches()
+            rebuildEpisodeRows()
             screenState = episodes.isEmpty ? .empty : .content
         } catch is CancellationError {
         } catch {
@@ -290,18 +324,22 @@ final class AnimeDetailEpisodesListViewModel: ObservableObject {
     }
 
     private func dateFromISOString(_ raw: String) -> Date? {
-        let iso = ISO8601DateFormatter()
-        iso.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        if let date = iso.date(from: raw) {
+        if let date = Self.iso8601WithFractionalSecondsFormatter.date(from: raw) {
             return date
         }
 
-        iso.formatOptions = [.withInternetDateTime]
-        if let date = iso.date(from: raw) {
+        if let date = Self.iso8601Formatter.date(from: raw) {
             return date
         }
 
-        iso.formatOptions = [.withFullDate]
-        return iso.date(from: raw)
+        return Self.fullDateFormatter.date(from: raw)
+    }
+
+    private func refreshEpisodeCaches() {
+        episodesByRowID = Dictionary(uniqueKeysWithValues: episodes.map { ($0.id, $0) })
+    }
+
+    private func rebuildEpisodeRows() {
+        episodeRows = episodes.map(rowPresentation(for:))
     }
 }

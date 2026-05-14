@@ -36,7 +36,7 @@ struct AnimeDetailEpisodesEntrySectionView: View {
 
                     Spacer(minLength: 0)
 
-                    Image(systemName: "chevron.right.circle.fill")
+                    Image(systemName: "chevron.right")
                         .font(.title3)
                         .foregroundStyle(ThemeColor.sakura)
                 }

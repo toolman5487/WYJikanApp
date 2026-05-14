@@ -55,7 +55,7 @@ struct AnimeEpisodeDTO: Codable, Identifiable, Hashable, Sendable {
     }
 }
 
-struct AnimeDetailEpisodeRowPresentation: Identifiable, Sendable {
+struct AnimeDetailEpisodeRowPresentation: Identifiable, Sendable, Equatable {
     let id: Int
     let summary: AnimeDetailEpisodeSummaryPresentation
     let detail: AnimeDetailEpisodeDetailPresentation?
@@ -63,7 +63,7 @@ struct AnimeDetailEpisodeRowPresentation: Identifiable, Sendable {
     let canExpand: Bool
 }
 
-struct AnimeDetailEpisodeSummaryPresentation: Sendable {
+struct AnimeDetailEpisodeSummaryPresentation: Sendable, Equatable {
     let episodeNumberText: String
     let title: String
     let airedText: String?
@@ -71,20 +71,20 @@ struct AnimeDetailEpisodeSummaryPresentation: Sendable {
     let tagTexts: [String]
 }
 
-enum AnimeDetailEpisodeDetailPresentation: Sendable {
+enum AnimeDetailEpisodeDetailPresentation: Sendable, Equatable {
     case loading(AnimeDetailEpisodeExpandedPresentation)
     case content(AnimeDetailEpisodeExpandedPresentation)
     case error(String, AnimeDetailEpisodeExpandedPresentation)
 }
 
-struct AnimeDetailEpisodeExpandedPresentation: Sendable {
+struct AnimeDetailEpisodeExpandedPresentation: Sendable, Equatable {
     let alternateTitle: String?
     let infoItems: [AnimeDetailEpisodeInfoItem]
     let synopsisText: String?
     let externalLinks: [AnimeDetailEpisodeExternalLink]
 }
 
-struct AnimeDetailEpisodeInfoItem: Identifiable, Sendable {
+struct AnimeDetailEpisodeInfoItem: Identifiable, Sendable, Equatable {
     let title: String
     let value: String
 
@@ -93,8 +93,8 @@ struct AnimeDetailEpisodeInfoItem: Identifiable, Sendable {
     }
 }
 
-struct AnimeDetailEpisodeExternalLink: Identifiable, Sendable {
-    enum Kind: Sendable {
+struct AnimeDetailEpisodeExternalLink: Identifiable, Sendable, Equatable {
+    enum Kind: Sendable, Equatable {
         case myAnimeList
         case discussion
     }

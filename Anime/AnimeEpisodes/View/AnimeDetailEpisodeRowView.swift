@@ -7,11 +7,15 @@
 
 import SwiftUI
 
-struct AnimeDetailEpisodeRowView: View {
+struct AnimeDetailEpisodeRowView: View, Equatable {
     @Environment(\.openURL) private var openURL
 
     let row: AnimeDetailEpisodeRowPresentation
     let onToggle: () -> Void
+
+    static func == (lhs: AnimeDetailEpisodeRowView, rhs: AnimeDetailEpisodeRowView) -> Bool {
+        lhs.row == rhs.row
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -24,7 +28,7 @@ struct AnimeDetailEpisodeRowView: View {
             if let detail = row.detail {
                 expandedContent(for: detail)
                     .padding(.top, 16)
-                    .transition(.opacity.combined(with: .move(edge: .top)))
+                    .transition(.opacity)
             }
         }
         .padding(16)
@@ -35,7 +39,6 @@ struct AnimeDetailEpisodeRowView: View {
                 style: .continuous
             )
         )
-        .animation(.easeInOut(duration: 0.2), value: row.isExpanded)
     }
 
     private var summaryContent: some View {

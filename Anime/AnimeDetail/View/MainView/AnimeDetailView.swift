@@ -51,6 +51,12 @@ struct AnimeDetailView: View {
             AnimeDetailHighlightsSectionView(viewModel: viewModel, anime: anime)
         case .basicInfo:
             AnimeDetailBasicInfoSectionView(viewModel: viewModel, anime: anime)
+        case .episodes:
+            AnimeDetailEpisodesEntrySectionView(
+                viewModel: viewModel,
+                anime: anime,
+                service: detailService
+            )
         case .score:
             AnimeDetailScoreSectionView(viewModel: viewModel, anime: anime)
         case .trailer:
@@ -75,12 +81,6 @@ struct AnimeDetailView: View {
             AnimeDetailRecommendationsSectionView(
                 viewModel: viewModel,
                 animeTitle: viewModel.displayTitle(for: anime)
-            )
-        case .episodes:
-            AnimeDetailEpisodesEntrySectionView(
-                viewModel: viewModel,
-                anime: anime,
-                service: detailService
             )
         }
     }

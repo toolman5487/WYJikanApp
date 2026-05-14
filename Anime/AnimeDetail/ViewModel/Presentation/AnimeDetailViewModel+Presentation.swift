@@ -13,6 +13,7 @@ extension AnimeDetailViewModel {
         case header
         case highlights
         case basicInfo
+        case episodes
         case score
         case trailer
         case synopsis
@@ -20,13 +21,13 @@ extension AnimeDetailViewModel {
         case staff
         case pictures
         case recommendations
-        case episodes
 
         var id: String {
             switch self {
             case .header: return "header"
             case .highlights: return "highlights"
             case .basicInfo: return "basicInfo"
+            case .episodes: return "episodes"
             case .score: return "score"
             case .trailer: return "trailer"
             case .synopsis: return "synopsis"
@@ -34,7 +35,6 @@ extension AnimeDetailViewModel {
             case .staff: return "staff"
             case .pictures: return "pictures"
             case .recommendations: return "recommendations"
-            case .episodes: return "episodes"
             }
         }
     }
@@ -96,9 +96,12 @@ extension AnimeDetailViewModel {
         var result: [Section] = [
             .header,
             .highlights,
-            .basicInfo,
-            .score
+            .basicInfo
         ]
+        if hasEpisodes(for: anime) {
+            result.append(.episodes)
+        }
+        result.append(.score)
         if hasTrailer(for: anime) {
             result.append(.trailer)
         }
@@ -116,9 +119,6 @@ extension AnimeDetailViewModel {
         }
         if hasRecommendations {
             result.append(.recommendations)
-        }
-        if hasEpisodes(for: anime) {
-            result.append(.episodes)
         }
         return result
     }

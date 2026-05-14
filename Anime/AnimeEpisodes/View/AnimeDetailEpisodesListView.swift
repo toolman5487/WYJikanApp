@@ -52,6 +52,7 @@ struct AnimeDetailEpisodesListView: View {
                                     await viewModel.toggleEpisodeDetail(for: row.id)
                                 }
                             }
+                            .equatable()
                         }
 
                         if viewModel.hasNextPage {
