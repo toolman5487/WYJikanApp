@@ -12,10 +12,17 @@ import SwiftData
 @MainActor
 final class MainMyListViewModel: ObservableObject {
     struct Presentation {
+        struct SummaryTile {
+            let title: String
+            let value: Int
+            let iconName: String
+        }
+
         let filteredItems: [MyListCollectionItem]
         let totalCount: Int
         let animeCount: Int
         let mangaCount: Int
+        let summaryTile: SummaryTile
     }
 
     enum Filter: String, CaseIterable, Identifiable {
@@ -69,11 +76,34 @@ final class MainMyListViewModel: ObservableObject {
             }
         }
 
+        let summaryTile: Presentation.SummaryTile
+        switch selectedFilter {
+        case .all:
+            summaryTile = .init(
+                title: "全部收藏",
+                value: items.count,
+                iconName: "heart.fill"
+            )
+        case .anime:
+            summaryTile = .init(
+                title: "動畫收藏",
+                value: animeCount,
+                iconName: MyListMediaKind.anime.iconName
+            )
+        case .manga:
+            summaryTile = .init(
+                title: "漫畫收藏",
+                value: mangaCount,
+                iconName: MyListMediaKind.manga.iconName
+            )
+        }
+
         return Presentation(
             filteredItems: filteredItems,
             totalCount: items.count,
             animeCount: animeCount,
-            mangaCount: mangaCount
+            mangaCount: mangaCount,
+            summaryTile: summaryTile
         )
     }
 

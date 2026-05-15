@@ -51,11 +51,11 @@ struct MainMyListView: View {
     }
     
     private func summaryView(presentation: MainMyListViewModel.Presentation) -> some View {
-        HStack(spacing: 12) {
-            MyListSummaryTile(title: "全部", value: presentation.totalCount, iconName: "heart.fill")
-            MyListSummaryTile(title: "動畫", value: presentation.animeCount, iconName: MyListMediaKind.anime.iconName)
-            MyListSummaryTile(title: "漫畫", value: presentation.mangaCount, iconName: MyListMediaKind.manga.iconName)
-        }
+        MyListSummaryTile(
+            title: presentation.summaryTile.title,
+            value: presentation.summaryTile.value,
+            iconName: presentation.summaryTile.iconName
+        )
     }
     
     @ViewBuilder
