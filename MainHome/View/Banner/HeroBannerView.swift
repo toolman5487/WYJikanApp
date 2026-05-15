@@ -59,7 +59,7 @@ struct HeroBannerView: View {
         ZStack {
             BannerSkeletonView()
             VStack(spacing: 12) {
-                ErrorMessageView(message: message, height: nil)
+                ErrorMessageView(state: .network(message), height: nil)
                 Button(buttonTitle) {
                     viewModel.retry()
                 }

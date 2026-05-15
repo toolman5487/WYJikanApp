@@ -48,10 +48,10 @@ struct HomeTrendingAnimeView: View {
                                 .frame(width: Self.cardWidth, height: Self.cardHeight)
                         }
                     case .error(let errorMessage):
-                        ErrorMessageView(message: errorMessage, height: Self.cardHeight)
+                        ErrorMessageView(state: .network(errorMessage), height: Self.cardHeight)
                             .frame(width: Self.cardWidth)
                     case .empty:
-                        ErrorMessageView(message: "尚無資料，稍後嘗試", height: Self.cardHeight)
+                        ErrorMessageView(state: .emptyCollection("尚無資料，稍後嘗試"), height: Self.cardHeight)
                             .frame(width: Self.cardWidth)
                     case .content:
                         ForEach(viewModel.items) { item in

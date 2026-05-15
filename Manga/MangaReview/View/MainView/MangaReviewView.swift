@@ -24,7 +24,7 @@ struct MangaReviewView: View {
         Group {
             switch viewModel.screenState {
             case let .error(message):
-                ErrorMessageView(message: message, height: 200)
+                ErrorMessageView(state: .network(message), height: 200)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             case .loading:
                 MangaReviewListSkeletonView()

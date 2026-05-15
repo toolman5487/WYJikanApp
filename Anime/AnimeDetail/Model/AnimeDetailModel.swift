@@ -140,6 +140,7 @@ struct AnimeCharacterEntryDTO: Codable, Identifiable, Hashable {
     let url: String?
     let images: AnimeImagesDTO?
     let name: String?
+    let nameKanji: String?
 
     var id: Int { malId }
 }
@@ -156,6 +157,7 @@ struct AnimeCharacterVoicePersonDTO: Codable, Identifiable, Hashable {
     let url: String?
     let images: AnimeImagesDTO?
     let name: String?
+    let nameKanji: String?
 
     var id: Int { malId }
 }
@@ -179,6 +181,8 @@ struct AnimeRecommendationEntryDTO: Codable, Identifiable, Hashable {
     let url: String?
     let images: AnimeImagesDTO?
     let title: String?
+    let titleEnglish: String?
+    let titleJapanese: String?
 
     var id: Int { malId }
 }

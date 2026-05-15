@@ -194,6 +194,7 @@
 		16A2002B2FB4000000D1E001 /* AnimeDetailEpisodesListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A2002A2FB4000000D1E001 /* AnimeDetailEpisodesListViewModel.swift */; };
 		16A200312FB4000000D1E001 /* AnimeDetailEpisodesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A200302FB4000000D1E001 /* AnimeDetailEpisodesModel.swift */; };
 		16A200332FB4000000D1E001 /* AnimeDetailEpisodeRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A200322FB4000000D1E001 /* AnimeDetailEpisodeRowView.swift */; };
+		16A200342FB4000000D1E001 /* AnimeDetailEpisodesLoadMoreFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A200352FB4000000D1E001 /* AnimeDetailEpisodesLoadMoreFooterView.swift */; };
 		16B100022F8A000000000002 /* CharacterListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B100012F8A000000000001 /* CharacterListView.swift */; };
 		16B100042F8A000000000004 /* CharacterListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B100032F8A000000000003 /* CharacterListViewModel.swift */; };
 		16B100062F8A000000000006 /* CharacterListContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B100052F8A000000000005 /* CharacterListContentView.swift */; };
@@ -458,6 +459,7 @@
 		16A2002A2FB4000000D1E001 /* AnimeDetailEpisodesListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeDetailEpisodesListViewModel.swift; sourceTree = "<group>"; };
 		16A200302FB4000000D1E001 /* AnimeDetailEpisodesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeDetailEpisodesModel.swift; sourceTree = "<group>"; };
 		16A200322FB4000000D1E001 /* AnimeDetailEpisodeRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeDetailEpisodeRowView.swift; sourceTree = "<group>"; };
+		16A200352FB4000000D1E001 /* AnimeDetailEpisodesLoadMoreFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeDetailEpisodesLoadMoreFooterView.swift; sourceTree = "<group>"; };
 		16B100012F8A000000000001 /* CharacterListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterListView.swift; sourceTree = "<group>"; };
 		16B100032F8A000000000003 /* CharacterListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterListViewModel.swift; sourceTree = "<group>"; };
 		16B100052F8A000000000005 /* CharacterListContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterListContentView.swift; sourceTree = "<group>"; };
@@ -2033,6 +2035,7 @@
 			children = (
 				16A200282FB4000000D1E001 /* AnimeDetailEpisodesListView.swift */,
 				16A200322FB4000000D1E001 /* AnimeDetailEpisodeRowView.swift */,
+				16A200352FB4000000D1E001 /* AnimeDetailEpisodesLoadMoreFooterView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -2594,6 +2597,7 @@
 				16A200312FB4000000D1E001 /* AnimeDetailEpisodesModel.swift in Sources */,
 				16A200292FB4000000D1E001 /* AnimeDetailEpisodesListView.swift in Sources */,
 				16A200332FB4000000D1E001 /* AnimeDetailEpisodeRowView.swift in Sources */,
+				16A200342FB4000000D1E001 /* AnimeDetailEpisodesLoadMoreFooterView.swift in Sources */,
 				16A2002B2FB4000000D1E001 /* AnimeDetailEpisodesListViewModel.swift in Sources */,
 				16F100062FAB300000000006 /* HomeRecommendedAnimeView.swift in Sources */,
 				15FC4F3A2F73E7340054153E /* HeroBannerView.swift in Sources */,

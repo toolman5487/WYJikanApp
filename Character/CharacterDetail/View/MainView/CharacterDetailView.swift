@@ -87,7 +87,7 @@ struct CharacterDetailView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
             case .error(let message):
-                ErrorMessageView(message: message, height: 200)
+                ErrorMessageView(state: .network(message), height: 200)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             case .loading:
                 ScrollView {

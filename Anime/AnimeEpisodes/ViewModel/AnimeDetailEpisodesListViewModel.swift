@@ -19,18 +19,26 @@ final class AnimeDetailEpisodesListViewModel: ObservableObject {
         case error(String)
     }
 
+    enum LoadMoreState: Equatable {
+        case hidden
+        case available
+        case loading
+        case error(message: String)
+    }
+
     @Published private(set) var screenState: ScreenState = .loading
+    @Published private(set) var loadMoreState: LoadMoreState = .hidden
     @Published private(set) var episodes: [AnimeEpisodeDTO] = []
     @Published private(set) var episodeRows: [AnimeDetailEpisodeRowPresentation] = []
-    @Published private(set) var hasNextPage = false
-    @Published private(set) var isLoadingMore = false
     @Published private(set) var expandedEpisodeIDs: Set<Int> = []
     @Published private(set) var episodeDetailStates: [Int: AnimeDetailEpisodeDetailPresentation] = [:]
 
     private let malId: Int
     private let service: any AnimeDetailServicing
     private var currentPage = 0
+    private var hasNextPage = false
     private var hasLoaded = false
+    private var isLoadingMore = false
     private var episodesByRowID: [Int: AnimeEpisodeDTO] = [:]
 
     private static let iso8601WithFractionalSecondsFormatter: ISO8601DateFormatter = {
@@ -74,23 +82,12 @@ final class AnimeDetailEpisodesListViewModel: ObservableObject {
     }
 
     func loadMore() async {
-        guard hasLoaded, hasNextPage, !isLoadingMore else { return }
-        isLoadingMore = true
-        defer { isLoadingMore = false }
+        await loadMorePage()
+    }
 
-        do {
-            let response = try await service.fetchAnimeEpisodes(malId: malId, page: currentPage + 1)
-            currentPage += 1
-            hasNextPage = response.pagination?.hasNextPage == true
-            episodes.append(contentsOf: response.data)
-            refreshEpisodeCaches()
-            rebuildEpisodeRows()
-        } catch is CancellationError {
-        } catch {
-            AppLogger.network.error(
-                "Anime episodes load-more failed: \(error.localizedDescription, privacy: .public)"
-            )
-        }
+    func retryLoadMore() async {
+        guard case .error = loadMoreState else { return }
+        await loadMorePage()
     }
 
     func toggleEpisodeDetail(for rowID: Int) async {
@@ -293,20 +290,87 @@ final class AnimeDetailEpisodesListViewModel: ObservableObject {
     }
 
     private func loadFirstPage() async {
+        resetPagination()
         screenState = .loading
 
         do {
             let response = try await service.fetchAnimeEpisodes(malId: malId, page: 1)
             hasLoaded = true
             currentPage = 1
-            hasNextPage = response.pagination?.hasNextPage == true
+            hasNextPage = resolvedHasNextPage(
+                from: response.pagination,
+                responseData: response.data
+            )
             episodes = response.data
             refreshEpisodeCaches()
             rebuildEpisodeRows()
             screenState = episodes.isEmpty ? .empty : .content
+            loadMoreState = resolvedLoadMoreState()
         } catch is CancellationError {
         } catch {
             screenState = .error(error.localizedDescription)
+            loadMoreState = .hidden
+        }
+    }
+
+    private func loadMorePage() async {
+        guard hasLoaded, hasNextPage, !isLoadingMore else { return }
+
+        isLoadingMore = true
+        loadMoreState = .loading
+
+        do {
+            let response = try await service.fetchAnimeEpisodes(malId: malId, page: currentPage + 1)
+            currentPage += 1
+            hasNextPage = resolvedHasNextPage(
+                from: response.pagination,
+                responseData: response.data
+            )
+            episodes.append(contentsOf: response.data)
+            refreshEpisodeCaches()
+            rebuildEpisodeRows()
+            isLoadingMore = false
+            loadMoreState = resolvedLoadMoreState()
+        } catch is CancellationError {
+            isLoadingMore = false
+            loadMoreState = resolvedLoadMoreState()
+        } catch {
+            AppLogger.network.error(
+                "Anime episodes load-more failed: \(error.localizedDescription, privacy: .public)"
+            )
+            isLoadingMore = false
+            loadMoreState = .error(message: "載入更多集數失敗")
+        }
+    }
+
+    private func resetPagination() {
+        currentPage = 0
+        hasNextPage = false
+        isLoadingMore = false
+        loadMoreState = .hidden
+    }
+
+    private func resolvedLoadMoreState() -> LoadMoreState {
+        if isLoadingMore {
+            return .loading
+        }
+        if case .error(let message) = loadMoreState {
+            return .error(message: message)
+        }
+        return hasNextPage ? .available : .hidden
+    }
+
+    private func resolvedHasNextPage(
+        from pagination: AnimeEpisodesPaginationDTO?,
+        responseData: [AnimeEpisodeDTO]
+    ) -> Bool {
+        switch (pagination?.hasNextPage, pagination?.lastVisiblePage) {
+        case (.some(let hasNextPage), _):
+            return hasNextPage
+        case (.none, .some(let lastVisiblePage)):
+            return currentPage < lastVisiblePage
+        case (.none, .none):
+            return !responseData.isEmpty
         }
     }
 

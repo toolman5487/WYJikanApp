@@ -54,10 +54,10 @@ struct HomeTrendingMangaView: View {
                                 .frame(width: Self.cardWidth, height: Self.cardHeight)
                         }
                     case .error(let errorMessage):
-                        ErrorMessageView(message: errorMessage, height: Self.cardHeight)
+                        ErrorMessageView(state: .network(errorMessage), height: Self.cardHeight)
                             .frame(width: Self.cardWidth)
                     case .empty:
-                        ErrorMessageView(message: "Empty Data", height: Self.cardHeight)
+                        ErrorMessageView(state: .emptyCollection("尚無資料"), height: Self.cardHeight)
                             .frame(width: Self.cardWidth)
                     case .content:
                         ForEach(viewModel.items) { item in

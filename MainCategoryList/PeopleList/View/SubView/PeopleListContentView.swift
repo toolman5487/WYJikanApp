@@ -16,7 +16,7 @@ struct PeopleListContentView: View {
             case .loading:
                 PeopleListLoadingView()
             case .error(let message):
-                ErrorMessageView(message: message, height: 180)
+                ErrorMessageView(state: .network(message), height: 180)
             case .empty:
                 Text("目前沒有聲優資料")
                     .font(.subheadline)
@@ -36,7 +36,7 @@ struct PeopleListContentView: View {
                 }
 
                 if let message = inlineError {
-                    ErrorMessageView(message: message)
+                    ErrorMessageView(state: .network(message))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 8)
                 }

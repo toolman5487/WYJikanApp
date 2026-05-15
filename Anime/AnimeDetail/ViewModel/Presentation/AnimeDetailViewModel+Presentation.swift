@@ -47,7 +47,12 @@ extension AnimeDetailViewModel {
     // MARK: - Header & Media
 
     func displayTitle(for anime: AnimeDetailDTO) -> String {
-        anime.titleJapanese ?? anime.titleEnglish ?? anime.title ?? "🎬"
+        preferredTitle(
+            japaneseTitle: anime.titleJapanese,
+            englishTitle: anime.titleEnglish,
+            fallbackTitle: anime.title,
+            emptyFallback: "🎬"
+        )
     }
 
     func posterURL(for anime: AnimeDetailDTO) -> URL? {
@@ -86,7 +91,12 @@ extension AnimeDetailViewModel {
             malId: anime.malId,
             mediaKind: .anime,
             title: displayTitle(for: anime),
-            subtitle: anime.titleEnglish ?? anime.title,
+            subtitle: preferredSecondaryTitle(
+                primaryTitle: displayTitle(for: anime),
+                japaneseTitle: anime.titleJapanese,
+                englishTitle: anime.titleEnglish,
+                fallbackTitle: anime.title
+            ),
             imageURLString: posterURL(for: anime)?.absoluteString,
             addedAt: Date()
         )
@@ -424,8 +434,11 @@ extension AnimeDetailViewModel {
     }
 
     func characterName(_ character: AnimeCharacterEntryDTO) -> String {
-        let trimmed = character.name?.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed?.isEmpty == false ? trimmed! : "未命名角色"
+        preferredDisplayName(
+            kanjiName: character.nameKanji,
+            fallbackName: character.name,
+            emptyFallback: "未命名角色"
+        )
     }
 
     func characterImageURL(_ character: AnimeCharacterEntryDTO) -> URL? {
@@ -444,23 +457,85 @@ extension AnimeDetailViewModel {
     }
 
     func voiceActorSummary(for role: AnimeCharacterRoleDTO) -> String {
-        guard let voiceActor = role.voiceActors?.first(where: { $0.person != nil }),
+        guard let voiceActor = preferredVoiceActor(for: role),
               let person = voiceActor.person else {
             return "暫無聲優資料"
         }
 
-        let personName = person.name?.trimmingCharacters(in: .whitespacesAndNewlines)
-        let resolvedName = personName?.isEmpty == false ? personName! : "未命名聲優"
-        let language = voiceActor.language?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let resolvedName = preferredDisplayName(
+            kanjiName: person.nameKanji,
+            fallbackName: person.name,
+            emptyFallback: "未命名聲優"
+        )
+        let language = trimmedText(voiceActor.language)
         guard let language, !language.isEmpty else {
             return resolvedName
         }
         return "\(resolvedName) · \(language)"
     }
 
+    private func preferredVoiceActor(for role: AnimeCharacterRoleDTO) -> AnimeCharacterVoiceActorDTO? {
+        let voiceActors = (role.voiceActors ?? []).filter { $0.person != nil }
+        return voiceActors.first(where: isJapaneseVoiceActor(_:)) ?? voiceActors.first
+    }
+
+    private func isJapaneseVoiceActor(_ voiceActor: AnimeCharacterVoiceActorDTO) -> Bool {
+        trimmedText(voiceActor.language)?.localizedCaseInsensitiveCompare("Japanese") == .orderedSame
+    }
+
+    private func preferredDisplayName(
+        kanjiName: String?,
+        fallbackName: String?,
+        emptyFallback: String
+    ) -> String {
+        trimmedText(kanjiName) ?? trimmedText(fallbackName) ?? emptyFallback
+    }
+
+    private func preferredTitle(
+        japaneseTitle: String?,
+        englishTitle: String?,
+        fallbackTitle: String?,
+        emptyFallback: String
+    ) -> String {
+        trimmedText(japaneseTitle) ?? trimmedText(englishTitle) ?? trimmedText(fallbackTitle) ?? emptyFallback
+    }
+
+    private func preferredSecondaryTitle(
+        primaryTitle: String,
+        japaneseTitle: String?,
+        englishTitle: String?,
+        fallbackTitle: String?
+    ) -> String? {
+        let candidates = [
+            trimmedText(englishTitle),
+            trimmedText(fallbackTitle),
+            trimmedText(japaneseTitle)
+        ]
+
+        for candidate in candidates {
+            if let candidate, candidate != primaryTitle {
+                return candidate
+            }
+        }
+
+        return nil
+    }
+
+    private func trimmedText(_ value: String?) -> String? {
+        guard let value = value?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !value.isEmpty else {
+            return nil
+        }
+        return value
+    }
+
     func recommendationTitle(_ recommendation: AnimeRecommendationDTO) -> String {
-        let title = recommendation.entry?.title?.trimmingCharacters(in: .whitespacesAndNewlines)
-        return title?.isEmpty == false ? title! : "未命名作品"
+        preferredTitle(
+            japaneseTitle: recommendation.entry?.titleJapanese,
+            englishTitle: recommendation.entry?.titleEnglish,
+            fallbackTitle: recommendation.entry?.title,
+            emptyFallback: "未命名作品"
+        )
     }
 
     func recommendationImageURL(_ recommendation: AnimeRecommendationDTO) -> URL? {

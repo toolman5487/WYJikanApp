@@ -13,7 +13,7 @@ struct RandomHeroErrorView: View {
 
     var body: some View {
         VStack(spacing: 12) {
-            ErrorMessageView(message: message)
+            ErrorMessageView(state: .network(message))
             Button("重試", action: onRetryTap)
                 .buttonStyle(.borderedProminent)
                 .tint(ThemeColor.sakura)

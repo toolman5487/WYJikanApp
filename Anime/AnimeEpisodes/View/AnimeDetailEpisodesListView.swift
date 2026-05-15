@@ -36,10 +36,10 @@ struct AnimeDetailEpisodesListView: View {
                 ProgressView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             case .empty:
-                ErrorMessageView(message: "目前沒有可顯示的集數資料", height: 200)
+                ErrorMessageView(state: .emptyCollection("目前沒有可顯示的集數資料"), height: 200)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             case .error(let message):
-                ErrorMessageView(message: message, height: 200)
+                ErrorMessageView(state: .network(message), height: 200)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             case .content:
                 ScrollView {
@@ -55,32 +55,11 @@ struct AnimeDetailEpisodesListView: View {
                             .equatable()
                         }
 
-                        if viewModel.hasNextPage {
-                            Button {
-                                Task { await viewModel.loadMore() }
-                            } label: {
-                                HStack {
-                                    Spacer(minLength: 0)
-                                    if viewModel.isLoadingMore {
-                                        ProgressView()
-                                    } else {
-                                        Text("載入更多集數")
-                                            .font(.subheadline.weight(.semibold))
-                                    }
-                                    Spacer(minLength: 0)
-                                }
-                                .foregroundStyle(ThemeColor.textPrimary)
-                                .frame(minHeight: 44)
-                                .background(ThemeColor.sakura)
-                                .clipShape(
-                                    RoundedRectangle(
-                                        cornerRadius: 16,
-                                        style: .continuous
-                                    )
-                                )
-                            }
-                            .buttonStyle(.plain)
-                        }
+                        AnimeDetailEpisodesLoadMoreFooterView(
+                            state: viewModel.loadMoreState,
+                            onLoadMore: viewModel.loadMore,
+                            onRetry: viewModel.retryLoadMore
+                        )
                     }
                     .padding()
                 }

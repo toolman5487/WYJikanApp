@@ -47,10 +47,10 @@ struct HomeRecommendedAnimeView: View {
                     }
                     .padding(.horizontal, Self.horizontalPadding)
                 case .error(let errorMessage):
-                    ErrorMessageView(message: errorMessage, height: 240)
+                    ErrorMessageView(state: .network(errorMessage), height: 240)
                         .padding(.horizontal, Self.horizontalPadding)
                 case .empty:
-                    ErrorMessageView(message: "尚無推薦資料", height: 240)
+                    ErrorMessageView(state: .emptyCollection("尚無推薦資料"), height: 240)
                         .padding(.horizontal, Self.horizontalPadding)
                 case .content:
                     LazyVGrid(columns: columns, alignment: .leading, spacing: Self.gridSpacing) {

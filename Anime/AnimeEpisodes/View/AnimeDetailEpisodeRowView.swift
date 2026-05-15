@@ -21,6 +21,8 @@ struct AnimeDetailEpisodeRowView: View, Equatable {
         VStack(alignment: .leading, spacing: 0) {
             Button(action: toggleIfNeeded) {
                 summaryContent
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
             .disabled(!row.canExpand)
@@ -31,6 +33,7 @@ struct AnimeDetailEpisodeRowView: View, Equatable {
                     .transition(.opacity)
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(16)
         .background(Color(.secondarySystemBackground))
         .clipShape(
@@ -74,6 +77,7 @@ struct AnimeDetailEpisodeRowView: View, Equatable {
                         .lineLimit(2)
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
 
             if row.canExpand {
                 Image(systemName: row.isExpanded ? "chevron.up" : "chevron.down")
