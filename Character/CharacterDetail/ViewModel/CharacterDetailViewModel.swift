@@ -56,6 +56,55 @@ final class CharacterDetailViewModel: ObservableObject {
 }
 
 extension CharacterDetailViewModel {
+    enum Section: Identifiable {
+        case header
+        case info
+        case about
+        case anime
+        case manga
+        case voices
+
+        var id: String {
+            switch self {
+            case .header: return "header"
+            case .info: return "info"
+            case .about: return "about"
+            case .anime: return "anime"
+            case .manga: return "manga"
+            case .voices: return "voices"
+            }
+        }
+    }
+
+    enum ExternalPageNavigationState: Equatable {
+        case unavailable
+        case available(title: String, url: URL)
+    }
+
+    func sections(for character: CharacterDetailDTO) -> [Section] {
+        var result: [Section] = [.header, .info]
+        if aboutText(for: character) != nil {
+            result.append(.about)
+        }
+        if !animeRoles(for: character).isEmpty {
+            result.append(.anime)
+        }
+        if !mangaRoles(for: character).isEmpty {
+            result.append(.manga)
+        }
+        if !voiceActors(for: character).isEmpty {
+            result.append(.voices)
+        }
+        return result
+    }
+
+    func externalPageNavigationState() -> ExternalPageNavigationState {
+        guard let detail,
+              let url = malPageURL(for: detail) else {
+            return .unavailable
+        }
+        return .available(title: displayName(for: detail), url: url)
+    }
 
     func displayName(for character: CharacterDetailDTO) -> String {
         firstNonEmpty(character.nameKanji, character.name) ?? "—"

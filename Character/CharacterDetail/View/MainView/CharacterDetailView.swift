@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct CharacterDetailView: View {
-
     let malId: Int
 
     @StateObject private var viewModel: CharacterDetailViewModel
@@ -18,45 +17,8 @@ struct CharacterDetailView: View {
         _viewModel = StateObject(wrappedValue: CharacterDetailViewModel(malId: malId, service: service))
     }
 
-    enum Section: Identifiable {
-        case header
-        case info
-        case about
-        case anime
-        case manga
-        case voices
-
-        var id: String {
-            switch self {
-            case .header: return "header"
-            case .info: return "info"
-            case .about: return "about"
-            case .anime: return "anime"
-            case .manga: return "manga"
-            case .voices: return "voices"
-            }
-        }
-    }
-
-    private func sections(for character: CharacterDetailDTO) -> [Section] {
-        var result: [Section] = [.header, .info]
-        if viewModel.aboutText(for: character) != nil {
-            result.append(.about)
-        }
-        if !viewModel.animeRoles(for: character).isEmpty {
-            result.append(.anime)
-        }
-        if !viewModel.mangaRoles(for: character).isEmpty {
-            result.append(.manga)
-        }
-        if !viewModel.voiceActors(for: character).isEmpty {
-            result.append(.voices)
-        }
-        return result
-    }
-
     @ViewBuilder
-    private func sectionView(_ section: Section, character: CharacterDetailDTO) -> some View {
+    private func sectionView(_ section: CharacterDetailViewModel.Section, character: CharacterDetailDTO) -> some View {
         switch section {
         case .header:
             CharacterDetailHeaderSectionView(viewModel: viewModel, character: character)
@@ -79,7 +41,7 @@ struct CharacterDetailView: View {
             case .loaded(let character):
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 20) {
-                        ForEach(sections(for: character)) { section in
+                        ForEach(viewModel.sections(for: character)) { section in
                             sectionView(section, character: character)
                         }
                     }
@@ -106,9 +68,12 @@ struct CharacterDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                if let detail = viewModel.detail, let url = viewModel.malPageURL(for: detail) {
+                switch viewModel.externalPageNavigationState() {
+                case .unavailable:
+                    EmptyView()
+                case let .available(title, url):
                     NavigationLink {
-                        NavigationWebPageView(title: viewModel.displayName(for: detail), url: url)
+                        NavigationWebPageView(title: title, url: url)
                     } label: {
                         Image(systemName: "safari")
                             .font(.body.weight(.bold))

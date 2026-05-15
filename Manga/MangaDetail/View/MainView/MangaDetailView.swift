@@ -5,7 +5,6 @@
 //  Created by Willy Hsu on 2026/3/31.
 //
 
-import OSLog
 import SwiftUI
 import SwiftData
 
@@ -18,7 +17,6 @@ struct MangaDetailView: View {
     @StateObject private var viewModel: MangaDetailViewModel
     @EnvironmentObject private var favoriteStatusStore: FavoriteStatusStore
     @Environment(\.modelContext) private var modelContext
-    private let favoriteRepository: any FavoriteRepository
     
     // MARK: - Initialization
     
@@ -28,8 +26,13 @@ struct MangaDetailView: View {
         favoriteRepository: any FavoriteRepository = SwiftDataFavoriteRepository.shared
     ) {
         self.malId = malId
-        self.favoriteRepository = favoriteRepository
-        _viewModel = StateObject(wrappedValue: MangaDetailViewModel(malId: malId, service: service))
+        _viewModel = StateObject(
+            wrappedValue: MangaDetailViewModel(
+                malId: malId,
+                service: service,
+                favoriteRepository: favoriteRepository
+            )
+        )
     }
     
     @ViewBuilder
@@ -50,28 +53,6 @@ struct MangaDetailView: View {
     
     private var isFavorite: Bool {
         favoriteStatusStore.isFavorite(malId: malId, mediaKind: .manga)
-    }
-    
-    private func toggleFavorite() {
-        do {
-            if isFavorite {
-                _ = try favoriteRepository.toggleFavorite(
-                    malId: malId,
-                    mediaKind: .manga,
-                    modelContext: modelContext,
-                    makeItem: nil
-                )
-            } else if let manga = viewModel.detail {
-                _ = try favoriteRepository.toggleFavorite(
-                    malId: malId,
-                    mediaKind: .manga,
-                    modelContext: modelContext,
-                    makeItem: { viewModel.favoriteItem(for: manga) }
-                )
-            }
-        } catch {
-            AppLogger.persistence.error("Manga favorite update failed: \(error.localizedDescription, privacy: .public)")
-        }
     }
     
     // MARK: - Body
@@ -110,7 +91,10 @@ struct MangaDetailView: View {
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
                 Button {
-                    toggleFavorite()
+                    viewModel.toggleFavorite(
+                        isFavorite: isFavorite,
+                        modelContext: modelContext
+                    )
                 } label: {
                     Image(systemName: isFavorite ? "heart.fill" : "heart")
                         .font(.body.weight(.bold))
@@ -118,6 +102,7 @@ struct MangaDetailView: View {
                         .frame(minWidth: 44, minHeight: 44)
                         .contentShape(Rectangle())
                 }
+                .disabled(!viewModel.isFavoriteActionEnabled)
             }
             ToolbarSpacer(.fixed, placement: .topBarTrailing)
             ToolbarItemGroup(placement: .topBarTrailing) {

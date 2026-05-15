@@ -34,7 +34,7 @@ struct HomeTodayAnimeScheduleListView: View {
         .safeAreaInset(edge: .top, spacing: 0) {
             HomeTodayAnimeScheduleListDayFilterContainerView(
                 selectedDay: viewModel.selectedDay,
-                onSelectDay: handleDaySelection(_:)
+                onSelectDay: viewModel.updateSelectedDay(_:)
             )
         }
         .navigationTitle("播出時間表")
@@ -68,53 +68,39 @@ struct HomeTodayAnimeScheduleListView: View {
     }
 
     private var notificationButton: some View {
-        Button {
+        let presentation = viewModel.notificationButtonPresentation(
+            for: notificationScheduler.state
+        )
+
+        return Button {
             Task {
                 await notificationScheduler.toggleBroadcastReminders()
             }
         } label: {
-            Image(systemName: notificationIconName)
+            Image(systemName: presentation.iconSystemName)
                 .font(.body.weight(.bold))
-                .foregroundStyle(notificationColor)
+                .foregroundStyle(notificationColor(for: presentation))
                 .frame(width: 44, height: 44)
-                .scaleEffect(notificationScheduler.state.isProcessing ? 1.12 : 1)
+                .scaleEffect(presentation.isAnimating ? 1.12 : 1)
                 .animation(
-                    notificationScheduler.state.isProcessing
+                    presentation.isAnimating
                     ? .easeInOut(duration: 0.48).repeatForever(autoreverses: true)
                     : .easeOut(duration: 0.18),
-                    value: notificationScheduler.state.isProcessing
+                    value: presentation.isAnimating
                 )
         }
-        .disabled(notificationScheduler.state.isProcessing)
-        .accessibilityLabel(notificationAccessibilityLabel)
+        .disabled(presentation.isDisabled)
+        .accessibilityLabel(presentation.accessibilityLabel)
     }
 
-    private var notificationIconName: String {
-        switch notificationScheduler.state {
-        case .processing:
-            return "bell.and.waves.left.and.right.fill"
-        case .enabled:
-            return "bell.fill"
-        case .disabled:
-            return "bell"
-        }
-    }
-
-    private var notificationColor: some ShapeStyle {
-        switch notificationScheduler.state {
-        case .enabled:
+    private func notificationColor(
+        for presentation: HomeTodayAnimeScheduleListViewModel.NotificationButtonPresentation
+    ) -> some ShapeStyle {
+        switch presentation.tint {
+        case .accent:
             return ThemeColor.sakura
-        case .disabled, .processing:
+        case .secondary:
             return Color.secondary
-        }
-    }
-
-    private var notificationAccessibilityLabel: String {
-        switch notificationScheduler.state {
-        case .enabled:
-            return "關閉播出提醒"
-        case .disabled, .processing:
-            return "開啟播出提醒"
         }
     }
 
@@ -176,10 +162,6 @@ struct HomeTodayAnimeScheduleListView: View {
         }
     }
 
-    private func handleDaySelection(_ day: HomeScheduleDay) {
-        guard viewModel.selectedDay != day else { return }
-        viewModel.selectedDay = day
-    }
 }
 
 #Preview {

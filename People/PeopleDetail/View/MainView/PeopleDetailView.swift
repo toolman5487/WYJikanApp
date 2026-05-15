@@ -5,12 +5,9 @@
 //  Created by Willy Hsu on 2026/4/23.
 //
 
-import Combine
-import Foundation
 import SwiftUI
 
 struct PeopleDetailView: View {
-
     let malId: Int
 
     @StateObject private var viewModel: PeopleDetailViewModel
@@ -20,45 +17,8 @@ struct PeopleDetailView: View {
         _viewModel = StateObject(wrappedValue: PeopleDetailViewModel(malId: malId, service: service))
     }
 
-    enum Section: Identifiable {
-        case header
-        case info
-        case about
-        case voices
-        case anime
-        case manga
-
-        var id: String {
-            switch self {
-            case .header: return "header"
-            case .info: return "info"
-            case .about: return "about"
-            case .voices: return "voices"
-            case .anime: return "anime"
-            case .manga: return "manga"
-            }
-        }
-    }
-
-    private func sections(for person: PeopleDetailDTO) -> [Section] {
-        var result: [Section] = [.header, .info]
-        if viewModel.aboutText(for: person) != nil {
-            result.append(.about)
-        }
-        if !viewModel.voiceRoles(for: person).isEmpty {
-            result.append(.voices)
-        }
-        if !viewModel.animeStaffPositions(for: person).isEmpty {
-            result.append(.anime)
-        }
-        if !viewModel.mangaStaffPositions(for: person).isEmpty {
-            result.append(.manga)
-        }
-        return result
-    }
-
     @ViewBuilder
-    private func sectionView(_ section: Section, person: PeopleDetailDTO) -> some View {
+    private func sectionView(_ section: PeopleDetailViewModel.Section, person: PeopleDetailDTO) -> some View {
         switch section {
         case .header:
             PeopleDetailHeaderSectionView(viewModel: viewModel, person: person)
@@ -81,7 +41,7 @@ struct PeopleDetailView: View {
             case .loaded(let person):
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 20) {
-                        ForEach(sections(for: person)) { section in
+                        ForEach(viewModel.sections(for: person)) { section in
                             sectionView(section, person: person)
                         }
                     }
@@ -108,9 +68,12 @@ struct PeopleDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                if let detail = viewModel.detail, let url = viewModel.malPageURL(for: detail) {
+                switch viewModel.externalPageNavigationState() {
+                case .unavailable:
+                    EmptyView()
+                case let .available(title, url):
                     NavigationLink {
-                        NavigationWebPageView(title: viewModel.displayName(for: detail), url: url)
+                        NavigationWebPageView(title: title, url: url)
                     } label: {
                         Image(systemName: "safari")
                             .font(.body.weight(.bold))

@@ -5,7 +5,6 @@
 //  Created by Willy Hsu on 2026/3/27.
 //
 
-import OSLog
 import SwiftUI
 import SwiftData
 
@@ -23,7 +22,6 @@ struct AnimeDetailView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var imagePreviewSession: ImagePreviewSession?
     private let detailService: any AnimeDetailServicing
-    private let favoriteRepository: any FavoriteRepository
 
     init(
         malId: Int,
@@ -32,8 +30,13 @@ struct AnimeDetailView: View {
     ) {
         self.malId = malId
         self.detailService = service
-        self.favoriteRepository = favoriteRepository
-        _viewModel = StateObject(wrappedValue: AnimeDetailViewModel(malId: malId, service: service))
+        _viewModel = StateObject(
+            wrappedValue: AnimeDetailViewModel(
+                malId: malId,
+                service: service,
+                favoriteRepository: favoriteRepository
+            )
+        )
     }
 
     @ViewBuilder
@@ -107,28 +110,6 @@ struct AnimeDetailView: View {
         favoriteStatusStore.isFavorite(malId: malId, mediaKind: .anime)
     }
 
-    private func toggleFavorite() {
-        do {
-            if isFavorite {
-                _ = try favoriteRepository.toggleFavorite(
-                    malId: malId,
-                    mediaKind: .anime,
-                    modelContext: modelContext,
-                    makeItem: nil
-                )
-            } else if let anime = viewModel.detail {
-                _ = try favoriteRepository.toggleFavorite(
-                    malId: malId,
-                    mediaKind: .anime,
-                    modelContext: modelContext,
-                    makeItem: { viewModel.favoriteItem(for: anime) }
-                )
-            }
-        } catch {
-            AppLogger.persistence.error("Anime favorite update failed: \(error.localizedDescription, privacy: .public)")
-        }
-    }
-
     var body: some View {
         Group {
             switch viewModel.screenState {
@@ -166,7 +147,10 @@ struct AnimeDetailView: View {
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
                 Button {
-                    toggleFavorite()
+                    viewModel.toggleFavorite(
+                        isFavorite: isFavorite,
+                        modelContext: modelContext
+                    )
                 } label: {
                     Image(systemName: isFavorite ? "heart.fill" : "heart")
                         .font(.body.weight(.bold))
@@ -174,7 +158,7 @@ struct AnimeDetailView: View {
                         .frame(minWidth: 44, minHeight: 44)
                         .contentShape(Rectangle())
                 }
-                .disabled(viewModel.detail == nil)
+                .disabled(!viewModel.isFavoriteActionEnabled)
             }
             ToolbarSpacer(.fixed, placement: .topBarTrailing)
             ToolbarItemGroup(placement: .topBarTrailing) {

@@ -7,6 +7,8 @@
 
 import Combine
 import Foundation
+import OSLog
+import SwiftData
 
 @MainActor
 final class MangaDetailViewModel: ObservableObject {
@@ -22,10 +24,16 @@ final class MangaDetailViewModel: ObservableObject {
 
     private let malId: Int
     private let service: MangaDetailServicing
+    private let favoriteRepository: any FavoriteRepository
 
-    init(malId: Int, service: MangaDetailServicing = MangaDetailService()) {
+    init(
+        malId: Int,
+        service: MangaDetailServicing = MangaDetailService(),
+        favoriteRepository: any FavoriteRepository = SwiftDataFavoriteRepository.shared
+    ) {
         self.malId = malId
         self.service = service
+        self.favoriteRepository = favoriteRepository
     }
 
     var detail: MangaDetailDTO? {
@@ -75,6 +83,35 @@ final class MangaDetailViewModel: ObservableObject {
             } else {
                 screenState = .error(error.localizedDescription)
             }
+        }
+    }
+
+    var isFavoriteActionEnabled: Bool {
+        detail != nil
+    }
+
+    func toggleFavorite(
+        isFavorite: Bool,
+        modelContext: ModelContext
+    ) {
+        do {
+            if isFavorite {
+                _ = try favoriteRepository.toggleFavorite(
+                    malId: malId,
+                    mediaKind: .manga,
+                    modelContext: modelContext,
+                    makeItem: nil
+                )
+            } else if let detail {
+                _ = try favoriteRepository.toggleFavorite(
+                    malId: malId,
+                    mediaKind: .manga,
+                    modelContext: modelContext,
+                    makeItem: { self.favoriteItem(for: detail) }
+                )
+            }
+        } catch {
+            AppLogger.persistence.error("Manga favorite update failed: \(error.localizedDescription, privacy: .public)")
         }
     }
 }

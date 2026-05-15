@@ -56,6 +56,55 @@ final class PeopleDetailViewModel: ObservableObject {
 }
 
 extension PeopleDetailViewModel {
+    enum Section: Identifiable {
+        case header
+        case info
+        case about
+        case voices
+        case anime
+        case manga
+
+        var id: String {
+            switch self {
+            case .header: return "header"
+            case .info: return "info"
+            case .about: return "about"
+            case .voices: return "voices"
+            case .anime: return "anime"
+            case .manga: return "manga"
+            }
+        }
+    }
+
+    enum ExternalPageNavigationState: Equatable {
+        case unavailable
+        case available(title: String, url: URL)
+    }
+
+    func sections(for person: PeopleDetailDTO) -> [Section] {
+        var result: [Section] = [.header, .info]
+        if aboutText(for: person) != nil {
+            result.append(.about)
+        }
+        if !voiceRoles(for: person).isEmpty {
+            result.append(.voices)
+        }
+        if !animeStaffPositions(for: person).isEmpty {
+            result.append(.anime)
+        }
+        if !mangaStaffPositions(for: person).isEmpty {
+            result.append(.manga)
+        }
+        return result
+    }
+
+    func externalPageNavigationState() -> ExternalPageNavigationState {
+        guard let detail,
+              let url = malPageURL(for: detail) else {
+            return .unavailable
+        }
+        return .available(title: displayName(for: detail), url: url)
+    }
 
     func displayName(for person: PeopleDetailDTO) -> String {
         let localName = [person.familyName, person.givenName]

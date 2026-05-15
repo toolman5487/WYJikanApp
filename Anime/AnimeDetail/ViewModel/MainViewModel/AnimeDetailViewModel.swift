@@ -7,6 +7,8 @@
 
 import Combine
 import Foundation
+import OSLog
+import SwiftData
 
 @MainActor
 final class AnimeDetailViewModel: ObservableObject {
@@ -25,10 +27,16 @@ final class AnimeDetailViewModel: ObservableObject {
 
     private let malId: Int
     private let service: AnimeDetailServicing
+    private let favoriteRepository: any FavoriteRepository
 
-    init(malId: Int, service: AnimeDetailServicing = AnimeDetailService()) {
+    init(
+        malId: Int,
+        service: AnimeDetailServicing = AnimeDetailService(),
+        favoriteRepository: any FavoriteRepository = SwiftDataFavoriteRepository.shared
+    ) {
         self.malId = malId
         self.service = service
+        self.favoriteRepository = favoriteRepository
     }
 
     var detail: AnimeDetailDTO? {
@@ -131,5 +139,34 @@ final class AnimeDetailViewModel: ObservableObject {
         pictureItems = []
         characterRoles = []
         recommendationItems = []
+    }
+
+    var isFavoriteActionEnabled: Bool {
+        detail != nil
+    }
+
+    func toggleFavorite(
+        isFavorite: Bool,
+        modelContext: ModelContext
+    ) {
+        do {
+            if isFavorite {
+                _ = try favoriteRepository.toggleFavorite(
+                    malId: malId,
+                    mediaKind: .anime,
+                    modelContext: modelContext,
+                    makeItem: nil
+                )
+            } else if let detail {
+                _ = try favoriteRepository.toggleFavorite(
+                    malId: malId,
+                    mediaKind: .anime,
+                    modelContext: modelContext,
+                    makeItem: { self.favoriteItem(for: detail) }
+                )
+            }
+        } catch {
+            AppLogger.persistence.error("Anime favorite update failed: \(error.localizedDescription, privacy: .public)")
+        }
     }
 }
