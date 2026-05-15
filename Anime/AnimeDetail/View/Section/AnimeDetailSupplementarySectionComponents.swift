@@ -67,7 +67,7 @@ struct AnimeDetailCharacterCardView: View {
                 Text(name)
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(ThemeColor.textPrimary)
-                    .lineLimit(2)
+                    .lineLimit(1)
 
                 Text(role)
                     .font(.caption)
@@ -77,7 +77,7 @@ struct AnimeDetailCharacterCardView: View {
                 Text(voiceActorSummary)
                     .font(.caption2)
                     .foregroundStyle(ThemeColor.textSecondary)
-                    .lineLimit(2)
+                    .lineLimit(1)
             }
             .frame(width: 124, alignment: .leading)
         }
@@ -112,13 +112,13 @@ struct AnimeDetailRecommendationCardView: View {
             Text(title)
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(ThemeColor.textPrimary)
-                .lineLimit(2)
+                .lineLimit(1)
                 .frame(width: 136, alignment: .leading)
 
             Text(summary)
                 .font(.caption2)
                 .foregroundStyle(ThemeColor.textSecondary)
-                .lineLimit(3)
+                .lineLimit(1)
                 .frame(width: 136, alignment: .leading)
         }
     }

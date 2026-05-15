@@ -72,7 +72,7 @@ private struct AnimeDetailRecommendationsListView: View {
                                 Text(viewModel.recommendationTitle(recommendation))
                                     .font(.subheadline.weight(.semibold))
                                     .foregroundStyle(ThemeColor.textPrimary)
-                                    .lineLimit(2)
+                                    .lineLimit(1)
 
                                 Text(viewModel.recommendationSummaryText(recommendation))
                                     .font(.caption)

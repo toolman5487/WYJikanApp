@@ -69,6 +69,7 @@ private struct AnimeDetailCharactersListView: View {
                                     Text(viewModel.characterName(character))
                                         .font(.headline)
                                         .foregroundStyle(ThemeColor.textPrimary)
+                                        .lineLimit(1)
                                         .multilineTextAlignment(.leading)
 
                                     Text(viewModel.characterRoleText(role))
@@ -78,6 +79,7 @@ private struct AnimeDetailCharactersListView: View {
                                     Text(viewModel.voiceActorSummary(for: role))
                                         .font(.caption)
                                         .foregroundStyle(ThemeColor.textSecondary)
+                                        .lineLimit(1)
                                         .fixedSize(horizontal: false, vertical: true)
                                 }
 
