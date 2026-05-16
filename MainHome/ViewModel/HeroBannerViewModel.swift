@@ -48,6 +48,16 @@ final class HeroBannerViewModel: ObservableObject {
         load()
     }
 
+    func refresh() async {
+        if let loadTask, isLoading {
+            await loadTask.value
+            return
+        }
+
+        let task = startLoad(forceRefresh: true, showsLoadingState: !hasContent)
+        await task.value
+    }
+
     func setCurrentIndex(_ index: Int) {
         guard items.indices.contains(index) else { return }
         currentIndex = index
@@ -81,54 +91,18 @@ final class HeroBannerViewModel: ObservableObject {
         }
     }
 
-    func load() {
-        loadTask?.cancel()
-        stopAutoScroll()
-        isLoading = true
-        screenState = .loading
-
-        loadTask = Task { @MainActor [weak self] in
-            guard let self else { return }
-            do {
-                let response = try await self.service.fetchHeroBanner()
-                var seenMalIds = Set<Int>()
-                let mapped: [BannerItem] = response.data.compactMap { dto in
-                    guard let urlString =
-                        dto.images?.webp?.largeImageUrl ??
-                        dto.images?.jpg?.largeImageUrl ??
-                        dto.images?.webp?.imageUrl ??
-                        dto.images?.jpg?.imageUrl,
-                        let url = URL(string: urlString)
-                    else { return nil }
-
-                    guard seenMalIds.insert(dto.malId).inserted else { return nil }
-                    return BannerItem(
-                        id: dto.malId,
-                        title: Self.displayTitle(
-                            japanese: dto.titleJapanese,
-                            english: dto.titleEnglish,
-                            fallback: dto.title
-                        ),
-                        type: dto.type,
-                        score: dto.score,
-                        imageURL: url
-                    )
-                }
-
-                let capped = Array(mapped.prefix(Self.maxBannerItems))
-                self.currentIndex = 0
-                self.isLoading = false
-                self.screenState = capped.isEmpty ? .empty : .content(capped)
-                self.startAutoScrollIfNeeded()
-            } catch is CancellationError {
-                self.isLoading = false
-            } catch {
-                self.currentIndex = 0
-                self.isLoading = false
-                self.screenState = .error(error.localizedDescription)
-                self.stopAutoScroll()
-            }
+    private var hasContent: Bool {
+        switch screenState {
+        case .content:
+            return true
+        case .loading, .error, .empty:
+            return false
         }
+    }
+
+    func load() {
+        guard !isLoading else { return }
+        _ = startLoad(forceRefresh: false, showsLoadingState: true)
     }
 
     func startAutoScrollIfNeeded() {
@@ -149,6 +123,74 @@ final class HeroBannerViewModel: ObservableObject {
     func stopAutoScroll() {
         autoScrollTask?.cancel()
         autoScrollTask = nil
+    }
+
+    private func performLoad(forceRefresh: Bool, showsLoadingState: Bool) async {
+        let previousState = screenState
+        let previousIndex = currentIndex
+        stopAutoScroll()
+        isLoading = true
+        defer {
+            isLoading = false
+            loadTask = nil
+        }
+
+        if showsLoadingState {
+            screenState = .loading
+        }
+
+        do {
+            let response = try await service.fetchHeroBanner(forceRefresh: forceRefresh)
+            var seenMalIds = Set<Int>()
+            let mapped: [BannerItem] = response.data.compactMap { dto in
+                guard let urlString =
+                    dto.images?.webp?.largeImageUrl ??
+                    dto.images?.jpg?.largeImageUrl ??
+                    dto.images?.webp?.imageUrl ??
+                    dto.images?.jpg?.imageUrl,
+                    let url = URL(string: urlString)
+                else { return nil }
+
+                guard seenMalIds.insert(dto.malId).inserted else { return nil }
+                return BannerItem(
+                    id: dto.malId,
+                    title: Self.displayTitle(
+                        japanese: dto.titleJapanese,
+                        english: dto.titleEnglish,
+                        fallback: dto.title
+                    ),
+                    type: dto.type,
+                    score: dto.score,
+                    imageURL: url
+                )
+            }
+
+            let capped = Array(mapped.prefix(Self.maxBannerItems))
+            currentIndex = 0
+            screenState = capped.isEmpty ? .empty : .content(capped)
+            startAutoScrollIfNeeded()
+        } catch is CancellationError {
+            return
+        } catch {
+            if forceRefresh, case .content(let items) = previousState {
+                currentIndex = max(0, min(previousIndex, items.count - 1))
+                screenState = previousState
+                startAutoScrollIfNeeded()
+            } else {
+                currentIndex = 0
+                screenState = .error(error.localizedDescription)
+                stopAutoScroll()
+            }
+        }
+    }
+
+    private func startLoad(forceRefresh: Bool, showsLoadingState: Bool) -> Task<Void, Never> {
+        let task = Task { @MainActor [weak self] in
+            guard let self else { return }
+            await self.performLoad(forceRefresh: forceRefresh, showsLoadingState: showsLoadingState)
+        }
+        loadTask = task
+        return task
     }
 
     private static func displayTitle(japanese: String?, english: String?, fallback: String?) -> String {

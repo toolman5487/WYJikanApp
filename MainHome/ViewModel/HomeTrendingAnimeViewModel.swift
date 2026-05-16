@@ -29,6 +29,10 @@ final class HomeTrendingAnimeViewModel: ObservableObject {
         self.service = service
     }
 
+    deinit {
+        loadTask?.cancel()
+    }
+
     var items: [HomeTrendingAnimeCardItem] {
         switch screenState {
         case .content(let items):
@@ -43,49 +47,88 @@ final class HomeTrendingAnimeViewModel: ObservableObject {
         load()
     }
 
+    func refresh() async {
+        if let loadTask, isLoading {
+            await loadTask.value
+            return
+        }
+
+        let task = startLoad(forceRefresh: true, showsLoadingState: !hasContent)
+        await task.value
+    }
+
     func load() {
-        loadTask?.cancel()
+        guard !isLoading else { return }
+        _ = startLoad(forceRefresh: false, showsLoadingState: true)
+    }
+
+    private var hasContent: Bool {
+        switch screenState {
+        case .content:
+            return true
+        case .loading, .error, .empty:
+            return false
+        }
+    }
+
+    private func performLoad(forceRefresh: Bool, showsLoadingState: Bool) async {
+        let previousState = screenState
         isLoading = true
-        screenState = .loading
+        defer {
+            isLoading = false
+            loadTask = nil
+        }
 
-        loadTask = Task { [weak self] in
-            guard let self else { return }
-            do {
-                let response = try await self.service.fetchTopAnime(limit: Self.maxCards)
-                let mapped: [HomeTrendingAnimeCardItem] = response.data.compactMap { dto -> HomeTrendingAnimeCardItem? in
-                    guard let urlString =
-                        dto.images?.webp?.largeImageUrl ??
-                        dto.images?.jpg?.largeImageUrl ??
-                        dto.images?.webp?.imageUrl ??
-                        dto.images?.jpg?.imageUrl,
-                        let url = URL(string: urlString) else { return nil }
+        if showsLoadingState {
+            screenState = .loading
+        }
 
-                    return HomeTrendingAnimeCardItem(
-                        id: dto.malId,
-                        title: Self.displayTitle(
-                            japanese: dto.titleJapanese,
-                            english: dto.titleEnglish,
-                            fallback: dto.title
-                        ),
-                        type: dto.type,
-                        score: dto.score,
-                        rank: dto.rank,
-                        imageURL: url
-                    )
-                }
+        do {
+            let response = try await service.fetchTopAnime(
+                limit: Self.maxCards,
+                forceRefresh: forceRefresh
+            )
+            let mapped: [HomeTrendingAnimeCardItem] = response.data.compactMap { dto -> HomeTrendingAnimeCardItem? in
+                guard let urlString =
+                    dto.images?.webp?.largeImageUrl ??
+                    dto.images?.jpg?.largeImageUrl ??
+                    dto.images?.webp?.imageUrl ??
+                    dto.images?.jpg?.imageUrl,
+                    let url = URL(string: urlString) else { return nil }
 
-                self.isLoading = false
-                self.screenState = mapped.isEmpty ? .empty : .content(mapped)
-            } catch {
-                self.isLoading = false
-                self.screenState = .error(error.localizedDescription)
+                return HomeTrendingAnimeCardItem(
+                    id: dto.malId,
+                    title: Self.displayTitle(
+                        japanese: dto.titleJapanese,
+                        english: dto.titleEnglish,
+                        fallback: dto.title
+                    ),
+                    type: dto.type,
+                    score: dto.score,
+                    rank: dto.rank,
+                    imageURL: url
+                )
+            }
+
+            screenState = mapped.isEmpty ? .empty : .content(mapped)
+        } catch is CancellationError {
+            return
+        } catch {
+            if forceRefresh, case .content = previousState {
+                screenState = previousState
+            } else {
+                screenState = .error(error.localizedDescription)
             }
         }
     }
 
-    func stop() {
-        loadTask?.cancel()
-        loadTask = nil
+    private func startLoad(forceRefresh: Bool, showsLoadingState: Bool) -> Task<Void, Never> {
+        let task = Task { [weak self] in
+            guard let self else { return }
+            await self.performLoad(forceRefresh: forceRefresh, showsLoadingState: showsLoadingState)
+        }
+        loadTask = task
+        return task
     }
 
     private static func displayTitle(japanese: String?, english: String?, fallback: String?) -> String {

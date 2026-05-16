@@ -30,6 +30,10 @@ final class HomeTodayAnimeViewModel: ObservableObject {
         self.service = service
     }
 
+    deinit {
+        loadTask?.cancel()
+    }
+
     var items: [HomeTodayAnimeCardItem] {
         switch screenState {
         case .content(let items):
@@ -44,51 +48,90 @@ final class HomeTodayAnimeViewModel: ObservableObject {
         load()
     }
 
+    func refresh() async {
+        if let loadTask, isLoading {
+            await loadTask.value
+            return
+        }
+
+        let task = startLoad(forceRefresh: true, showsLoadingState: !hasContent)
+        await task.value
+    }
+
     func load() {
-        loadTask?.cancel()
+        guard !isLoading else { return }
+        _ = startLoad(forceRefresh: false, showsLoadingState: true)
+    }
+
+    private var hasContent: Bool {
+        switch screenState {
+        case .content:
+            return true
+        case .loading, .error, .empty:
+            return false
+        }
+    }
+
+    private func performLoad(forceRefresh: Bool, showsLoadingState: Bool) async {
+        let previousState = screenState
         isLoading = true
-        screenState = .loading
+        defer {
+            isLoading = false
+            loadTask = nil
+        }
 
-        loadTask = Task { [weak self] in
-            guard let self else { return }
-            do {
-                let response = try await self.service.fetchTodayAnime(limit: Self.scheduleFetchLimit)
-                let mapped: [HomeTodayAnimeCardItem] = response.data.compactMap { dto -> HomeTodayAnimeCardItem? in
-                    guard let urlString =
-                        dto.images?.jpg?.largeImageUrl ??
-                        dto.images?.webp?.largeImageUrl ??
-                        dto.images?.jpg?.imageUrl ??
-                        dto.images?.webp?.imageUrl,
-                        let url = URL(string: urlString) else { return nil }
+        if showsLoadingState {
+            screenState = .loading
+        }
 
-                    return HomeTodayAnimeCardItem(
-                        id: dto.malId,
-                        title: Self.displayTitle(
-                            japanese: dto.titleJapanese,
-                            english: dto.titleEnglish,
-                            fallback: dto.title
-                        ),
-                        type: dto.type,
-                        score: dto.score,
-                        imageURL: url
-                    )
-                }
+        do {
+            let response = try await service.fetchTodayAnime(
+                limit: Self.scheduleFetchLimit,
+                forceRefresh: forceRefresh
+            )
+            let mapped: [HomeTodayAnimeCardItem] = response.data.compactMap { dto -> HomeTodayAnimeCardItem? in
+                guard let urlString =
+                    dto.images?.jpg?.largeImageUrl ??
+                    dto.images?.webp?.largeImageUrl ??
+                    dto.images?.jpg?.imageUrl ??
+                    dto.images?.webp?.imageUrl,
+                    let url = URL(string: urlString) else { return nil }
 
-                var seenIDs = Set<Int>()
-                let uniqueInOrder = mapped.filter { seenIDs.insert($0.id).inserted }
-                let items = Array(uniqueInOrder.prefix(Self.maxCards))
-                self.isLoading = false
-                self.screenState = items.isEmpty ? .empty : .content(items)
-            } catch {
-                self.isLoading = false
-                self.screenState = .error(error.localizedDescription)
+                return HomeTodayAnimeCardItem(
+                    id: dto.malId,
+                    title: Self.displayTitle(
+                        japanese: dto.titleJapanese,
+                        english: dto.titleEnglish,
+                        fallback: dto.title
+                    ),
+                    type: dto.type,
+                    score: dto.score,
+                    imageURL: url
+                )
+            }
+
+            var seenIDs = Set<Int>()
+            let uniqueInOrder = mapped.filter { seenIDs.insert($0.id).inserted }
+            let items = Array(uniqueInOrder.prefix(Self.maxCards))
+            screenState = items.isEmpty ? .empty : .content(items)
+        } catch is CancellationError {
+            return
+        } catch {
+            if forceRefresh, case .content = previousState {
+                screenState = previousState
+            } else {
+                screenState = .error(error.localizedDescription)
             }
         }
     }
 
-    func stop() {
-        loadTask?.cancel()
-        loadTask = nil
+    private func startLoad(forceRefresh: Bool, showsLoadingState: Bool) -> Task<Void, Never> {
+        let task = Task { [weak self] in
+            guard let self else { return }
+            await self.performLoad(forceRefresh: forceRefresh, showsLoadingState: showsLoadingState)
+        }
+        loadTask = task
+        return task
     }
 
     private static func displayTitle(japanese: String?, english: String?, fallback: String?) -> String {

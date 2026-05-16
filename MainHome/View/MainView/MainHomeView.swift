@@ -9,6 +9,11 @@ import SwiftUI
 
 struct MainHomeView: View {
     @EnvironmentObject private var router: MainHomeRouter
+    @StateObject private var heroBannerViewModel: HeroBannerViewModel
+    @StateObject private var todayAnimeViewModel: HomeTodayAnimeViewModel
+    @StateObject private var trendingAnimeViewModel: HomeTrendingAnimeViewModel
+    @StateObject private var trendingMangaViewModel: HomeTrendingMangaViewModel
+    @StateObject private var recommendedAnimeViewModel: HomeRecommendedAnimeViewModel
     
     enum HomeSection: Identifiable {
         case todayAnime
@@ -41,19 +46,39 @@ struct MainHomeView: View {
         .trendingManga,
         .recommendedAnime
     ]
+
+    init(service: MainHomeServicing = MainHomeService()) {
+        _heroBannerViewModel = StateObject(wrappedValue: HeroBannerViewModel(service: service))
+        _todayAnimeViewModel = StateObject(wrappedValue: HomeTodayAnimeViewModel(service: service))
+        _trendingAnimeViewModel = StateObject(wrappedValue: HomeTrendingAnimeViewModel(service: service))
+        _trendingMangaViewModel = StateObject(wrappedValue: HomeTrendingMangaViewModel(service: service))
+        _recommendedAnimeViewModel = StateObject(wrappedValue: HomeRecommendedAnimeViewModel(service: service))
+    }
     
     
     @ViewBuilder
     private func sectionView(_ section: HomeSection) -> some View {
         switch section {
         case .todayAnime:
-            HomeTodayAnimeView(showsHeader: false)
+            HomeTodayAnimeView(
+                viewModel: todayAnimeViewModel,
+                showsHeader: false
+            )
         case .trendingAnime:
-            HomeTrendingAnimeView(showsHeader: false)
+            HomeTrendingAnimeView(
+                viewModel: trendingAnimeViewModel,
+                showsHeader: false
+            )
         case .trendingManga:
-            HomeTrendingMangaView(showsHeader: false)
+            HomeTrendingMangaView(
+                viewModel: trendingMangaViewModel,
+                showsHeader: false
+            )
         case .recommendedAnime:
-            HomeRecommendedAnimeView(showsHeader: false)
+            HomeRecommendedAnimeView(
+                viewModel: recommendedAnimeViewModel,
+                showsHeader: false
+            )
         }
     }
 
@@ -79,7 +104,7 @@ struct MainHomeView: View {
         NavigationStack(path: $router.path) {
             ScrollView {
                 LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
-                    HeroBannerView()
+                    HeroBannerView(viewModel: heroBannerViewModel)
                         .ignoresSafeArea(edges: .top)
 
                     ForEach(sections) { section in
@@ -90,6 +115,9 @@ struct MainHomeView: View {
                         }
                     }
                 }
+            }
+            .refreshable {
+                await refreshAllContent()
             }
             .toolbarBackground(.hidden, for: .navigationBar)
             .navigationDestination(for: MainHomeRoute.self) { route in
@@ -107,6 +135,22 @@ struct MainHomeView: View {
                 }
             }
         }
+    }
+
+    private func refreshAllContent() async {
+        async let heroBannerRefresh = heroBannerViewModel.refresh()
+        async let todayAnimeRefresh = todayAnimeViewModel.refresh()
+        async let trendingAnimeRefresh = trendingAnimeViewModel.refresh()
+        async let trendingMangaRefresh = trendingMangaViewModel.refresh()
+        async let recommendedAnimeRefresh = recommendedAnimeViewModel.refresh()
+
+        _ = await (
+            heroBannerRefresh,
+            todayAnimeRefresh,
+            trendingAnimeRefresh,
+            trendingMangaRefresh,
+            recommendedAnimeRefresh
+        )
     }
 }
 

@@ -35,6 +35,11 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
         self.service = service
     }
 
+    deinit {
+        loadTask?.cancel()
+        titleEnrichmentTask?.cancel()
+    }
+
     private var allItems: [HomeRecommendedAnimeCardItem] {
         switch screenState {
         case .content(let items):
@@ -57,62 +62,98 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
         load()
     }
 
-    func load() {
-        loadTask?.cancel()
-        titleEnrichmentTask?.cancel()
-        isLoading = true
-        screenState = .loading
-        visibleCount = Self.initialVisibleCards
-
-        loadTask = Task { [weak self] in
-            guard let self else { return }
-            do {
-                let response = try await self.service.fetchRecommendedAnime(limit: Self.maxCards)
-                let mapped: [HomeRecommendedAnimeCardItem] = response.data.compactMap { dto in
-                    guard dto.entry.count >= 2 else { return nil }
-                    let source = dto.entry[0]
-                    let recommended = dto.entry[1]
-                    guard let urlString =
-                        recommended.images?.webp?.largeImageUrl ??
-                        recommended.images?.jpg?.largeImageUrl ??
-                        recommended.images?.webp?.imageUrl ??
-                        recommended.images?.jpg?.imageUrl,
-                        let url = URL(string: urlString)
-                    else { return nil }
-
-                    return HomeRecommendedAnimeCardItem(
-                        id: dto.id,
-                        sourceTitle: source.title?.trimmingCharacters(in: .whitespacesAndNewlines).nonEmpty ?? "原作",
-                        recommendedTitle: Self.titleCache[recommended.malId] ??
-                            recommended.title?.trimmingCharacters(in: .whitespacesAndNewlines).nonEmpty ??
-                            "推薦作品",
-                        username: dto.user?.username?.trimmingCharacters(in: .whitespacesAndNewlines).nonEmpty,
-                        detailMalId: recommended.malId,
-                        imageURL: url
-                    )
-                }
-
-                var seenRecommendationIDs = Set<String>()
-                let items = mapped.filter { seenRecommendationIDs.insert($0.id).inserted }
-                self.isLoading = false
-                self.screenState = items.isEmpty ? .empty : .content(items)
-                self.startTitleEnrichmentIfNeeded()
-            } catch {
-                self.isLoading = false
-                self.screenState = .error(error.localizedDescription)
-            }
+    func refresh() async {
+        if let loadTask, isLoading {
+            await loadTask.value
+            return
         }
+
+        let task = startLoad(forceRefresh: true, showsLoadingState: !hasContent)
+        await task.value
     }
 
-    func stop() {
-        loadTask?.cancel()
-        loadTask = nil
-        titleEnrichmentTask?.cancel()
-        titleEnrichmentTask = nil
+    func load() {
+        guard !isLoading else { return }
+        _ = startLoad(forceRefresh: false, showsLoadingState: true)
     }
 
     func loadMore() {
         visibleCount = min(visibleCount + Self.loadMoreStep, allItems.count)
+    }
+
+    private var hasContent: Bool {
+        switch screenState {
+        case .content:
+            return true
+        case .loading, .error, .empty:
+            return false
+        }
+    }
+
+    private func performLoad(forceRefresh: Bool, showsLoadingState: Bool) async {
+        let previousState = screenState
+        let previousVisibleCount = visibleCount
+        titleEnrichmentTask?.cancel()
+        isLoading = true
+        defer {
+            isLoading = false
+            loadTask = nil
+        }
+
+        if showsLoadingState {
+            screenState = .loading
+            visibleCount = Self.initialVisibleCards
+        }
+
+        do {
+            let response = try await service.fetchRecommendedAnime(
+                limit: Self.maxCards,
+                forceRefresh: forceRefresh
+            )
+            let mapped: [HomeRecommendedAnimeCardItem] = response.data.compactMap { dto in
+                guard dto.entry.count >= 2 else { return nil }
+                let source = dto.entry[0]
+                let recommended = dto.entry[1]
+                guard let urlString =
+                    recommended.images?.webp?.largeImageUrl ??
+                    recommended.images?.jpg?.largeImageUrl ??
+                    recommended.images?.webp?.imageUrl ??
+                    recommended.images?.jpg?.imageUrl,
+                    let url = URL(string: urlString)
+                else { return nil }
+
+                return HomeRecommendedAnimeCardItem(
+                    id: dto.id,
+                    sourceTitle: source.title?.trimmingCharacters(in: .whitespacesAndNewlines).nonEmpty ?? "原作",
+                    recommendedTitle: Self.titleCache[recommended.malId] ??
+                        recommended.title?.trimmingCharacters(in: .whitespacesAndNewlines).nonEmpty ??
+                        "推薦作品",
+                    username: dto.user?.username?.trimmingCharacters(in: .whitespacesAndNewlines).nonEmpty,
+                    detailMalId: recommended.malId,
+                    imageURL: url
+                )
+            }
+
+            var seenRecommendationIDs = Set<String>()
+            let items = mapped.filter { seenRecommendationIDs.insert($0.id).inserted }
+            visibleCount = resolvedVisibleCount(
+                itemCount: items.count,
+                previousVisibleCount: previousVisibleCount,
+                preservesExpandedState: forceRefresh && hasContentState(previousState)
+            )
+            screenState = items.isEmpty ? .empty : .content(items)
+            startTitleEnrichmentIfNeeded()
+        } catch is CancellationError {
+            return
+        } catch {
+            if forceRefresh, hasContentState(previousState) {
+                screenState = previousState
+                visibleCount = previousVisibleCount
+                startTitleEnrichmentIfNeeded()
+            } else {
+                screenState = .error(error.localizedDescription)
+            }
+        }
     }
 
     private func startTitleEnrichmentIfNeeded() {
@@ -127,7 +168,10 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
             for id in uncachedIDs {
                 if Task.isCancelled { return }
                 do {
-                    let response = try await self.service.fetchAnimeDetail(malId: id)
+                    let response = try await self.service.fetchAnimeDetail(
+                        malId: id,
+                        forceRefresh: false
+                    )
                     let anime = response.data
                     let title = Self.preferredTitle(
                         japanese: anime.titleJapanese,
@@ -142,6 +186,38 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
                 }
             }
         }
+    }
+
+    private func startLoad(forceRefresh: Bool, showsLoadingState: Bool) -> Task<Void, Never> {
+        let task = Task { [weak self] in
+            guard let self else { return }
+            await self.performLoad(forceRefresh: forceRefresh, showsLoadingState: showsLoadingState)
+        }
+        loadTask = task
+        return task
+    }
+
+    private func hasContentState(_ state: HomeRecommendedAnimeScreenState) -> Bool {
+        switch state {
+        case .content:
+            return true
+        case .loading, .error, .empty:
+            return false
+        }
+    }
+
+    private func resolvedVisibleCount(
+        itemCount: Int,
+        previousVisibleCount: Int,
+        preservesExpandedState: Bool
+    ) -> Int {
+        guard itemCount > 0 else { return 0 }
+
+        if preservesExpandedState {
+            return min(max(previousVisibleCount, Self.initialVisibleCards), itemCount)
+        }
+
+        return min(Self.initialVisibleCards, itemCount)
     }
 
     private func replaceRecommendedTitle(for malId: Int, with title: String) {

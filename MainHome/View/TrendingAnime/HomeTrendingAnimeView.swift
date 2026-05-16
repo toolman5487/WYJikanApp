@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct HomeTrendingAnimeView: View {
-    @StateObject private var viewModel = HomeTrendingAnimeViewModel()
+    @ObservedObject private var viewModel: HomeTrendingAnimeViewModel
     @EnvironmentObject private var favoriteStatusStore: FavoriteStatusStore
     @EnvironmentObject private var router: MainHomeRouter
     let showsHeader: Bool
@@ -23,7 +23,11 @@ struct HomeTrendingAnimeView: View {
         cardHeight * Self.posterAspectRatio
     }
 
-    init(showsHeader: Bool = true) {
+    init(
+        viewModel: HomeTrendingAnimeViewModel,
+        showsHeader: Bool = true
+    ) {
+        self.viewModel = viewModel
         self.showsHeader = showsHeader
     }
     
@@ -84,14 +88,11 @@ struct HomeTrendingAnimeView: View {
         .onAppear {
             viewModel.loadIfNeeded()
         }
-        .onDisappear {
-            viewModel.stop()
-        }
     }
 }
 
 #Preview {
-    HomeTrendingAnimeView()
+    HomeTrendingAnimeView(viewModel: HomeTrendingAnimeViewModel())
         .environmentObject(FavoriteStatusStore())
         .environmentObject(MainHomeRouter())
 }

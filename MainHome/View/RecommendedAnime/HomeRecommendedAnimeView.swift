@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct HomeRecommendedAnimeView: View {
-    @StateObject private var viewModel = HomeRecommendedAnimeViewModel()
+    @ObservedObject private var viewModel: HomeRecommendedAnimeViewModel
     @EnvironmentObject private var favoriteStatusStore: FavoriteStatusStore
     @EnvironmentObject private var router: MainHomeRouter
     let showsHeader: Bool
@@ -23,7 +23,11 @@ struct HomeRecommendedAnimeView: View {
         count: Self.columnCount
     )
 
-    init(showsHeader: Bool = true) {
+    init(
+        viewModel: HomeRecommendedAnimeViewModel,
+        showsHeader: Bool = true
+    ) {
+        self.viewModel = viewModel
         self.showsHeader = showsHeader
     }
 
@@ -97,15 +101,12 @@ struct HomeRecommendedAnimeView: View {
         .onAppear {
             viewModel.loadIfNeeded()
         }
-        .onDisappear {
-            viewModel.stop()
-        }
     }
 
 }
 
 #Preview {
-    HomeRecommendedAnimeView()
+    HomeRecommendedAnimeView(viewModel: HomeRecommendedAnimeViewModel())
         .environmentObject(FavoriteStatusStore())
         .environmentObject(MainHomeRouter())
 }

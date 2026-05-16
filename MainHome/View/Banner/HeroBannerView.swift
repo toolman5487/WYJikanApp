@@ -8,10 +8,14 @@
 import SwiftUI
 
 struct HeroBannerView: View {
-    @StateObject private var viewModel = HeroBannerViewModel()
+    @ObservedObject private var viewModel: HeroBannerViewModel
     @EnvironmentObject private var router: MainHomeRouter
     
     private static let heroAspectRatio: CGFloat = 2.0 / 3.0
+
+    init(viewModel: HeroBannerViewModel) {
+        self.viewModel = viewModel
+    }
     
     var body: some View {
         VStack(spacing: 0) {
@@ -84,6 +88,6 @@ struct HeroBannerView: View {
 }
 
 #Preview {
-    HeroBannerView()
+    HeroBannerView(viewModel: HeroBannerViewModel())
         .environmentObject(MainHomeRouter())
 }
