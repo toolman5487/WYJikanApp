@@ -22,7 +22,11 @@ struct CharacterDetailAnimeWorksSectionView: View {
                         CharacterDetailWorkCardView(
                             title: viewModel.workTitle(anime),
                             subtitle: viewModel.roleText(role.role),
-                            imageURL: viewModel.imageURL(from: anime.images)
+                            imageURL: viewModel.imageURL(from: anime.images),
+                            cardWidth: 160,
+                            cardHeight: 240,
+                            cornerRadius: 16,
+                            textMinHeight: 44
                         )
                     }
                     .buttonStyle(.plain)
@@ -47,7 +51,11 @@ struct CharacterDetailMangaWorksSectionView: View {
                         CharacterDetailWorkCardView(
                             title: viewModel.workTitle(manga),
                             subtitle: viewModel.roleText(role.role),
-                            imageURL: viewModel.imageURL(from: manga.images)
+                            imageURL: viewModel.imageURL(from: manga.images),
+                            cardWidth: 160,
+                            cardHeight: 240,
+                            cornerRadius: 16,
+                            textMinHeight: 44
                         )
                     }
                     .buttonStyle(.plain)
@@ -61,25 +69,41 @@ private struct CharacterDetailWorkCardView: View {
     let title: String
     let subtitle: String
     let imageURL: URL?
+    let cardWidth: CGFloat
+    let cardHeight: CGFloat
+    let cornerRadius: CGFloat
+    let textMinHeight: CGFloat
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             posterView
-                .frame(width: 112, height: 156)
-                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .frame(width: cardWidth, height: cardHeight)
+                .clipShape(
+                    RoundedRectangle(
+                        cornerRadius: cornerRadius,
+                        style: .continuous
+                    )
+                )
 
-            Text(title)
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(ThemeColor.textPrimary)
-                .lineLimit(2)
-                .frame(width: 112, alignment: .leading)
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(ThemeColor.textPrimary)
+                    .lineLimit(2)
 
-            Text(subtitle)
-                .font(.caption2)
-                .foregroundStyle(ThemeColor.textSecondary)
-                .lineLimit(1)
-                .frame(width: 112, alignment: .leading)
+                Text(subtitle)
+                    .font(.caption2)
+                    .foregroundStyle(ThemeColor.textSecondary)
+                    .lineLimit(1)
+            }
+            .frame(
+                minWidth: cardWidth,
+                maxWidth: cardWidth,
+                minHeight: textMinHeight,
+                alignment: .topLeading
+            )
         }
+        .frame(width: cardWidth, alignment: .leading)
     }
 
     @ViewBuilder
@@ -87,7 +111,10 @@ private struct CharacterDetailWorkCardView: View {
         if let imageURL {
             RemotePosterImageView(url: imageURL)
         } else {
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
+            RoundedRectangle(
+                cornerRadius: cornerRadius,
+                style: .continuous
+            )
                 .fill(Color(.systemGray5))
                 .overlay {
                     Image(systemName: "photo")

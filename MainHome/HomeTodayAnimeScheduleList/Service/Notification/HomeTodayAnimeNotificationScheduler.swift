@@ -21,6 +21,10 @@ final class HomeTodayAnimeNotificationScheduler: BaseUserNotificationManager {
         userDefaults.object(forKey: HomeTodayAnimeNotificationConfig.lastRefreshDateKey) as? Date
     }
 
+    private var lastRefreshAttemptDate: Date? {
+        userDefaults.object(forKey: HomeTodayAnimeNotificationConfig.lastRefreshAttemptDateKey) as? Date
+    }
+
     init(
         service: HomeTodayAnimeScheduleListServicing = HomeTodayAnimeScheduleListService(),
         notificationCenter: UNUserNotificationCenter = UNUserNotificationCenter.current(),
@@ -87,6 +91,7 @@ final class HomeTodayAnimeNotificationScheduler: BaseUserNotificationManager {
         guard await shouldRefreshSchedule() else { return }
 
         do {
+            markLastRefreshAttemptDate()
             try await withProcessingState(.refreshing) {
                 _ = try await scheduleBroadcastReminderNotifications()
             }
@@ -129,6 +134,7 @@ final class HomeTodayAnimeNotificationScheduler: BaseUserNotificationManager {
         guard beginProcessing(.disabling) != nil else { return }
         await removeManagedPendingNotificationRequests()
         clearLastRefreshDate()
+        clearLastRefreshAttemptDate()
         setState(.disabled)
 
         if showFeedback {
@@ -165,6 +171,11 @@ final class HomeTodayAnimeNotificationScheduler: BaseUserNotificationManager {
     }
 
     private func shouldRefreshSchedule() async -> Bool {
+        if let lastRefreshAttemptDate,
+           Date().timeIntervalSince(lastRefreshAttemptDate) < HomeTodayAnimeNotificationConfig.failedScheduleRefreshRetryInterval {
+            return false
+        }
+
         let pendingRequests = await pendingManagedNotificationRequests()
         if pendingRequests.isEmpty {
             return true
@@ -196,7 +207,15 @@ final class HomeTodayAnimeNotificationScheduler: BaseUserNotificationManager {
         userDefaults.set(date, forKey: HomeTodayAnimeNotificationConfig.lastRefreshDateKey)
     }
 
+    private func markLastRefreshAttemptDate(_ date: Date = Date()) {
+        userDefaults.set(date, forKey: HomeTodayAnimeNotificationConfig.lastRefreshAttemptDateKey)
+    }
+
     private func clearLastRefreshDate() {
         userDefaults.removeObject(forKey: HomeTodayAnimeNotificationConfig.lastRefreshDateKey)
+    }
+
+    private func clearLastRefreshAttemptDate() {
+        userDefaults.removeObject(forKey: HomeTodayAnimeNotificationConfig.lastRefreshAttemptDateKey)
     }
 }

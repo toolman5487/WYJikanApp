@@ -23,7 +23,11 @@ struct PeopleDetailVoiceRolesSectionView: View {
                             characterName: viewModel.characterName(character),
                             workTitle: role.anime.map(viewModel.workTitle) ?? "-",
                             role: viewModel.roleText(role.role),
-                            imageURL: viewModel.imageURL(from: character.images)
+                            imageURL: viewModel.imageURL(from: character.images),
+                            cardWidth: 160,
+                            cardHeight: 240,
+                            cornerRadius: 16,
+                            textMinHeight: 60
                         )
                     }
                     .buttonStyle(.plain)
@@ -38,31 +42,46 @@ private struct PeopleDetailVoiceRoleCardView: View {
     let workTitle: String
     let role: String
     let imageURL: URL?
+    let cardWidth: CGFloat
+    let cardHeight: CGFloat
+    let cornerRadius: CGFloat
+    let textMinHeight: CGFloat
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             posterView
-                .frame(width: 112, height: 156)
-                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .frame(width: cardWidth, height: cardHeight)
+                .clipShape(
+                    RoundedRectangle(
+                        cornerRadius: cornerRadius,
+                        style: .continuous
+                    )
+                )
 
-            Text(characterName)
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(ThemeColor.textPrimary)
-                .lineLimit(2)
-                .frame(width: 112, alignment: .leading)
+            VStack(alignment: .leading, spacing: 4) {
+                Text(characterName)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(ThemeColor.textPrimary)
+                    .lineLimit(2)
 
-            Text(workTitle)
-                .font(.caption2)
-                .foregroundStyle(ThemeColor.textSecondary)
-                .lineLimit(1)
-                .frame(width: 112, alignment: .leading)
+                Text(workTitle)
+                    .font(.caption2)
+                    .foregroundStyle(ThemeColor.textSecondary)
+                    .lineLimit(1)
 
-            Text(role)
-                .font(.caption2)
-                .foregroundStyle(ThemeColor.textTertiary)
-                .lineLimit(1)
-                .frame(width: 112, alignment: .leading)
+                Text(role)
+                    .font(.caption2)
+                    .foregroundStyle(ThemeColor.textTertiary)
+                    .lineLimit(1)
+            }
+            .frame(
+                minWidth: cardWidth,
+                maxWidth: cardWidth,
+                minHeight: textMinHeight,
+                alignment: .topLeading
+            )
         }
+        .frame(width: cardWidth, alignment: .leading)
     }
 
     @ViewBuilder
@@ -70,7 +89,10 @@ private struct PeopleDetailVoiceRoleCardView: View {
         if let imageURL {
             RemotePosterImageView(url: imageURL)
         } else {
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
+            RoundedRectangle(
+                cornerRadius: cornerRadius,
+                style: .continuous
+            )
                 .fill(Color(.systemGray5))
                 .overlay {
                     Image(systemName: "person.crop.rectangle")

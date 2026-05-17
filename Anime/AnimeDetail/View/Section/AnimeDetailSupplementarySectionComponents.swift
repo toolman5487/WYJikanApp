@@ -56,12 +56,21 @@ struct AnimeDetailCharacterCardView: View {
     let role: String
     let voiceActorSummary: String
     let imageURL: URL?
+    let cardWidth: CGFloat
+    let cardHeight: CGFloat
+    let cornerRadius: CGFloat
+    let textMinHeight: CGFloat
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             portraitView
-                .frame(width: 124, height: 156)
-                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .frame(width: cardWidth, height: cardHeight)
+                .clipShape(
+                    RoundedRectangle(
+                        cornerRadius: cornerRadius,
+                        style: .continuous
+                    )
+                )
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(name)
@@ -79,8 +88,14 @@ struct AnimeDetailCharacterCardView: View {
                     .foregroundStyle(ThemeColor.textSecondary)
                     .lineLimit(1)
             }
-            .frame(width: 124, alignment: .leading)
+            .frame(
+                minWidth: cardWidth,
+                maxWidth: cardWidth,
+                minHeight: textMinHeight,
+                alignment: .topLeading
+            )
         }
+        .frame(width: cardWidth, alignment: .leading)
     }
 
     @ViewBuilder
@@ -88,7 +103,10 @@ struct AnimeDetailCharacterCardView: View {
         if let imageURL {
             RemotePosterImageView(url: imageURL)
         } else {
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
+            RoundedRectangle(
+                cornerRadius: cornerRadius,
+                style: .continuous
+            )
                 .fill(Color(.systemGray5))
                 .overlay {
                     Image(systemName: "person.fill")
@@ -102,25 +120,41 @@ struct AnimeDetailRecommendationCardView: View {
     let title: String
     let summary: String
     let imageURL: URL?
+    let cardWidth: CGFloat
+    let cardHeight: CGFloat
+    let cornerRadius: CGFloat
+    let textMinHeight: CGFloat
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             posterView
-                .frame(width: 136, height: 196)
-                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .frame(width: cardWidth, height: cardHeight)
+                .clipShape(
+                    RoundedRectangle(
+                        cornerRadius: cornerRadius,
+                        style: .continuous
+                    )
+                )
 
-            Text(title)
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(ThemeColor.textPrimary)
-                .lineLimit(1)
-                .frame(width: 136, alignment: .leading)
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(ThemeColor.textPrimary)
+                    .lineLimit(1)
 
-            Text(summary)
-                .font(.caption2)
-                .foregroundStyle(ThemeColor.textSecondary)
-                .lineLimit(1)
-                .frame(width: 136, alignment: .leading)
+                Text(summary)
+                    .font(.caption2)
+                    .foregroundStyle(ThemeColor.textSecondary)
+                    .lineLimit(1)
+            }
+            .frame(
+                minWidth: cardWidth,
+                maxWidth: cardWidth,
+                minHeight: textMinHeight,
+                alignment: .topLeading
+            )
         }
+        .frame(width: cardWidth, alignment: .leading)
     }
 
     @ViewBuilder
@@ -128,7 +162,10 @@ struct AnimeDetailRecommendationCardView: View {
         if let imageURL {
             RemotePosterImageView(url: imageURL)
         } else {
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
+            RoundedRectangle(
+                cornerRadius: cornerRadius,
+                style: .continuous
+            )
                 .fill(Color(.systemGray5))
                 .overlay {
                     Image(systemName: "photo")

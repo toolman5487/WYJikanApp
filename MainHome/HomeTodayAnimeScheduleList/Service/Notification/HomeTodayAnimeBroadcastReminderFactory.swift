@@ -6,8 +6,20 @@
 //
 
 import Foundation
+import OSLog
 
 struct HomeTodayAnimeBroadcastReminderFactory {
+    private struct DayReminderFetchFailure {
+        let day: HomeScheduleDay
+        let page: Int
+        let error: any Error
+    }
+
+    private struct DayReminderFetchResult {
+        let reminders: [HomeTodayAnimeBroadcastReminder]
+        let failure: DayReminderFetchFailure?
+    }
+
     private let service: HomeTodayAnimeScheduleListServicing
 
     init(service: HomeTodayAnimeScheduleListServicing) {
@@ -17,12 +29,40 @@ struct HomeTodayAnimeBroadcastReminderFactory {
     func makeReminders() async throws -> [HomeTodayAnimeBroadcastReminder] {
         let now = Date()
         var reminders: [HomeTodayAnimeBroadcastReminder] = []
+        var lastFailure: DayReminderFetchFailure?
 
         for day in HomeScheduleDay.allCases {
-            var page = 1
-            var hasNextPage = true
+            let result = await fetchReminders(for: day, now: now)
+            reminders.append(contentsOf: result.reminders)
 
-            while hasNextPage, page <= HomeTodayAnimeNotificationConfig.maxPagesPerDay {
+            if let failure = result.failure {
+                lastFailure = failure
+                AppLogger.notifications.warning(
+                    """
+                    Today anime reminder fetch failed for day=\(failure.day.rawValue, privacy: .public) \
+                    page=\(failure.page) \(failure.error.localizedDescription, privacy: .public)
+                    """
+                )
+            }
+        }
+
+        let deduplicated = deduplicatedReminders(reminders)
+        if deduplicated.isEmpty, let lastFailure {
+            throw lastFailure.error
+        }
+        return deduplicated
+    }
+
+    private func fetchReminders(
+        for day: HomeScheduleDay,
+        now: Date
+    ) async -> DayReminderFetchResult {
+        var page = 1
+        var hasNextPage = true
+        var reminders: [HomeTodayAnimeBroadcastReminder] = []
+
+        while hasNextPage, page <= HomeTodayAnimeNotificationConfig.maxPagesPerDay {
+            do {
                 let response = try await service.fetchSchedulePage(
                     day: day,
                     page: page,
@@ -36,10 +76,15 @@ struct HomeTodayAnimeBroadcastReminderFactory {
 
                 hasNextPage = response.pagination?.hasNextPage == true
                 page += 1
+            } catch {
+                return DayReminderFetchResult(
+                    reminders: reminders,
+                    failure: DayReminderFetchFailure(day: day, page: page, error: error)
+                )
             }
         }
 
-        return deduplicatedReminders(reminders)
+        return DayReminderFetchResult(reminders: reminders, failure: nil)
     }
 
     private func makeReminder(

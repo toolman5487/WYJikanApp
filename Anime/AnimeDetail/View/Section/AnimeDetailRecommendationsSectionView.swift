@@ -33,7 +33,11 @@ struct AnimeDetailRecommendationsSectionView: View {
                                 AnimeDetailRecommendationCardView(
                                     title: viewModel.recommendationTitle(recommendation),
                                     summary: viewModel.recommendationSummaryText(recommendation),
-                                    imageURL: viewModel.recommendationImageURL(recommendation)
+                                    imageURL: viewModel.recommendationImageURL(recommendation),
+                                    cardWidth: 160,
+                                    cardHeight: 240,
+                                    cornerRadius: 16,
+                                    textMinHeight: 44
                                 )
                             }
                             .buttonStyle(.plain)
@@ -52,8 +56,14 @@ private struct AnimeDetailRecommendationsListView: View {
     let viewModel: AnimeDetailViewModel
 
     private let columns = [
-        GridItem(.flexible(), spacing: 16, alignment: .top),
-        GridItem(.flexible(), spacing: 16, alignment: .top)
+        GridItem(
+            .adaptive(
+                minimum: 160,
+                maximum: 160
+            ),
+            spacing: 16,
+            alignment: .top
+        )
     ]
 
     var body: some View {
@@ -66,19 +76,33 @@ private struct AnimeDetailRecommendationsListView: View {
                         } label: {
                             VStack(alignment: .leading, spacing: 12) {
                                 recommendationPoster(recommendation)
-                                    .aspectRatio(2.0 / 3.0, contentMode: .fit)
-                                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                                    .frame(width: 160, height: 240)
+                                    .clipShape(
+                                        RoundedRectangle(
+                                            cornerRadius: 16,
+                                            style: .continuous
+                                        )
+                                    )
 
-                                Text(viewModel.recommendationTitle(recommendation))
-                                    .font(.subheadline.weight(.semibold))
-                                    .foregroundStyle(ThemeColor.textPrimary)
-                                    .lineLimit(1)
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(viewModel.recommendationTitle(recommendation))
+                                        .font(.subheadline.weight(.semibold))
+                                        .foregroundStyle(ThemeColor.textPrimary)
+                                        .lineLimit(1)
 
-                                Text(viewModel.recommendationSummaryText(recommendation))
-                                    .font(.caption)
-                                    .foregroundStyle(ThemeColor.textSecondary)
-                                    .lineLimit(3)
+                                    Text(viewModel.recommendationSummaryText(recommendation))
+                                        .font(.caption)
+                                        .foregroundStyle(ThemeColor.textSecondary)
+                                        .lineLimit(3)
+                                }
+                                .frame(
+                                    minWidth: 160,
+                                    maxWidth: 160,
+                                    minHeight: 72,
+                                    alignment: .topLeading
+                                )
                             }
+                            .frame(width: 160, alignment: .leading)
                         }
                         .buttonStyle(.plain)
                     }
@@ -95,7 +119,10 @@ private struct AnimeDetailRecommendationsListView: View {
         if let imageURL = viewModel.recommendationImageURL(recommendation) {
             RemotePosterImageView(url: imageURL)
         } else {
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
+            RoundedRectangle(
+                cornerRadius: 16,
+                style: .continuous
+            )
                 .fill(Color(.systemGray5))
                 .overlay {
                     Image(systemName: "photo")

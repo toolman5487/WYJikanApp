@@ -74,7 +74,7 @@ struct ErrorMessageView: View {
         case .emptyCollection:
             "tray.fill"
         case .unavailable:
-            "xmark.shield.fill"
+            "square.3.layers.3d.down.right.slash"
         }
     }
 
