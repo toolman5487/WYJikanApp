@@ -42,8 +42,16 @@ struct CharacterDetailHorizontalCardsSkeletonView: View {
                 HStack(spacing: 12) {
                     ForEach(0..<4, id: \.self) { _ in
                         VStack(alignment: .leading, spacing: 8) {
-                            SkeletonBar(width: 112, height: 156, cornerRadius: 16)
-                            SkeletonBar(width: 112, height: 12, cornerRadius: 4)
+                            SkeletonBar(
+                                width: 160,
+                                height: 240,
+                                cornerRadius: 16
+                            )
+                            SkeletonBar(
+                                width: 160,
+                                height: 12,
+                                cornerRadius: 4
+                            )
                             SkeletonBar(width: 64, height: 8, cornerRadius: 4)
                         }
                     }

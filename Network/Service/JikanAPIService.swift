@@ -191,17 +191,58 @@ private actor JikanAPIInFlightRequestStore {
     }
 }
 
+// MARK: - JikanAPITransientFailureBackoffStore
+
+private actor JikanAPITransientFailureBackoffStore {
+    private struct Entry: Sendable {
+        let statusCode: Int
+        let expirationDate: Date
+    }
+
+    private var storage: [String: Entry] = [:]
+
+    func statusCode(for key: String, now: Date = Date()) -> Int? {
+        switch storage[key] {
+        case .some(let entry) where entry.expirationDate > now:
+            return entry.statusCode
+        case .some:
+            storage.removeValue(forKey: key)
+            return nil
+        case .none:
+            return nil
+        }
+    }
+
+    func record(statusCode: Int, for key: String, cooldown: TimeInterval, now: Date = Date()) {
+        storage[key] = Entry(
+            statusCode: statusCode,
+            expirationDate: now.addingTimeInterval(cooldown)
+        )
+    }
+
+    func remove(for key: String) {
+        storage.removeValue(forKey: key)
+    }
+}
+
 // MARK: - JikanAPIService
 
 final class JikanAPIService {
     
     static let shared = JikanAPIService()
+
+    private static let transientFailureCooldown: TimeInterval = 60
+    private static let transientRetryDelays: [UInt64] = [
+        400_000_000,
+        900_000_000
+    ]
     
     private var baseURL: String { APIConfig.jikanBaseURL }
     private let session: URLSession
     private let decoder: JSONDecoder
     private let responseCache = JikanAPIResponseCache()
     private let inFlightRequestStore = JikanAPIInFlightRequestStore()
+    private let transientFailureBackoffStore = JikanAPITransientFailureBackoffStore()
     
     init(
         session: URLSession = .shared,
@@ -284,6 +325,17 @@ final class JikanAPIService {
         return "\(method) \(urlString)"
     }
 
+    // MARK: - Retry Policy
+
+    private func isTransientStatusCode(_ statusCode: Int) -> Bool {
+        statusCode == 429 || (500...599).contains(statusCode)
+    }
+
+    private func retryDelayNanoseconds(for attempt: Int) -> UInt64? {
+        guard attempt < Self.transientRetryDelays.count else { return nil }
+        return Self.transientRetryDelays[attempt]
+    }
+
     // MARK: - Remote Execution
 
     private func execute(_ urlRequest: URLRequest) async throws -> Data {
@@ -291,32 +343,47 @@ final class JikanAPIService {
             throw JikanAPIError.invalidURL
         }
 
-        AppLogger.network.debug("\(urlRequest.httpMethod ?? "GET") \(url.absoluteString, privacy: .public)")
+        var attempt = 0
 
-        do {
-            let (data, response) = try await session.data(for: urlRequest)
+        while true {
+            AppLogger.network.debug("\(urlRequest.httpMethod ?? "GET") \(url.absoluteString, privacy: .public)")
 
-            if let httpResponse = response as? HTTPURLResponse {
-                AppLogger.network.debug(
-                    "HTTP \(httpResponse.statusCode) bytes \(data.count) \(url.absoluteString, privacy: .public)"
-                )
+            do {
+                let (data, response) = try await session.data(for: urlRequest)
+
+                switch responseState(for: response, data: data) {
+                case .success:
+                    if let httpResponse = response as? HTTPURLResponse {
+                        AppLogger.network.debug(
+                            "HTTP \(httpResponse.statusCode) bytes \(data.count) \(url.absoluteString, privacy: .public)"
+                        )
+                    }
+                    return data
+                case .emptyBody:
+                    AppLogger.network.error("empty body \(url.absoluteString, privacy: .public)")
+                    throw JikanAPIError.noData
+                case .serverError(let statusCode):
+                    if isTransientStatusCode(statusCode),
+                       let delay = retryDelayNanoseconds(for: attempt) {
+                        attempt += 1
+                        AppLogger.network.warning(
+                            "transient server error HTTP \(statusCode) bytes \(data.count) retry \(attempt) \(url.absoluteString, privacy: .public)"
+                        )
+                        try await Task.sleep(nanoseconds: delay)
+                        continue
+                    }
+
+                    AppLogger.network.error("server error HTTP \(statusCode) bytes \(data.count) \(url.absoluteString, privacy: .public)")
+                    throw JikanAPIError.serverError(statusCode: statusCode)
+                }
+            } catch let apiError as JikanAPIError {
+                throw apiError
+            } catch is CancellationError {
+                throw CancellationError()
+            } catch {
+                AppLogger.network.error("request failed \(url.absoluteString, privacy: .public) \(error.localizedDescription, privacy: .public)")
+                throw JikanAPIError.networkError(error)
             }
-
-            switch responseState(for: response, data: data) {
-            case .success:
-                return data
-            case .emptyBody:
-                AppLogger.network.error("empty body \(url.absoluteString, privacy: .public)")
-                throw JikanAPIError.noData
-            case .serverError(let statusCode):
-                AppLogger.network.error("server error HTTP \(statusCode) \(url.absoluteString, privacy: .public)")
-                throw JikanAPIError.serverError(statusCode: statusCode)
-            }
-        } catch let apiError as JikanAPIError {
-            throw apiError
-        } catch {
-            AppLogger.network.error("request failed \(url.absoluteString, privacy: .public) \(error.localizedDescription, privacy: .public)")
-            throw JikanAPIError.networkError(error)
         }
     }
 
@@ -337,10 +404,27 @@ final class JikanAPIService {
                 return cachedData
             }
 
+            if let statusCode = await transientFailureBackoffStore.statusCode(for: key) {
+                AppLogger.cache.debug("cache transient failure backoff \(key, privacy: .public)")
+                throw JikanAPIError.serverError(statusCode: statusCode)
+            }
+
             AppLogger.cache.debug("cache miss \(key, privacy: .public)")
-            let freshData = try await sharedDataTask(for: urlRequest, key: key)
-            await responseCache.insert(freshData, for: key, ttl: ttl)
-            return freshData
+            do {
+                let freshData = try await sharedDataTask(for: urlRequest, key: key)
+                await responseCache.insert(freshData, for: key, ttl: ttl)
+                await transientFailureBackoffStore.remove(for: key)
+                return freshData
+            } catch JikanAPIError.serverError(let statusCode) where isTransientStatusCode(statusCode) {
+                await transientFailureBackoffStore.record(
+                    statusCode: statusCode,
+                    for: key,
+                    cooldown: Self.transientFailureCooldown
+                )
+                throw JikanAPIError.serverError(statusCode: statusCode)
+            } catch {
+                throw error
+            }
         }
     }
 

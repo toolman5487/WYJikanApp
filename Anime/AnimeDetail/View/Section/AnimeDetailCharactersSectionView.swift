@@ -34,7 +34,11 @@ struct AnimeDetailCharactersSectionView: View {
                                     name: viewModel.characterName(character),
                                     role: viewModel.characterRoleText(role),
                                     voiceActorSummary: viewModel.voiceActorSummary(for: role),
-                                    imageURL: viewModel.characterImageURL(character)
+                                    imageURL: viewModel.characterImageURL(character),
+                                    cardWidth: 160,
+                                    cardHeight: 240,
+                                    cornerRadius: 16,
+                                    textMinHeight: 56
                                 )
                             }
                             .buttonStyle(.plain)
