@@ -145,56 +145,30 @@ struct AnimeDetailView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItemGroup(placement: .topBarTrailing) {
-                Button {
+            DetailNavigationToolbar(
+                isFavorite: isFavorite,
+                isFavoriteActionEnabled: viewModel.isFavoriteActionEnabled,
+                shareState: viewModel.shareNavigationState(),
+                reviewState: viewModel.reviewNavigationState(),
+                isRefreshing: viewModel.isRefreshing,
+                onFavoriteTap: {
                     viewModel.toggleFavorite(
                         isFavorite: isFavorite,
                         modelContext: modelContext
                     )
-                } label: {
-                    Image(systemName: isFavorite ? "heart.fill" : "heart")
-                        .font(.body.weight(.bold))
-                        .foregroundStyle(ThemeColor.sakura)
-                        .frame(minWidth: 44, minHeight: 44)
-                        .contentShape(Rectangle())
-                }
-                .disabled(!viewModel.isFavoriteActionEnabled)
-            }
-            ToolbarSpacer(.fixed, placement: .topBarTrailing)
-            ToolbarItemGroup(placement: .topBarTrailing) {
-                switch viewModel.reviewNavigationState() {
-                case .loading:
-                    Image(systemName: "text.bubble.fill")
-                        .font(.body.weight(.bold))
-                        .foregroundStyle(ThemeColor.textSecondary)
-                        .frame(width: 44, height: 44)
-                case let .available(title):
-                    NavigationLink {
-                        AnimeReviewView(
-                            malId: malId,
-                            animeTitle: title
-                        )
-                    } label: {
-                        Image(systemName: "text.bubble.fill")
-                            .font(.body.weight(.bold))
-                            .foregroundStyle(ThemeColor.sakura)
-                            .frame(width: 44, height: 44)
-                    }
-                }
-
-                Button {
+                },
+                onRefreshTap: {
                     Task {
                         await viewModel.load(forceRefresh: true)
                     }
-                } label: {
-                    Image(systemName: "arrow.trianglehead.counterclockwise")
-                        .font(.body.weight(.bold))
-                        .symbolEffect(.rotate, options: .repeating, isActive: viewModel.isRefreshing)
-                        .opacity(viewModel.isRefreshing ? 0.7 : 1)
-                        .frame(minWidth: 44, minHeight: 44)
-                        .contentShape(Rectangle())
+                },
+                reviewDestination: { title in
+                    AnimeReviewView(
+                        malId: malId,
+                        animeTitle: title
+                    )
                 }
-            }
+            )
         }
         .fullScreenCover(item: $imagePreviewSession) { session in
             ImagePreviewViewer(

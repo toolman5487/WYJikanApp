@@ -39,11 +39,6 @@ extension AnimeDetailViewModel {
         }
     }
 
-    enum ReviewNavigationState {
-        case loading
-        case available(title: String)
-    }
-
     // MARK: - Header & Media
 
     func displayTitle(for anime: AnimeDetailDTO) -> String {
@@ -81,9 +76,29 @@ extension AnimeDetailViewModel {
         displayTitle(for: anime)
     }
 
-    func reviewNavigationState() -> ReviewNavigationState {
+    func reviewNavigationState() -> DetailNavigationToolbarReviewState {
         guard let detail else { return .loading }
         return .available(title: reviewTitle(for: detail))
+    }
+
+    func shareNavigationState() -> DetailNavigationToolbarShareState {
+        guard let detail,
+              let url = malWorkPageURL(for: detail) else {
+            return .loading
+        }
+        let title = displayTitle(for: detail)
+        return .available(
+            title: title,
+            message: shareMessageText(for: detail),
+            url: url
+        )
+    }
+
+    func shareMessageText(for anime: AnimeDetailDTO) -> String {
+        let title = displayTitle(for: anime)
+        let details = shareDetailsText(for: anime)
+        guard !details.isEmpty else { return title }
+        return "\(title)\n\n\(details)"
     }
 
     func favoriteItem(for anime: AnimeDetailDTO) -> MyListCollectionItem {
@@ -363,6 +378,36 @@ extension AnimeDetailViewModel {
     func scoreDisplayText(for anime: AnimeDetailDTO) -> String {
         guard let score = anime.score else { return "-" }
         return String(format: "%.2f", score) + " / 10.0"
+    }
+
+    private func shareDetailsText(for anime: AnimeDetailDTO) -> String {
+        let releaseText = shareValue(seasonText(for: anime)) ?? shareValue(airedPeriodDisplayText(for: anime))
+
+        return [
+            shareLine(title: "類型", value: typeDisplayText(for: anime)),
+            shareLine(title: "評分", value: scoreDisplayText(for: anime)),
+            shareLine(title: "排名", value: anime.rank.map { "#\($0)" }),
+            shareLine(title: "人氣", value: anime.popularity.map { "#\($0)" }),
+            shareLine(title: "收藏", value: anime.favorites.map(formatNumber)),
+            shareLine(title: "狀態", value: statusDisplayText(for: anime)),
+            shareLine(title: "播出", value: releaseText)
+        ]
+        .compactMap { $0 }
+        .joined(separator: "\n")
+    }
+
+    private func shareLine(title: String, value: String?) -> String? {
+        guard let value = shareValue(value) else { return nil }
+        return "\(title)：\(value)"
+    }
+
+    private func shareValue(_ value: String?) -> String? {
+        guard let value = value?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !value.isEmpty,
+              value != "-" else {
+            return nil
+        }
+        return value
     }
 
     func synopsisDisplayText(for anime: AnimeDetailDTO) -> String {

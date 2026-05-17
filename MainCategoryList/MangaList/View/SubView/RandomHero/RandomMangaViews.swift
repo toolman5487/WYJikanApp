@@ -19,7 +19,7 @@ struct RandomMangaSectionView: View {
                     .font(.title3.weight(.bold))
                     .foregroundStyle(ThemeColor.sakura)
 
-                Text("不知道看什麼？試試手氣，隨機挖到下一部想追的漫畫作品。")
+                Text("試試手氣，隨機挖到下一部想追的漫畫作品。")
                     .font(.subheadline)
                     .foregroundStyle(ThemeColor.textSecondary)
             }
@@ -88,7 +88,7 @@ private struct RandomMangaCardView: View {
     let isFavorite: Bool
     let onDrawTap: () -> Void
 
-    private static let heroHeight: CGFloat = 370
+    private static let heroHeight: CGFloat = 320
     private static let horizontalPadding: CGFloat = 16
     private static let verticalPadding: CGFloat = 16
 

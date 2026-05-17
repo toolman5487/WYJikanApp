@@ -27,11 +27,6 @@ extension MangaDetailViewModel {
         }
     }
 
-    enum ReviewNavigationState {
-        case loading
-        case available(title: String)
-    }
-
     // MARK: - Header & Media
 
     func displayTitle(for manga: MangaDetailDTO) -> String {
@@ -75,9 +70,29 @@ extension MangaDetailViewModel {
         displayTitle(for: manga)
     }
 
-    func reviewNavigationState() -> ReviewNavigationState {
+    func reviewNavigationState() -> DetailNavigationToolbarReviewState {
         guard let detail else { return .loading }
         return .available(title: reviewTitle(for: detail))
+    }
+
+    func shareNavigationState() -> DetailNavigationToolbarShareState {
+        guard let detail,
+              let url = malWorkPageURL(for: detail) else {
+            return .loading
+        }
+        let title = displayTitle(for: detail)
+        return .available(
+            title: title,
+            message: shareMessageText(for: detail),
+            url: url
+        )
+    }
+
+    func shareMessageText(for manga: MangaDetailDTO) -> String {
+        let title = displayTitle(for: manga)
+        let details = shareDetailsText(for: manga)
+        guard !details.isEmpty else { return title }
+        return "\(title)\n\n\(details)"
     }
 
     func favoriteItem(for manga: MangaDetailDTO) -> MyListCollectionItem {
@@ -169,6 +184,34 @@ extension MangaDetailViewModel {
     func scoreDisplayText(for manga: MangaDetailDTO) -> String {
         guard let score = manga.score else { return "-" }
         return String(format: "%.2f", score) + " / 10.0"
+    }
+
+    private func shareDetailsText(for manga: MangaDetailDTO) -> String {
+        [
+            shareLine(title: "類型", value: mangaTypeDisplayText(for: manga)),
+            shareLine(title: "評分", value: scoreDisplayText(for: manga)),
+            shareLine(title: "排名", value: manga.rank.map { "#\($0)" }),
+            shareLine(title: "人氣", value: manga.popularity.map { "#\($0)" }),
+            shareLine(title: "收藏", value: manga.favorites.map(formatNumber)),
+            shareLine(title: "狀態", value: mangaStatusDisplayText(for: manga)),
+            shareLine(title: "發行", value: publishedPeriodDisplayText(for: manga))
+        ]
+        .compactMap { $0 }
+        .joined(separator: "\n")
+    }
+
+    private func shareLine(title: String, value: String?) -> String? {
+        guard let value = shareValue(value) else { return nil }
+        return "\(title)：\(value)"
+    }
+
+    private func shareValue(_ value: String?) -> String? {
+        guard let value = value?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !value.isEmpty,
+              value != "-" else {
+            return nil
+        }
+        return value
     }
 
     // MARK: - Synopsis & Themes

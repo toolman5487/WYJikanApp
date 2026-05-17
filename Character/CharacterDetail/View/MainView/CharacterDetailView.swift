@@ -67,21 +67,10 @@ struct CharacterDetailView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                switch viewModel.externalPageNavigationState() {
-                case .unavailable:
-                    EmptyView()
-                case let .available(title, url):
-                    NavigationLink {
-                        NavigationWebPageView(title: title, url: url)
-                    } label: {
-                        Image(systemName: "safari")
-                            .font(.body.weight(.bold))
-                            .frame(minWidth: 44, minHeight: 44)
-                            .contentShape(Rectangle())
-                    }
-                }
-            }
+            DetailExternalActionsToolbar(
+                shareState: viewModel.shareNavigationState(),
+                externalPageState: viewModel.externalPageNavigationState()
+            )
         }
         .task(id: malId) {
             await viewModel.load()

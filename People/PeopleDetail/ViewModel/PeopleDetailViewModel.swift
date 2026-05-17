@@ -76,11 +76,6 @@ extension PeopleDetailViewModel {
         }
     }
 
-    enum ExternalPageNavigationState: Equatable {
-        case unavailable
-        case available(title: String, url: URL)
-    }
-
     func sections(for person: PeopleDetailDTO) -> [Section] {
         var result: [Section] = [.header, .info]
         if aboutText(for: person) != nil {
@@ -98,12 +93,32 @@ extension PeopleDetailViewModel {
         return result
     }
 
-    func externalPageNavigationState() -> ExternalPageNavigationState {
+    func externalPageNavigationState() -> DetailNavigationToolbarExternalPageState {
         guard let detail,
               let url = malPageURL(for: detail) else {
             return .unavailable
         }
         return .available(title: displayName(for: detail), url: url)
+    }
+
+    func shareNavigationState() -> DetailNavigationToolbarShareState {
+        guard let detail,
+              let url = malPageURL(for: detail) else {
+            return .loading
+        }
+        let title = displayName(for: detail)
+        return .available(
+            title: title,
+            message: shareMessageText(for: detail),
+            url: url
+        )
+    }
+
+    func shareMessageText(for person: PeopleDetailDTO) -> String {
+        let title = displayName(for: person)
+        let details = shareDetailsText(for: person)
+        guard !details.isEmpty else { return title }
+        return "\(title)\n\n\(details)"
     }
 
     func displayName(for person: PeopleDetailDTO) -> String {
@@ -206,6 +221,37 @@ extension PeopleDetailViewModel {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
         return formatter.string(from: NSNumber(value: value)) ?? "\(value)"
+    }
+
+    private func shareDetailsText(for person: PeopleDetailDTO) -> String {
+        [
+            shareLine(title: "英文名", value: englishName(for: person)),
+            shareLine(title: "生日", value: birthdayText(for: person)),
+            shareLine(title: "收藏", value: favoritesText(for: person)),
+            shareLine(title: "配音角色", value: countText(voiceRoles(for: person).count, unit: "個")),
+            shareLine(title: "動畫參與", value: countText(animeStaffPositions(for: person).count, unit: "部")),
+            shareLine(title: "漫畫參與", value: countText(mangaStaffPositions(for: person).count, unit: "部"))
+        ]
+        .compactMap { $0 }
+        .joined(separator: "\n")
+    }
+
+    private func countText(_ count: Int, unit: String) -> String? {
+        guard count > 0 else { return nil }
+        return "\(formatNumber(count)) \(unit)"
+    }
+
+    private func shareLine(title: String, value: String?) -> String? {
+        guard let value = shareValue(value) else { return nil }
+        return "\(title)：\(value)"
+    }
+
+    private func shareValue(_ value: String?) -> String? {
+        guard let value = nonEmpty(value),
+              value != "-" else {
+            return nil
+        }
+        return value
     }
 
     private var dateFormatter: DateFormatter {
