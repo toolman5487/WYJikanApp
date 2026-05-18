@@ -8,14 +8,20 @@
 import SwiftUI
 
 struct HeroBannerSlideView: View {
+
+    // MARK: - Properties
+
     let item: BannerItem
     let pageLabel: String
-    
+
+    // MARK: - Body
+
     var body: some View {
         ZStack(alignment: .bottomLeading) {
             HeroBannerImageView(url: item.imageURL)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .clipped()
+
             LinearGradient(
                 colors: [
                     Color.black.opacity(0.08),
@@ -68,6 +74,8 @@ struct HeroBannerSlideView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
+
+    // MARK: - Private Methods
 
     private func badge(text: String) -> some View {
         Text(text)

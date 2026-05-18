@@ -1712,9 +1712,9 @@
 		15FC4F382F73E71E0054153E /* Banner */ = {
 			isa = PBXGroup;
 			children = (
+				15FC4F462F74DF4D0054153E /* HeroBannerImageView.swift */,
 				15FF80162F76575F00D3241C /* HeroBannerSlideView.swift */,
 				15FC4F392F73E7340054153E /* HeroBannerView.swift */,
-				15FC4F462F74DF4D0054153E /* HeroBannerImageView.swift */,
 			);
 			path = Banner;
 			sourceTree = "<group>";
@@ -1853,12 +1853,12 @@
 		15FCF8842F73C2660054153E /* View */ = {
 			isa = PBXGroup;
 			children = (
-				1572FE0B2F762E7600756CBA /* TodayAnime */,
-				15FC4F6C2F752BEE0054153E /* TrendingManga */,
-				15FC4F502F75070C0054153E /* TrendingAnime */,
-				16F100072FAB300000000007 /* RecommendedAnime */,
 				15FC4F382F73E71E0054153E /* Banner */,
 				15FC4F372F73E7090054153E /* MainView */,
+				16F100072FAB300000000007 /* RecommendedAnime */,
+				1572FE0B2F762E7600756CBA /* TodayAnime */,
+				15FC4F502F75070C0054153E /* TrendingAnime */,
+				15FC4F6C2F752BEE0054153E /* TrendingManga */,
 			);
 			path = View;
 			sourceTree = "<group>";

@@ -8,20 +8,21 @@
 import SwiftUI
 
 struct HomeRecommendedAnimeView: View {
-    @ObservedObject private var viewModel: HomeRecommendedAnimeViewModel
-    @EnvironmentObject private var favoriteStatusStore: FavoriteStatusStore
+
+    // MARK: - Properties
+
     @EnvironmentObject private var router: MainHomeRouter
+    @EnvironmentObject private var favoriteStatusStore: FavoriteStatusStore
+    @ObservedObject private var viewModel: HomeRecommendedAnimeViewModel
+
     let showsHeader: Bool
 
-    private static let gridSpacing: CGFloat = 16
-    private static let horizontalPadding: CGFloat = 16
-    private static let skeletonCount: Int = 9
-    private static let columnCount: Int = 3
-    private static let loadMoreTopPadding: CGFloat = 8
     private let columns = Array(
-        repeating: GridItem(.flexible(), spacing: Self.gridSpacing, alignment: .top),
-        count: Self.columnCount
+        repeating: GridItem(.flexible(), spacing: 16, alignment: .top),
+        count: 3
     )
+
+    // MARK: - Lifecycle
 
     init(
         viewModel: HomeRecommendedAnimeViewModel,
@@ -30,6 +31,8 @@ struct HomeRecommendedAnimeView: View {
         self.viewModel = viewModel
         self.showsHeader = showsHeader
     }
+
+    // MARK: - Body
 
     var body: some View {
         let favoriteIDs = favoriteStatusStore.favoriteIDs(for: .anime)
@@ -42,22 +45,25 @@ struct HomeRecommendedAnimeView: View {
             VStack(alignment: .leading, spacing: 0) {
                 switch viewModel.screenState {
                 case .loading:
-                    LazyVGrid(columns: columns, alignment: .leading, spacing: Self.gridSpacing) {
-                        ForEach(0..<Self.skeletonCount, id: \.self) { _ in
+                    LazyVGrid(columns: columns, alignment: .leading, spacing: 16) {
+                        ForEach(0..<9, id: \.self) { _ in
                             BannerSkeletonView()
                                 .aspectRatio(2.0 / 3.0, contentMode: .fit)
                                 .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                         }
                     }
-                    .padding(.horizontal, Self.horizontalPadding)
+                    .padding(.horizontal, 16)
+
                 case .error(let errorMessage):
                     ErrorMessageView(state: .network(errorMessage), height: 240)
-                        .padding(.horizontal, Self.horizontalPadding)
+                        .padding(.horizontal, 16)
+
                 case .empty:
                     ErrorMessageView(state: .emptyCollection("尚無推薦資料"), height: 240)
-                        .padding(.horizontal, Self.horizontalPadding)
+                        .padding(.horizontal, 16)
+
                 case .content:
-                    LazyVGrid(columns: columns, alignment: .leading, spacing: Self.gridSpacing) {
+                    LazyVGrid(columns: columns, alignment: .leading, spacing: 16) {
                         ForEach(viewModel.displayedItems) { item in
                             Button {
                                 router.push(.animeDetail(malId: item.detailMalId))
@@ -74,14 +80,16 @@ struct HomeRecommendedAnimeView: View {
                                     )
                                 }
                                 .overlay(alignment: .topTrailing) {
-                                    MyListCollectionStatusBadgeView(isFavorite: favoriteIDs.contains(item.detailMalId))
-                                        .padding(8)
+                                    MyListCollectionStatusBadgeView(
+                                        isFavorite: favoriteIDs.contains(item.detailMalId)
+                                    )
+                                    .padding(8)
                                 }
                             }
                             .buttonStyle(.plain)
                         }
                     }
-                    .padding(.horizontal, Self.horizontalPadding)
+                    .padding(.horizontal, 16)
 
                     if viewModel.canLoadMore {
                         Button("載入更多") {
@@ -92,8 +100,8 @@ struct HomeRecommendedAnimeView: View {
                         .frame(maxWidth: .infinity, minHeight: 44)
                         .background(ThemeColor.sakura)
                         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                        .padding(.top, Self.loadMoreTopPadding)
-                        .padding(.horizontal, Self.horizontalPadding)
+                        .padding(.top, 8)
+                        .padding(.horizontal, 16)
                     }
                 }
             }
@@ -102,7 +110,6 @@ struct HomeRecommendedAnimeView: View {
             viewModel.loadIfNeeded()
         }
     }
-
 }
 
 #Preview {

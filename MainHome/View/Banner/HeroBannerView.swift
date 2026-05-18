@@ -8,15 +8,22 @@
 import SwiftUI
 
 struct HeroBannerView: View {
+
+    // MARK: - Properties
+
     @ObservedObject private var viewModel: HeroBannerViewModel
     @EnvironmentObject private var router: MainHomeRouter
-    
+
     private static let heroAspectRatio: CGFloat = 2.0 / 3.0
+
+    // MARK: - Lifecycle
 
     init(viewModel: HeroBannerViewModel) {
         self.viewModel = viewModel
     }
-    
+
+    // MARK: - Body
+
     var body: some View {
         VStack(spacing: 0) {
             content
@@ -32,7 +39,9 @@ struct HeroBannerView: View {
             viewModel.stopAutoScroll()
         }
     }
-    
+
+    // MARK: - Private Methods
+
     @ViewBuilder
     private var content: some View {
         switch viewModel.screenState {
@@ -48,7 +57,10 @@ struct HeroBannerView: View {
                     Button {
                         router.push(.animeDetail(malId: item.id))
                     } label: {
-                        HeroBannerSlideView(item: item, pageLabel: "\(index + 1) / \(viewModel.items.count)")
+                        HeroBannerSlideView(
+                            item: item,
+                            pageLabel: "\(index + 1) / \(viewModel.items.count)"
+                        )
                     }
                     .buttonStyle(.plain)
                     .contentShape(Rectangle())
@@ -78,7 +90,7 @@ struct HeroBannerView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
-    
+
     private var selectionBinding: Binding<Int> {
         Binding(
             get: { viewModel.currentIndex },

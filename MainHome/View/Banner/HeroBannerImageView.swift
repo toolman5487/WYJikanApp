@@ -9,10 +9,15 @@ import SwiftUI
 import SDWebImageSwiftUI
 
 struct HeroBannerImageView: View {
+
+    // MARK: - Properties
+
     let url: URL
-    
+
     @State private var didFail = false
-    
+
+    // MARK: - Body
+
     var body: some View {
         WebImage(url: url) { image in
             image

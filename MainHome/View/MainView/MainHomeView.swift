@@ -8,19 +8,22 @@
 import SwiftUI
 
 struct MainHomeView: View {
+
+    // MARK: - Properties
+
     @EnvironmentObject private var router: MainHomeRouter
     @StateObject private var heroBannerViewModel: HeroBannerViewModel
     @StateObject private var todayAnimeViewModel: HomeTodayAnimeViewModel
-    @StateObject private var trendingAnimeViewModel: HomeTrendingAnimeViewModel
     @StateObject private var trendingMangaViewModel: HomeTrendingMangaViewModel
+    @StateObject private var trendingAnimeViewModel: HomeTrendingAnimeViewModel
     @StateObject private var recommendedAnimeViewModel: HomeRecommendedAnimeViewModel
-    
+
     enum HomeSection: Identifiable {
         case todayAnime
         case trendingAnime
         case trendingManga
         case recommendedAnime
-        
+
         var id: String {
             switch self {
             case .todayAnime: return "todayAnime"
@@ -39,13 +42,15 @@ struct MainHomeView: View {
             }
         }
     }
-    
+
     private let sections: [HomeSection] = [
         .todayAnime,
         .trendingAnime,
         .trendingManga,
         .recommendedAnime
     ]
+
+    // MARK: - Lifecycle
 
     init(service: MainHomeServicing = MainHomeService()) {
         _heroBannerViewModel = StateObject(wrappedValue: HeroBannerViewModel(service: service))
@@ -54,8 +59,48 @@ struct MainHomeView: View {
         _trendingMangaViewModel = StateObject(wrappedValue: HomeTrendingMangaViewModel(service: service))
         _recommendedAnimeViewModel = StateObject(wrappedValue: HomeRecommendedAnimeViewModel(service: service))
     }
-    
-    
+
+    // MARK: - Body
+
+    var body: some View {
+        NavigationStack(path: $router.path) {
+            ScrollView {
+                LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
+                    HeroBannerView(viewModel: heroBannerViewModel)
+                        .ignoresSafeArea(edges: .top)
+
+                    ForEach(sections) { section in
+                        Section {
+                            sectionView(section)
+                        } header: {
+                            sectionHeaderView(section)
+                        }
+                    }
+                }
+            }
+            .refreshable {
+                await refreshAllContent()
+            }
+            .toolbarBackground(.hidden, for: .navigationBar)
+            .navigationDestination(for: MainHomeRoute.self) { route in
+                switch route {
+                case .todayAnimeSchedule:
+                    HomeTodayAnimeScheduleListView()
+                case .trendingAnimeList:
+                    HomeTrendingAnimeListView()
+                case .trendingMangaList:
+                    HomeTrendingMangaListView()
+                case .animeDetail(let malId):
+                    AnimeDetailView(malId: malId)
+                case .mangaDetail(let malId):
+                    MangaDetailView(malId: malId)
+                }
+            }
+        }
+    }
+
+    // MARK: - Private Methods
+
     @ViewBuilder
     private func sectionView(_ section: HomeSection) -> some View {
         switch section {
@@ -97,43 +142,6 @@ struct MainHomeView: View {
             return .navigable(action: { router.push(.trendingMangaList) })
         case .recommendedAnime:
             return .plain
-        }
-    }
-    
-    var body: some View {
-        NavigationStack(path: $router.path) {
-            ScrollView {
-                LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
-                    HeroBannerView(viewModel: heroBannerViewModel)
-                        .ignoresSafeArea(edges: .top)
-
-                    ForEach(sections) { section in
-                        Section {
-                            sectionView(section)
-                        } header: {
-                            sectionHeaderView(section)
-                        }
-                    }
-                }
-            }
-            .refreshable {
-                await refreshAllContent()
-            }
-            .toolbarBackground(.hidden, for: .navigationBar)
-            .navigationDestination(for: MainHomeRoute.self) { route in
-                switch route {
-                case .todayAnimeSchedule:
-                    HomeTodayAnimeScheduleListView()
-                case .trendingAnimeList:
-                    HomeTrendingAnimeListView()
-                case .trendingMangaList:
-                    HomeTrendingMangaListView()
-                case .animeDetail(let malId):
-                    AnimeDetailView(malId: malId)
-                case .mangaDetail(let malId):
-                    MangaDetailView(malId: malId)
-                }
-            }
         }
     }
 

@@ -80,8 +80,7 @@ struct GenreAnimeSectionHeaderView: View {
         } label: {
             GlassSectionHeaderView(
                 title: titleText,
-                showsDisclosureIndicator: true,
-                outerVerticalPadding: 16
+                showsDisclosureIndicator: true
             )
         }
         .buttonStyle(.plain)
