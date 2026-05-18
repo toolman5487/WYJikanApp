@@ -8,12 +8,13 @@
 import SwiftUI
 
 struct RandomHeroSectionView: View {
+
     // MARK: - Properties
 
     @ObservedObject var viewModel: RandomHeroViewModel
     let favoriteIDs: Set<Int>
 
-    // MARK: - View
+    // MARK: - Body
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -30,6 +31,7 @@ struct RandomHeroSectionView: View {
             switch viewModel.drawState {
             case .loading where viewModel.randomPick == nil:
                 RandomHeroSkeletonView()
+
             case .failure(let error) where viewModel.randomPick == nil:
                 RandomHeroCardView(
                     pick: nil,
@@ -42,6 +44,7 @@ struct RandomHeroSectionView: View {
                     isFavorite: false,
                     onDrawTap: viewModel.drawRandomAnime
                 )
+
             case .loading:
                 RandomHeroCardView(
                     pick: viewModel.randomPick,
@@ -53,6 +56,7 @@ struct RandomHeroSectionView: View {
                     isFavorite: viewModel.randomPick.map { favoriteIDs.contains($0.id) } ?? false,
                     onDrawTap: viewModel.drawRandomAnime
                 )
+
             case .ready, .cooldown:
                 RandomHeroCardView(
                     pick: viewModel.randomPick,
@@ -64,6 +68,7 @@ struct RandomHeroSectionView: View {
                     isFavorite: viewModel.randomPick.map { favoriteIDs.contains($0.id) } ?? false,
                     onDrawTap: viewModel.drawRandomAnime
                 )
+
             case .failure:
                 RandomHeroCardView(
                     pick: viewModel.randomPick,

@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct PeopleListLoadingView: View {
+
+    // MARK: - Body
+
     var body: some View {
         LazyVGrid(columns: PeopleListGridMetrics.columns, spacing: 16) {
             ForEach(0..<9, id: \.self) { _ in

@@ -1,5 +1,5 @@
 //
-//  GenreAnimeListContainerView.swift
+//  GenreMangaListContainerView.swift
 //  WYJikanApp
 //
 //  Created by Willy Hsu on 2026/4/10.
@@ -7,21 +7,19 @@
 
 import SwiftUI
 
-struct GenreAnimeListContainerView: View {
-
+struct GenreMangaListContainerView: View {
     // MARK: - Properties
 
-    @ObservedObject var viewModel: GenreAnimeViewModel
+    @ObservedObject var viewModel: GenreMangaViewModel
     let favoriteIDs: Set<Int>
 
-    // MARK: - Body
+    // MARK: - View
 
     var body: some View {
         Group {
             switch viewModel.screenState {
             case .loading:
-                GenreAnimeListSkeletonView()
-
+                GenreMangaListSkeletonView()
             case .error(let message):
                 Text(message)
                     .font(.footnote)
@@ -29,14 +27,12 @@ struct GenreAnimeListContainerView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
-
             case .empty:
                 Text("目前沒有分類資料")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.vertical, 24)
-
             case .content(let sections, let inlineError, let loadMoreState):
                 LazyVStack(alignment: .leading, spacing: 0, pinnedViews: [.sectionHeaders]) {
                     if let message = inlineError {
@@ -44,25 +40,24 @@ struct GenreAnimeListContainerView: View {
                             .font(.footnote)
                             .foregroundStyle(.secondary)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.horizontal, 8)
+                            .padding(.horizontal, 16)
                             .padding(.bottom, 8)
                     }
 
                     ForEach(sections) { section in
                         Section {
-                            GenreAnimeSectionView(
+                            GenreMangaSectionView(
                                 section: section,
                                 favoriteIDs: favoriteIDs
                             )
                         } header: {
-                            GenreAnimeSectionHeaderView(section: section)
+                            GenreMangaSectionHeaderView(section: section)
                         }
                     }
 
                     switch loadMoreState {
                     case .hidden:
                         EmptyView()
-
                     case .available, .loading:
                         Button {
                             viewModel.loadMoreSections()

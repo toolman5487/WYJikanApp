@@ -8,10 +8,15 @@
 import SwiftUI
 
 struct MainCategoryListView: View {
-    
+
+    // MARK: - Properties
+
     @StateObject private var viewModel = MainCategoryListViewModel()
+
     private let topAnchorId = "MainCategoryListTopAnchor"
-    
+
+    // MARK: - Body
+
     var body: some View {
         NavigationStack {
             ScrollViewReader { proxy in
@@ -19,7 +24,7 @@ struct MainCategoryListView: View {
                     Color.clear
                         .frame(height: 0)
                         .id(topAnchorId)
-                    
+
                     selectedContentView
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal)
@@ -57,18 +62,21 @@ struct MainCategoryListView: View {
             }
         }
     }
-    
-    // MARK: - Private Views
-    
+
+    // MARK: - Private Methods
+
     @ViewBuilder
     private var selectedContentView: some View {
         switch viewModel.selectedKind {
         case .anime:
             AnimeListView(viewModel: viewModel.animeListViewModel)
+
         case .manga:
             MangaListView(viewModel: viewModel.mangaListViewModel)
+
         case .people:
             PeopleListView(viewModel: viewModel.peopleListViewModel)
+
         case .character:
             CharacterListView(viewModel: viewModel.characterListViewModel)
         }

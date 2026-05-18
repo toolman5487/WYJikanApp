@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct RandomHeroActionButtonsView: View {
+
     // MARK: - Properties
 
     let drawButtonTitle: String
@@ -15,7 +16,7 @@ struct RandomHeroActionButtonsView: View {
     let detailMalId: Int?
     let onDrawTap: () -> Void
 
-    // MARK: - View
+    // MARK: - Body
 
     var body: some View {
         if let id = detailMalId {

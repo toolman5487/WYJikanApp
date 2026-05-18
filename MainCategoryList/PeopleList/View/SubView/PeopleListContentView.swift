@@ -8,21 +8,29 @@
 import SwiftUI
 
 struct PeopleListContentView: View {
+
+    // MARK: - Properties
+
     @ObservedObject var viewModel: PeopleListViewModel
+
+    // MARK: - Body
 
     var body: some View {
         LazyVStack(alignment: .leading, spacing: 16) {
             switch viewModel.screenState {
             case .loading:
                 PeopleListLoadingView()
+
             case .error(let message):
                 ErrorMessageView(state: .network(message), height: 180)
+
             case .empty:
                 Text("目前沒有聲優資料")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.vertical, 48)
+
             case .content(let rows, let inlineError, let footer):
                 LazyVGrid(columns: PeopleListGridMetrics.columns, spacing: 16) {
                     ForEach(rows) { row in
@@ -44,6 +52,7 @@ struct PeopleListContentView: View {
                 switch footer {
                 case .hidden:
                     EmptyView()
+
                 case .loadMore:
                     PeopleLoadMoreButton(
                         title: "載入更多聲優",
@@ -51,6 +60,7 @@ struct PeopleListContentView: View {
                         isVisible: true,
                         action: viewModel.loadMore
                     )
+
                 case .loadingMore:
                     PeopleLoadMoreButton(
                         title: "載入更多聲優",
@@ -64,6 +74,8 @@ struct PeopleListContentView: View {
         .padding(.top, 8)
     }
 }
+
+// MARK: - PeopleListGridMetrics
 
 enum PeopleListGridMetrics {
     static let columns = Array(

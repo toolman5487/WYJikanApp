@@ -8,7 +8,12 @@
 import SwiftUI
 
 struct PeopleListView: View {
+
+    // MARK: - Properties
+
     @ObservedObject var viewModel: PeopleListViewModel
+
+    // MARK: - Body
 
     var body: some View {
         PeopleListContentView(viewModel: viewModel)

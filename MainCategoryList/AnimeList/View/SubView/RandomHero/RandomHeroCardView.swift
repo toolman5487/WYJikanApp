@@ -9,6 +9,9 @@ import SwiftUI
 import SDWebImageSwiftUI
 
 struct RandomHeroCardView: View {
+
+    // MARK: - Properties
+
     let pick: AnimeListRandomDTO?
     let isDrawing: Bool
     var errorMessage: String? = nil
@@ -19,9 +22,7 @@ struct RandomHeroCardView: View {
     let isFavorite: Bool
     let onDrawTap: () -> Void
 
-    private static let heroHeight: CGFloat = 320
-    private static let horizontalPadding: CGFloat = 16
-    private static let verticalPadding: CGFloat = 16
+    // MARK: - Body
 
     var body: some View {
         GeometryReader { proxy in
@@ -71,13 +72,13 @@ struct RandomHeroCardView: View {
                         onDrawTap: onDrawTap
                     )
                 }
-                .padding(.horizontal, Self.horizontalPadding)
-                .padding(.vertical, Self.verticalPadding)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 16)
             }
         }
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
         .frame(maxWidth: .infinity)
-        .frame(height: Self.heroHeight)
+        .frame(height: 320)
         .overlay(alignment: .topTrailing) {
             if pick != nil {
                 MyListCollectionStatusBadgeView(isFavorite: isFavorite)
@@ -104,6 +105,8 @@ struct RandomHeroCardView: View {
                 .strokeBorder(Color.white.opacity(0.08))
         }
     }
+
+    // MARK: - Private Methods
 
     private func posterWidth(for containerWidth: CGFloat) -> CGFloat {
         min(118, max(92, containerWidth * 0.32))

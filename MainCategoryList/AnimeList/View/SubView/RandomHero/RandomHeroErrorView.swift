@@ -8,8 +8,13 @@
 import SwiftUI
 
 struct RandomHeroErrorView: View {
+
+    // MARK: - Properties
+
     let message: String
     let onRetryTap: () -> Void
+
+    // MARK: - Body
 
     var body: some View {
         VStack(spacing: 12) {

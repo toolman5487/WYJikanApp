@@ -8,21 +8,29 @@
 import SwiftUI
 
 struct CharacterListContentView: View {
+
+    // MARK: - Properties
+
     @ObservedObject var viewModel: CharacterListViewModel
+
+    // MARK: - Body
 
     var body: some View {
         LazyVStack(alignment: .leading, spacing: 16) {
             switch viewModel.screenState {
             case .loading:
                 CharacterListLoadingView()
+
             case .error(let message):
                 ErrorMessageView(state: .network(message), height: 180)
+
             case .empty:
                 Text("目前沒有角色資料")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.vertical, 48)
+
             case .content(let rows, let inlineError, let footer):
                 LazyVGrid(columns: CharacterListGridMetrics.columns, spacing: 16) {
                     ForEach(rows) { row in
@@ -44,6 +52,7 @@ struct CharacterListContentView: View {
                 switch footer {
                 case .hidden:
                     EmptyView()
+
                 case .loadMore:
                     CharacterLoadMoreButton(
                         title: "載入更多角色",
@@ -51,6 +60,7 @@ struct CharacterListContentView: View {
                         isVisible: true,
                         action: viewModel.loadMore
                     )
+
                 case .loadingMore:
                     CharacterLoadMoreButton(
                         title: "載入更多角色",
@@ -64,6 +74,8 @@ struct CharacterListContentView: View {
         .padding(.top, 8)
     }
 }
+
+// MARK: - CharacterListGridMetrics
 
 enum CharacterListGridMetrics {
     static let columns = Array(

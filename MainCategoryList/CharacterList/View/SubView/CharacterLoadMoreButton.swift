@@ -8,10 +8,15 @@
 import SwiftUI
 
 struct CharacterLoadMoreButton: View {
+
+    // MARK: - Properties
+
     let title: String
     let isLoading: Bool
     let isVisible: Bool
     let action: () -> Void
+
+    // MARK: - Body
 
     var body: some View {
         if isVisible {

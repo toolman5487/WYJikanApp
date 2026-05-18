@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct CharacterListLoadingView: View {
+
+    // MARK: - Body
+
     var body: some View {
         LazyVGrid(columns: CharacterListGridMetrics.columns, spacing: 16) {
             ForEach(0..<9, id: \.self) { _ in

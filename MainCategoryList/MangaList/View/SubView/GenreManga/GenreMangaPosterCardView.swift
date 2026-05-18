@@ -1,27 +1,22 @@
 //
-//  GenreAnimePosterCardView.swift
+//  GenreMangaPosterCardView.swift
 //  WYJikanApp
 //
-//  Created by Willy Hsu on 2026/4/9.
+//  Created by Willy Hsu on 2026/4/10.
 //
 
 import SwiftUI
 
-struct GenreAnimePosterCardView: View {
-
-    // MARK: - Properties
-
-    let item: AnimeListRandomDTO
+struct GenreMangaPosterCardView: View {
+    let item: MangaListRandomDTO
     let cardWidth: CGFloat
     let cardHeight: CGFloat
     let cardCornerRadius: CGFloat
     let isFavorite: Bool
 
-    // MARK: - Body
-
     var body: some View {
         NavigationLink {
-            AnimeDetailView(malId: item.id)
+            MangaDetailView(malId: item.id)
         } label: {
             PosterCardView(rank: item.rank) {
                 Group {

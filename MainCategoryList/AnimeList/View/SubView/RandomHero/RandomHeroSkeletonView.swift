@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct RandomHeroSkeletonView: View {
+
+    // MARK: - Body
+
     var body: some View {
         BannerSkeletonView()
             .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))

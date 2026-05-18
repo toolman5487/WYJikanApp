@@ -8,23 +8,15 @@
 import SwiftUI
 
 struct GenreAnimeSectionView: View {
-    // MARK: - Constants
-
-    private static let cardHeight: CGFloat = 200
-    private static let posterAspectRatio: CGFloat = 2.0 / 3.0
-    private static let cardCornerRadius: CGFloat = 16
-    private static let cardSpacing: CGFloat = 12
 
     // MARK: - Properties
 
     let section: AnimeGenreSection
     let favoriteIDs: Set<Int>
 
-    private static var cardWidth: CGFloat {
-        cardHeight * posterAspectRatio
-    }
+    private let cardWidth: CGFloat = 200 * (2.0 / 3.0)
 
-    // MARK: - View
+    // MARK: - Body
 
     var body: some View {
         Group {
@@ -36,15 +28,17 @@ struct GenreAnimeSectionView: View {
         }
     }
 
+    // MARK: - Private Methods
+
     private var contentView: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: Self.cardSpacing) {
+            HStack(spacing: 12) {
                 ForEach(section.items.prefix(10)) { item in
                     GenreAnimePosterCardView(
                         item: item,
-                        cardWidth: Self.cardWidth,
-                        cardHeight: Self.cardHeight,
-                        cardCornerRadius: Self.cardCornerRadius,
+                        cardWidth: cardWidth,
+                        cardHeight: 200,
+                        cardCornerRadius: 16,
                         isFavorite: favoriteIDs.contains(item.id)
                     )
                 }
@@ -55,11 +49,11 @@ struct GenreAnimeSectionView: View {
 
     private var contentSkeletonView: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: Self.cardSpacing) {
+            HStack(spacing: 12) {
                 ForEach(0..<6, id: \.self) { _ in
-                    RoundedRectangle(cornerRadius: Self.cardCornerRadius, style: .continuous)
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
                         .fill(Color(.systemGray5))
-                        .frame(width: Self.cardWidth, height: Self.cardHeight)
+                        .frame(width: cardWidth, height: 200)
                 }
             }
             .padding(.horizontal, 16)
@@ -67,12 +61,15 @@ struct GenreAnimeSectionView: View {
     }
 }
 
+// MARK: - GenreAnimeSectionHeaderView
+
 struct GenreAnimeSectionHeaderView: View {
+
+    // MARK: - Properties
+
     let section: AnimeGenreSection
 
-    private var titleText: String {
-        section.genre.name ?? "未分類"
-    }
+    // MARK: - Body
 
     var body: some View {
         NavigationLink {
@@ -85,6 +82,12 @@ struct GenreAnimeSectionHeaderView: View {
         }
         .buttonStyle(.plain)
         .background(Color(.systemBackground).opacity(0.001))
+    }
+
+    // MARK: - Private Methods
+
+    private var titleText: String {
+        section.genre.name ?? "未分類"
     }
 }
 

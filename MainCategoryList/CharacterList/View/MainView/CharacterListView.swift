@@ -8,7 +8,12 @@
 import SwiftUI
 
 struct CharacterListView: View {
+
+    // MARK: - Properties
+
     @ObservedObject var viewModel: CharacterListViewModel
+
+    // MARK: - Body
 
     var body: some View {
         CharacterListContentView(viewModel: viewModel)

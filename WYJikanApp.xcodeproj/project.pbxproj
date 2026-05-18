@@ -185,7 +185,10 @@
 		16A001042F89000000A1B2C3 /* RandomMangaViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A001052F89000000A1B2C3 /* RandomMangaViewModel.swift */; };
 		16A001062F89000000A1B2C3 /* GenreMangaViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A001072F89000000A1B2C3 /* GenreMangaViewModel.swift */; };
 		16A001082F89000000A1B2C3 /* RandomMangaViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A001092F89000000A1B2C3 /* RandomMangaViews.swift */; };
-		16A0010A2F89000000A1B2C3 /* GenreMangaViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A0010B2F89000000A1B2C3 /* GenreMangaViews.swift */; };
+		16A001122FB5000000A1B2C3 /* GenreMangaListContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A001132FB5000000A1B2C3 /* GenreMangaListContainerView.swift */; };
+		16A001142FB5000000A1B2C3 /* GenreMangaSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A001152FB5000000A1B2C3 /* GenreMangaSectionView.swift */; };
+		16A001162FB5000000A1B2C3 /* GenreMangaPosterCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A001172FB5000000A1B2C3 /* GenreMangaPosterCardView.swift */; };
+		16A001182FB5000000A1B2C3 /* GenreMangaListSkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A001192FB5000000A1B2C3 /* GenreMangaListSkeletonView.swift */; };
 		16A200212FB4000000D1E001 /* AnimeDetailCharactersSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A200202FB4000000D1E001 /* AnimeDetailCharactersSectionView.swift */; };
 		16A200232FB4000000D1E001 /* AnimeDetailRecommendationsSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A200222FB4000000D1E001 /* AnimeDetailRecommendationsSectionView.swift */; };
 		16A200252FB4000000D1E001 /* AnimeDetailEpisodesEntrySectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A200242FB4000000D1E001 /* AnimeDetailEpisodesEntrySectionView.swift */; };
@@ -450,7 +453,10 @@
 		16A001052F89000000A1B2C3 /* RandomMangaViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomMangaViewModel.swift; sourceTree = "<group>"; };
 		16A001072F89000000A1B2C3 /* GenreMangaViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenreMangaViewModel.swift; sourceTree = "<group>"; };
 		16A001092F89000000A1B2C3 /* RandomMangaViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomMangaViews.swift; sourceTree = "<group>"; };
-		16A0010B2F89000000A1B2C3 /* GenreMangaViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenreMangaViews.swift; sourceTree = "<group>"; };
+		16A001132FB5000000A1B2C3 /* GenreMangaListContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenreMangaListContainerView.swift; sourceTree = "<group>"; };
+		16A001152FB5000000A1B2C3 /* GenreMangaSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenreMangaSectionView.swift; sourceTree = "<group>"; };
+		16A001172FB5000000A1B2C3 /* GenreMangaPosterCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenreMangaPosterCardView.swift; sourceTree = "<group>"; };
+		16A001192FB5000000A1B2C3 /* GenreMangaListSkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenreMangaListSkeletonView.swift; sourceTree = "<group>"; };
 		16A200202FB4000000D1E001 /* AnimeDetailCharactersSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeDetailCharactersSectionView.swift; sourceTree = "<group>"; };
 		16A200222FB4000000D1E001 /* AnimeDetailRecommendationsSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeDetailRecommendationsSectionView.swift; sourceTree = "<group>"; };
 		16A200242FB4000000D1E001 /* AnimeDetailEpisodesEntrySectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeDetailEpisodesEntrySectionView.swift; sourceTree = "<group>"; };
@@ -1999,7 +2005,10 @@
 		16A001102F89000000A1B2C3 /* GenreManga */ = {
 			isa = PBXGroup;
 			children = (
-				16A0010B2F89000000A1B2C3 /* GenreMangaViews.swift */,
+				16A001132FB5000000A1B2C3 /* GenreMangaListContainerView.swift */,
+				16A001192FB5000000A1B2C3 /* GenreMangaListSkeletonView.swift */,
+				16A001172FB5000000A1B2C3 /* GenreMangaPosterCardView.swift */,
+				16A001152FB5000000A1B2C3 /* GenreMangaSectionView.swift */,
 			);
 			path = GenreManga;
 			sourceTree = "<group>";
@@ -2519,7 +2528,10 @@
 				15D4MD032F7C50300E37C03 /* MangaDetailHeaderSectionView.swift in Sources */,
 				15D4MD052F7C50500E37C05 /* MangaDetailHighlightsSectionView.swift in Sources */,
 				156E5D312FB368B300EBA27F /* AppNotificationDelegate.swift in Sources */,
-				16A0010A2F89000000A1B2C3 /* GenreMangaViews.swift in Sources */,
+				16A001122FB5000000A1B2C3 /* GenreMangaListContainerView.swift in Sources */,
+				16A001182FB5000000A1B2C3 /* GenreMangaListSkeletonView.swift in Sources */,
+				16A001162FB5000000A1B2C3 /* GenreMangaPosterCardView.swift in Sources */,
+				16A001142FB5000000A1B2C3 /* GenreMangaSectionView.swift in Sources */,
 				159667C12F8632B70033410A /* MangaListView.swift in Sources */,
 				16A001002F89000000A1B2C3 /* MangaListModel.swift in Sources */,
 				16A001022F89000000A1B2C3 /* MangaListViewModel.swift in Sources */,

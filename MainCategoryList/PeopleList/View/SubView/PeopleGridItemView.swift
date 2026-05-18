@@ -8,7 +8,12 @@
 import SwiftUI
 
 struct PeopleGridItemView: View {
+
+    // MARK: - Properties
+
     let row: PeopleListRow
+
+    // MARK: - Body
 
     var body: some View {
         VStack(spacing: 8) {
@@ -24,6 +29,8 @@ struct PeopleGridItemView: View {
                 .frame(maxWidth: .infinity, minHeight: 32, alignment: .top)
         }
     }
+
+    // MARK: - Private Methods
 
     @ViewBuilder
     private var poster: some View {

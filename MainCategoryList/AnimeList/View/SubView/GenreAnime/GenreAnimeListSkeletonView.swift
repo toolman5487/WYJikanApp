@@ -8,46 +8,26 @@
 import SwiftUI
 
 struct GenreAnimeListSkeletonView: View {
-    // MARK: - Constants
 
-    private static let cardCount: Int = 6
-    private static let cardHeight: CGFloat = 240
-    private static let posterAspectRatio: CGFloat = 2.0 / 3.0
-    private static let cardCornerRadius: CGFloat = 16
-    private static let cardSpacing: CGFloat = 12
-    private static let horizontalPadding: CGFloat = 16
-    private static let sectionCount: Int = 3
-
-    // MARK: - View
+    // MARK: - Body
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            ForEach(0..<Self.sectionCount, id: \.self) { _ in
+            ForEach(0..<3, id: \.self) { _ in
                 VStack(alignment: .leading, spacing: 12) {
                     SkeletonBar(width: 120, height: 24, cornerRadius: 8)
-                        .padding(.horizontal, Self.horizontalPadding)
+                        .padding(.horizontal, 16)
 
                     ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: Self.cardSpacing) {
-                            ForEach(0..<Self.cardCount, id: \.self) { _ in
-                                RoundedRectangle(
-                                    cornerRadius: Self.cardCornerRadius,
-                                    style: .continuous
-                                )
-                                .fill(Color(.systemGray5))
-                                .clipShape(
-                                    RoundedRectangle(
-                                        cornerRadius: Self.cardCornerRadius,
-                                        style: .continuous
-                                    )
-                                )
-                                .frame(
-                                    width: Self.cardHeight * Self.posterAspectRatio,
-                                    height: Self.cardHeight
-                                )
+                        HStack(spacing: 12) {
+                            ForEach(0..<6, id: \.self) { _ in
+                                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                    .fill(Color(.systemGray5))
+                                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                                    .frame(width: 240 * (2.0 / 3.0), height: 240)
                             }
                         }
-                        .padding(.horizontal, Self.horizontalPadding)
+                        .padding(.horizontal, 16)
                     }
                 }
             }
