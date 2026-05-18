@@ -2,16 +2,21 @@
 //  HomeTrendingAnimeListRowView.swift
 //  WYJikanApp
 //
-//  Created by Willy Hsu 2026/5/5.
+//  Created by Willy Hsu on 2026/5/5.
 //
 
 import SwiftUI
 
 struct HomeTrendingAnimeListRowView: View {
+
+    // MARK: - Properties
+
     let item: HomeTrendingAnimeListItem
     let sort: HomeTrendingAnimeListSort
     let isFavorite: Bool
     let onTap: () -> Void
+
+    // MARK: - Body
 
     var body: some View {
         Button(action: onTap) {
@@ -60,6 +65,8 @@ struct HomeTrendingAnimeListRowView: View {
         }
         .buttonStyle(.plain)
     }
+
+    // MARK: - Private Methods
 
     private var posterView: some View {
         Group {

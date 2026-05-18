@@ -2,19 +2,27 @@
 //  HomeTrendingAnimeListView.swift
 //  WYJikanApp
 //
-//  Created by Willy Hsu 2026/5/5.
+//  Created by Willy Hsu on 2026/5/5.
 //
 
 import SwiftUI
 
 struct HomeTrendingAnimeListView: View {
-    @StateObject private var viewModel: HomeTrendingAnimeListViewModel
-    @EnvironmentObject private var favoriteStatusStore: FavoriteStatusStore
+
+    // MARK: - Properties
+
     @EnvironmentObject private var router: MainHomeRouter
+    @EnvironmentObject private var favoriteStatusStore: FavoriteStatusStore
+
+    @StateObject private var viewModel: HomeTrendingAnimeListViewModel
+
+    // MARK: - Lifecycle
 
     init(viewModel: HomeTrendingAnimeListViewModel = HomeTrendingAnimeListViewModel()) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
+
+    // MARK: - Body
 
     var body: some View {
         ScrollView {
@@ -66,20 +74,25 @@ struct HomeTrendingAnimeListView: View {
         }
     }
 
+    // MARK: - Private Methods
+
     @ViewBuilder
     private var stateContentView: some View {
         switch viewModel.screenState {
         case .loading:
             HomeTrendingAnimeListLoadingView()
                 .transition(.opacity.combined(with: .move(edge: .bottom)))
+
         case .empty:
             HomeTrendingAnimeListEmptyStateView()
                 .transition(.opacity.combined(with: .move(edge: .bottom)))
+
         case .error(let message):
             HomeTrendingAnimeListErrorStateView(message: message) {
                 Task { await viewModel.reload() }
             }
             .transition(.opacity.combined(with: .move(edge: .bottom)))
+
         case .content(let content):
             sectionListView(sections: content.sections)
                 .transition(.opacity.combined(with: .move(edge: .bottom)))

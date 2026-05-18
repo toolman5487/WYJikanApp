@@ -8,11 +8,18 @@
 import SwiftUI
 
 struct HomeTrendingMangaListView: View {
+
+    // MARK: - Properties
+
     @StateObject private var viewModel: HomeTrendingMangaListViewModel
+
+    // MARK: - Lifecycle
 
     init(viewModel: HomeTrendingMangaListViewModel = HomeTrendingMangaListViewModel()) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
+
+    // MARK: - Body
 
     var body: some View {
         ScrollView {
@@ -63,11 +70,14 @@ struct HomeTrendingMangaListView: View {
         }
     }
 
+    // MARK: - Private Methods
+
     @ViewBuilder
     private var stateContentView: some View {
         switch viewModel.screenState {
         case .loading:
             MangaCategoryDetailLoadingView()
+
         case .empty:
             VStack(alignment: .leading, spacing: 16) {
                 emptyStateCard
@@ -82,8 +92,10 @@ struct HomeTrendingMangaListView: View {
                     }
                 )
             }
+
         case .error(let message):
             errorStateCard(message: message)
+
         case .content(let items):
             MangaCategoryDetailGridSectionView(
                 items: items,
@@ -99,6 +111,20 @@ struct HomeTrendingMangaListView: View {
                 }
             )
         }
+    }
+
+    private var emptyStateTitle: String {
+        if viewModel.selectedFormat == .all {
+            return "目前還沒有熱門漫畫資料"
+        }
+        return "目前沒有符合條件的熱門漫畫"
+    }
+
+    private var emptyStateSubtitle: String {
+        if viewModel.selectedFormat == .all {
+            return "稍後再回來看看，榜單更新後就會顯示在這裡。"
+        }
+        return "可以先切回「全部」，或繼續載入更多作品看看。"
     }
 
     private var emptyStateCard: some View {
@@ -138,20 +164,6 @@ struct HomeTrendingMangaListView: View {
         .padding(24)
         .background(Color(.secondarySystemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-    }
-
-    private var emptyStateTitle: String {
-        if viewModel.selectedFormat == .all {
-            return "目前還沒有熱門漫畫資料"
-        }
-        return "目前沒有符合條件的熱門漫畫"
-    }
-
-    private var emptyStateSubtitle: String {
-        if viewModel.selectedFormat == .all {
-            return "稍後再回來看看，榜單更新後就會顯示在這裡。"
-        }
-        return "可以先切回「全部」，或繼續載入更多作品看看。"
     }
 
     private var applyingSelectionOverlay: some View {

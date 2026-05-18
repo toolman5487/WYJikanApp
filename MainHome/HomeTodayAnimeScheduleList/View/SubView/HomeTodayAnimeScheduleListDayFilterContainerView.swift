@@ -8,8 +8,13 @@
 import SwiftUI
 
 struct HomeTodayAnimeScheduleListDayFilterContainerView: View {
+
+    // MARK: - Properties
+
     let selectedDay: HomeScheduleDay
     let onSelectDay: (HomeScheduleDay) -> Void
+
+    // MARK: - Body
 
     var body: some View {
         VStack(spacing: 12) {

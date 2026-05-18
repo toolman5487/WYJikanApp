@@ -8,9 +8,14 @@
 import SwiftUI
 
 struct HomeTodayAnimeScheduleListTimelineRowView: View {
+
+    // MARK: - Properties
+
     let item: HomeTodayAnimeTimelineItem
     let isFavorite: Bool
     let onTap: () -> Void
+
+    // MARK: - Body
 
     var body: some View {
         Button(action: onTap) {
@@ -57,6 +62,8 @@ struct HomeTodayAnimeScheduleListTimelineRowView: View {
         }
         .buttonStyle(.plain)
     }
+
+    // MARK: - Private Methods
 
     private var posterView: some View {
         Group {

@@ -2,29 +2,37 @@
 //  HomeTrendingAnimeListLoadMoreFooterView.swift
 //  WYJikanApp
 //
-//  Created by Willy Hsu 2026/5/5.
+//  Created by Willy Hsu on 2026/5/5.
 //
 
 import SwiftUI
 
 struct HomeTrendingAnimeListLoadMoreFooterView: View {
+
+    // MARK: - Properties
+
     let state: HomeTrendingAnimeListViewModel.LoadMoreState
     let onLoadMore: () -> Void
     let onRetry: () -> Void
+
+    // MARK: - Body
 
     @ViewBuilder
     var body: some View {
         switch state {
         case .hidden:
             EmptyView()
+
         case .available:
             Button("載入更多作品", action: onLoadMore)
                 .buttonStyle(.borderedProminent)
                 .tint(ThemeColor.sakura)
                 .frame(maxWidth: .infinity, alignment: .center)
+
         case .loading:
             ProgressView()
                 .frame(maxWidth: .infinity, minHeight: 44)
+
         case .error(let message):
             VStack(alignment: .leading, spacing: 12) {
                 Text(message)

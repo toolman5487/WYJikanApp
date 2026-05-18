@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct HomeTodayAnimeScheduleListEmptyStateView: View {
+
+    // MARK: - Body
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("這天目前沒有可顯示的 TV 動畫")

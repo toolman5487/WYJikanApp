@@ -2,12 +2,15 @@
 //  HomeTrendingAnimeListEmptyStateView.swift
 //  WYJikanApp
 //
-//  Created by Willy Hsu 2026/5/5.
+//  Created by Willy Hsu on 2026/5/5.
 //
 
 import SwiftUI
 
 struct HomeTrendingAnimeListEmptyStateView: View {
+
+    // MARK: - Body
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("目前還沒有熱門動畫資料")

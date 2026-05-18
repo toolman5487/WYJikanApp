@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct HomeTodayAnimeScheduleListLoadingView: View {
+
+    // MARK: - Body
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             ForEach(0..<3, id: \.self) { _ in

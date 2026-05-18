@@ -8,9 +8,14 @@
 import SwiftUI
 
 struct HomeTodayAnimeScheduleListHeaderView: View {
+
+    // MARK: - Properties
+
     let title: String
     let subtitle: String
     let loadedCountText: String
+
+    // MARK: - Body
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -36,6 +41,8 @@ struct HomeTodayAnimeScheduleListHeaderView: View {
         .background(headerBackground)
         .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
     }
+
+    // MARK: - Private Methods
 
     private var headerBackground: some View {
         LinearGradient(

@@ -8,7 +8,12 @@
 import SwiftUI
 
 struct HomeTodayAnimeScheduleListSectionHeaderView: View {
+
+    // MARK: - Properties
+
     let section: HomeTodayAnimeTimeSection
+
+    // MARK: - Body
 
     var body: some View {
         GlassSectionHeaderView(

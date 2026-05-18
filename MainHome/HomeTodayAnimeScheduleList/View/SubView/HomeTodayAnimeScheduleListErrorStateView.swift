@@ -8,8 +8,13 @@
 import SwiftUI
 
 struct HomeTodayAnimeScheduleListErrorStateView: View {
+
+    // MARK: - Properties
+
     let message: String
     let onRetry: () -> Void
+
+    // MARK: - Body
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {

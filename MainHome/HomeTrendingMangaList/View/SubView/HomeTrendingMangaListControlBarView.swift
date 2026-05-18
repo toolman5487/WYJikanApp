@@ -8,8 +8,13 @@
 import SwiftUI
 
 struct HomeTrendingMangaListControlBarContainerView: View {
+
+    // MARK: - Properties
+
     @Binding var selectedSort: HomeTrendingMangaListSort
     @Binding var selectedFormat: HomeTrendingMangaListFormat
+
+    // MARK: - Body
 
     var body: some View {
         VStack(spacing: 12) {
@@ -27,8 +32,13 @@ struct HomeTrendingMangaListControlBarContainerView: View {
 }
 
 struct HomeTrendingMangaListControlBarView: View {
+
+    // MARK: - Properties
+
     @Binding var selectedSort: HomeTrendingMangaListSort
     @Binding var selectedFormat: HomeTrendingMangaListFormat
+
+    // MARK: - Body
 
     var body: some View {
         HStack(spacing: 12) {
@@ -61,6 +71,8 @@ struct HomeTrendingMangaListControlBarView: View {
             Spacer(minLength: 0)
         }
     }
+
+    // MARK: - Private Methods
 
     private func controlChip(title: String, systemImage: String) -> some View {
         HStack(spacing: 8) {

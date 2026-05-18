@@ -8,14 +8,22 @@
 import SwiftUI
 
 struct HomeTodayAnimeScheduleListView: View {
-    @StateObject private var viewModel: HomeTodayAnimeScheduleListViewModel
-    @EnvironmentObject private var favoriteStatusStore: FavoriteStatusStore
+
+    // MARK: - Properties
+
     @EnvironmentObject private var router: MainHomeRouter
+    @EnvironmentObject private var favoriteStatusStore: FavoriteStatusStore
     @EnvironmentObject private var notificationScheduler: HomeTodayAnimeNotificationScheduler
+
+    @StateObject private var viewModel: HomeTodayAnimeScheduleListViewModel
+
+    // MARK: - Lifecycle
 
     init(viewModel: HomeTodayAnimeScheduleListViewModel = HomeTodayAnimeScheduleListViewModel()) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
+
+    // MARK: - Body
 
     var body: some View {
         ScrollView {
@@ -67,6 +75,8 @@ struct HomeTodayAnimeScheduleListView: View {
         }
     }
 
+    // MARK: - Private Methods
+
     private var notificationButton: some View {
         let presentation = viewModel.notificationButtonPresentation(
             for: notificationScheduler.state
@@ -110,14 +120,17 @@ struct HomeTodayAnimeScheduleListView: View {
         case .loading:
             HomeTodayAnimeScheduleListLoadingView()
                 .transition(.opacity.combined(with: .move(edge: .bottom)))
+
         case .empty:
             HomeTodayAnimeScheduleListEmptyStateView()
                 .transition(.opacity.combined(with: .move(edge: .bottom)))
+
         case .error(let message):
             HomeTodayAnimeScheduleListErrorStateView(message: message) {
                 Task { await viewModel.reload() }
             }
             .transition(.opacity.combined(with: .move(edge: .bottom)))
+
         case .content(let sections):
             timelineListView(sections: sections)
                 .transition(.opacity.combined(with: .move(edge: .bottom)))
@@ -161,7 +174,6 @@ struct HomeTodayAnimeScheduleListView: View {
             )
         }
     }
-
 }
 
 #Preview {

@@ -2,15 +2,20 @@
 //  HomeTrendingAnimeListHeaderView.swift
 //  WYJikanApp
 //
-//  Created by Willy Hsu 2026/5/5.
+//  Created by Willy Hsu on 2026/5/5.
 //
 
 import SwiftUI
 
 struct HomeTrendingAnimeListHeaderView: View {
+
+    // MARK: - Properties
+
     let title: String
     let subtitle: String
     let loadedCountText: String
+
+    // MARK: - Body
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -36,6 +41,8 @@ struct HomeTrendingAnimeListHeaderView: View {
         .background(headerBackground)
         .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
     }
+
+    // MARK: - Private Methods
 
     private var headerBackground: some View {
         LinearGradient(

@@ -8,8 +8,13 @@
 import SwiftUI
 
 struct HomeTodayAnimeScheduleListDayFilterView: View {
+
+    // MARK: - Properties
+
     let selectedDay: HomeScheduleDay
     let onSelectDay: (HomeScheduleDay) -> Void
+
+    // MARK: - Body
 
     var body: some View {
         CapsuleFilterBarView(
@@ -19,6 +24,8 @@ struct HomeTodayAnimeScheduleListDayFilterView: View {
             selectionAnimation: nil
         )
     }
+
+    // MARK: - Private Methods
 
     private var selectedDayBinding: Binding<HomeScheduleDay> {
         Binding(

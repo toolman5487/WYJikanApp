@@ -8,17 +8,22 @@
 import SwiftUI
 
 struct HomeTrendingAnimeListControlBarContainerView: View {
+
+    // MARK: - Properties
+
     let items: [HomeTrendingAnimeListSortChipItem]
     let onSelectSort: (HomeTrendingAnimeListSort) -> Void
-    
+
+    // MARK: - Body
+
     var body: some View {
         VStack(spacing: 12) {
             HomeTrendingAnimeListControlBarView(
                 items: items,
                 onSelectSort: onSelectSort
             )
-                .padding(.horizontal, 16)
-            
+            .padding(.horizontal, 16)
+
             Divider()
         }
         .padding(.top, 8)
@@ -27,9 +32,14 @@ struct HomeTrendingAnimeListControlBarContainerView: View {
 }
 
 struct HomeTrendingAnimeListControlBarView: View {
+
+    // MARK: - Properties
+
     let items: [HomeTrendingAnimeListSortChipItem]
     let onSelectSort: (HomeTrendingAnimeListSort) -> Void
-    
+
+    // MARK: - Body
+
     var body: some View {
         CapsuleFilterBarView(
             tags: items,
@@ -41,6 +51,8 @@ struct HomeTrendingAnimeListControlBarView: View {
             }
         )
     }
+
+    // MARK: - Private Methods
 
     private var selectedItemBinding: Binding<HomeTrendingAnimeListSortChipItem> {
         Binding(

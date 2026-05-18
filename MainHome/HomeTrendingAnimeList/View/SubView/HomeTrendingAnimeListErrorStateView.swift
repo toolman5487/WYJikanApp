@@ -2,14 +2,19 @@
 //  HomeTrendingAnimeListErrorStateView.swift
 //  WYJikanApp
 //
-//  Created by Willy Hsu 2026/5/5.
+//  Created by Willy Hsu on 2026/5/5.
 //
 
 import SwiftUI
 
 struct HomeTrendingAnimeListErrorStateView: View {
+
+    // MARK: - Properties
+
     let message: String
     let onRetry: () -> Void
+
+    // MARK: - Body
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
