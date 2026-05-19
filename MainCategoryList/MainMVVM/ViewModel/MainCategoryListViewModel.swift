@@ -68,6 +68,51 @@ final class MainCategoryListViewModel: ObservableObject {
         }
     }
 
+    var topFilterState: MainCategoryTopFilterState {
+        switch selectedKind {
+        case .anime, .manga:
+            return .hidden
+
+        case .people:
+            return .menu(
+                MainCategoryTopFilterMenu(
+                    accessibilityLabel: "聲優篩選",
+                    accessibilityValue: peopleListViewModel.selectedSort.title,
+                    selectionIdentifier: peopleListViewModel.selectedSort.rawValue,
+                    options: PeopleListSort.allCases.map(MainCategoryTopFilterOption.people)
+                )
+            )
+
+        case .character:
+            return .menu(
+                MainCategoryTopFilterMenu(
+                    accessibilityLabel: "角色篩選",
+                    accessibilityValue: characterListViewModel.selectedSort.title,
+                    selectionIdentifier: characterListViewModel.selectedSort.rawValue,
+                    options: CharacterListSort.allCases.map(MainCategoryTopFilterOption.character)
+                )
+            )
+        }
+    }
+
+    var activeTopFilterSelectionIdentifier: String? {
+        switch topFilterState {
+        case .hidden:
+            return nil
+        case .menu(let menu):
+            return menu.selectionIdentifier
+        }
+    }
+
+    func selectTopFilterOption(_ option: MainCategoryTopFilterOption) {
+        switch option {
+        case .people(let sort):
+            peopleListViewModel.selectSort(sort)
+        case .character(let sort):
+            characterListViewModel.selectSort(sort)
+        }
+    }
+
     func stopLoading() {
         animeListViewModel.stop()
         mangaListViewModel.stop()

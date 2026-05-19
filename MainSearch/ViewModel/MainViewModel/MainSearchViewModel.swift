@@ -33,8 +33,18 @@ final class MainSearchViewModel: ObservableObject {
     private var activeIntent: SearchIntent?
     private var loadMoreTask: Task<Void, Never>?
 
-    init(service: MainSearchServicing = MainSearchService()) {
+    init(
+        service: MainSearchServicing = MainSearchService(),
+        initialKind: MainSearchKind = .anime,
+        initialQuery: String = "",
+        initialSortOption: MainSearchSortOption = .default
+    ) {
         self.service = service
+        self.query = initialQuery
+        self.kind = initialKind
+        if MainSearchSortOption.supportedOptions(for: initialKind).contains(initialSortOption) {
+            self.sortOption = initialSortOption
+        }
         bindSearchPipeline()
         bindSortPipeline()
     }

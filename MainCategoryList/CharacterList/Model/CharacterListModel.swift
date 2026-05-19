@@ -7,6 +7,34 @@
 
 import Foundation
 
+enum CharacterListSort: String, CaseIterable, Hashable, Sendable {
+    case popularity
+    case nameAscending
+    case nameDescending
+
+    var title: String {
+        switch self {
+        case .popularity:
+            return "熱門"
+        case .nameAscending:
+            return "名稱 A-Z"
+        case .nameDescending:
+            return "名稱 Z-A"
+        }
+    }
+
+    var systemImageName: String {
+        switch self {
+        case .popularity:
+            return "flame.fill"
+        case .nameAscending:
+            return "textformat.abc"
+        case .nameDescending:
+            return "textformat.abc.dottedunderline"
+        }
+    }
+}
+
 struct CharacterListResponse: Codable, Sendable {
     let pagination: CharacterListPagination?
     let data: [CharacterListDTO]
@@ -25,6 +53,7 @@ struct CharacterListDTO: Codable, Identifiable, Hashable, Sendable {
     let name: String?
     let nameKanji: String?
     let nicknames: [String]?
+    let favorites: Int?
 
     var id: Int { malId }
 }
@@ -35,14 +64,20 @@ struct CharacterListRow: Identifiable, Hashable, Sendable {
     let name: String
     let imageURL: URL?
     let malPageURL: URL?
+    let favorites: Int?
+    let sortTitle: String
 
     static func from(_ dto: CharacterListDTO) -> CharacterListRow {
-        CharacterListRow(
+        let displayName = displayName(japanese: dto.nameKanji, fallback: dto.name)
+
+        return CharacterListRow(
             id: dto.malId,
             malId: dto.malId,
-            name: displayName(japanese: dto.nameKanji, fallback: dto.name),
+            name: displayName,
             imageURL: posterURL(from: dto.images),
-            malPageURL: malPageURL(from: dto.url, malId: dto.malId)
+            malPageURL: malPageURL(from: dto.url, malId: dto.malId),
+            favorites: dto.favorites,
+            sortTitle: normalizedSortTitle(from: displayName)
         )
     }
 
@@ -75,5 +110,9 @@ struct CharacterListRow: Identifiable, Hashable, Sendable {
             webp?.smallImageUrl
         ]
         return candidates.compactMap { $0 }.first.flatMap { URL(string: $0) }
+    }
+
+    private static func normalizedSortTitle(from title: String) -> String {
+        title.folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
     }
 }

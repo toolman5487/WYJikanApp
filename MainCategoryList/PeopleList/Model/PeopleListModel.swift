@@ -7,6 +7,34 @@
 
 import Foundation
 
+enum PeopleListSort: String, CaseIterable, Hashable, Sendable {
+    case popularity
+    case nameAscending
+    case nameDescending
+
+    var title: String {
+        switch self {
+        case .popularity:
+            return "熱門"
+        case .nameAscending:
+            return "名稱 A-Z"
+        case .nameDescending:
+            return "名稱 Z-A"
+        }
+    }
+
+    var systemImageName: String {
+        switch self {
+        case .popularity:
+            return "flame.fill"
+        case .nameAscending:
+            return "textformat.abc"
+        case .nameDescending:
+            return "textformat.abc.dottedunderline"
+        }
+    }
+}
+
 struct PeopleListResponse: Codable, Sendable {
     let pagination: PeopleListPagination?
     let data: [PeopleListDTO]
@@ -25,6 +53,7 @@ struct PeopleListDTO: Codable, Identifiable, Hashable, Sendable {
     let name: String?
     let givenName: String?
     let familyName: String?
+    let favorites: Int?
 
     var id: Int { malId }
 }
@@ -35,14 +64,24 @@ struct PeopleListRow: Identifiable, Hashable, Sendable {
     let name: String
     let imageURL: URL?
     let malPageURL: URL?
+    let favorites: Int?
+    let sortTitle: String
 
     static func from(_ dto: PeopleListDTO) -> PeopleListRow {
-        PeopleListRow(
+        let displayName = displayName(
+            familyName: dto.familyName,
+            givenName: dto.givenName,
+            fallback: dto.name
+        )
+
+        return PeopleListRow(
             id: dto.malId,
             malId: dto.malId,
-            name: displayName(familyName: dto.familyName, givenName: dto.givenName, fallback: dto.name),
+            name: displayName,
             imageURL: posterURL(from: dto.images),
-            malPageURL: malPageURL(from: dto.url, malId: dto.malId)
+            malPageURL: malPageURL(from: dto.url, malId: dto.malId),
+            favorites: dto.favorites,
+            sortTitle: normalizedSortTitle(from: displayName)
         )
     }
 
@@ -81,5 +120,9 @@ struct PeopleListRow: Identifiable, Hashable, Sendable {
             webp?.smallImageUrl
         ]
         return candidates.compactMap { $0 }.first.flatMap { URL(string: $0) }
+    }
+
+    private static func normalizedSortTitle(from title: String) -> String {
+        title.folding(options: [.diacriticInsensitive, .caseInsensitive], locale: .current)
     }
 }

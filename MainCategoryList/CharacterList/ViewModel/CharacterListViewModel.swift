@@ -33,11 +33,13 @@ final class CharacterListViewModel: ObservableObject {
     @Published private(set) var rows: [CharacterListRow] = []
     @Published private(set) var hasNextPage = true
     @Published private(set) var paginationState: PaginationState = .idle
+    @Published private(set) var selectedSort: CharacterListSort = .popularity
 
     private let service: MainCategoryListServicing
     private let pageLimit = 12
     private var currentPage = 0
     private var loadTask: Task<Void, Never>?
+    private var sourceRows: [CharacterListRow] = []
 
     init(service: MainCategoryListServicing = MainCategoryListService()) {
         self.service = service
@@ -83,6 +85,7 @@ final class CharacterListViewModel: ObservableObject {
         loadTask?.cancel()
         currentPage = 0
         hasNextPage = true
+        sourceRows = []
         rows = []
         paginationState = .idle
         loadPage(1)
@@ -104,6 +107,12 @@ final class CharacterListViewModel: ObservableObject {
         paginationState = .idle
     }
 
+    func selectSort(_ sort: CharacterListSort) {
+        guard selectedSort != sort else { return }
+        selectedSort = sort
+        applySelectedSort()
+    }
+
     private func loadPage(_ page: Int) {
         let isFirstPage = page == 1
         paginationState = isFirstPage ? .loadingInitial : .loadingMore
@@ -118,11 +127,52 @@ final class CharacterListViewModel: ObservableObject {
                 let newRows = response.data.map(CharacterListRow.from)
                 currentPage = response.pagination?.currentPage ?? page
                 hasNextPage = response.pagination?.hasNextPage ?? !newRows.isEmpty
-                rows = isFirstPage ? newRows : rows + newRows
+                sourceRows = isFirstPage ? newRows : sourceRows + newRows
+                applySelectedSort()
                 paginationState = .idle
             } catch {
                 guard !Task.isCancelled else { return }
                 paginationState = .error(error.localizedDescription)
+            }
+        }
+    }
+
+    private func applySelectedSort() {
+        rows = sortedRows(from: sourceRows, sort: selectedSort)
+    }
+
+    private func sortedRows(from rows: [CharacterListRow], sort: CharacterListSort) -> [CharacterListRow] {
+        switch sort {
+        case .popularity:
+            return rows.sorted { lhs, rhs in
+                switch (lhs.favorites, rhs.favorites) {
+                case let (left?, right?) where left != right:
+                    return left > right
+                case (.some, nil):
+                    return true
+                case (nil, .some):
+                    return false
+                default:
+                    return lhs.sortTitle.localizedStandardCompare(rhs.sortTitle) == .orderedAscending
+                }
+            }
+
+        case .nameAscending:
+            return rows.sorted { lhs, rhs in
+                let result = lhs.sortTitle.localizedStandardCompare(rhs.sortTitle)
+                if result == .orderedSame {
+                    return (lhs.favorites ?? 0) > (rhs.favorites ?? 0)
+                }
+                return result == .orderedAscending
+            }
+
+        case .nameDescending:
+            return rows.sorted { lhs, rhs in
+                let result = lhs.sortTitle.localizedStandardCompare(rhs.sortTitle)
+                if result == .orderedSame {
+                    return (lhs.favorites ?? 0) > (rhs.favorites ?? 0)
+                }
+                return result == .orderedDescending
             }
         }
     }

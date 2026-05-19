@@ -32,18 +32,28 @@ struct MainCategoryListView: View {
                         .id(viewModel.selectedKind)
                 }
                 .safeAreaInset(edge: .top, spacing: 0) {
-                    CapsuleFilterBarView(
-                        tags: MainListKind.categoryTags,
-                        title: { $0.title },
-                        selection: $viewModel.selectedKind
-                    )
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal)
+                    HStack(alignment: .center, spacing: 12) {
+                        CapsuleFilterBarView(
+                            tags: MainListKind.categoryTags,
+                            title: { $0.title },
+                            selection: $viewModel.selectedKind
+                        )
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                        topFilterMenu
+                    }
+                    .padding(.horizontal, 16)
                     .padding(.vertical, 12)
                     .background(.ultraThinMaterial)
                 }
                 .onChange(of: viewModel.selectedKind) { _, _ in
                     proxy.scrollTo(topAnchorId, anchor: .top)
+                }
+                .onChange(of: viewModel.activeTopFilterSelectionIdentifier) { _, _ in
+                    guard viewModel.activeTopFilterSelectionIdentifier != nil else { return }
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        proxy.scrollTo(topAnchorId, anchor: .top)
+                    }
                 }
             }
             .toolbar {
@@ -79,6 +89,35 @@ struct MainCategoryListView: View {
 
         case .character:
             CharacterListView(viewModel: viewModel.characterListViewModel)
+        }
+    }
+
+    @ViewBuilder
+    private var topFilterMenu: some View {
+        switch viewModel.topFilterState {
+        case .hidden:
+            EmptyView()
+
+        case .menu(let menu):
+            Menu {
+                ForEach(menu.options) { option in
+                    Button {
+                        viewModel.selectTopFilterOption(option)
+                    } label: {
+                        Label(
+                            option.title,
+                            systemImage: option.systemImageName
+                        )
+                    }
+                }
+            } label: {
+                Image(systemName: "slider.horizontal.3")
+                    .font(.title3.weight(.bold))
+                    .foregroundStyle(ThemeColor.textPrimary)
+                    .frame(width: 40, height: 40)
+            }
+            .accessibilityLabel(menu.accessibilityLabel)
+            .accessibilityValue(menu.accessibilityValue)
         }
     }
 }
