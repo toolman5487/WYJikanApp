@@ -43,21 +43,20 @@ struct RandomMangaSectionView: View {
     @ViewBuilder
     private var drawStateContent: some View {
         switch viewModel.drawState {
-        case .loading where viewModel.randomPick == nil:
-            RandomMangaSkeletonView()
-
-        case .failure(let error) where viewModel.randomPick == nil:
+        case .idle:
             RandomMangaCardView(
                 pick: nil,
                 isDrawing: false,
-                errorMessage: error,
+                errorMessage: nil,
                 cooldownText: nil,
                 drawButtonTitle: viewModel.drawButtonTitle,
                 canDraw: viewModel.canDraw,
-                detailMalId: viewModel.randomPick?.malId,
+                detailMalId: nil,
                 isFavorite: false,
                 onDrawTap: viewModel.drawRandomManga
             )
+        case .loading where viewModel.randomPick == nil:
+            RandomMangaSkeletonView()
 
         case .loading:
             RandomMangaCardView(
@@ -87,6 +86,7 @@ struct RandomMangaSectionView: View {
             RandomMangaCardView(
                 pick: viewModel.randomPick,
                 isDrawing: false,
+                errorMessage: viewModel.drawError,
                 cooldownText: nil,
                 drawButtonTitle: viewModel.drawButtonTitle,
                 canDraw: viewModel.canDraw,
@@ -290,17 +290,24 @@ private struct RandomMangaCardView: View {
                     .lineLimit(2)
                     .minimumScaleFactor(0.88)
                     .multilineTextAlignment(.leading)
-            } else {
+            } else if let errorMessage {
                 Text("載入失敗")
                     .font(.system(.title2, design: .rounded).weight(.bold))
                     .foregroundStyle(ThemeColor.textPrimary)
 
-                if let errorMessage {
-                    Text(errorMessage)
-                        .font(.footnote)
-                        .foregroundStyle(ThemeColor.textPrimary.opacity(0.9))
-                        .lineLimit(2)
-                }
+                Text(errorMessage)
+                    .font(.footnote)
+                    .foregroundStyle(ThemeColor.textPrimary.opacity(0.9))
+                    .lineLimit(2)
+            } else {
+                Text("今天抽這部")
+                    .font(.system(.title2, design: .rounded).weight(.bold))
+                    .foregroundStyle(ThemeColor.textPrimary)
+
+                Text("按下按鈕，交給系統幫你抽出下一部值得開追的漫畫作品。")
+                    .font(.footnote)
+                    .foregroundStyle(ThemeColor.textPrimary.opacity(0.9))
+                    .lineLimit(2)
             }
         }
     }

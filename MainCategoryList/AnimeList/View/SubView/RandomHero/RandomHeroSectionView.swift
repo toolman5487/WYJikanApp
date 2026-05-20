@@ -40,21 +40,20 @@ struct RandomHeroSectionView: View {
     @ViewBuilder
     private var drawStateContent: some View {
         switch viewModel.drawState {
-        case .loading where viewModel.randomPick == nil:
-            RandomHeroSkeletonView()
-
-        case .failure(let error) where viewModel.randomPick == nil:
+        case .idle:
             RandomHeroCardView(
                 pick: nil,
                 isDrawing: false,
-                errorMessage: error,
+                errorMessage: nil,
                 cooldownText: nil,
                 drawButtonTitle: viewModel.drawButtonTitle,
                 canDraw: viewModel.canDraw,
-                detailMalId: viewModel.randomPick?.malId,
+                detailMalId: nil,
                 isFavorite: false,
                 onDrawTap: viewModel.drawRandomAnime
             )
+        case .loading where viewModel.randomPick == nil:
+            RandomHeroSkeletonView()
 
         case .loading:
             RandomHeroCardView(
@@ -84,6 +83,7 @@ struct RandomHeroSectionView: View {
             RandomHeroCardView(
                 pick: viewModel.randomPick,
                 isDrawing: false,
+                errorMessage: viewModel.drawError,
                 cooldownText: nil,
                 drawButtonTitle: viewModel.drawButtonTitle,
                 canDraw: viewModel.canDraw,

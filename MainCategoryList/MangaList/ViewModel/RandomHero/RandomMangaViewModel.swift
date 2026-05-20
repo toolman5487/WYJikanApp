@@ -11,6 +11,7 @@ import Combine
 @MainActor
 final class RandomMangaViewModel: ObservableObject {
     enum DrawState {
+        case idle
         case loading
         case ready
         case failure(message: String)
@@ -21,7 +22,7 @@ final class RandomMangaViewModel: ObservableObject {
     private static let minimumDrawLoadingDuration: Duration = .seconds(2)
     private static let persistedRandomPickKey = "manga.random.lastPick"
 
-    @Published private(set) var drawState: DrawState = .loading
+    @Published private(set) var drawState: DrawState = .idle
     @Published private(set) var randomPick: MangaListRandomDTO?
 
     var isDrawing: Bool {
@@ -62,7 +63,14 @@ final class RandomMangaViewModel: ObservableObject {
         if cooldownRemainingSeconds > 0 {
             return "\(cooldownDisplayText) 後可再抽"
         }
-        return randomPick == nil ? "開始抽獎" : "再抽一次"
+        switch drawState {
+        case .idle:
+            return "開始抽獎"
+        case .ready, .failure, .cooldown:
+            return randomPick == nil ? "開始抽獎" : "再抽一次"
+        case .loading:
+            return "抽獎中..."
+        }
     }
 
     private let service: MainCategoryListServicing
@@ -85,15 +93,23 @@ final class RandomMangaViewModel: ObservableObject {
 
         let persistedPick = restorePersistedRandomPick()
         randomPick = persistedPick
-        drawState = .ready
+        drawState = persistedPick == nil ? .idle : .ready
         updateCooldownState(seconds: drawCooldownTimer.remainingSeconds)
         cooldownCancellable = drawCooldownTimer.$remainingSeconds
             .sink { [weak self] seconds in
                 self?.updateCooldownState(seconds: seconds)
             }
+
+        if persistedPick == nil {
+            drawRandomManga(isAutomatic: true)
+        }
     }
 
     func drawRandomManga() {
+        drawRandomManga(isAutomatic: false)
+    }
+
+    private func drawRandomManga(isAutomatic: Bool) {
         guard !isDrawing else { return }
         guard drawCooldownTimer.canTrigger else { return }
 
@@ -118,7 +134,11 @@ final class RandomMangaViewModel: ObservableObject {
                 guard !Task.isCancelled else { return }
                 await self.waitForMinimumLoadingDuration(since: drawStartedAt)
                 guard !Task.isCancelled else { return }
-                self.drawState = .failure(message: error.localizedDescription)
+                if isAutomatic, self.randomPick == nil {
+                    self.drawState = .idle
+                } else {
+                    self.drawState = .failure(message: error.localizedDescription)
+                }
             }
         }
     }
@@ -131,7 +151,7 @@ final class RandomMangaViewModel: ObservableObject {
             if seconds > 0 {
                 drawState = .cooldown(remainingSeconds: seconds)
             } else {
-                drawState = .ready
+                drawState = randomPick == nil ? .idle : .ready
             }
         }
     }
@@ -143,8 +163,8 @@ final class RandomMangaViewModel: ObservableObject {
         default:
             switch drawState {
             case .cooldown:
-                drawState = .ready
-            case .loading, .ready, .failure:
+                drawState = randomPick == nil ? .idle : .ready
+            case .idle, .loading, .ready, .failure:
                 break
             }
         }

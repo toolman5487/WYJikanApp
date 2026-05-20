@@ -198,17 +198,24 @@ struct RandomHeroCardView: View {
                     .lineLimit(2)
                     .minimumScaleFactor(0.88)
                     .multilineTextAlignment(.leading)
-            } else {
+            } else if let errorMessage {
                 Text("載入失敗")
                     .font(.system(.title2, design: .rounded).weight(.bold))
                     .foregroundStyle(ThemeColor.textPrimary)
 
-                if let errorMessage {
-                    Text(errorMessage)
-                        .font(.footnote)
-                        .foregroundStyle(ThemeColor.textPrimary.opacity(0.9))
-                        .lineLimit(2)
-                }
+                Text(errorMessage)
+                    .font(.footnote)
+                    .foregroundStyle(ThemeColor.textPrimary.opacity(0.9))
+                    .lineLimit(2)
+            } else {
+                Text("今天抽這部")
+                    .font(.system(.title2, design: .rounded).weight(.bold))
+                    .foregroundStyle(ThemeColor.textPrimary)
+
+                Text("按下按鈕，交給系統幫你抽出下一部值得開看的作品。")
+                    .font(.footnote)
+                    .foregroundStyle(ThemeColor.textPrimary.opacity(0.9))
+                    .lineLimit(2)
             }
         }
     }

@@ -13,6 +13,7 @@ final class RandomHeroViewModel: ObservableObject {
     // MARK: - Types
 
     enum DrawState {
+        case idle
         case loading
         case ready
         case failure(message: String)
@@ -27,7 +28,7 @@ final class RandomHeroViewModel: ObservableObject {
 
     // MARK: - Published State
 
-    @Published private(set) var drawState: DrawState = .loading
+    @Published private(set) var drawState: DrawState = .idle
     @Published private(set) var randomPick: AnimeListRandomDTO?
 
     // MARK: - Computed Properties
@@ -76,7 +77,14 @@ final class RandomHeroViewModel: ObservableObject {
         if cooldownRemainingSeconds > 0 {
             return "\(cooldownDisplayText) 後可再抽"
         }
-        return randomPick == nil ? "開始抽獎" : "再抽一次"
+        switch drawState {
+        case .idle:
+            return "開始抽獎"
+        case .ready, .failure, .cooldown:
+            return randomPick == nil ? "開始抽獎" : "再抽一次"
+        case .loading:
+            return "抽獎中..."
+        }
     }
 
     // MARK: - Dependencies
@@ -104,17 +112,25 @@ final class RandomHeroViewModel: ObservableObject {
         )
         let persistedPick = restorePersistedRandomPick()
         randomPick = persistedPick
-        drawState = .ready
+        drawState = persistedPick == nil ? .idle : .ready
         updateCooldownState(seconds: drawCooldownTimer.remainingSeconds)
         cooldownCancellable = drawCooldownTimer.$remainingSeconds
             .sink { [weak self] seconds in
                 self?.updateCooldownState(seconds: seconds)
             }
+
+        if persistedPick == nil {
+            drawRandomAnime(isAutomatic: true)
+        }
     }
 
     // MARK: - Public Methods
 
     func drawRandomAnime() {
+        drawRandomAnime(isAutomatic: false)
+    }
+
+    private func drawRandomAnime(isAutomatic: Bool) {
         guard !isDrawing else { return }
         guard drawCooldownTimer.canTrigger else { return }
         drawTask?.cancel()
@@ -138,7 +154,11 @@ final class RandomHeroViewModel: ObservableObject {
                 guard !Task.isCancelled else { return }
                 await self.waitForMinimumLoadingDuration(since: drawStartedAt)
                 guard !Task.isCancelled else { return }
-                self.drawState = .failure(message: error.localizedDescription)
+                if isAutomatic, self.randomPick == nil {
+                    self.drawState = .idle
+                } else {
+                    self.drawState = .failure(message: error.localizedDescription)
+                }
             }
         }
     }
@@ -151,7 +171,7 @@ final class RandomHeroViewModel: ObservableObject {
             if seconds > 0 {
                 drawState = .cooldown(remainingSeconds: seconds)
             } else {
-                drawState = .ready
+                drawState = randomPick == nil ? .idle : .ready
             }
         }
     }
@@ -165,8 +185,8 @@ final class RandomHeroViewModel: ObservableObject {
         default:
             switch drawState {
             case .cooldown:
-                drawState = .ready
-            case .loading, .ready, .failure:
+                drawState = randomPick == nil ? .idle : .ready
+            case .idle, .loading, .ready, .failure:
                 break
             }
         }
