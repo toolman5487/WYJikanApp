@@ -25,7 +25,7 @@ struct HomeTodayAnimeScheduleListView: View {
 
     var body: some View {
         ScrollView {
-            LazyVStack(alignment: .leading, spacing: 24, pinnedViews: [.sectionHeaders]) {
+            LazyVStack(alignment: .leading, spacing: 0, pinnedViews: [.sectionHeaders]) {
                 HomeTodayAnimeScheduleListHeaderView(
                     title: viewModel.headerTitle,
                     subtitle: viewModel.headerSubtitle,
@@ -89,7 +89,7 @@ struct HomeTodayAnimeScheduleListView: View {
     private func timelineListView(sections: [HomeTodayAnimeTimeSection]) -> some View {
         let favoriteIDs = favoriteStatusStore.favoriteIDs(for: .anime)
 
-        return LazyVStack(alignment: .leading, spacing: 20, pinnedViews: [.sectionHeaders]) {
+        return LazyVStack(alignment: .leading, spacing: 0, pinnedViews: [.sectionHeaders]) {
             ForEach(sections) { section in
                 Section {
                     VStack(spacing: 12) {

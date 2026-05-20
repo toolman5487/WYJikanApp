@@ -11,7 +11,7 @@ struct AnimeCategoryDetailGridCardView: View {
     let item: AnimeCategoryItemDTO
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 4) {
             PosterCardView(rank: item.rank) {
                 Group {
                     if let posterURL = item.posterURL {
@@ -26,13 +26,13 @@ struct AnimeCategoryDetailGridCardView: View {
                     }
                 }
             }
-            .frame(height: 220)
+            .aspectRatio(2.0 / 3.0, contentMode: .fit)
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
 
             Text(item.displayTitle)
                 .font(.headline)
                 .foregroundStyle(ThemeColor.textPrimary)
-                .lineLimit(2)
+                .lineLimit(1)
 
             Text(metaText)
                 .font(.caption.weight(.semibold))
@@ -42,7 +42,7 @@ struct AnimeCategoryDetailGridCardView: View {
                 Text(synopsis)
                     .font(.caption)
                     .foregroundStyle(ThemeColor.textSecondary)
-                    .lineLimit(3)
+                    .lineLimit(1)
             }
         }
     }
