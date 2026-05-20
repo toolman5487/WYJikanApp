@@ -8,7 +8,12 @@
 import SwiftUI
 
 struct MangaCategoryDetailView: View {
+
+    // MARK: - Properties
+
     @StateObject private var viewModel: MangaCategoryDetailViewModel
+
+    // MARK: - Initialization
 
     init(
         genre: MangaListGenreDTO,
@@ -19,7 +24,21 @@ struct MangaCategoryDetailView: View {
         )
     }
 
+    // MARK: - Body
+
     var body: some View {
+        scrollContent
+            .navigationTitle(viewModel.genreTitle)
+            .navigationBarTitleDisplayMode(.inline)
+            .background(Color(.systemBackground))
+            .task {
+                await viewModel.loadIfNeeded()
+            }
+    }
+
+    // MARK: - Scroll Content
+
+    private var scrollContent: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 MangaCategoryDetailHeaderView(
@@ -37,25 +56,24 @@ struct MangaCategoryDetailView: View {
             .padding(.top, 16)
             .padding(.bottom, 28)
         }
-        .navigationTitle(viewModel.genreTitle)
-        .navigationBarTitleDisplayMode(.inline)
-        .background(Color(.systemBackground))
-        .task {
-            await viewModel.loadIfNeeded()
-        }
     }
+
+    // MARK: - State Content
 
     @ViewBuilder
     private var stateContentView: some View {
         switch viewModel.screenState {
         case .loading:
             MangaCategoryDetailLoadingView()
+
         case .empty:
             MangaCategoryDetailEmptyStateView()
+
         case let .error(message):
             MangaCategoryDetailErrorStateView(message: message) {
                 Task { await viewModel.reload() }
             }
+
         case let .content(items):
             MangaCategoryDetailGridSectionView(
                 items: items,
@@ -73,6 +91,8 @@ struct MangaCategoryDetailView: View {
         }
     }
 }
+
+// MARK: - Preview
 
 #Preview {
     NavigationStack {

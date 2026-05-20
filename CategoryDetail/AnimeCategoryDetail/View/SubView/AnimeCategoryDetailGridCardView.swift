@@ -8,7 +8,12 @@
 import SwiftUI
 
 struct AnimeCategoryDetailGridCardView: View {
+
+    // MARK: - Properties
+
     let item: AnimeCategoryItemDTO
+
+    // MARK: - Body
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -46,6 +51,8 @@ struct AnimeCategoryDetailGridCardView: View {
             }
         }
     }
+
+    // MARK: - Private Methods
 
     private var metaText: String {
         var segments: [String] = []

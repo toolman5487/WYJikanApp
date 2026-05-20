@@ -8,15 +8,21 @@
 import SwiftUI
 
 struct MangaCategoryDetailLoadMoreFooterView: View {
+
+    // MARK: - Properties
+
     let state: MangaCategoryDetailViewModel.LoadMoreState
     let onLoadMore: () -> Void
     let onRetry: () -> Void
+
+    // MARK: - Body
 
     @ViewBuilder
     var body: some View {
         switch state {
         case .hidden:
             EmptyView()
+
         case .available:
             Button("載入更多作品") {
                 onLoadMore()
@@ -24,9 +30,11 @@ struct MangaCategoryDetailLoadMoreFooterView: View {
             .buttonStyle(.borderedProminent)
             .tint(ThemeColor.sakura)
             .frame(maxWidth: .infinity, alignment: .center)
+
         case .loading:
             ProgressView()
                 .frame(maxWidth: .infinity, minHeight: 44)
+
         case let .error(message):
             VStack(alignment: .leading, spacing: 12) {
                 Text(message)

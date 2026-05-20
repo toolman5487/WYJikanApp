@@ -8,8 +8,13 @@
 import SwiftUI
 
 struct MangaCategoryDetailControlBarView: View {
+
+    // MARK: - Properties
+
     @Binding var selectedSort: MangaCategoryFilter.Sort
     @Binding var selectedFormat: MangaCategoryFilter.Format
+
+    // MARK: - Body
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -46,6 +51,8 @@ struct MangaCategoryDetailControlBarView: View {
             }
         }
     }
+
+    // MARK: - Private Methods
 
     private func controlChip(title: String, systemImage: String) -> some View {
         HStack(spacing: 8) {

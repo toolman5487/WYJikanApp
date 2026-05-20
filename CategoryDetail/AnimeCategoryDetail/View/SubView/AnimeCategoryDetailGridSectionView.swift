@@ -8,16 +8,21 @@
 import SwiftUI
 
 struct AnimeCategoryDetailGridSectionView: View {
+
+    // MARK: - Properties
+
+    private let gridColumns = [
+        GridItem(.flexible(), spacing: 16),
+        GridItem(.flexible(), spacing: 16)
+    ]
+
     let items: [AnimeCategoryItemDTO]
     let loadMoreState: AnimeCategoryDetailViewModel.LoadMoreState
     let onItemAppear: (AnimeCategoryItemDTO) -> Void
     let onLoadMore: () -> Void
     let onRetryLoadMore: () -> Void
 
-    private let gridColumns = [
-        GridItem(.flexible(), spacing: 16),
-        GridItem(.flexible(), spacing: 16)
-    ]
+    // MARK: - Body
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {

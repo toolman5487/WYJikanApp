@@ -8,9 +8,14 @@
 import SwiftUI
 
 struct MangaCategoryDetailHeaderView: View {
+
+    // MARK: - Properties
+
     let title: String
     let subtitle: String
     let loadedCountText: String
+
+    // MARK: - Body
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -34,6 +39,8 @@ struct MangaCategoryDetailHeaderView: View {
         .background(headerBackground)
         .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
     }
+
+    // MARK: - Private Methods
 
     private var headerBackground: some View {
         ZStack(alignment: .topTrailing) {

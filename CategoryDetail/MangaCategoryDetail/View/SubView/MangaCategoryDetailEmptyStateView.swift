@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct MangaCategoryDetailEmptyStateView: View {
+
+    // MARK: - Body
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("這個分類目前還沒有作品")

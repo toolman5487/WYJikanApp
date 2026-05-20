@@ -8,15 +8,15 @@
 import SwiftUI
 
 struct MainCategoryListView: View {
-
+    
     // MARK: - Properties
-
+    
     @StateObject private var viewModel = MainCategoryListViewModel()
-
+    
     private let topAnchorId = "MainCategoryListTopAnchor"
-
+    
     // MARK: - Body
-
+    
     var body: some View {
         NavigationStack {
             scrollView
@@ -35,16 +35,16 @@ struct MainCategoryListView: View {
                 }
         }
     }
-
+    
     // MARK: - Scroll View
-
+    
     private var scrollView: some View {
         ScrollViewReader { proxy in
             ScrollView {
                 Color.clear
                     .frame(height: 0)
                     .id(topAnchorId)
-
+                
                 selectedContentView
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal)
@@ -59,7 +59,7 @@ struct MainCategoryListView: View {
                         selection: $viewModel.selectedKind
                     )
                     .frame(maxWidth: .infinity, alignment: .leading)
-
+                    
                     topFilterMenu
                 }
                 .padding(.horizontal, 16)
@@ -77,34 +77,34 @@ struct MainCategoryListView: View {
             }
         }
     }
-
+    
     // MARK: - Selected Content
-
+    
     @ViewBuilder
     private var selectedContentView: some View {
         switch viewModel.selectedKind {
         case .anime:
             AnimeListView(viewModel: viewModel.animeListViewModel)
-
+            
         case .manga:
             MangaListView(viewModel: viewModel.mangaListViewModel)
-
+            
         case .people:
             PeopleListView(viewModel: viewModel.peopleListViewModel)
-
+            
         case .character:
             CharacterListView(viewModel: viewModel.characterListViewModel)
         }
     }
-
+    
     // MARK: - Top Filter Menu
-
+    
     @ViewBuilder
     private var topFilterMenu: some View {
         switch viewModel.topFilterState {
         case .hidden:
             EmptyView()
-
+            
         case .menu(let menu):
             Menu {
                 ForEach(menu.options) { option in

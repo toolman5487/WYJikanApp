@@ -8,7 +8,12 @@
 import SwiftUI
 
 struct AnimeCategoryDetailView: View {
+
+    // MARK: - Properties
+
     @StateObject private var viewModel: AnimeCategoryDetailViewModel
+
+    // MARK: - Initialization
 
     init(
         genre: AnimeListGenreDTO,
@@ -19,7 +24,21 @@ struct AnimeCategoryDetailView: View {
         )
     }
 
+    // MARK: - Body
+
     var body: some View {
+        scrollContent
+            .navigationTitle(viewModel.genreTitle)
+            .navigationBarTitleDisplayMode(.inline)
+            .background(Color(.systemBackground))
+            .task {
+                await viewModel.loadIfNeeded()
+            }
+    }
+
+    // MARK: - Scroll Content
+
+    private var scrollContent: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 AnimeCategoryDetailHeaderView(
@@ -37,25 +56,24 @@ struct AnimeCategoryDetailView: View {
             .padding(.top, 16)
             .padding(.bottom, 28)
         }
-        .navigationTitle(viewModel.genreTitle)
-        .navigationBarTitleDisplayMode(.inline)
-        .background(Color(.systemBackground))
-        .task {
-            await viewModel.loadIfNeeded()
-        }
     }
+
+    // MARK: - State Content
 
     @ViewBuilder
     private var stateContentView: some View {
         switch viewModel.screenState {
         case .loading:
             AnimeCategoryDetailLoadingView()
+
         case .empty:
             AnimeCategoryDetailEmptyStateView()
+
         case let .error(message):
             AnimeCategoryDetailErrorStateView(message: message) {
                 Task { await viewModel.reload() }
             }
+
         case let .content(items):
             AnimeCategoryDetailGridSectionView(
                 items: items,
@@ -73,6 +91,8 @@ struct AnimeCategoryDetailView: View {
         }
     }
 }
+
+// MARK: - Preview
 
 #Preview {
     NavigationStack {

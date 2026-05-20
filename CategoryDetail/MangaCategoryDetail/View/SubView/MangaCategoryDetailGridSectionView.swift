@@ -8,16 +8,21 @@
 import SwiftUI
 
 struct MangaCategoryDetailGridSectionView: View {
+
+    // MARK: - Properties
+
+    private let gridColumns = [
+        GridItem(.flexible(), spacing: 16),
+        GridItem(.flexible(), spacing: 16)
+    ]
+
     let items: [MangaCategoryItemDTO]
     let loadMoreState: MangaCategoryDetailViewModel.LoadMoreState
     let onItemAppear: (MangaCategoryItemDTO) -> Void
     let onLoadMore: () -> Void
     let onRetryLoadMore: () -> Void
 
-    private let gridColumns = [
-        GridItem(.flexible(), spacing: 16),
-        GridItem(.flexible(), spacing: 16)
-    ]
+    // MARK: - Body
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
