@@ -13,7 +13,6 @@ enum HomeTodayAnimeNotificationConfig {
     static let lastRefreshAttemptDateKey = "homeTodayAnimeNotificationLastRefreshAttemptDate"
     static let legacySummaryIdentifierPrefix = "home.todayAnime.dailySummary."
     static let reminderIdentifierPrefix = "home.todayAnime.broadcastReminder."
-    static let deliveryTimeText = "播出時間"
     static let pageSize = 25
     static let maxPagesPerDay = 4
     static let maxScheduledNotifications = 60

@@ -12,8 +12,6 @@ import UserNotifications
 
 @MainActor
 final class HomeTodayAnimeNotificationScheduler: BaseUserNotificationManager {
-    @Published var feedback: HomeTodayAnimeNotificationFeedback?
-
     private let reminderFactory: HomeTodayAnimeBroadcastReminderFactory
     private let requestFactory: HomeTodayAnimeNotificationRequestFactory
 
@@ -44,15 +42,12 @@ final class HomeTodayAnimeNotificationScheduler: BaseUserNotificationManager {
         )
     }
 
-    var deliveryTimeText: String {
-        HomeTodayAnimeNotificationConfig.deliveryTimeText
-    }
-
     func requestAuthorizationOnLaunchIfNeeded() async {
         guard await refreshAuthorizationState() == .notDetermined else { return }
 
         do {
             try await ensureAuthorization()
+            setState(.enabled)
         } catch BaseUserNotificationError.permissionDenied {
             setState(.disabled)
         } catch {
@@ -71,19 +66,6 @@ final class HomeTodayAnimeNotificationScheduler: BaseUserNotificationManager {
         clearLastRefreshDate()
     }
 
-    func toggleBroadcastReminders() async {
-        guard !state.isProcessing else { return }
-
-        switch state {
-        case .enabled:
-            await disableBroadcastReminders(showFeedback: true)
-        case .disabled:
-            await enableBroadcastReminders()
-        case .processing:
-            return
-        }
-    }
-
     func refreshScheduledNotificationIfNeeded() async {
         guard state == .enabled else { return }
         await refreshAuthorizationStatus()
@@ -98,49 +80,6 @@ final class HomeTodayAnimeNotificationScheduler: BaseUserNotificationManager {
         } catch {
             AppLogger.notifications.error(
                 "Refresh today anime notification failed: \(error.localizedDescription, privacy: .public)"
-            )
-        }
-    }
-
-    private func enableBroadcastReminders() async {
-        guard let previousState = beginProcessing(.enabling) else { return }
-        defer { restoreStateIfProcessing(previousState, expected: .enabling) }
-
-        do {
-            try await ensureAuthorization()
-            let scheduledCount = try await scheduleBroadcastReminderNotifications()
-            setState(.enabled)
-            feedback = HomeTodayAnimeNotificationFeedback(
-                title: "已開啟播出提醒",
-                message: HomeTodayAnimeNotificationFeedbackMessage.enabled(scheduledCount: scheduledCount)
-            )
-        } catch BaseUserNotificationError.permissionDenied {
-            setState(.disabled)
-            feedback = HomeTodayAnimeNotificationFeedback(
-                title: "無法開啟通知",
-                message: "請到 iOS 設定允許 WYJikanApp 傳送通知後，再回來開啟今日動畫提醒。"
-            )
-        } catch {
-            setState(.disabled)
-            feedback = HomeTodayAnimeNotificationFeedback(
-                title: "通知排程失敗",
-                message: "目前無法取得動畫播出時間，請稍後再試一次。"
-            )
-            AppLogger.notifications.error("Enable today anime notification failed: \(error.localizedDescription, privacy: .public)")
-        }
-    }
-
-    private func disableBroadcastReminders(showFeedback: Bool) async {
-        guard beginProcessing(.disabling) != nil else { return }
-        await removeManagedPendingNotificationRequests()
-        clearLastRefreshDate()
-        clearLastRefreshAttemptDate()
-        setState(.disabled)
-
-        if showFeedback {
-            feedback = HomeTodayAnimeNotificationFeedback(
-                title: "已關閉播出提醒",
-                message: "之後不會再於動畫播出時主動通知。"
             )
         }
     }

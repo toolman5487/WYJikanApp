@@ -10,18 +10,6 @@ import Foundation
 
 @MainActor
 final class HomeTodayAnimeScheduleListViewModel: ObservableObject {
-    struct NotificationButtonPresentation: Equatable {
-        enum Tint: Equatable {
-            case accent
-            case secondary
-        }
-
-        let iconSystemName: String
-        let tint: Tint
-        let isAnimating: Bool
-        let isDisabled: Bool
-    }
-
     enum ScreenState {
         case loading
         case content(sections: [HomeTodayAnimeTimeSection])
@@ -112,34 +100,6 @@ final class HomeTodayAnimeScheduleListViewModel: ObservableObject {
     func updateSelectedDay(_ day: HomeScheduleDay) {
         guard selectedDay != day else { return }
         selectedDay = day
-    }
-
-    func notificationButtonPresentation(
-        for state: BaseUserNotificationState
-    ) -> NotificationButtonPresentation {
-        switch state {
-        case .processing:
-            return NotificationButtonPresentation(
-                iconSystemName: "bell.and.waves.left.and.right.fill",
-                tint: .secondary,
-                isAnimating: true,
-                isDisabled: true
-            )
-        case .enabled:
-            return NotificationButtonPresentation(
-                iconSystemName: "bell.fill",
-                tint: .accent,
-                isAnimating: false,
-                isDisabled: false
-            )
-        case .disabled:
-            return NotificationButtonPresentation(
-                iconSystemName: "bell",
-                tint: .secondary,
-                isAnimating: false,
-                isDisabled: false
-            )
-        }
     }
 
     // MARK: - Binding

@@ -13,8 +13,6 @@ struct HomeTodayAnimeScheduleListView: View {
 
     @EnvironmentObject private var router: MainHomeRouter
     @EnvironmentObject private var favoriteStatusStore: FavoriteStatusStore
-    @EnvironmentObject private var notificationScheduler: HomeTodayAnimeNotificationScheduler
-
     @StateObject private var viewModel: HomeTodayAnimeScheduleListViewModel
 
     // MARK: - Lifecycle
@@ -49,9 +47,7 @@ struct HomeTodayAnimeScheduleListView: View {
         .navigationBarTitleDisplayMode(.inline)
         .background(Color(.systemBackground))
         .toolbar {
-            ToolbarItemGroup(placement: .topBarTrailing) {
-                notificationButton
-
+            ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     Task { await viewModel.reload() }
                 } label: {
@@ -62,54 +58,8 @@ struct HomeTodayAnimeScheduleListView: View {
                 }
             }
         }
-        .alert(item: $notificationScheduler.feedback) { feedback in
-            Alert(
-                title: Text(feedback.title),
-                message: Text(feedback.message),
-                dismissButton: .default(Text("知道了"))
-            )
-        }
         .task {
             await viewModel.loadIfNeeded()
-            await notificationScheduler.refreshAuthorizationStatus()
-        }
-    }
-
-    // MARK: - Private Methods
-
-    private var notificationButton: some View {
-        let presentation = viewModel.notificationButtonPresentation(
-            for: notificationScheduler.state
-        )
-
-        return Button {
-            Task {
-                await notificationScheduler.toggleBroadcastReminders()
-            }
-        } label: {
-            Image(systemName: presentation.iconSystemName)
-                .font(.body.weight(.bold))
-                .foregroundStyle(notificationColor(for: presentation))
-                .frame(width: 44, height: 44)
-                .scaleEffect(presentation.isAnimating ? 1.12 : 1)
-                .animation(
-                    presentation.isAnimating
-                    ? .easeInOut(duration: 0.48).repeatForever(autoreverses: true)
-                    : .easeOut(duration: 0.18),
-                    value: presentation.isAnimating
-                )
-        }
-        .disabled(presentation.isDisabled)
-    }
-
-    private func notificationColor(
-        for presentation: HomeTodayAnimeScheduleListViewModel.NotificationButtonPresentation
-    ) -> some ShapeStyle {
-        switch presentation.tint {
-        case .accent:
-            return ThemeColor.sakura
-        case .secondary:
-            return Color.secondary
         }
     }
 
@@ -180,6 +130,5 @@ struct HomeTodayAnimeScheduleListView: View {
         HomeTodayAnimeScheduleListView()
             .environmentObject(FavoriteStatusStore())
             .environmentObject(MainHomeRouter())
-            .environmentObject(HomeTodayAnimeNotificationScheduler())
     }
 }
