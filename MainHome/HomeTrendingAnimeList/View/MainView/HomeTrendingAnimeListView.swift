@@ -26,7 +26,7 @@ struct HomeTrendingAnimeListView: View {
 
     var body: some View {
         ScrollView {
-            LazyVStack(alignment: .leading, spacing: 24, pinnedViews: [.sectionHeaders]) {
+            LazyVStack(alignment: .leading, spacing: 8, pinnedViews: [.sectionHeaders]) {
                 let header = viewModel.headerContent
                 HomeTrendingAnimeListHeaderView(
                     title: header.title,
@@ -102,7 +102,7 @@ struct HomeTrendingAnimeListView: View {
     private func sectionListView(sections: [HomeTrendingAnimeListSectionContent]) -> some View {
         let favoriteIDs = favoriteStatusStore.favoriteIDs(for: .anime)
 
-        return LazyVStack(alignment: .leading, spacing: 20, pinnedViews: [.sectionHeaders]) {
+        return LazyVStack(alignment: .leading, spacing: 8, pinnedViews: [.sectionHeaders]) {
             ForEach(sections) { section in
                 Section {
                     VStack(spacing: 12) {
@@ -134,7 +134,10 @@ struct HomeTrendingAnimeListView: View {
     }
 
     private func sectionHeaderView(_ section: HomeTrendingAnimeListSectionContent) -> some View {
-        GlassSectionHeaderView(title: section.title)
+        GlassSectionHeaderView(
+            title: section.title,
+            outerVerticalPadding: 0
+        )
     }
 
     private var applyingSelectionOverlay: some View {

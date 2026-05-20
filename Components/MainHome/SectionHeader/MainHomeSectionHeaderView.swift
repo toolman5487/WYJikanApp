@@ -31,7 +31,6 @@ struct GlassSectionHeaderView: View {
                 .buttonStyle(.plain)
             }
         }
-        .padding(.horizontal, 16)
         .padding(.vertical, outerVerticalPadding)
     }
 

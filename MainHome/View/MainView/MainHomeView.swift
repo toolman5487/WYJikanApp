@@ -129,6 +129,7 @@ struct MainHomeView: View {
 
     private func sectionHeaderView(_ section: HomeSection) -> some View {
         GlassSectionHeaderView(title: section.title, state: state(for: section))
+            .padding(.horizontal, 16)
             .background(Color(.systemBackground).opacity(0.001))
     }
 

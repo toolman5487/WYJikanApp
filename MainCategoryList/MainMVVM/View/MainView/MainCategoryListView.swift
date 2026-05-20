@@ -64,7 +64,6 @@ struct MainCategoryListView: View {
                         Image(systemName: "arrow.trianglehead.counterclockwise")
                             .font(.body.weight(.bold))
                     }
-                    .accessibilityLabel("重新整理")
                 }
             }
             .onDisappear {
@@ -116,7 +115,6 @@ struct MainCategoryListView: View {
                     .foregroundStyle(ThemeColor.textPrimary)
                     .frame(width: 40, height: 40)
             }
-            .accessibilityLabel(menu.accessibilityLabel)
             .accessibilityValue(menu.accessibilityValue)
         }
     }

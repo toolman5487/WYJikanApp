@@ -44,7 +44,6 @@ struct MainSearchView: View {
                             .foregroundStyle(ThemeColor.textPrimary)
                             .frame(width: 40, height: 40)
                     }
-                    .accessibilityLabel("排序方式")
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 12)

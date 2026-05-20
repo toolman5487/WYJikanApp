@@ -18,7 +18,6 @@ final class HomeTodayAnimeScheduleListViewModel: ObservableObject {
 
         let iconSystemName: String
         let tint: Tint
-        let accessibilityLabel: String
         let isAnimating: Bool
         let isDisabled: Bool
     }
@@ -123,7 +122,6 @@ final class HomeTodayAnimeScheduleListViewModel: ObservableObject {
             return NotificationButtonPresentation(
                 iconSystemName: "bell.and.waves.left.and.right.fill",
                 tint: .secondary,
-                accessibilityLabel: "開啟播出提醒",
                 isAnimating: true,
                 isDisabled: true
             )
@@ -131,7 +129,6 @@ final class HomeTodayAnimeScheduleListViewModel: ObservableObject {
             return NotificationButtonPresentation(
                 iconSystemName: "bell.fill",
                 tint: .accent,
-                accessibilityLabel: "關閉播出提醒",
                 isAnimating: false,
                 isDisabled: false
             )
@@ -139,7 +136,6 @@ final class HomeTodayAnimeScheduleListViewModel: ObservableObject {
             return NotificationButtonPresentation(
                 iconSystemName: "bell",
                 tint: .secondary,
-                accessibilityLabel: "開啟播出提醒",
                 isAnimating: false,
                 isDisabled: false
             )

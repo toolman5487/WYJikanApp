@@ -100,7 +100,6 @@ struct HomeTodayAnimeScheduleListView: View {
                 )
         }
         .disabled(presentation.isDisabled)
-        .accessibilityLabel(presentation.accessibilityLabel)
     }
 
     private func notificationColor(

@@ -23,7 +23,7 @@ struct HomeTrendingMangaListView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
+            VStack(alignment: .leading, spacing: 8) {
                 HomeTrendingAnimeListHeaderView(
                     title: viewModel.headerTitle,
                     subtitle: viewModel.headerSubtitle,
