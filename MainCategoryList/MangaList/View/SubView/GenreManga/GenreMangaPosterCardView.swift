@@ -8,11 +8,16 @@
 import SwiftUI
 
 struct GenreMangaPosterCardView: View {
+
+    // MARK: - Properties
+
     let item: MangaListRandomDTO
     let cardWidth: CGFloat
     let cardHeight: CGFloat
     let cardCornerRadius: CGFloat
     let isFavorite: Bool
+
+    // MARK: - Body
 
     var body: some View {
         NavigationLink {

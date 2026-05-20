@@ -19,60 +19,66 @@ struct MainCategoryListView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollViewReader { proxy in
-                ScrollView {
-                    Color.clear
-                        .frame(height: 0)
-                        .id(topAnchorId)
-
-                    selectedContentView
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal)
-                        .padding(.bottom, 16)
-                        .id(viewModel.selectedKind)
-                }
-                .safeAreaInset(edge: .top, spacing: 0) {
-                    HStack(alignment: .center, spacing: 12) {
-                        CapsuleFilterBarView(
-                            tags: MainListKind.categoryTags,
-                            title: { $0.title },
-                            selection: $viewModel.selectedKind
-                        )
-                        .frame(maxWidth: .infinity, alignment: .leading)
-
-                        topFilterMenu
+            scrollView
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button {
+                            viewModel.reloadSelectedKind()
+                        } label: {
+                            Image(systemName: "arrow.trianglehead.counterclockwise")
+                                .font(.body.weight(.bold))
+                        }
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
-                    .background(.ultraThinMaterial)
                 }
-                .onChange(of: viewModel.selectedKind) { _, _ in
+                .onDisappear {
+                    viewModel.stopLoading()
+                }
+        }
+    }
+
+    // MARK: - Scroll View
+
+    private var scrollView: some View {
+        ScrollViewReader { proxy in
+            ScrollView {
+                Color.clear
+                    .frame(height: 0)
+                    .id(topAnchorId)
+
+                selectedContentView
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal)
+                    .padding(.bottom, 16)
+                    .id(viewModel.selectedKind)
+            }
+            .safeAreaInset(edge: .top, spacing: 0) {
+                HStack(alignment: .center, spacing: 12) {
+                    CapsuleFilterBarView(
+                        tags: MainListKind.categoryTags,
+                        title: { $0.title },
+                        selection: $viewModel.selectedKind
+                    )
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                    topFilterMenu
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+                .background(.ultraThinMaterial)
+            }
+            .onChange(of: viewModel.selectedKind) { _, _ in
+                proxy.scrollTo(topAnchorId, anchor: .top)
+            }
+            .onChange(of: viewModel.activeTopFilterSelectionIdentifier) { _, _ in
+                guard viewModel.activeTopFilterSelectionIdentifier != nil else { return }
+                withAnimation(.easeInOut(duration: 0.2)) {
                     proxy.scrollTo(topAnchorId, anchor: .top)
                 }
-                .onChange(of: viewModel.activeTopFilterSelectionIdentifier) { _, _ in
-                    guard viewModel.activeTopFilterSelectionIdentifier != nil else { return }
-                    withAnimation(.easeInOut(duration: 0.2)) {
-                        proxy.scrollTo(topAnchorId, anchor: .top)
-                    }
-                }
-            }
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        viewModel.reloadSelectedKind()
-                    } label: {
-                        Image(systemName: "arrow.trianglehead.counterclockwise")
-                            .font(.body.weight(.bold))
-                    }
-                }
-            }
-            .onDisappear {
-                viewModel.stopLoading()
             }
         }
     }
 
-    // MARK: - Private Methods
+    // MARK: - Selected Content
 
     @ViewBuilder
     private var selectedContentView: some View {
@@ -90,6 +96,8 @@ struct MainCategoryListView: View {
             CharacterListView(viewModel: viewModel.characterListViewModel)
         }
     }
+
+    // MARK: - Top Filter Menu
 
     @ViewBuilder
     private var topFilterMenu: some View {
@@ -119,6 +127,8 @@ struct MainCategoryListView: View {
         }
     }
 }
+
+// MARK: - Preview
 
 #Preview {
     MainCategoryListView()

@@ -35,6 +35,8 @@ struct GenreAnimeListSkeletonView: View {
     }
 }
 
+// MARK: - Preview
+
 #Preview {
     GenreAnimeListSkeletonView()
 }

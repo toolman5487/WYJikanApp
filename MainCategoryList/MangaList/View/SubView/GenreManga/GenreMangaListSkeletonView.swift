@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct GenreMangaListSkeletonView: View {
+
     // MARK: - Constants
 
     private static let cardCount: Int = 6
@@ -18,7 +19,7 @@ struct GenreMangaListSkeletonView: View {
     private static let horizontalPadding: CGFloat = 16
     private static let sectionCount: Int = 3
 
-    // MARK: - View
+    // MARK: - Body
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {

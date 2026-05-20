@@ -10,6 +10,12 @@ import SDWebImageSwiftUI
 
 struct RandomHeroCardView: View {
 
+    // MARK: - Constants
+
+    private static let heroHeight: CGFloat = 320
+    private static let horizontalPadding: CGFloat = 16
+    private static let verticalPadding: CGFloat = 16
+
     // MARK: - Properties
 
     let pick: AnimeListRandomDTO?
@@ -72,13 +78,13 @@ struct RandomHeroCardView: View {
                         onDrawTap: onDrawTap
                     )
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 16)
+                .padding(.horizontal, Self.horizontalPadding)
+                .padding(.vertical, Self.verticalPadding)
             }
         }
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
         .frame(maxWidth: .infinity)
-        .frame(height: 320)
+        .frame(height: Self.heroHeight)
         .overlay(alignment: .topTrailing) {
             if pick != nil {
                 MyListCollectionStatusBadgeView(isFavorite: isFavorite)
@@ -269,6 +275,8 @@ struct RandomHeroCardView: View {
             .clipShape(Capsule())
     }
 }
+
+// MARK: - Preview
 
 #Preview {
     VStack(spacing: 16) {

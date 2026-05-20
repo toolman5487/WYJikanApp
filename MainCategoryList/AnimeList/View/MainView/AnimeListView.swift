@@ -53,6 +53,8 @@ private struct MainView: View {
     }
 }
 
+// MARK: - Preview
+
 #Preview {
     NavigationStack {
         ScrollView {

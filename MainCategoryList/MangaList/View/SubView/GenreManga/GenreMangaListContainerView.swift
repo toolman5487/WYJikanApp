@@ -8,12 +8,13 @@
 import SwiftUI
 
 struct GenreMangaListContainerView: View {
+
     // MARK: - Properties
 
     @ObservedObject var viewModel: GenreMangaViewModel
     let favoriteIDs: Set<Int>
 
-    // MARK: - View
+    // MARK: - Body
 
     var body: some View {
         Group {

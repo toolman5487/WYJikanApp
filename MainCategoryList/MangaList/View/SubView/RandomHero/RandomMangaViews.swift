@@ -8,76 +8,108 @@
 import SwiftUI
 import SDWebImageSwiftUI
 
+// MARK: - RandomMangaSectionView
+
 struct RandomMangaSectionView: View {
+
+    // MARK: - Properties
+
     @ObservedObject var viewModel: RandomMangaViewModel
     let favoriteIDs: Set<Int>
 
+    // MARK: - Body
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("今天抽這部")
-                    .font(.title3.weight(.bold))
-                    .foregroundStyle(ThemeColor.sakura)
+            sectionHeader
+            drawStateContent
+        }
+    }
 
-                Text("試試手氣，隨機挖到下一部想追的漫畫作品。")
-                    .font(.subheadline)
-                    .foregroundStyle(ThemeColor.textSecondary)
-            }
+    // MARK: - Private Methods
 
-            switch viewModel.drawState {
-            case .loading where viewModel.randomPick == nil:
-                RandomMangaSkeletonView()
-            case .failure(let error) where viewModel.randomPick == nil:
-                RandomMangaCardView(
-                    pick: nil,
-                    isDrawing: false,
-                    errorMessage: error,
-                    cooldownText: nil,
-                    drawButtonTitle: viewModel.drawButtonTitle,
-                    canDraw: viewModel.canDraw,
-                    detailMalId: viewModel.randomPick?.malId,
-                    isFavorite: false,
-                    onDrawTap: viewModel.drawRandomManga
-                )
-            case .loading:
-                RandomMangaCardView(
-                    pick: viewModel.randomPick,
-                    isDrawing: true,
-                    cooldownText: nil,
-                    drawButtonTitle: viewModel.drawButtonTitle,
-                    canDraw: viewModel.canDraw,
-                    detailMalId: viewModel.randomPick?.malId,
-                    isFavorite: viewModel.randomPick.map { favoriteIDs.contains($0.id) } ?? false,
-                    onDrawTap: viewModel.drawRandomManga
-                )
-            case .ready, .cooldown:
-                RandomMangaCardView(
-                    pick: viewModel.randomPick,
-                    isDrawing: false,
-                    cooldownText: viewModel.cooldownRemainingSeconds > 0 ? "再次抽選倒數 \(viewModel.cooldownDisplayText)" : nil,
-                    drawButtonTitle: viewModel.drawButtonTitle,
-                    canDraw: viewModel.canDraw,
-                    detailMalId: viewModel.randomPick?.malId,
-                    isFavorite: viewModel.randomPick.map { favoriteIDs.contains($0.id) } ?? false,
-                    onDrawTap: viewModel.drawRandomManga
-                )
-            case .failure:
-                RandomMangaCardView(
-                    pick: viewModel.randomPick,
-                    isDrawing: false,
-                    cooldownText: nil,
-                    drawButtonTitle: viewModel.drawButtonTitle,
-                    canDraw: viewModel.canDraw,
-                    detailMalId: viewModel.randomPick?.malId,
-                    isFavorite: viewModel.randomPick.map { favoriteIDs.contains($0.id) } ?? false,
-                    onDrawTap: viewModel.drawRandomManga
-                )
-            }
+    private var sectionHeader: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("今天抽這部")
+                .font(.title3.weight(.bold))
+                .foregroundStyle(ThemeColor.sakura)
+
+            Text("試試手氣，隨機挖到下一部想追的漫畫作品。")
+                .font(.subheadline)
+                .foregroundStyle(ThemeColor.textSecondary)
+        }
+    }
+
+    @ViewBuilder
+    private var drawStateContent: some View {
+        switch viewModel.drawState {
+        case .loading where viewModel.randomPick == nil:
+            RandomMangaSkeletonView()
+
+        case .failure(let error) where viewModel.randomPick == nil:
+            RandomMangaCardView(
+                pick: nil,
+                isDrawing: false,
+                errorMessage: error,
+                cooldownText: nil,
+                drawButtonTitle: viewModel.drawButtonTitle,
+                canDraw: viewModel.canDraw,
+                detailMalId: viewModel.randomPick?.malId,
+                isFavorite: false,
+                onDrawTap: viewModel.drawRandomManga
+            )
+
+        case .loading:
+            RandomMangaCardView(
+                pick: viewModel.randomPick,
+                isDrawing: true,
+                cooldownText: nil,
+                drawButtonTitle: viewModel.drawButtonTitle,
+                canDraw: viewModel.canDraw,
+                detailMalId: viewModel.randomPick?.malId,
+                isFavorite: viewModel.randomPick.map { favoriteIDs.contains($0.id) } ?? false,
+                onDrawTap: viewModel.drawRandomManga
+            )
+
+        case .ready, .cooldown:
+            RandomMangaCardView(
+                pick: viewModel.randomPick,
+                isDrawing: false,
+                cooldownText: viewModel.cooldownRemainingSeconds > 0 ? "再次抽選倒數 \(viewModel.cooldownDisplayText)" : nil,
+                drawButtonTitle: viewModel.drawButtonTitle,
+                canDraw: viewModel.canDraw,
+                detailMalId: viewModel.randomPick?.malId,
+                isFavorite: viewModel.randomPick.map { favoriteIDs.contains($0.id) } ?? false,
+                onDrawTap: viewModel.drawRandomManga
+            )
+
+        case .failure:
+            RandomMangaCardView(
+                pick: viewModel.randomPick,
+                isDrawing: false,
+                cooldownText: nil,
+                drawButtonTitle: viewModel.drawButtonTitle,
+                canDraw: viewModel.canDraw,
+                detailMalId: viewModel.randomPick?.malId,
+                isFavorite: viewModel.randomPick.map { favoriteIDs.contains($0.id) } ?? false,
+                onDrawTap: viewModel.drawRandomManga
+            )
         }
     }
 }
 
+// MARK: - RandomMangaCardView
+
 private struct RandomMangaCardView: View {
+
+    // MARK: - Constants
+
+    private static let heroHeight: CGFloat = 320
+    private static let horizontalPadding: CGFloat = 16
+    private static let verticalPadding: CGFloat = 16
+
+    // MARK: - Properties
+
     let pick: MangaListRandomDTO?
     let isDrawing: Bool
     var errorMessage: String? = nil
@@ -88,9 +120,7 @@ private struct RandomMangaCardView: View {
     let isFavorite: Bool
     let onDrawTap: () -> Void
 
-    private static let heroHeight: CGFloat = 320
-    private static let horizontalPadding: CGFloat = 16
-    private static let verticalPadding: CGFloat = 16
+    // MARK: - Body
 
     var body: some View {
         GeometryReader { proxy in
@@ -173,6 +203,8 @@ private struct RandomMangaCardView: View {
                 .strokeBorder(Color.white.opacity(0.08))
         }
     }
+
+    // MARK: - Private Methods
 
     private func posterWidth(for containerWidth: CGFloat) -> CGFloat {
         min(118, max(92, containerWidth * 0.32))
@@ -338,11 +370,18 @@ private struct RandomMangaCardView: View {
     }
 }
 
+// MARK: - RandomMangaActionButtonsView
+
 private struct RandomMangaActionButtonsView: View {
+
+    // MARK: - Properties
+
     let drawButtonTitle: String
     let canDraw: Bool
     let detailMalId: Int?
     let onDrawTap: () -> Void
+
+    // MARK: - Body
 
     var body: some View {
         if let id = detailMalId {
@@ -381,7 +420,12 @@ private struct RandomMangaActionButtonsView: View {
     }
 }
 
+// MARK: - RandomMangaSkeletonView
+
 private struct RandomMangaSkeletonView: View {
+
+    // MARK: - Body
+
     var body: some View {
         BannerSkeletonView()
             .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))

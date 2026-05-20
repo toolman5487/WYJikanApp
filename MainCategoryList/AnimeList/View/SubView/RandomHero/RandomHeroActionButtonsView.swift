@@ -55,6 +55,8 @@ struct RandomHeroActionButtonsView: View {
     }
 }
 
+// MARK: - Preview
+
 #Preview {
     RandomHeroActionButtonsView(
         drawButtonTitle: "再抽一次",

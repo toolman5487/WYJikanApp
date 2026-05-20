@@ -18,72 +18,84 @@ struct RandomHeroSectionView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("今天抽這部")
-                    .font(.title3.weight(.bold))
-                    .foregroundStyle(ThemeColor.sakura)
+            sectionHeader
+            drawStateContent
+        }
+    }
 
-                Text("不知道看什麼？試試手氣，隨機挖到下一部想追的作品。")
-                    .font(.subheadline)
-                    .foregroundStyle(ThemeColor.textSecondary)
-            }
+    // MARK: - Private Methods
 
-            switch viewModel.drawState {
-            case .loading where viewModel.randomPick == nil:
-                RandomHeroSkeletonView()
+    private var sectionHeader: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("今天抽這部")
+                .font(.title3.weight(.bold))
+                .foregroundStyle(ThemeColor.sakura)
 
-            case .failure(let error) where viewModel.randomPick == nil:
-                RandomHeroCardView(
-                    pick: nil,
-                    isDrawing: false,
-                    errorMessage: error,
-                    cooldownText: nil,
-                    drawButtonTitle: viewModel.drawButtonTitle,
-                    canDraw: viewModel.canDraw,
-                    detailMalId: viewModel.randomPick?.malId,
-                    isFavorite: false,
-                    onDrawTap: viewModel.drawRandomAnime
-                )
+            Text("不知道看什麼？試試手氣，隨機挖到下一部想追的作品。")
+                .font(.subheadline)
+                .foregroundStyle(ThemeColor.textSecondary)
+        }
+    }
 
-            case .loading:
-                RandomHeroCardView(
-                    pick: viewModel.randomPick,
-                    isDrawing: true,
-                    cooldownText: nil,
-                    drawButtonTitle: viewModel.drawButtonTitle,
-                    canDraw: viewModel.canDraw,
-                    detailMalId: viewModel.randomPick?.malId,
-                    isFavorite: viewModel.randomPick.map { favoriteIDs.contains($0.id) } ?? false,
-                    onDrawTap: viewModel.drawRandomAnime
-                )
+    @ViewBuilder
+    private var drawStateContent: some View {
+        switch viewModel.drawState {
+        case .loading where viewModel.randomPick == nil:
+            RandomHeroSkeletonView()
 
-            case .ready, .cooldown:
-                RandomHeroCardView(
-                    pick: viewModel.randomPick,
-                    isDrawing: false,
-                    cooldownText: viewModel.cooldownRemainingSeconds > 0 ? "再次抽選倒數 \(viewModel.cooldownDisplayText)" : nil,
-                    drawButtonTitle: viewModel.drawButtonTitle,
-                    canDraw: viewModel.canDraw,
-                    detailMalId: viewModel.randomPick?.malId,
-                    isFavorite: viewModel.randomPick.map { favoriteIDs.contains($0.id) } ?? false,
-                    onDrawTap: viewModel.drawRandomAnime
-                )
+        case .failure(let error) where viewModel.randomPick == nil:
+            RandomHeroCardView(
+                pick: nil,
+                isDrawing: false,
+                errorMessage: error,
+                cooldownText: nil,
+                drawButtonTitle: viewModel.drawButtonTitle,
+                canDraw: viewModel.canDraw,
+                detailMalId: viewModel.randomPick?.malId,
+                isFavorite: false,
+                onDrawTap: viewModel.drawRandomAnime
+            )
 
-            case .failure:
-                RandomHeroCardView(
-                    pick: viewModel.randomPick,
-                    isDrawing: false,
-                    cooldownText: nil,
-                    drawButtonTitle: viewModel.drawButtonTitle,
-                    canDraw: viewModel.canDraw,
-                    detailMalId: viewModel.randomPick?.malId,
-                    isFavorite: viewModel.randomPick.map { favoriteIDs.contains($0.id) } ?? false,
-                    onDrawTap: viewModel.drawRandomAnime
-                )
-            }
+        case .loading:
+            RandomHeroCardView(
+                pick: viewModel.randomPick,
+                isDrawing: true,
+                cooldownText: nil,
+                drawButtonTitle: viewModel.drawButtonTitle,
+                canDraw: viewModel.canDraw,
+                detailMalId: viewModel.randomPick?.malId,
+                isFavorite: viewModel.randomPick.map { favoriteIDs.contains($0.id) } ?? false,
+                onDrawTap: viewModel.drawRandomAnime
+            )
+
+        case .ready, .cooldown:
+            RandomHeroCardView(
+                pick: viewModel.randomPick,
+                isDrawing: false,
+                cooldownText: viewModel.cooldownRemainingSeconds > 0 ? "再次抽選倒數 \(viewModel.cooldownDisplayText)" : nil,
+                drawButtonTitle: viewModel.drawButtonTitle,
+                canDraw: viewModel.canDraw,
+                detailMalId: viewModel.randomPick?.malId,
+                isFavorite: viewModel.randomPick.map { favoriteIDs.contains($0.id) } ?? false,
+                onDrawTap: viewModel.drawRandomAnime
+            )
+
+        case .failure:
+            RandomHeroCardView(
+                pick: viewModel.randomPick,
+                isDrawing: false,
+                cooldownText: nil,
+                drawButtonTitle: viewModel.drawButtonTitle,
+                canDraw: viewModel.canDraw,
+                detailMalId: viewModel.randomPick?.malId,
+                isFavorite: viewModel.randomPick.map { favoriteIDs.contains($0.id) } ?? false,
+                onDrawTap: viewModel.drawRandomAnime
+            )
         }
     }
 }
+
+// MARK: - Preview
 
 #Preview {
     RandomHeroSectionView(

@@ -26,6 +26,8 @@ struct CharacterListView: View {
     }
 }
 
+// MARK: - Preview
+
 #Preview {
     ScrollView {
         CharacterListView(viewModel: CharacterListViewModel())

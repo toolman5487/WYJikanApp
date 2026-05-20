@@ -29,6 +29,8 @@ struct RandomHeroErrorView: View {
     }
 }
 
+// MARK: - Preview
+
 #Preview {
     RandomHeroErrorView(message: "載入失敗") {}
 }

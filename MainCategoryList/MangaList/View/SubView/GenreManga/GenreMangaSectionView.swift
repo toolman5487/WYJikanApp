@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct GenreMangaSectionView: View {
+
     // MARK: - Constants
 
     private static let cardHeight: CGFloat = 200
@@ -24,7 +25,7 @@ struct GenreMangaSectionView: View {
         cardHeight * posterAspectRatio
     }
 
-    // MARK: - View
+    // MARK: - Body
 
     var body: some View {
         Group {
@@ -35,6 +36,8 @@ struct GenreMangaSectionView: View {
             }
         }
     }
+
+    // MARK: - Private Methods
 
     private var contentView: some View {
         ScrollView(.horizontal, showsIndicators: false) {
@@ -67,12 +70,15 @@ struct GenreMangaSectionView: View {
     }
 }
 
+// MARK: - GenreMangaSectionHeaderView
+
 struct GenreMangaSectionHeaderView: View {
+
+    // MARK: - Properties
+
     let section: MangaGenreSection
 
-    private var titleText: String {
-        section.genre.name ?? "未分類"
-    }
+    // MARK: - Body
 
     var body: some View {
         NavigationLink {
@@ -85,5 +91,11 @@ struct GenreMangaSectionHeaderView: View {
         }
         .buttonStyle(.plain)
         .background(Color(.systemBackground).opacity(0.001))
+    }
+
+    // MARK: - Private Methods
+
+    private var titleText: String {
+        section.genre.name ?? "未分類"
     }
 }

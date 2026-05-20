@@ -18,6 +18,8 @@ struct RandomHeroSkeletonView: View {
     }
 }
 
+// MARK: - Preview
+
 #Preview {
     RandomHeroSkeletonView()
 }

@@ -26,6 +26,8 @@ struct PeopleListView: View {
     }
 }
 
+// MARK: - Preview
+
 #Preview {
     ScrollView {
         PeopleListView(viewModel: PeopleListViewModel())
