@@ -9,7 +9,11 @@ import Charts
 import SwiftUI
 
 struct MyListDistributionChartCardView: View {
+    // MARK: - Properties
+
     let statistics: MainMyListViewModel.Presentation.Statistics
+
+    // MARK: - Body
 
     var body: some View {
         MyListStatisticsCardContainer(
@@ -82,6 +86,8 @@ struct MyListDistributionChartCardView: View {
             }
         }
     }
+
+    // MARK: - Private Methods
 
     private var distributionSubtitle: String? {
         guard let topGenreSlice = statistics.selectedAnalysis.topGenreSlice else {

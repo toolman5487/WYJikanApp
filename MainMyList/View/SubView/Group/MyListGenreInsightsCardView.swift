@@ -8,7 +8,11 @@
 import SwiftUI
 
 struct MyListGenreInsightsCardView: View {
+    // MARK: - Properties
+
     let statistics: MainMyListViewModel.Presentation.Statistics
+
+    // MARK: - Body
 
     var body: some View {
         MyListStatisticsCardContainer(
@@ -23,10 +27,12 @@ struct MyListGenreInsightsCardView: View {
         }
     }
 
+    // MARK: - Private Views
+
     private func insightRow(
         for analysis: MainMyListViewModel.Presentation.Statistics.GenreAnalysis
     ) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .firstTextBaseline, spacing: 8) {
                 Text(analysis.scope.title)
                     .font(.subheadline.weight(.semibold))
@@ -59,13 +65,15 @@ struct MyListGenreInsightsCardView: View {
                 .frame(width: 40, height: 40)
 
             Image(systemName: "tray.fill")
-                .font(.system(size: 18, weight: .semibold))
+                .font(.system(size: 20, weight: .semibold))
                 .foregroundStyle(ThemeColor.textTertiary)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 4)
         .accessibilityHidden(true)
     }
+
+    // MARK: - Private Methods
 
     private func insightDescription(
         for analysis: MainMyListViewModel.Presentation.Statistics.GenreAnalysis

@@ -8,9 +8,13 @@
 import SwiftUI
 
 struct MyListStatisticsCardContainer<Content: View>: View {
+    // MARK: - Properties
+
     let title: String
     let subtitle: String?
     @ViewBuilder let content: Content
+
+    // MARK: - Init
 
     init(
         title: String,
@@ -21,6 +25,8 @@ struct MyListStatisticsCardContainer<Content: View>: View {
         self.subtitle = subtitle
         self.content = content()
     }
+
+    // MARK: - Body
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
