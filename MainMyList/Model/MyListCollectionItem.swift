@@ -36,6 +36,7 @@ final class MyListCollectionItem {
     var title: String
     var subtitle: String?
     var imageURLString: String?
+    var genreNamesRawValue: String?
     var addedAt: Date
 
     init(
@@ -44,6 +45,7 @@ final class MyListCollectionItem {
         title: String,
         subtitle: String?,
         imageURLString: String?,
+        genreNames: [String] = [],
         addedAt: Date
     ) {
         self.malId = malId
@@ -51,6 +53,7 @@ final class MyListCollectionItem {
         self.title = title
         self.subtitle = subtitle
         self.imageURLString = imageURLString
+        self.genreNamesRawValue = Self.serializeGenreNames(genreNames)
         self.addedAt = addedAt
     }
 }
@@ -63,5 +66,43 @@ extension MyListCollectionItem {
     var imageURL: URL? {
         guard let imageURLString else { return nil }
         return URL(string: imageURLString)
+    }
+
+    var genreNames: [String] {
+        guard
+            let genreNamesRawValue,
+            let data = genreNamesRawValue.data(using: .utf8),
+            let decodedGenreNames = try? JSONDecoder().decode([String].self, from: data)
+        else {
+            return []
+        }
+
+        return Self.normalizedGenreNames(from: decodedGenreNames)
+    }
+
+    private static func serializeGenreNames(_ genreNames: [String]) -> String? {
+        let normalizedGenreNames = normalizedGenreNames(from: genreNames)
+        guard
+            !normalizedGenreNames.isEmpty,
+            let data = try? JSONEncoder().encode(normalizedGenreNames)
+        else {
+            return nil
+        }
+
+        return String(data: data, encoding: .utf8)
+    }
+
+    private static func normalizedGenreNames(from genreNames: [String]) -> [String] {
+        var seenGenreNames = Set<String>()
+        var normalizedGenreNames: [String] = []
+
+        for genreName in genreNames {
+            let trimmedGenreName = genreName.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !trimmedGenreName.isEmpty else { continue }
+            guard seenGenreNames.insert(trimmedGenreName).inserted else { continue }
+            normalizedGenreNames.append(trimmedGenreName)
+        }
+
+        return normalizedGenreNames
     }
 }

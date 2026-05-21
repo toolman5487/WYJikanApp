@@ -11,6 +11,7 @@ struct MyListSummaryTile: View {
     let title: String
     let value: Int
     let iconName: String
+    let detail: String
 
     var body: some View {
         HStack(alignment: .top, spacing: 16) {
@@ -32,6 +33,10 @@ struct MyListSummaryTile: View {
                         .font(.subheadline)
                         .foregroundStyle(ThemeColor.textSecondary)
                 }
+
+                Text(detail)
+                    .font(.footnote)
+                    .foregroundStyle(ThemeColor.textSecondary)
             }
 
             Spacer(minLength: 0)

@@ -51,11 +51,7 @@ struct MainMyListView: View {
     }
     
     private func summaryView(presentation: MainMyListViewModel.Presentation) -> some View {
-        MyListSummaryTile(
-            title: presentation.summaryTile.title,
-            value: presentation.summaryTile.value,
-            iconName: presentation.summaryTile.iconName
-        )
+        MyListStatisticsSectionView(presentation: presentation)
     }
     
     @ViewBuilder

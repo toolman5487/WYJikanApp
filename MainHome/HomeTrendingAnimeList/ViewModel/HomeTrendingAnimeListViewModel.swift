@@ -136,10 +136,12 @@ final class HomeTrendingAnimeListViewModel: ObservableObject {
             guard isCurrentGeneration(generation) else { return }
 
             currentPage = response.pagination?.currentPage ?? currentPage + 1
-            hasNextPage = response.pagination?.hasNextPage ?? !response.data.isEmpty
-
             let incoming = response.data.compactMap(Self.item(from:))
-            sourceItems = mergedDeduplicatedItems(existing: sourceItems, incoming: incoming)
+            let mergedItems = mergedDeduplicatedItems(existing: sourceItems, incoming: incoming)
+            let appendedNewItems = mergedItems.count > sourceItems.count
+
+            hasNextPage = appendedNewItems && (response.pagination?.hasNextPage ?? !response.data.isEmpty)
+            sourceItems = mergedItems
             isLoadingMore = false
             applyPresentation()
         } catch is CancellationError {

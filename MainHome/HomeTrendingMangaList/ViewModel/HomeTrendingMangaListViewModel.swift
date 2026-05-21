@@ -135,8 +135,11 @@ final class HomeTrendingMangaListViewModel: ObservableObject {
             guard isCurrentGeneration(generation) else { return }
 
             currentPage = page.currentPage
-            hasNextPage = page.hasNextPage
-            sourceItems = mergedDeduplicatedItems(existing: sourceItems, incoming: page.items)
+            let mergedItems = mergedDeduplicatedItems(existing: sourceItems, incoming: page.items)
+            let appendedNewItems = mergedItems.count > sourceItems.count
+
+            hasNextPage = appendedNewItems && page.hasNextPage
+            sourceItems = mergedItems
             applyPresentation()
         } catch is CancellationError {
             return

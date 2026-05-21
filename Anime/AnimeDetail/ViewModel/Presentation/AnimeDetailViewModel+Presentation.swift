@@ -113,6 +113,7 @@ extension AnimeDetailViewModel {
                 fallbackTitle: anime.title
             ),
             imageURLString: posterURL(for: anime)?.absoluteString,
+            genreNames: (anime.genres ?? []).compactMap(\.name),
             addedAt: Date()
         )
     }
