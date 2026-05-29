@@ -106,13 +106,36 @@ class BaseUserNotificationManager: ObservableObject {
         }
     }
 
+    func isManagedNotificationIdentifier(_ identifier: String) -> Bool {
+        managedIdentifierPrefixes.contains { identifier.hasPrefix($0) }
+    }
+
     func pendingManagedNotificationRequests() async -> [UNNotificationRequest] {
         let pendingRequests = await notificationCenter.pendingNotificationRequests()
         return pendingRequests.filter { request in
-            managedIdentifierPrefixes.contains { prefix in
-                request.identifier.hasPrefix(prefix)
-            }
+            isManagedNotificationIdentifier(request.identifier)
         }
+    }
+
+    @discardableResult
+    func removeManagedNotifications(where identifierMatches: (String) -> Bool) async -> Int {
+        let pendingIdentifiers = await pendingManagedNotificationRequests()
+            .map(\.identifier)
+            .filter(identifierMatches)
+        if !pendingIdentifiers.isEmpty {
+            notificationCenter.removePendingNotificationRequests(withIdentifiers: pendingIdentifiers)
+        }
+
+        let deliveredIdentifiers = await notificationCenter.deliveredNotifications()
+            .map(\.request.identifier)
+            .filter { identifier in
+                isManagedNotificationIdentifier(identifier) && identifierMatches(identifier)
+            }
+        if !deliveredIdentifiers.isEmpty {
+            notificationCenter.removeDeliveredNotifications(withIdentifiers: deliveredIdentifiers)
+        }
+
+        return pendingIdentifiers.count + deliveredIdentifiers.count
     }
 
     @discardableResult

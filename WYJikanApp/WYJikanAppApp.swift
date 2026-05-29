@@ -34,8 +34,9 @@ struct WYJikanAppApp: App {
         _favoriteStatusStore = StateObject(
             wrappedValue: favoriteStatusStore
         )
+        let todayAnimeNotificationScheduler = HomeTodayAnimeNotificationScheduler()
         _todayAnimeNotificationScheduler = StateObject(
-            wrappedValue: HomeTodayAnimeNotificationScheduler()
+            wrappedValue: todayAnimeNotificationScheduler
         )
         _mainTabBarViewModel = StateObject(
             wrappedValue: MainTabBarViewModel.shared
@@ -43,6 +44,12 @@ struct WYJikanAppApp: App {
         _mainHomeRouter = StateObject(
             wrappedValue: MainHomeRouter.shared
         )
+
+        MainActor.assumeIsolated {
+            AppNotificationDelegate.onNotificationOpened = { response in
+                await todayAnimeNotificationScheduler.clearNotificationsForOpenedResponse(response)
+            }
+        }
     }
 
     var body: some Scene {

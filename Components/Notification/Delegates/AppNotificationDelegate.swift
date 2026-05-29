@@ -9,6 +9,9 @@ import UIKit
 import UserNotifications
 
 final class AppNotificationDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
+    @MainActor
+    static var onNotificationOpened: (@MainActor (UNNotificationResponse) async -> Void)?
+
     private enum NotificationUserInfoKey {
         static let route = "route"
         static let animeID = "animeID"
@@ -37,6 +40,8 @@ final class AppNotificationDelegate: NSObject, UIApplicationDelegate, UNUserNoti
         _ center: UNUserNotificationCenter,
         didReceive response: UNNotificationResponse
     ) async {
+        await Self.onNotificationOpened?(response)
+
         let userInfo = response.notification.request.content.userInfo
         guard let routeValue = userInfo[NotificationUserInfoKey.route] as? String,
               let route = NotificationRoute(rawValue: routeValue) else {

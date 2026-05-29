@@ -66,6 +66,18 @@ final class HomeTodayAnimeNotificationScheduler: BaseUserNotificationManager {
         clearLastRefreshDate()
     }
 
+    func clearNotificationsForOpenedResponse(_ response: UNNotificationResponse) async {
+        let identifier = response.notification.request.identifier
+        guard isManagedNotificationIdentifier(identifier) else { return }
+
+        if let animeID = response.notification.request.content.userInfo["animeID"] as? Int {
+            let prefix = HomeTodayAnimeNotificationConfig.broadcastReminderIdentifierPrefix(forAnimeID: animeID)
+            _ = await removeManagedNotifications { $0.hasPrefix(prefix) }
+        } else {
+            _ = await removeManagedNotifications { $0 == identifier }
+        }
+    }
+
     func refreshScheduledNotificationIfNeeded() async {
         guard state == .enabled else { return }
         await refreshAuthorizationStatus()
