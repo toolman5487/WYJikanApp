@@ -12,17 +12,25 @@ extension MangaDetailViewModel {
     enum Section: Identifiable {
         case header
         case highlights
+        case basicInfo
         case score
         case synopsis
+        case characters
         case publication
+        case pictures
+        case recommendations
 
         var id: String {
             switch self {
             case .header: return "header"
             case .highlights: return "highlights"
+            case .basicInfo: return "basicInfo"
             case .score: return "score"
             case .synopsis: return "synopsis"
+            case .characters: return "characters"
             case .publication: return "publication"
+            case .pictures: return "pictures"
+            case .recommendations: return "recommendations"
             }
         }
     }
@@ -111,13 +119,23 @@ extension MangaDetailViewModel {
         var result: [Section] = [
             .header,
             .highlights,
+            .basicInfo,
             .score
         ]
         if hasSynopsis(for: manga) {
             result.append(.synopsis)
         }
+        if hasCharacters {
+            result.append(.characters)
+        }
         if hasPublicationInfo(for: manga) || hasThemes(for: manga) || !hasSynopsis(for: manga) {
             result.append(.publication)
+        }
+        if hasPictures {
+            result.append(.pictures)
+        }
+        if hasRecommendations {
+            result.append(.recommendations)
         }
         return result
     }
@@ -166,6 +184,11 @@ extension MangaDetailViewModel {
         AnimeDetailDateFormatting.slashSeparatedPeriod(from: manga.published) ?? "-"
     }
 
+    func publishingStateText(for manga: MangaDetailDTO) -> String? {
+        guard let publishing = manga.publishing else { return nil }
+        return publishing ? "目前連載中" : "非連載中"
+    }
+
     // MARK: - Lists & Numbers
 
     func joinedNames(from entities: [AnimeRelatedEntityDTO]?) -> String {
@@ -178,6 +201,136 @@ extension MangaDetailViewModel {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
         return formatter.string(from: NSNumber(value: value)) ?? "\(value)"
+    }
+
+    // MARK: - Supplementary Content
+
+    var hasPictures: Bool {
+        !pictureItems.isEmpty
+    }
+
+    var hasCharacters: Bool {
+        !allCharacterRoles.isEmpty
+    }
+
+    var hasRecommendations: Bool {
+        !allRecommendations.isEmpty
+    }
+
+    var previewCharacterRoles: [MangaCharacterRoleDTO] {
+        Array(allCharacterRoles.prefix(8))
+    }
+
+    var allCharacterRoles: [MangaCharacterRoleDTO] {
+        characterRoles.filter { $0.character != nil }
+    }
+
+    var previewRecommendations: [MangaRecommendationDTO] {
+        Array(allRecommendations.prefix(6))
+    }
+
+    var allRecommendations: [MangaRecommendationDTO] {
+        recommendationItems.filter { $0.entry != nil }
+    }
+
+    func characterName(_ character: AnimeCharacterEntryDTO) -> String {
+        preferredDisplayName(
+            kanjiName: character.nameKanji,
+            fallbackName: character.name,
+            emptyFallback: "未命名角色"
+        )
+    }
+
+    func characterImageURL(_ character: AnimeCharacterEntryDTO) -> URL? {
+        let urlString =
+            character.images?.webp?.largeImageUrl ??
+            character.images?.jpg?.largeImageUrl ??
+            character.images?.webp?.imageUrl ??
+            character.images?.jpg?.imageUrl
+        guard let urlString else { return nil }
+        return URL(string: urlString)
+    }
+
+    func characterRoleText(_ role: MangaCharacterRoleDTO) -> String {
+        trimmedText(role.role) ?? "未標示定位"
+    }
+
+    func characterFavoriteText(_ role: MangaCharacterRoleDTO) -> String {
+        guard let favorites = role.favorites, favorites > 0 else {
+            return "角色資料"
+        }
+        return "\(formatNumber(favorites)) 人收藏"
+    }
+
+    func recommendationTitle(_ recommendation: MangaRecommendationDTO) -> String {
+        preferredTitle(
+            japaneseTitle: recommendation.entry?.titleJapanese,
+            englishTitle: recommendation.entry?.titleEnglish,
+            fallbackTitle: recommendation.entry?.title,
+            emptyFallback: "未命名作品"
+        )
+    }
+
+    func recommendationImageURL(_ recommendation: MangaRecommendationDTO) -> URL? {
+        let urlString =
+            recommendation.entry?.images?.webp?.largeImageUrl ??
+            recommendation.entry?.images?.jpg?.largeImageUrl ??
+            recommendation.entry?.images?.webp?.imageUrl ??
+            recommendation.entry?.images?.jpg?.imageUrl
+        guard let urlString else { return nil }
+        return URL(string: urlString)
+    }
+
+    func recommendationSummaryText(_ recommendation: MangaRecommendationDTO) -> String {
+        if let content = recommendation.content?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .replacingOccurrences(of: "\n", with: " "),
+           !content.isEmpty {
+            return String(content.prefix(52))
+        }
+
+        if let votes = recommendation.votes {
+            return "\(formatNumber(votes)) 人推薦"
+        }
+
+        return "相似作品推薦"
+    }
+
+    func imagePreviewItems(for manga: MangaDetailDTO) -> [ImagePreviewItem] {
+        var items: [ImagePreviewItem] = []
+        var seenURLs = Set<URL>()
+
+        if let posterURL = posterURL(for: manga), seenURLs.insert(posterURL).inserted {
+            items.append(ImagePreviewItem(id: "poster-\(manga.malId)", url: posterURL))
+        }
+
+        for picture in pictureItems where seenURLs.insert(picture.url).inserted {
+            items.append(ImagePreviewItem(id: "picture-\(picture.id)", url: picture.url))
+        }
+
+        return items
+    }
+
+    func initialPreviewIndex(
+        for items: [ImagePreviewItem],
+        selectedImageURL: URL?
+    ) -> Int {
+        guard !items.isEmpty else { return 0 }
+        guard let selectedImageURL,
+              let index = items.firstIndex(where: { $0.url == selectedImageURL }) else {
+            return 0
+        }
+        return index
+    }
+
+    func initialPreviewIndex(
+        for manga: MangaDetailDTO,
+        items: [ImagePreviewItem],
+        selectedPictureIndex: Int
+    ) -> Int {
+        guard !items.isEmpty else { return 0 }
+        let posterOffset = posterURL(for: manga) == nil ? 0 : 1
+        return min(selectedPictureIndex + posterOffset, max(items.count - 1, 0))
     }
 
     // MARK: - Score
@@ -256,6 +409,31 @@ extension MangaDetailViewModel {
     }
 
     // MARK: - Private Methods
+
+    private func preferredDisplayName(
+        kanjiName: String?,
+        fallbackName: String?,
+        emptyFallback: String
+    ) -> String {
+        trimmedText(kanjiName) ?? trimmedText(fallbackName) ?? emptyFallback
+    }
+
+    private func preferredTitle(
+        japaneseTitle: String?,
+        englishTitle: String?,
+        fallbackTitle: String?,
+        emptyFallback: String
+    ) -> String {
+        trimmedText(japaneseTitle) ?? trimmedText(englishTitle) ?? trimmedText(fallbackTitle) ?? emptyFallback
+    }
+
+    private func trimmedText(_ value: String?) -> String? {
+        guard let value = value?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !value.isEmpty else {
+            return nil
+        }
+        return value
+    }
 
     private func cleanedSynopsis(for manga: MangaDetailDTO) -> String? {
         guard var synopsis = manga.synopsis?.trimmingCharacters(in: .whitespacesAndNewlines), !synopsis.isEmpty else {

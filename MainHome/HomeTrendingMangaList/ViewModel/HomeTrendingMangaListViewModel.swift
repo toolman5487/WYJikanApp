@@ -23,7 +23,6 @@ final class HomeTrendingMangaListViewModel: ObservableObject {
     @Published var selectedFormat: HomeTrendingMangaListFormat = .all
     @Published private(set) var screenState: ScreenState = .loading
     @Published private(set) var loadMoreState: LoadMoreState = .hidden
-    @Published private(set) var isApplyingMenuSelection = false
 
     private let service: HomeTrendingMangaListServicing
     private let pageSize = 24
@@ -35,7 +34,6 @@ final class HomeTrendingMangaListViewModel: ObservableObject {
     private var isLoadingMore = false
     private var requestGeneration = 0
     private var cancellables: Set<AnyCancellable> = []
-    private var menuSelectionTask: Task<Void, Never>?
 
     init(service: HomeTrendingMangaListServicing = HomeTrendingMangaListService()) {
         self.service = service
@@ -82,12 +80,12 @@ final class HomeTrendingMangaListViewModel: ObservableObject {
             $selectedSort.removeDuplicates(),
             $selectedFormat.removeDuplicates()
         )
-        .dropFirst()
-        .sink { [weak self] _, _ in
-            guard let self, self.hasLoaded else { return }
-            self.presentSelectionChange()
-        }
-        .store(in: &cancellables)
+            .dropFirst()
+            .sink { [weak self] _, _ in
+                guard let self, self.hasLoaded else { return }
+                self.applyPresentation()
+            }
+            .store(in: &cancellables)
     }
 
     private func fetchFirstPage(showSkeleton: Bool) async {
@@ -159,22 +157,6 @@ final class HomeTrendingMangaListViewModel: ObservableObject {
         let presentedItems = presentedItems(from: sourceItems)
         screenState = presentedItems.isEmpty ? .empty : .content(items: presentedItems)
         loadMoreState = resolvedLoadMoreState()
-    }
-
-    private func presentSelectionChange() {
-        menuSelectionTask?.cancel()
-        menuSelectionTask = Task { [weak self] in
-            guard let self else { return }
-
-            isApplyingMenuSelection = true
-
-            try? await Task.sleep(nanoseconds: 350_000_000)
-            guard !Task.isCancelled else { return }
-
-            applyPresentation()
-
-            isApplyingMenuSelection = false
-        }
     }
 
     private func presentedItems(from items: [MangaCategoryItemDTO]) -> [MangaCategoryItemDTO] {

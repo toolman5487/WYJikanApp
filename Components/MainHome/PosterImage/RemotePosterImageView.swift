@@ -10,35 +10,46 @@ import SDWebImageSwiftUI
 
 struct RemotePosterImageView: View {
     let url: URL
+    let contentMode: ContentMode
+    let onImageSizeChange: ((CGSize) -> Void)?
 
     @State private var didFail = false
 
+    init(
+        url: URL,
+        contentMode: ContentMode = .fill,
+        onImageSizeChange: ((CGSize) -> Void)? = nil
+    ) {
+        self.url = url
+        self.contentMode = contentMode
+        self.onImageSizeChange = onImageSizeChange
+    }
+
     var body: some View {
-        GeometryReader { proxy in
-            WebImage(url: url) { image in
-                image
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: proxy.size.width, height: proxy.size.height)
-                    .clipped()
-            } placeholder: {
+        WebImage(url: url) { image in
+            image
+                .resizable()
+                .aspectRatio(contentMode: contentMode)
+        } placeholder: {
+            Color(.systemBackground)
+        }
+        .onFailure { _ in
+            didFail = true
+        }
+        .onSuccess { image, _, _ in
+            onImageSizeChange?(image.size)
+        }
+        .overlay {
+            if didFail {
                 Color(.systemBackground)
-                    .frame(width: proxy.size.width, height: proxy.size.height)
-                    .clipped()
-            }
-            .onFailure { _ in
-                didFail = true
-            }
-            .overlay {
-                if didFail {
-                    Color(.systemBackground)
-                        .overlay(Image(systemName: "photo").imageScale(.large))
-                        .frame(width: proxy.size.width, height: proxy.size.height)
-                        .clipped()
-                }
+                    .overlay {
+                        Image(systemName: "photo")
+                            .imageScale(.large)
+                    }
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .clipped()
         .onChange(of: url) { _, _ in
             didFail = false
         }

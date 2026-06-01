@@ -65,23 +65,10 @@ struct HomeTodayAnimeView: View {
                             Button {
                                 router.push(.animeDetail(malId: item.id))
                             } label: {
-                                PosterCardView {
-                                    RemotePosterImageView(url: item.imageURL)
-                                }
-                                .frame(width: cardWidth, height: 240)
-                                .overlay(alignment: .bottomLeading) {
-                                    PosterCardMetadataOverlayView(
-                                        title: item.title,
-                                        type: item.type,
-                                        score: item.score
-                                    )
-                                }
-                                .overlay(alignment: .topTrailing) {
-                                    MyListCollectionStatusBadgeView(
-                                        isFavorite: favoriteIDs.contains(item.id)
-                                    )
-                                    .padding(8)
-                                }
+                                HomeTodayAnimeCardView(
+                                    item: item,
+                                    isFavorite: favoriteIDs.contains(item.id)
+                                )
                             }
                             .buttonStyle(.plain)
                         }
@@ -92,6 +79,49 @@ struct HomeTodayAnimeView: View {
         }
         .onAppear {
             viewModel.loadIfNeeded()
+        }
+    }
+}
+
+private struct HomeTodayAnimeCardView: View {
+    let item: HomeTodayAnimeCardItem
+    let isFavorite: Bool
+
+    @State private var imageSize: CGSize?
+
+    private let cardSize = CGSize(width: 240 * (2.0 / 3.0), height: 240)
+
+    private var imageContentMode: ContentMode {
+        guard let imageSize, imageSize.width > imageSize.height else {
+            return .fill
+        }
+        return .fit
+    }
+
+    var body: some View {
+        PosterCardView {
+            RemotePosterImageView(
+                url: item.imageURL,
+                contentMode: imageContentMode,
+                onImageSizeChange: { size in
+                    imageSize = size
+                }
+            )
+        }
+        .frame(width: cardSize.width, height: cardSize.height)
+        .overlay(alignment: .bottomLeading) {
+            PosterCardMetadataOverlayView(
+                title: item.title,
+                type: item.type,
+                score: item.score
+            )
+        }
+        .overlay(alignment: .topTrailing) {
+            MyListCollectionStatusBadgeView(isFavorite: isFavorite)
+                .padding(8)
+        }
+        .onChange(of: item.imageURL) { _, _ in
+            imageSize = nil
         }
     }
 }

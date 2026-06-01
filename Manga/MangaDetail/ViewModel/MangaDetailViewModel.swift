@@ -21,6 +21,9 @@ final class MangaDetailViewModel: ObservableObject {
     }
 
     @Published private(set) var screenState: ScreenState = .idle
+    @Published private(set) var pictureItems: [MangaDetailPictureItem] = []
+    @Published private(set) var characterRoles: [MangaCharacterRoleDTO] = []
+    @Published private(set) var recommendationItems: [MangaRecommendationDTO] = []
 
     private let malId: Int
     private let service: MangaDetailServicing
@@ -68,6 +71,7 @@ final class MangaDetailViewModel: ObservableObject {
 
         if existingDetail == nil {
             screenState = .loading
+            resetSupplementaryContent()
         } else if let existingDetail {
             screenState = .refreshing(existingDetail)
         }
@@ -75,6 +79,7 @@ final class MangaDetailViewModel: ObservableObject {
         do {
             let response = try await service.fetchMangaDetail(malId: malId)
             screenState = .loaded(response.data)
+            await loadSupplementaryContent(resetOnFailure: existingDetail == nil)
         } catch is CancellationError {
             return
         } catch {
@@ -82,8 +87,57 @@ final class MangaDetailViewModel: ObservableObject {
                 screenState = .loaded(existingDetail)
             } else {
                 screenState = .error(error.localizedDescription)
+                resetSupplementaryContent()
             }
         }
+    }
+
+    private func loadSupplementaryContent(resetOnFailure: Bool) async {
+        await loadPictures(resetOnFailure: resetOnFailure)
+        await loadCharacters(resetOnFailure: resetOnFailure)
+        await loadRecommendations(resetOnFailure: resetOnFailure)
+    }
+
+    private func loadPictures(resetOnFailure: Bool) async {
+        do {
+            let resolvedPictures = try await service.fetchMangaPictures(malId: malId)
+            pictureItems = MangaDetailPictureMapping.items(from: resolvedPictures)
+        } catch is CancellationError {
+        } catch {
+            if resetOnFailure {
+                pictureItems = []
+            }
+        }
+    }
+
+    private func loadCharacters(resetOnFailure: Bool) async {
+        do {
+            let resolvedCharacters = try await service.fetchMangaCharacters(malId: malId)
+            characterRoles = resolvedCharacters.data
+        } catch is CancellationError {
+        } catch {
+            if resetOnFailure {
+                characterRoles = []
+            }
+        }
+    }
+
+    private func loadRecommendations(resetOnFailure: Bool) async {
+        do {
+            let resolvedRecommendations = try await service.fetchMangaRecommendations(malId: malId)
+            recommendationItems = resolvedRecommendations.data
+        } catch is CancellationError {
+        } catch {
+            if resetOnFailure {
+                recommendationItems = []
+            }
+        }
+    }
+
+    private func resetSupplementaryContent() {
+        pictureItems = []
+        characterRoles = []
+        recommendationItems = []
     }
 
     var isFavoriteActionEnabled: Bool {

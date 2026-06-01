@@ -95,14 +95,38 @@ final class MainMyListViewModel: ObservableObject {
         }
     }
 
-    @Published var selectedFilter: Filter = .all
+    @Published private(set) var presentation: Presentation
+    @Published var selectedFilter: Filter = .all {
+        didSet {
+            guard selectedFilter != oldValue else { return }
+            rebuildPresentationFromCachedItems()
+        }
+    }
+
     private let favoriteRepository: any FavoriteRepository
+    private var cachedItems: [MyListCollectionItem] = []
 
     init(favoriteRepository: any FavoriteRepository = SwiftDataFavoriteRepository.shared) {
         self.favoriteRepository = favoriteRepository
+        self.presentation = Self.emptyPresentation(selectedFilter: .all)
     }
 
-    func makePresentation(from items: [MyListCollectionItem]) -> Presentation {
+    func refreshPresentation(from items: [MyListCollectionItem]) {
+        cachedItems = items
+        rebuildPresentationFromCachedItems()
+    }
+
+    private func rebuildPresentationFromCachedItems() {
+        presentation = makePresentation(
+            from: cachedItems,
+            selectedFilter: selectedFilter
+        )
+    }
+
+    private func makePresentation(
+        from items: [MyListCollectionItem],
+        selectedFilter: Filter
+    ) -> Presentation {
         let calendar = Calendar.current
         let now = Date()
         let weekStartDate = calendar.date(byAdding: .day, value: -6, to: calendar.startOfDay(for: now))
@@ -233,6 +257,72 @@ final class MainMyListViewModel: ObservableObject {
         case .none:
             return "最近 7 天新增 \(count) 筆收藏"
         }
+    }
+
+    private static func emptyPresentation(selectedFilter: Filter) -> Presentation {
+        let emptyAllAnalysis = Presentation.Statistics.GenreAnalysis(
+            scope: .all,
+            itemCount: 0,
+            genreSlices: [],
+            missingGenreItemCount: 0
+        )
+        let emptyAnimeAnalysis = Presentation.Statistics.GenreAnalysis(
+            scope: .anime,
+            itemCount: 0,
+            genreSlices: [],
+            missingGenreItemCount: 0
+        )
+        let emptyMangaAnalysis = Presentation.Statistics.GenreAnalysis(
+            scope: .manga,
+            itemCount: 0,
+            genreSlices: [],
+            missingGenreItemCount: 0
+        )
+
+        let selectedAnalysis: Presentation.Statistics.GenreAnalysis
+        let summaryTile: Presentation.SummaryTile
+        switch selectedFilter {
+        case .all:
+            selectedAnalysis = emptyAllAnalysis
+            summaryTile = .init(
+                title: "全部收藏",
+                value: 0,
+                iconName: "heart.fill",
+                detail: "最近 7 天新增 0 筆收藏"
+            )
+        case .anime:
+            selectedAnalysis = emptyAnimeAnalysis
+            summaryTile = .init(
+                title: "動畫收藏",
+                value: 0,
+                iconName: MyListMediaKind.anime.iconName,
+                detail: "最近 7 天新增 0 筆動畫收藏"
+            )
+        case .manga:
+            selectedAnalysis = emptyMangaAnalysis
+            summaryTile = .init(
+                title: "漫畫收藏",
+                value: 0,
+                iconName: MyListMediaKind.manga.iconName,
+                detail: "最近 7 天新增 0 筆漫畫收藏"
+            )
+        }
+
+        let statistics = Presentation.Statistics(
+            totalCount: 0,
+            animeCount: 0,
+            mangaCount: 0,
+            allAnalysis: emptyAllAnalysis,
+            animeAnalysis: emptyAnimeAnalysis,
+            mangaAnalysis: emptyMangaAnalysis,
+            selectedAnalysis: selectedAnalysis
+        )
+
+        return Presentation(
+            filteredItems: [],
+            statistics: statistics,
+            summaryTile: summaryTile
+        )
     }
 
     private func makeGenreAnalysis(

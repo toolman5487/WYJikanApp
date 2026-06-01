@@ -57,7 +57,9 @@ struct HomeTrendingAnimeListControlBarView: View {
     private var selectedItemBinding: Binding<HomeTrendingAnimeListSortChipItem> {
         Binding(
             get: {
-                items.first(where: \.isSelected) ?? items.first!
+                items.first(where: \.isSelected)
+                    ?? items.first
+                    ?? HomeTrendingAnimeListSortChipItem(sort: .apiDefault, isSelected: true)
             },
             set: { newValue in
                 onSelectSort(newValue.sort)

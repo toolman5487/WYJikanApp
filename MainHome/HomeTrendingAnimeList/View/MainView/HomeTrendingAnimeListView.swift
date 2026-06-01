@@ -39,24 +39,15 @@ struct HomeTrendingAnimeListView: View {
             .padding(.top, 16)
             .padding(.bottom, 28)
         }
-        .allowsHitTesting(!viewModel.isApplyingMenuSelection)
-        .overlay {
-            if viewModel.isApplyingMenuSelection {
-                applyingSelectionOverlay
-                    .transition(.opacity.combined(with: .scale(scale: 0.98)))
-            }
-        }
         .safeAreaInset(edge: .top, spacing: 0) {
             HomeTrendingAnimeListControlBarContainerView(
                 items: viewModel.sortChipItems,
                 onSelectSort: viewModel.selectSort(_:)
             )
-            .disabled(viewModel.isApplyingMenuSelection)
         }
         .navigationTitle("熱門動畫")
         .navigationBarTitleDisplayMode(.inline)
         .background(Color(.systemBackground))
-        .animation(.easeInOut(duration: 0.2), value: viewModel.isApplyingMenuSelection)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -138,26 +129,5 @@ struct HomeTrendingAnimeListView: View {
             title: section.title,
             outerVerticalPadding: 0
         )
-    }
-
-    private var applyingSelectionOverlay: some View {
-        ZStack {
-            Color(.systemBackground)
-                .opacity(0.92)
-
-            VStack(alignment: .leading, spacing: 20) {
-                Text("更新榜單中...")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(ThemeColor.textSecondary)
-
-                HomeTrendingAnimeListLoadingView()
-            }
-            .padding(20)
-            .background(Color(.systemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-            .shadow(color: Color.black.opacity(0.06), radius: 16, y: 8)
-            .padding(.horizontal, 16)
-        }
-        .safeAreaPadding(.top)
     }
 }

@@ -9,13 +9,24 @@ import SwiftData
 import SwiftUI
 
 struct MainMyListView: View {
+    private struct ItemRevision: Equatable {
+        let id: PersistentIdentifier
+        let malId: Int
+        let mediaKindRawValue: String
+        let title: String
+        let subtitle: String?
+        let imageURLString: String?
+        let genreNamesRawValue: String?
+        let addedAt: Date
+    }
+
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \MyListCollectionItem.addedAt, order: .reverse)
     private var items: [MyListCollectionItem]
     @StateObject private var viewModel = MainMyListViewModel()
     
     var body: some View {
-        let presentation = viewModel.makePresentation(from: items)
+        let presentation = viewModel.presentation
 
         NavigationStack {
             ScrollView {
@@ -32,6 +43,27 @@ struct MainMyListView: View {
             .background(Color(.systemBackground))
             .navigationTitle("我的收藏")
             .navigationBarTitleDisplayMode(.large)
+        }
+        .onAppear {
+            viewModel.refreshPresentation(from: items)
+        }
+        .onChange(of: itemRevisions) { _, _ in
+            viewModel.refreshPresentation(from: items)
+        }
+    }
+
+    private var itemRevisions: [ItemRevision] {
+        items.map { item in
+            ItemRevision(
+                id: item.persistentModelID,
+                malId: item.malId,
+                mediaKindRawValue: item.mediaKindRawValue,
+                title: item.title,
+                subtitle: item.subtitle,
+                imageURLString: item.imageURLString,
+                genreNamesRawValue: item.genreNamesRawValue,
+                addedAt: item.addedAt
+            )
         }
     }
     

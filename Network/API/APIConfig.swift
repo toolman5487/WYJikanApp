@@ -32,6 +32,7 @@ enum APIConfig {
         static func characters(id: Int) -> String { "/manga/\(id)/characters" }
         static func recommendations(id: Int) -> String { "/manga/\(id)/recommendations" }
         static func reviews(id: Int) -> String { "/manga/\(id)/reviews" }
+        static func pictures(id: Int) -> String { "/manga/\(id)/pictures" }
     }
 
     // MARK: - Characters & People

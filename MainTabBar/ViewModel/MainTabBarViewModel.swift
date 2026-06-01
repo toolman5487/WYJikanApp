@@ -4,7 +4,6 @@
 //
 
 import Combine
-import SwiftUI
 
 enum AppTab: Hashable {
     case home

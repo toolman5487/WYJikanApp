@@ -498,8 +498,11 @@ extension AnimeDetailViewModel {
     }
 
     func characterRoleText(_ role: AnimeCharacterRoleDTO) -> String {
-        let trimmed = role.role?.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed?.isEmpty == false ? trimmed! : "未標示定位"
+        guard let trimmed = role.role?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !trimmed.isEmpty else {
+            return "未標示定位"
+        }
+        return trimmed
     }
 
     func voiceActorSummary(for role: AnimeCharacterRoleDTO) -> String {

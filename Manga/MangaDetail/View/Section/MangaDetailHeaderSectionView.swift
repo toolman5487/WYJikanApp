@@ -10,6 +10,17 @@ import SwiftUI
 struct MangaDetailHeaderSectionView: View {
     let viewModel: MangaDetailViewModel
     let manga: MangaDetailDTO
+    let onTapPoster: (() -> Void)?
+
+    init(
+        viewModel: MangaDetailViewModel,
+        manga: MangaDetailDTO,
+        onTapPoster: (() -> Void)? = nil
+    ) {
+        self.viewModel = viewModel
+        self.manga = manga
+        self.onTapPoster = onTapPoster
+    }
 
     var body: some View {
         HStack(alignment: .top, spacing: 16) {
@@ -44,6 +55,10 @@ struct MangaDetailHeaderSectionView: View {
                 .aspectRatio(2.0 / 3.0, contentMode: .fit)
                 .frame(width: 132, height: 196)
                 .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    onTapPoster?()
+                }
         }
     }
 }

@@ -8,7 +8,6 @@
 import Combine
 import Foundation
 import OSLog
-import SwiftUI
 
 @MainActor
 final class AnimeDetailEpisodesListViewModel: ObservableObject {
@@ -97,17 +96,13 @@ final class AnimeDetailEpisodesListViewModel: ObservableObject {
         }
 
         if expandedEpisodeIDs.contains(episodeNumber) {
-            withAnimation(.easeInOut(duration: 0.18)) {
-                expandedEpisodeIDs.remove(episodeNumber)
-                rebuildEpisodeRows()
-            }
+            expandedEpisodeIDs.remove(episodeNumber)
+            rebuildEpisodeRows()
             return
         }
 
-        withAnimation(.easeInOut(duration: 0.18)) {
-            expandedEpisodeIDs.insert(episodeNumber)
-            rebuildEpisodeRows()
-        }
+        expandedEpisodeIDs.insert(episodeNumber)
+        rebuildEpisodeRows()
         guard episodeDetailStates[episodeNumber] == nil else { return }
 
         episodeDetailStates[episodeNumber] = .loading(expandedPresentation(for: episode))

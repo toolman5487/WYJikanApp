@@ -61,6 +61,7 @@ struct AnimeDetailEpisodesListView: View {
                             onRetry: viewModel.retryLoadMore
                         )
                     }
+                    .animation(.easeInOut(duration: 0.18), value: viewModel.episodeRows)
                     .padding()
                 }
             }
