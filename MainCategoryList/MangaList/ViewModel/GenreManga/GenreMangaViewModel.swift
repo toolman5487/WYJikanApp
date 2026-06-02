@@ -35,47 +35,18 @@ final class GenreMangaViewModel: ObservableObject {
         case content(sections: [MangaGenreSection], inlineError: String?, loadMoreState: LoadMoreState)
     }
 
-    private enum BatchPhase {
-        case initial
-        case loadMore
-
-        var loadState: LoadState {
-            switch self {
-            case .initial:
-                return .loadingInitial
-            case .loadMore:
-                return .loadingMore
-            }
-        }
-
-        var batchSize: Int {
-            switch self {
-            case .initial:
-                return GenreMangaViewModel.initialGenreSections
-            case .loadMore:
-                return GenreMangaViewModel.loadMoreGenreSections
-            }
-        }
-    }
-
-    private struct PendingBatch {
-        let phase: BatchPhase
-        let startIndex: Int
-        let endIndex: Int
-        var nextGenreIndex: Int
-        var shouldApplyInitialDelay: Bool
-    }
-
     // MARK: - Constants
 
-    private static let initialGenreSections = 5
-    private static let loadMoreGenreSections = 5
     private static let genreMangaLimit = 5
     private static let maxRetryCount = 2
-    private static let initialItemRequestDelay: Duration = .milliseconds(1200)
-    private static let requestInterval: Duration = .seconds(1)
     private static let retryBackoff: Duration = .milliseconds(800)
     private static let genreErrorMessage = "目前無法載入分類資料，請稍後再試"
+    private static let batchConfiguration = MainCategoryGenreBatchConfiguration(
+        initialBatchSize: 5,
+        loadMoreBatchSize: 5,
+        initialItemRequestDelay: .milliseconds(1200),
+        requestInterval: .seconds(1)
+    )
 
     // MARK: - Published State
 
@@ -107,18 +78,18 @@ final class GenreMangaViewModel: ObservableObject {
     // MARK: - Dependencies
 
     private let service: MainCategoryListServicing
+    private let batchLoader: MainCategoryGenreBatchLoader<MangaListGenreDTO, MangaListRandomDTO>
 
     // MARK: - Loading State
 
     private var loadTask: Task<Void, Never>?
     private var allLocalizedGenres: [MangaListGenreDTO] = []
-    private var loadedGenreCount = 0
-    private var pendingBatch: PendingBatch?
 
     // MARK: - Lifecycle
 
     init(service: MainCategoryListServicing = MainCategoryListService()) {
         self.service = service
+        self.batchLoader = MainCategoryGenreBatchLoader(configuration: Self.batchConfiguration)
     }
 
     // MARK: - Public Methods
@@ -143,12 +114,12 @@ final class GenreMangaViewModel: ObservableObject {
         switch loadState {
         case .loadingInitial, .loadingMore:
             return
-        default:
+        case .idle, .paused, .loaded, .error:
             break
         }
         guard canLoadMore else { return }
 
-        runLoadTask { await $0.startBatch(.loadMore) }
+        runLoadTask { await $0.startGenreBatch(.loadMore) }
     }
 
     func stop() {
@@ -162,25 +133,29 @@ final class GenreMangaViewModel: ObservableObject {
             break
         }
     }
+}
 
-    // MARK: - Screen State Helpers
+// MARK: - Screen State
 
-    private var inlineErrorMessage: String? {
+private extension GenreMangaViewModel {
+    var inlineErrorMessage: String? {
         guard case .error(let message) = loadState else { return nil }
         return message
     }
 
-    private var footerLoadMoreState: LoadMoreState {
+    var footerLoadMoreState: LoadMoreState {
         if !canLoadMore {
             return .hidden
         }
 
         return loadState == .loadingMore ? .loading : .available
     }
+}
 
-    // MARK: - Task Management
+// MARK: - Task Management
 
-    private func runLoadTask(
+private extension GenreMangaViewModel {
+    func runLoadTask(
         _ operation: @escaping @MainActor (GenreMangaViewModel) async -> Void
     ) {
         loadTask?.cancel()
@@ -189,139 +164,128 @@ final class GenreMangaViewModel: ObservableObject {
             await operation(self)
         }
     }
+}
 
-    // MARK: - Loading Lifecycle
+// MARK: - Loading Lifecycle
 
-    private func resetLoadingContext() {
+private extension GenreMangaViewModel {
+    func resetLoadingContext() {
         canLoadMore = false
         genreSections = []
         allLocalizedGenres = []
-        loadedGenreCount = 0
-        pendingBatch = nil
+        batchLoader.reset()
         loadState = .idle
     }
 
-    private func resumeLoading() {
+    func resumeLoading() {
         runLoadTask { viewModel in
-            if viewModel.pendingBatch != nil {
-                await viewModel.continuePendingBatch()
-            } else if viewModel.genreSections.isEmpty {
-                if viewModel.allLocalizedGenres.isEmpty {
-                    await viewModel.fetchSections()
-                } else {
-                    await viewModel.startBatch(.initial)
-                }
-            } else {
+            switch (
+                viewModel.batchLoader.hasPendingBatch,
+                viewModel.genreSections.isEmpty,
+                viewModel.allLocalizedGenres.isEmpty
+            ) {
+            case (true, _, _):
+                await viewModel.continuePendingGenreBatch()
+            case (false, true, true):
+                await viewModel.fetchSections()
+            case (false, true, false):
+                await viewModel.startGenreBatch(.initial)
+            case (false, false, _):
                 viewModel.loadState = .loaded
             }
         }
     }
 
-    private func fetchSections() async {
+    func fetchSections() async {
         loadState = .loadingInitial
         canLoadMore = false
         genreSections = []
         allLocalizedGenres = []
-        loadedGenreCount = 0
-        pendingBatch = nil
+        batchLoader.reset()
 
         do {
             let genres = try await service.fetchMangaGenres().data
-            let validGenres = genres.filter { genre in
-                guard let name = genre.name else { return false }
-                return !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-            }
-            allLocalizedGenres = validGenres.map(localizedGenre)
+            allLocalizedGenres = validLocalizedGenres(from: genres)
             guard !allLocalizedGenres.isEmpty else {
                 loadState = .loaded
                 return
             }
 
-            await startBatch(.initial)
+            await startGenreBatch(.initial)
         } catch {
             guard !Task.isCancelled else { return }
             loadState = .error(message: Self.genreErrorMessage)
             canLoadMore = false
         }
     }
+}
 
-    // MARK: - Batch Loading
+// MARK: - Batch Loading
 
-    private func startBatch(_ phase: BatchPhase) async {
-        guard let batch = makePendingBatch(for: phase) else {
+private extension GenreMangaViewModel {
+    func startGenreBatch(_ phase: MainCategoryGenreBatchPhase) async {
+        let result = await batchLoader.startBatch(
+            phase,
+            genres: allLocalizedGenres,
+            onBatchStart: applyPlaceholders,
+            onPhaseChange: applyBatchPhase,
+            fetchItems: { [weak self] genre in
+                guard let self else { return [] }
+                return await self.fetchGenreItemsWithRetry(genreId: genre.id)
+            },
+            didLoadGenreItems: { [weak self] genre, items in
+                self?.updateGenreSection(genreId: genre.id, items: items)
+            }
+        )
+        applyBatchResult(result)
+    }
+
+    func continuePendingGenreBatch() async {
+        let result = await batchLoader.continuePendingBatch(
+            genres: allLocalizedGenres,
+            onPhaseChange: applyBatchPhase,
+            fetchItems: { [weak self] genre in
+                guard let self else { return [] }
+                return await self.fetchGenreItemsWithRetry(genreId: genre.id)
+            },
+            didLoadGenreItems: { [weak self] genre, items in
+                self?.updateGenreSection(genreId: genre.id, items: items)
+            }
+        )
+        applyBatchResult(result)
+    }
+
+    func applyBatchPhase(_ phase: MainCategoryGenreBatchPhase) {
+        switch phase {
+        case .initial:
+            loadState = .loadingInitial
+        case .loadMore:
+            loadState = .loadingMore
+        }
+    }
+
+    func applyBatchResult(_ result: MainCategoryGenreBatchResult) {
+        switch result {
+        case .finished(let canLoadMore):
+            self.canLoadMore = canLoadMore
+            loadState = .loaded
+        case .empty:
             canLoadMore = false
             loadState = genreSections.isEmpty ? .error(message: Self.genreErrorMessage) : .loaded
-            return
+        case .cancelled:
+            break
         }
-
-        pendingBatch = batch
-        applyPlaceholdersIfNeeded(for: batch)
-        await continuePendingBatch()
     }
 
-    private func continuePendingBatch() async {
-        guard var batch = pendingBatch else { return }
-
-        loadState = batch.phase.loadState
-
-        if batch.shouldApplyInitialDelay {
-            try? await Task.sleep(for: Self.initialItemRequestDelay)
-            guard !Task.isCancelled else {
-                pendingBatch = batch
-                return
-            }
-            batch.shouldApplyInitialDelay = false
-            pendingBatch = batch
-        }
-
-        while batch.nextGenreIndex < batch.endIndex {
-            let genre = allLocalizedGenres[batch.nextGenreIndex]
-            let items = await fetchGenreItemsWithRetry(genreId: genre.id)
-            guard !Task.isCancelled else {
-                pendingBatch = batch
-                return
-            }
-
-            updateGenreSection(genreId: genre.id, items: items)
-            batch.nextGenreIndex += 1
-            pendingBatch = batch
-
-            if batch.nextGenreIndex < batch.endIndex {
-                try? await Task.sleep(for: Self.requestInterval)
-                guard !Task.isCancelled else {
-                    pendingBatch = batch
-                    return
-                }
-            }
-        }
-
-        loadedGenreCount = batch.endIndex
-        pendingBatch = nil
-        canLoadMore = loadedGenreCount < allLocalizedGenres.count
-        loadState = .loaded
-    }
-
-    private func makePendingBatch(for phase: BatchPhase) -> PendingBatch? {
-        let startIndex = loadedGenreCount
-        let endIndex = min(startIndex + phase.batchSize, allLocalizedGenres.count)
-        guard startIndex < endIndex else { return nil }
-
-        return PendingBatch(
-            phase: phase,
-            startIndex: startIndex,
-            endIndex: endIndex,
-            nextGenreIndex: startIndex,
-            shouldApplyInitialDelay: true
-        )
-    }
-
-    private func applyPlaceholdersIfNeeded(for batch: PendingBatch) {
-        let batchGenres = Array(allLocalizedGenres[batch.startIndex..<batch.endIndex])
-        let placeholderSections = batchGenres.map { genre in
+    func applyPlaceholders(
+        phase: MainCategoryGenreBatchPhase,
+        genres: [MangaListGenreDTO]
+    ) {
+        let placeholderSections = genres.map { genre in
             MangaGenreSection(genre: genre, items: [])
         }
 
-        switch batch.phase {
+        switch phase {
         case .initial:
             if genreSections.isEmpty {
                 genreSections = placeholderSections
@@ -333,18 +297,43 @@ final class GenreMangaViewModel: ObservableObject {
             genreSections.append(contentsOf: missingSections)
         }
     }
+}
 
-    // MARK: - Genre Mapping
+// MARK: - Section Updates
 
-    private func localizedGenre(_ genre: MangaListGenreDTO) -> MangaListGenreDTO {
+private extension GenreMangaViewModel {
+    func updateGenreSection(genreId: Int, items: [MangaListRandomDTO]) {
+        guard let index = genreSections.firstIndex(where: { $0.genre.id == genreId }) else { return }
+        genreSections[index] = MangaGenreSection(
+            genre: genreSections[index].genre,
+            items: items
+        )
+    }
+}
+
+// MARK: - Genre Mapping
+
+private extension GenreMangaViewModel {
+    func validLocalizedGenres(from genres: [MangaListGenreDTO]) -> [MangaListGenreDTO] {
+        genres
+            .filter { genre in
+                guard let name = genre.name else { return false }
+                return !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            }
+            .map(localizedGenre)
+    }
+
+    func localizedGenre(_ genre: MangaListGenreDTO) -> MangaListGenreDTO {
         guard let englishName = genre.name else { return genre }
         let localizedName = MangaGenreLocalizationModel.localizedName(for: englishName)
         return MangaListGenreDTO(malId: genre.malId, name: localizedName)
     }
+}
 
-    // MARK: - Item Fetching
+// MARK: - Item Fetching
 
-    private func fetchGenreItemsWithRetry(genreId: Int) async -> [MangaListRandomDTO] {
+private extension GenreMangaViewModel {
+    func fetchGenreItemsWithRetry(genreId: Int) async -> [MangaListRandomDTO] {
         var attempt = 0
         while attempt <= Self.maxRetryCount {
             guard !Task.isCancelled else { return [] }
@@ -361,15 +350,5 @@ final class GenreMangaViewModel: ObservableObject {
             }
         }
         return []
-    }
-
-    // MARK: - Section Updates
-
-    private func updateGenreSection(genreId: Int, items: [MangaListRandomDTO]) {
-        guard let index = genreSections.firstIndex(where: { $0.genre.id == genreId }) else { return }
-        genreSections[index] = MangaGenreSection(
-            genre: genreSections[index].genre,
-            items: items
-        )
     }
 }

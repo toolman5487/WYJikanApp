@@ -116,28 +116,16 @@ extension MangaDetailViewModel {
     }
 
     func sections(for manga: MangaDetailDTO) -> [Section] {
-        var result: [Section] = [
-            .header,
-            .highlights,
-            .basicInfo,
-            .score
-        ]
-        if hasSynopsis(for: manga) {
-            result.append(.synopsis)
-        }
-        if hasCharacters {
-            result.append(.characters)
-        }
-        if hasPublicationInfo(for: manga) || hasThemes(for: manga) || !hasSynopsis(for: manga) {
-            result.append(.publication)
-        }
-        if hasPictures {
-            result.append(.pictures)
-        }
-        if hasRecommendations {
-            result.append(.recommendations)
-        }
-        return result
+        MangaDetailSectionBuilder().sections(
+            for: MangaDetailSectionAvailability(
+                hasSynopsis: hasSynopsis(for: manga),
+                hasCharacters: hasCharacters,
+                hasPublicationInfo: hasPublicationInfo(for: manga),
+                hasThemes: hasThemes(for: manga),
+                hasPictures: hasPictures,
+                hasRecommendations: hasRecommendations
+            )
+        )
     }
 
     // MARK: - Type & Status
@@ -297,30 +285,21 @@ extension MangaDetailViewModel {
     }
 
     func imagePreviewItems(for manga: MangaDetailDTO) -> [ImagePreviewItem] {
-        var items: [ImagePreviewItem] = []
-        var seenURLs = Set<URL>()
-
-        if let posterURL = posterURL(for: manga), seenURLs.insert(posterURL).inserted {
-            items.append(ImagePreviewItem(id: "poster-\(manga.malId)", url: posterURL))
-        }
-
-        for picture in pictureItems where seenURLs.insert(picture.url).inserted {
-            items.append(ImagePreviewItem(id: "picture-\(picture.id)", url: picture.url))
-        }
-
-        return items
+        MangaDetailImagePreviewBuilder().items(
+            mangaId: manga.malId,
+            posterURL: posterURL(for: manga),
+            pictureItems: pictureItems
+        )
     }
 
     func initialPreviewIndex(
         for items: [ImagePreviewItem],
         selectedImageURL: URL?
     ) -> Int {
-        guard !items.isEmpty else { return 0 }
-        guard let selectedImageURL,
-              let index = items.firstIndex(where: { $0.url == selectedImageURL }) else {
-            return 0
-        }
-        return index
+        MangaDetailImagePreviewBuilder().initialIndex(
+            for: items,
+            selectedImageURL: selectedImageURL
+        )
     }
 
     func initialPreviewIndex(
@@ -328,9 +307,11 @@ extension MangaDetailViewModel {
         items: [ImagePreviewItem],
         selectedPictureIndex: Int
     ) -> Int {
-        guard !items.isEmpty else { return 0 }
-        let posterOffset = posterURL(for: manga) == nil ? 0 : 1
-        return min(selectedPictureIndex + posterOffset, max(items.count - 1, 0))
+        MangaDetailImagePreviewBuilder().initialIndex(
+            for: items,
+            selectedPictureIndex: selectedPictureIndex,
+            hasPoster: posterURL(for: manga) != nil
+        )
     }
 
     // MARK: - Score

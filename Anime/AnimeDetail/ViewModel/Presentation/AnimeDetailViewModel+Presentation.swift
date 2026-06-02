@@ -119,34 +119,17 @@ extension AnimeDetailViewModel {
     }
 
     func sections(for anime: AnimeDetailDTO) -> [Section] {
-        var result: [Section] = [
-            .header,
-            .highlights,
-            .basicInfo
-        ]
-        if hasEpisodes(for: anime) {
-            result.append(.episodes)
-        }
-        result.append(.score)
-        if hasTrailer(for: anime) {
-            result.append(.trailer)
-        }
-        if hasSynopsis(for: anime) {
-            result.append(.synopsis)
-        }
-        if hasCharacters {
-            result.append(.characters)
-        }
-        if hasStaffInfo(for: anime) || hasThemes(for: anime) {
-            result.append(.staff)
-        }
-        if hasPictures {
-            result.append(.pictures)
-        }
-        if hasRecommendations {
-            result.append(.recommendations)
-        }
-        return result
+        AnimeDetailSectionBuilder().sections(
+            for: AnimeDetailSectionAvailability(
+                hasEpisodes: hasEpisodes(for: anime),
+                hasTrailer: hasTrailer(for: anime),
+                hasSynopsis: hasSynopsis(for: anime),
+                hasCharacters: hasCharacters,
+                hasStaffOrThemes: hasStaffInfo(for: anime) || hasThemes(for: anime),
+                hasPictures: hasPictures,
+                hasRecommendations: hasRecommendations
+            )
+        )
     }
 
     func sensitiveContentText(for anime: AnimeDetailDTO) -> String? {
@@ -629,30 +612,21 @@ extension AnimeDetailViewModel {
     }
 
     func imagePreviewItems(for anime: AnimeDetailDTO) -> [ImagePreviewItem] {
-        var items: [ImagePreviewItem] = []
-        var seenURLs = Set<URL>()
-
-        if let posterURL = posterURL(for: anime), seenURLs.insert(posterURL).inserted {
-            items.append(ImagePreviewItem(id: "poster-\(anime.malId)", url: posterURL))
-        }
-
-        for picture in pictureItems where seenURLs.insert(picture.url).inserted {
-            items.append(ImagePreviewItem(id: "picture-\(picture.id)", url: picture.url))
-        }
-
-        return items
+        AnimeDetailImagePreviewBuilder().items(
+            animeId: anime.malId,
+            posterURL: posterURL(for: anime),
+            pictureItems: pictureItems
+        )
     }
 
     func initialPreviewIndex(
         for items: [ImagePreviewItem],
         selectedImageURL: URL?
     ) -> Int {
-        guard !items.isEmpty else { return 0 }
-        guard let selectedImageURL,
-              let index = items.firstIndex(where: { $0.url == selectedImageURL }) else {
-            return 0
-        }
-        return index
+        AnimeDetailImagePreviewBuilder().initialIndex(
+            for: items,
+            selectedImageURL: selectedImageURL
+        )
     }
 
     func initialPreviewIndex(
@@ -660,9 +634,11 @@ extension AnimeDetailViewModel {
         items: [ImagePreviewItem],
         selectedPictureIndex: Int
     ) -> Int {
-        guard !items.isEmpty else { return 0 }
-        let posterOffset = posterURL(for: anime) == nil ? 0 : 1
-        return min(selectedPictureIndex + posterOffset, max(items.count - 1, 0))
+        AnimeDetailImagePreviewBuilder().initialIndex(
+            for: items,
+            selectedPictureIndex: selectedPictureIndex,
+            hasPoster: posterURL(for: anime) != nil
+        )
     }
 
     // MARK: - Private Methods

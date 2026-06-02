@@ -23,23 +23,28 @@ final class MainSearchViewModel: ObservableObject {
     @Published private(set) var screenState: MainSearchScreenState = .emptyPrompt
     @Published private(set) var loadMoreState: MainSearchLoadMoreState = .hidden
 
-    private let service: MainSearchServicing
+    private let searchPublisherFactory: MainSearchSearchPublisherFactory
+    private let sorter: MainSearchResultSorter
+    private let presentationBuilder: MainSearchPresentationBuilder
+
     private var cancellables = Set<AnyCancellable>()
-    private var unsortedRows: [MainSearchResultRow] = []
-    private var currentPage = 0
-    private var hasNextPage = false
-    private var loadMoreTriggerIDs = Set<String>()
-    private var requestState: RequestState = .idle
-    private var activeIntent: SearchIntent?
+    private var pagination = MainSearchPaginationState()
     private var loadMoreTask: Task<Void, Never>?
 
     init(
         service: MainSearchServicing = MainSearchService(),
         initialKind: MainSearchKind = .anime,
         initialQuery: String = "",
-        initialSortOption: MainSearchSortOption = .default
+        initialSortOption: MainSearchSortOption = .default,
+        sorter: MainSearchResultSorter = MainSearchResultSorter(),
+        presentationBuilder: MainSearchPresentationBuilder = MainSearchPresentationBuilder()
     ) {
-        self.service = service
+        self.searchPublisherFactory = MainSearchSearchPublisherFactory(
+            service: service,
+            resultLimit: Self.searchResultLimit
+        )
+        self.sorter = sorter
+        self.presentationBuilder = presentationBuilder
         self.query = initialQuery
         self.kind = initialKind
         if MainSearchSortOption.supportedOptions(for: initialKind).contains(initialSortOption) {
@@ -49,45 +54,36 @@ final class MainSearchViewModel: ObservableObject {
         bindSortPipeline()
     }
 
-    // MARK: - Combine
+    // MARK: - Public
 
-    private enum SearchEvent: Equatable {
-        case queryAdjusted
-        case kindAdjusted
+    func loadMoreIfNeeded(currentRow: MainSearchResultRow) {
+        guard pagination.shouldLoadMore(currentRow: currentRow) else { return }
+        if case .error = loadMoreState { return }
+        loadMore()
     }
 
-    private struct SearchIntent: Equatable {
-        let trimmedQuery: String
-        let kind: MainSearchKind
-        let event: SearchEvent
+    func retryLoadMore() {
+        guard pagination.hasNextPage, pagination.canStartLoadMore else { return }
+        loadMore()
     }
+}
 
-    private enum RequestState: Equatable {
-        case idle
-        case searching
-        case loadingMore
-        case loadMoreError(String)
-    }
+// MARK: - Combine
 
-    private enum SearchOutput {
-        case reset
-        case loading(clearExistingRows: Bool)
-        case result(page: MainSearchPage, error: String?)
-    }
-
-    private func bindSearchPipeline() {
-        let initialQuerySync = Just(SearchEvent.queryAdjusted)
+private extension MainSearchViewModel {
+    func bindSearchPipeline() {
+        let initialQuerySync = Just(MainSearchEvent.queryAdjusted)
 
         let queryPath = $query
             .map { Self.trim($0) }
             .removeDuplicates()
             .debounce(for: Self.debounceInterval, scheduler: RunLoop.main)
-            .map { _ in SearchEvent.queryAdjusted }
+            .map { _ in MainSearchEvent.queryAdjusted }
 
         let kindPath = $kind
             .removeDuplicates()
             .dropFirst()
-            .map { _ in SearchEvent.kindAdjusted }
+            .map { _ in MainSearchEvent.kindAdjusted }
 
         let triggers = Publishers.Merge(
             Publishers.Merge(initialQuerySync, queryPath),
@@ -96,27 +92,22 @@ final class MainSearchViewModel: ObservableObject {
 
         triggers
             .receive(on: RunLoop.main)
-            .map { [weak self] event -> SearchIntent? in
+            .map { [weak self] event -> MainSearchIntent? in
                 guard let self else {
                     return nil
                 }
-                return SearchIntent(
+                return MainSearchIntent(
                     trimmedQuery: Self.trim(self.query),
                     kind: self.kind,
                     event: event
                 )
             }
             .compactMap { $0 }
-            .map { [weak self] intent -> AnyPublisher<SearchOutput, Never> in
+            .map { [weak self] intent -> AnyPublisher<MainSearchSearchOutput, Never> in
                 guard let self else {
                     return Empty().eraseToAnyPublisher()
                 }
-
-                if intent.trimmedQuery.isEmpty {
-                    return Just(.reset).eraseToAnyPublisher()
-                }
-
-                return self.searchPublisher(for: intent)
+                return self.searchPublisherFactory.publisher(for: intent)
             }
             .switchToLatest()
             .receive(on: RunLoop.main)
@@ -127,14 +118,14 @@ final class MainSearchViewModel: ObservableObject {
                     self.resetSearchState()
                 case .loading(let clearExistingRows):
                     self.startSearching(clearExistingRows: clearExistingRows)
-                case .result(let page, let error):
-                    self.finishSearch(page: page, error: error)
+                case .result(let intent, let page, let error):
+                    self.finishSearch(intent: intent, page: page, error: error)
                 }
             }
             .store(in: &cancellables)
     }
 
-    private func bindSortPipeline() {
+    func bindSortPipeline() {
         $kind
             .removeDuplicates()
             .sink { [weak self] kind in
@@ -154,282 +145,106 @@ final class MainSearchViewModel: ObservableObject {
             }
             .store(in: &cancellables)
     }
+}
 
-    // MARK: - Private
+// MARK: - Search
 
-    private static func trim(_ string: String) -> String {
+private extension MainSearchViewModel {
+    static func trim(_ string: String) -> String {
         string.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
-    func loadMoreIfNeeded(currentRow: MainSearchResultRow) {
-        guard hasNextPage, canStartLoadMore else { return }
-        if case .error = loadMoreState { return }
-        guard loadMoreTriggerIDs.contains(currentRow.id) else { return }
-        loadMore()
+    func resetSearchState() {
+        loadMoreTask?.cancel()
+        pagination.reset()
+        screenState = .emptyPrompt
+        loadMoreState = .hidden
     }
 
-    func retryLoadMore() {
-        guard hasNextPage, canStartLoadMore else { return }
-        loadMore()
-    }
-
-    private func searchPublisher(for intent: SearchIntent) -> AnyPublisher<SearchOutput, Never> {
-        Deferred { [weak self] () -> AnyPublisher<SearchOutput, Never> in
-            guard let self else {
-                return Empty().eraseToAnyPublisher()
-            }
-
-            let subject = PassthroughSubject<SearchOutput, Never>()
-            let clearExistingRows = {
-                switch intent.event {
-                case .queryAdjusted:
-                    return false
-                case .kindAdjusted:
-                    return true
-                }
-            }()
-
-            let task = Task { @MainActor [weak self] in
-                guard let self else {
-                    subject.send(completion: .finished)
-                    return
-                }
-
-                do {
-                    let page = try await self.service.searchPage(
-                        kind: intent.kind,
-                        query: intent.trimmedQuery,
-                        page: 1,
-                        limit: Self.searchResultLimit
-                    )
-                    guard !Task.isCancelled else {
-                        subject.send(completion: .finished)
-                        return
-                    }
-                    subject.send(.result(page: page, error: nil))
-                } catch {
-                    guard !Task.isCancelled else {
-                        subject.send(completion: .finished)
-                        return
-                    }
-                    subject.send(
-                        .result(
-                            page: MainSearchPage(rows: [], currentPage: 1, hasNextPage: false),
-                            error: error.localizedDescription
-                        )
-                    )
-                }
-
-                subject.send(completion: .finished)
-            }
-
-            return subject
-                .prepend(.loading(clearExistingRows: clearExistingRows))
-                .handleEvents(receiveCancel: {
-                    task.cancel()
-                })
-                .eraseToAnyPublisher()
+    func startSearching(clearExistingRows: Bool) {
+        loadMoreTask?.cancel()
+        pagination.startSearching(clearExistingRows: clearExistingRows)
+        loadMoreState = .hidden
+        if clearExistingRows || pagination.unsortedRows.isEmpty {
+            screenState = .loading
         }
-        .eraseToAnyPublisher()
     }
 
-    private func loadMore() {
-        guard let activeIntent else { return }
+    func finishSearch(
+        intent: MainSearchIntent,
+        page: MainSearchPage,
+        error: String?
+    ) {
+        guard let error else {
+            pagination.finishSearch(intent: intent, page: page)
+            applySortedResults()
+            return
+        }
 
-        requestState = .loadingMore
+        pagination.failSearch()
+        screenState = .error(error)
+        loadMoreState = .hidden
+    }
+}
+
+// MARK: - Pagination
+
+private extension MainSearchViewModel {
+    func loadMore() {
+        guard let activeIntent = pagination.activeIntent else { return }
+
+        pagination.startLoadingMore()
         loadMoreState = .loading
         loadMoreTask?.cancel()
-        let nextPage = currentPage + 1
+        let nextPage = pagination.nextPage
 
         loadMoreTask = Task { @MainActor [weak self] in
             guard let self else { return }
 
             do {
-                let page = try await self.service.searchPage(
-                    kind: activeIntent.kind,
-                    query: activeIntent.trimmedQuery,
-                    page: nextPage,
-                    limit: Self.searchResultLimit
+                let page = try await self.searchPublisherFactory.loadPage(
+                    for: activeIntent,
+                    page: nextPage
                 )
                 guard !Task.isCancelled else { return }
 
-                self.currentPage = page.currentPage
-                self.hasNextPage = page.hasNextPage
-                self.unsortedRows += page.rows
-                self.requestState = .idle
+                self.pagination.finishLoadMore(page: page)
                 self.applySortedResults()
             } catch {
                 guard !Task.isCancelled else { return }
-                self.requestState = .loadMoreError(error.localizedDescription)
-                self.loadMoreState = self.resolvedLoadMoreState()
+                self.pagination.failLoadMore(message: error.localizedDescription)
+                self.loadMoreState = self.presentationBuilder.loadMoreState(
+                    requestState: self.pagination.requestState,
+                    hasNextPage: self.pagination.hasNextPage
+                )
             }
         }
     }
+}
 
-    private func applySortedResults(using option: MainSearchSortOption? = nil) {
-        let sorted = sortedRows(from: unsortedRows, using: option ?? sortOption)
-        loadMoreTriggerIDs = Set(sorted.suffix(5).map(\.id))
-        if sorted.isEmpty {
-            let trimmedQuery = Self.trim(query)
-            screenState = trimmedQuery.isEmpty ? .emptyPrompt : .emptyResults(query: query)
+// MARK: - Presentation
+
+private extension MainSearchViewModel {
+    func applySortedResults(using option: MainSearchSortOption? = nil) {
+        let sortedRows = sorter.sortedRows(
+            from: pagination.unsortedRows,
+            using: option ?? sortOption
+        )
+        pagination.updateLoadMoreTriggers(from: sortedRows)
+
+        screenState = presentationBuilder.screenState(
+            query: query,
+            sortedRows: sortedRows
+        )
+
+        guard !sortedRows.isEmpty else {
             loadMoreState = .hidden
             return
         }
 
-        screenState = .content(sorted)
-        loadMoreState = resolvedLoadMoreState()
-    }
-
-    private func resolvedLoadMoreState() -> MainSearchLoadMoreState {
-        switch requestState {
-        case .loadingMore:
-            return .loading
-        case .loadMoreError(let message):
-            return .error(message)
-        case .idle, .searching:
-            return hasNextPage ? .available : .hidden
-        }
-    }
-
-    private var canStartLoadMore: Bool {
-        switch requestState {
-        case .idle, .loadMoreError:
-            return true
-        case .searching, .loadingMore:
-            return false
-        }
-    }
-
-    private func resetSearchState() {
-        loadMoreTask?.cancel()
-        activeIntent = nil
-        currentPage = 0
-        hasNextPage = false
-        loadMoreTriggerIDs = []
-        unsortedRows = []
-        requestState = .idle
-        screenState = .emptyPrompt
-        loadMoreState = .hidden
-    }
-
-    private func startSearching(clearExistingRows: Bool) {
-        loadMoreTask?.cancel()
-        if clearExistingRows {
-            activeIntent = nil
-            currentPage = 0
-            hasNextPage = false
-            unsortedRows = []
-        }
-        requestState = .searching
-        loadMoreState = .hidden
-        if clearExistingRows || unsortedRows.isEmpty {
-            screenState = .loading
-        }
-    }
-
-    private func finishSearch(page: MainSearchPage, error: String?) {
-        guard let error else {
-            activeIntent = SearchIntent(
-                trimmedQuery: Self.trim(query),
-                kind: kind,
-                event: .queryAdjusted
-            )
-            currentPage = page.currentPage
-            hasNextPage = page.hasNextPage
-            unsortedRows = page.rows
-            requestState = .idle
-            applySortedResults()
-            return
-        }
-
-        activeIntent = nil
-        currentPage = 0
-        hasNextPage = false
-        unsortedRows = []
-        requestState = .idle
-        screenState = .error(error)
-        loadMoreState = .hidden
-    }
-
-    private func sortedRows(
-        from rows: [MainSearchResultRow],
-        using option: MainSearchSortOption
-    ) -> [MainSearchResultRow] {
-        switch option {
-        case .default:
-            return rows
-        case .titleAscending:
-            return rows.sorted { lhs, rhs in
-                lhs.sortTitle.localizedCompare(rhs.sortTitle) == .orderedAscending
-            }
-        case .titleDescending:
-            return rows.sorted { lhs, rhs in
-                lhs.sortTitle.localizedCompare(rhs.sortTitle) == .orderedDescending
-            }
-        case .newest:
-            return rows.sorted { lhs, rhs in
-                switch (lhs.year, rhs.year) {
-                case let (left?, right?):
-                    if left == right {
-                        return lhs.sortTitle.localizedCompare(rhs.sortTitle) == .orderedAscending
-                    }
-                    return left > right
-                case (.some, .none):
-                    return true
-                case (.none, .some):
-                    return false
-                case (.none, .none):
-                    return lhs.sortTitle.localizedCompare(rhs.sortTitle) == .orderedAscending
-                }
-            }
-        case .oldest:
-            return rows.sorted { lhs, rhs in
-                switch (lhs.year, rhs.year) {
-                case let (left?, right?):
-                    if left == right {
-                        return lhs.sortTitle.localizedCompare(rhs.sortTitle) == .orderedAscending
-                    }
-                    return left < right
-                case (.some, .none):
-                    return true
-                case (.none, .some):
-                    return false
-                case (.none, .none):
-                    return lhs.sortTitle.localizedCompare(rhs.sortTitle) == .orderedAscending
-                }
-            }
-        case .popularityDescending:
-            return rows.sorted { lhs, rhs in
-                switch (lhs.popularityScore, rhs.popularityScore) {
-                case let (left?, right?):
-                    if left == right {
-                        return lhs.sortTitle.localizedCompare(rhs.sortTitle) == .orderedAscending
-                    }
-                    return left > right
-                case (.some, .none):
-                    return true
-                case (.none, .some):
-                    return false
-                case (.none, .none):
-                    return lhs.sortTitle.localizedCompare(rhs.sortTitle) == .orderedAscending
-                }
-            }
-        case .popularityAscending:
-            return rows.sorted { lhs, rhs in
-                switch (lhs.popularityScore, rhs.popularityScore) {
-                case let (left?, right?):
-                    if left == right {
-                        return lhs.sortTitle.localizedCompare(rhs.sortTitle) == .orderedAscending
-                    }
-                    return left < right
-                case (.some, .none):
-                    return true
-                case (.none, .some):
-                    return false
-                case (.none, .none):
-                    return lhs.sortTitle.localizedCompare(rhs.sortTitle) == .orderedAscending
-                }
-            }
-        }
+        loadMoreState = presentationBuilder.loadMoreState(
+            requestState: pagination.requestState,
+            hasNextPage: pagination.hasNextPage
+        )
     }
 }
