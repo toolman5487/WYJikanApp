@@ -23,6 +23,12 @@ struct MainTabBarView: View {
                 } label: {
                     Image(systemName: viewModel.selectedTab == .categorylist ? "film.stack.fill" : "film.stack")
                 }
+
+                Tab(value: AppTab.news) {
+                    MainNewsView()
+                } label: {
+                    Image(systemName: viewModel.selectedTab == .news ? "newspaper.fill" : "newspaper")
+                }
                 
                 Tab(value: AppTab.myList) {
                     MainMyListView()

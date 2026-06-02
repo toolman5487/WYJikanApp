@@ -8,6 +8,7 @@ import Combine
 enum AppTab: Hashable {
     case home
     case categorylist
+    case news
     case myList
     case searchLiquidGlass
 }

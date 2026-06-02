@@ -202,6 +202,17 @@
 		16A200312FB4000000D1E001 /* AnimeDetailEpisodesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A200302FB4000000D1E001 /* AnimeDetailEpisodesModel.swift */; };
 		16A200332FB4000000D1E001 /* AnimeDetailEpisodeRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A200322FB4000000D1E001 /* AnimeDetailEpisodeRowView.swift */; };
 		16A200342FB4000000D1E001 /* AnimeDetailEpisodesLoadMoreFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A200352FB4000000D1E001 /* AnimeDetailEpisodesLoadMoreFooterView.swift */; };
+		16AA10022FCF300000000002 /* MainNewsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AA10012FCF300000000001 /* MainNewsModel.swift */; };
+		16AA10042FCF300000000004 /* MainNewsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AA10032FCF300000000003 /* MainNewsService.swift */; };
+		16AA10122FCF310000000012 /* MainNewsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AA10112FCF310000000011 /* MainNewsViewModel.swift */; };
+		16AA10142FCF310000000014 /* MainNewsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AA10132FCF310000000013 /* MainNewsView.swift */; };
+		16AA10162FCF310000000016 /* MainNewsHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AA10152FCF310000000015 /* MainNewsHeaderView.swift */; };
+		16AA10182FCF310000000018 /* MainNewsSourceFilterBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AA10172FCF310000000017 /* MainNewsSourceFilterBarView.swift */; };
+		16AA101A2FCF31000000001A /* MainNewsArticleRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AA10192FCF310000000019 /* MainNewsArticleRowView.swift */; };
+		16AA101C2FCF31000000001C /* MainNewsLoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AA101B2FCF31000000001B /* MainNewsLoadingView.swift */; };
+		16AA101E2FCF31000000001E /* MainNewsEmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AA101D2FCF31000000001D /* MainNewsEmptyStateView.swift */; };
+		16AA10202FCF310000000020 /* MainNewsErrorStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AA101F2FCF31000000001F /* MainNewsErrorStateView.swift */; };
+		16AA10262FCF320000000026 /* MainNewsPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AA10252FCF320000000025 /* MainNewsPresentation.swift */; };
 		16B100022F8A000000000002 /* CharacterListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B100012F8A000000000001 /* CharacterListView.swift */; };
 		16B100042F8A000000000004 /* CharacterListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B100032F8A000000000003 /* CharacterListViewModel.swift */; };
 		16B100062F8A000000000006 /* CharacterListContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B100052F8A000000000005 /* CharacterListContentView.swift */; };
@@ -484,6 +495,17 @@
 		16A200302FB4000000D1E001 /* AnimeDetailEpisodesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeDetailEpisodesModel.swift; sourceTree = "<group>"; };
 		16A200322FB4000000D1E001 /* AnimeDetailEpisodeRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeDetailEpisodeRowView.swift; sourceTree = "<group>"; };
 		16A200352FB4000000D1E001 /* AnimeDetailEpisodesLoadMoreFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeDetailEpisodesLoadMoreFooterView.swift; sourceTree = "<group>"; };
+		16AA10012FCF300000000001 /* MainNewsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainNewsModel.swift; sourceTree = "<group>"; };
+		16AA10032FCF300000000003 /* MainNewsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainNewsService.swift; sourceTree = "<group>"; };
+		16AA10112FCF310000000011 /* MainNewsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainNewsViewModel.swift; sourceTree = "<group>"; };
+		16AA10132FCF310000000013 /* MainNewsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainNewsView.swift; sourceTree = "<group>"; };
+		16AA10152FCF310000000015 /* MainNewsHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainNewsHeaderView.swift; sourceTree = "<group>"; };
+		16AA10172FCF310000000017 /* MainNewsSourceFilterBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainNewsSourceFilterBarView.swift; sourceTree = "<group>"; };
+		16AA10192FCF310000000019 /* MainNewsArticleRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainNewsArticleRowView.swift; sourceTree = "<group>"; };
+		16AA101B2FCF31000000001B /* MainNewsLoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainNewsLoadingView.swift; sourceTree = "<group>"; };
+		16AA101D2FCF31000000001D /* MainNewsEmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainNewsEmptyStateView.swift; sourceTree = "<group>"; };
+		16AA101F2FCF31000000001F /* MainNewsErrorStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainNewsErrorStateView.swift; sourceTree = "<group>"; };
+		16AA10252FCF320000000025 /* MainNewsPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainNewsPresentation.swift; sourceTree = "<group>"; };
 		16B100012F8A000000000001 /* CharacterListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterListView.swift; sourceTree = "<group>"; };
 		16B100032F8A000000000003 /* CharacterListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterListViewModel.swift; sourceTree = "<group>"; };
 		16B100052F8A000000000005 /* CharacterListContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterListContentView.swift; sourceTree = "<group>"; };
@@ -730,6 +752,17 @@
 				15FF296A2F763B4300D3241C /* AnimeDetailViewModel.swift */,
 			);
 			path = MainViewModel;
+			sourceTree = "<group>";
+		};
+		1557EA622FCF21FF0034A77C /* MainNEWS */ = {
+			isa = PBXGroup;
+			children = (
+				16AA10052FCF300000000005 /* Model */,
+				16AA10062FCF300000000006 /* Service */,
+				16AA10222FCF310000000022 /* View */,
+				16AA10212FCF310000000021 /* ViewModel */,
+			);
+			path = MainNEWS;
 			sourceTree = "<group>";
 		};
 		155A9C032F782C2200F1E4F0 /* SkeletonBar */ = {
@@ -1634,6 +1667,7 @@
 				15A295532F86300F0056071F /* MainCategoryList */,
 				15FCF8832F73C25A0054153E /* MainHome */,
 				15FA49FD2F97C7F900EC4C09 /* MainMyList */,
+				1557EA622FCF21FF0034A77C /* MainNEWS */,
 				15A80E3D2F7E55DF00DDB201 /* MainSearch */,
 				15134BB62F7269BD002DBB76 /* MainTabBar */,
 				15A8B7292F7E0D8100DDB201 /* Manga */,
@@ -2106,6 +2140,61 @@
 				16F6A0012FC200000000001 /* AnimeDetailEpisodeRowPresenter.swift */,
 			);
 			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		16AA10052FCF300000000005 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				16AA10012FCF300000000001 /* MainNewsModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		16AA10062FCF300000000006 /* Service */ = {
+			isa = PBXGroup;
+			children = (
+				16AA10032FCF300000000003 /* MainNewsService.swift */,
+			);
+			path = Service;
+			sourceTree = "<group>";
+		};
+		16AA10212FCF310000000021 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				16AA10112FCF310000000011 /* MainNewsViewModel.swift */,
+				16AA10252FCF320000000025 /* MainNewsPresentation.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		16AA10222FCF310000000022 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				16AA10232FCF310000000023 /* MainView */,
+				16AA10242FCF310000000024 /* SubView */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		16AA10232FCF310000000023 /* MainView */ = {
+			isa = PBXGroup;
+			children = (
+				16AA10132FCF310000000013 /* MainNewsView.swift */,
+			);
+			path = MainView;
+			sourceTree = "<group>";
+		};
+		16AA10242FCF310000000024 /* SubView */ = {
+			isa = PBXGroup;
+			children = (
+				16AA10152FCF310000000015 /* MainNewsHeaderView.swift */,
+				16AA10172FCF310000000017 /* MainNewsSourceFilterBarView.swift */,
+				16AA10192FCF310000000019 /* MainNewsArticleRowView.swift */,
+				16AA101B2FCF31000000001B /* MainNewsLoadingView.swift */,
+				16AA101D2FCF31000000001D /* MainNewsEmptyStateView.swift */,
+				16AA101F2FCF31000000001F /* MainNewsErrorStateView.swift */,
+			);
+			path = SubView;
 			sourceTree = "<group>";
 		};
 		16B101012F8A000000000001 /* View */ = {
@@ -2810,6 +2899,17 @@
 				15AFDCB32FA6527900C707FD /* MangaCategoryDetailModel.swift in Sources */,
 				15AFDCB42FA6527900C707FD /* MangaCategoryDetailService.swift in Sources */,
 				15AFDCB52FA6527900C707FD /* MangaCategoryDetailViewModel.swift in Sources */,
+				16AA10022FCF300000000002 /* MainNewsModel.swift in Sources */,
+				16AA10042FCF300000000004 /* MainNewsService.swift in Sources */,
+				16AA10122FCF310000000012 /* MainNewsViewModel.swift in Sources */,
+				16AA10142FCF310000000014 /* MainNewsView.swift in Sources */,
+				16AA10162FCF310000000016 /* MainNewsHeaderView.swift in Sources */,
+				16AA10182FCF310000000018 /* MainNewsSourceFilterBarView.swift in Sources */,
+				16AA101A2FCF31000000001A /* MainNewsArticleRowView.swift in Sources */,
+				16AA101C2FCF31000000001C /* MainNewsLoadingView.swift in Sources */,
+				16AA101E2FCF31000000001E /* MainNewsEmptyStateView.swift in Sources */,
+				16AA10202FCF310000000020 /* MainNewsErrorStateView.swift in Sources */,
+				16AA10262FCF320000000026 /* MainNewsPresentation.swift in Sources */,
 				1555A23A2F7B951000501496 /* AnimeDetailViewModel+DisplayPolicy.swift in Sources */,
 				1574ECAB2F7CB30F00E37AE8 /* MangaDetailService.swift in Sources */,
 				15CF35722F8100D900384C5C /* CapsuleTagScrollView.swift in Sources */,

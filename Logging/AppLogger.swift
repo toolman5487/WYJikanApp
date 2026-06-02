@@ -8,7 +8,7 @@ import OSLog
 
 // MARK: - AppLogCategory
 
-enum AppLogCategory: String, CaseIterable, Sendable {
+nonisolated enum AppLogCategory: String, CaseIterable, Sendable {
 
     case app = "App"
     case lifecycle = "Lifecycle"
@@ -34,14 +34,14 @@ enum AppLogCategory: String, CaseIterable, Sendable {
     case search = "Search"
     case configuration = "Configuration"
 
-    var logger: Logger {
+    nonisolated var logger: Logger {
         Logger(subsystem: AppLogger.subsystem, category: rawValue)
     }
 }
 
 // MARK: - AppLogger
 
-enum AppLogger {
+nonisolated enum AppLogger {
 
     static let subsystem = Bundle.main.bundleIdentifier ?? "WYJikanApp"
 
