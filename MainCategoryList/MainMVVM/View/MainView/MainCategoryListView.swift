@@ -20,16 +20,7 @@ struct MainCategoryListView: View {
     var body: some View {
         NavigationStack {
             scrollView
-                .toolbar {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button {
-                            viewModel.reloadSelectedKind()
-                        } label: {
-                            Image(systemName: "arrow.trianglehead.counterclockwise")
-                                .font(.body.weight(.bold))
-                        }
-                    }
-                }
+                .toolbar(.hidden, for: .navigationBar)
                 .onDisappear {
                     viewModel.stopLoading()
                 }
@@ -44,7 +35,7 @@ struct MainCategoryListView: View {
                 Color.clear
                     .frame(height: 0)
                     .id(topAnchorId)
-                
+
                 selectedContentView
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal)
@@ -52,19 +43,7 @@ struct MainCategoryListView: View {
                     .id(viewModel.selectedKind)
             }
             .safeAreaInset(edge: .top, spacing: 0) {
-                HStack(alignment: .center, spacing: 12) {
-                    CapsuleFilterBarView(
-                        tags: MainListKind.categoryTags,
-                        title: { $0.title },
-                        selection: $viewModel.selectedKind
-                    )
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    
-                    topFilterMenu
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
-                .background(.ultraThinMaterial)
+                topFilterHeader
             }
             .onChange(of: viewModel.selectedKind) { _, _ in
                 proxy.scrollTo(topAnchorId, anchor: .top)
@@ -76,6 +55,24 @@ struct MainCategoryListView: View {
                 }
             }
         }
+    }
+
+    private var topFilterHeader: some View {
+        HStack(alignment: .center, spacing: 12) {
+            CapsuleFilterBarView(
+                tags: MainListKind.categoryTags,
+                title: { $0.title },
+                selection: $viewModel.selectedKind
+            )
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            topFilterMenu
+
+            reloadButton
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background(Color.clear)
     }
     
     // MARK: - Selected Content
@@ -125,6 +122,18 @@ struct MainCategoryListView: View {
             }
             .accessibilityValue(menu.accessibilityValue)
         }
+    }
+
+    private var reloadButton: some View {
+        Button {
+            viewModel.reloadSelectedKind()
+        } label: {
+            Image(systemName: "arrow.trianglehead.counterclockwise")
+                .font(.title3.weight(.bold))
+                .foregroundStyle(ThemeColor.textPrimary)
+                .frame(width: 40, height: 40)
+        }
+        .buttonStyle(.plain)
     }
 }
 

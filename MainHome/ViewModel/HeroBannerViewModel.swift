@@ -13,10 +13,50 @@ enum HeroBannerScreenState: Equatable {
     case error(String)
     case empty
     case content([BannerItem])
+
+    var items: [BannerItem] {
+        switch self {
+        case .content(let items):
+            return items
+        case .loading, .error, .empty:
+            return []
+        }
+    }
+
+    var hasContent: Bool {
+        switch self {
+        case .content:
+            return true
+        case .loading, .error, .empty:
+            return false
+        }
+    }
 }
 
 @MainActor
 final class HeroBannerViewModel: ObservableObject {
+    private enum LoadState {
+        case idle
+        case loading(Task<Void, Never>)
+
+        nonisolated var task: Task<Void, Never>? {
+            switch self {
+            case .idle:
+                return nil
+            case .loading(let task):
+                return task
+            }
+        }
+
+        nonisolated var isLoading: Bool {
+            switch self {
+            case .idle:
+                return false
+            case .loading:
+                return true
+            }
+        }
+    }
     
     let emptyStateMessage: String
     private static let maxBannerItems = 15
@@ -26,9 +66,8 @@ final class HeroBannerViewModel: ObservableObject {
     @Published private(set) var currentIndex: Int = 0
 
     private let service: MainHomeServicing
-    private var loadTask: Task<Void, Never>?
+    private var loadState: LoadState = .idle
     private var autoScrollTask: Task<Void, Never>?
-    private var isLoading = false
 
     init(
         service: MainHomeServicing = MainHomeService(),
@@ -39,22 +78,22 @@ final class HeroBannerViewModel: ObservableObject {
     }
 
     deinit {
-        loadTask?.cancel()
+        loadState.task?.cancel()
         autoScrollTask?.cancel()
     }
 
     func loadIfNeeded() {
-        guard items.isEmpty, !isLoading else { return }
+        guard items.isEmpty, !loadState.isLoading else { return }
         load()
     }
 
     func refresh() async {
-        if let loadTask, isLoading {
-            await loadTask.value
+        if let task = loadState.task {
+            await task.value
             return
         }
 
-        let task = startLoad(forceRefresh: true, showsLoadingState: !hasContent)
+        let task = startLoad(forceRefresh: true, showsLoadingState: !screenState.hasContent)
         await task.value
     }
 
@@ -83,25 +122,11 @@ final class HeroBannerViewModel: ObservableObject {
     }
 
     var items: [BannerItem] {
-        switch screenState {
-        case .content(let items):
-            return items
-        case .loading, .error, .empty:
-            return []
-        }
-    }
-
-    private var hasContent: Bool {
-        switch screenState {
-        case .content:
-            return true
-        case .loading, .error, .empty:
-            return false
-        }
+        screenState.items
     }
 
     func load() {
-        guard !isLoading else { return }
+        guard !loadState.isLoading else { return }
         _ = startLoad(forceRefresh: false, showsLoadingState: true)
     }
 
@@ -129,10 +154,8 @@ final class HeroBannerViewModel: ObservableObject {
         let previousState = screenState
         let previousIndex = currentIndex
         stopAutoScroll()
-        isLoading = true
         defer {
-            isLoading = false
-            loadTask = nil
+            loadState = .idle
         }
 
         if showsLoadingState {
@@ -189,20 +212,20 @@ final class HeroBannerViewModel: ObservableObject {
             guard let self else { return }
             await self.performLoad(forceRefresh: forceRefresh, showsLoadingState: showsLoadingState)
         }
-        loadTask = task
+        loadState = .loading(task)
         return task
     }
 
     private static func displayTitle(japanese: String?, english: String?, fallback: String?) -> String {
-        if let japanese, !japanese.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            return japanese
+        switch [
+            japanese?.trimmingCharacters(in: .whitespacesAndNewlines),
+            english?.trimmingCharacters(in: .whitespacesAndNewlines),
+            fallback?.trimmingCharacters(in: .whitespacesAndNewlines)
+        ].compactMap({ $0 }).first(where: { !$0.isEmpty }) {
+        case .some(let title):
+            return title
+        case .none:
+            return "未命名作品"
         }
-        if let english, !english.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            return english
-        }
-        if let fallback, !fallback.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            return fallback
-        }
-        return "未命名作品"
     }
 }

@@ -130,8 +130,10 @@ struct MangaDetailView: View {
                         AnimeDetailBasicInfoSectionSkeletonView()
                         MangaDetailScoreSectionSkeletonView()
                         MangaDetailSynopsisSectionSkeletonView()
+                        MangaDetailCharactersSectionSkeletonView()
                         MangaDetailPublicationSectionSkeletonView()
                         AnimeDetailPicturesSectionSkeletonView()
+                        MangaDetailRecommendationsSectionSkeletonView()
                     }
                     .padding()
                     .frame(maxWidth: .infinity, alignment: .leading)

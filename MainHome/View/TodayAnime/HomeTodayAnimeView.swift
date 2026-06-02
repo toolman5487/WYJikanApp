@@ -17,7 +17,7 @@ struct HomeTodayAnimeView: View {
 
     let showsHeader: Bool
 
-    private let cardWidth: CGFloat = 240 * (2.0 / 3.0)
+    private let cardSize = MainHomePosterCardMetrics.size
 
     // MARK: - Lifecycle
 
@@ -43,22 +43,22 @@ struct HomeTodayAnimeView: View {
             }
 
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 16) {
+                LazyHStack(spacing: 16) {
                     switch viewModel.screenState {
                     case .loading:
                         ForEach(0..<10, id: \.self) { _ in
                             BannerSkeletonView()
-                                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                                .frame(width: cardWidth, height: 240)
+                                .clipShape(RoundedRectangle(cornerRadius: MainHomePosterCardMetrics.cornerRadius, style: .continuous))
+                                .frame(width: cardSize.width, height: cardSize.height)
                         }
 
                     case .error(let errorMessage):
-                        ErrorMessageView(state: .network(errorMessage), height: 240)
-                            .frame(width: cardWidth)
+                        ErrorMessageView(state: .network(errorMessage), height: cardSize.height)
+                            .frame(width: cardSize.width)
 
                     case .empty:
-                        ErrorMessageView(state: .emptyCollection("尚無資料"), height: 240)
-                            .frame(width: cardWidth)
+                        ErrorMessageView(state: .emptyCollection("尚無資料"), height: cardSize.height)
+                            .frame(width: cardSize.width)
 
                     case .content:
                         ForEach(viewModel.items) { item in
@@ -87,25 +87,13 @@ private struct HomeTodayAnimeCardView: View {
     let item: HomeTodayAnimeCardItem
     let isFavorite: Bool
 
-    @State private var imageSize: CGSize?
-
-    private let cardSize = CGSize(width: 240 * (2.0 / 3.0), height: 240)
-
-    private var imageContentMode: ContentMode {
-        guard let imageSize, imageSize.width > imageSize.height else {
-            return .fill
-        }
-        return .fit
-    }
+    private let cardSize = MainHomePosterCardMetrics.size
 
     var body: some View {
         PosterCardView {
             RemotePosterImageView(
                 url: item.imageURL,
-                contentMode: imageContentMode,
-                onImageSizeChange: { size in
-                    imageSize = size
-                }
+                fixedSize: cardSize
             )
         }
         .frame(width: cardSize.width, height: cardSize.height)
@@ -119,9 +107,6 @@ private struct HomeTodayAnimeCardView: View {
         .overlay(alignment: .topTrailing) {
             MyListCollectionStatusBadgeView(isFavorite: isFavorite)
                 .padding(8)
-        }
-        .onChange(of: item.imageURL) { _, _ in
-            imageSize = nil
         }
     }
 }

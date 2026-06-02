@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct CapsuleFilterBarView<Tag: Hashable>: View {
+    // MARK: - Properties
+
     @Namespace private var selectionAnimationNamespace
 
     let tags: [Tag]
@@ -16,6 +18,8 @@ struct CapsuleFilterBarView<Tag: Hashable>: View {
     var selection: Binding<Tag>
     var selectionAnimation: Animation? = .easeInOut(duration: 0.22)
     var onTap: ((Tag) -> Void)? = nil
+
+    // MARK: - Body
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
@@ -39,6 +43,8 @@ struct CapsuleFilterBarView<Tag: Hashable>: View {
             .padding(.vertical, 4)
         }
     }
+
+    // MARK: - Private Methods
 
     private func filterItem(for tag: Tag) -> some View {
         let isSelected = selection.wrappedValue == tag

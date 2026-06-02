@@ -42,6 +42,26 @@ struct AnimeDetailBasicInfoSectionSkeletonView: View {
     }
 }
 
+// MARK: - Episodes
+
+struct AnimeDetailEpisodesEntrySectionSkeletonView: View {
+    var body: some View {
+        AnimeDetailSectionCard("集數") {
+            HStack(alignment: .center, spacing: 16) {
+                VStack(alignment: .leading, spacing: 8) {
+                    SkeletonBar(width: 136, height: 20, cornerRadius: 8)
+                    SkeletonBar(width: 220, height: 14, cornerRadius: 7)
+                }
+
+                Spacer(minLength: 0)
+
+                SkeletonBar(width: 24, height: 24, cornerRadius: 12)
+            }
+            .padding(.vertical, 4)
+        }
+    }
+}
+
 // MARK: - Score
 
 struct AnimeDetailScoreSectionSkeletonView: View {
@@ -79,6 +99,14 @@ struct AnimeDetailSynopsisSectionSkeletonView: View {
     }
 }
 
+// MARK: - Characters
+
+struct AnimeDetailCharactersSectionSkeletonView: View {
+    var body: some View {
+        AnimeDetailHorizontalCardSectionSkeletonView(titleWidth: 96, actionWidth: 64)
+    }
+}
+
 // MARK: - Staff
 
 struct AnimeDetailStaffSectionSkeletonView: View {
@@ -94,6 +122,48 @@ struct AnimeDetailStaffSectionSkeletonView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
+    }
+}
+
+// MARK: - Recommendations
+
+struct AnimeDetailRecommendationsSectionSkeletonView: View {
+    var body: some View {
+        AnimeDetailHorizontalCardSectionSkeletonView(titleWidth: 112, actionWidth: 64)
+    }
+}
+
+// MARK: - Shared
+
+struct AnimeDetailHorizontalCardSectionSkeletonView: View {
+    let titleWidth: CGFloat
+    let actionWidth: CGFloat
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .center) {
+                SkeletonBar(width: titleWidth, height: 24, cornerRadius: 8)
+
+                Spacer(minLength: 0)
+
+                SkeletonBar(width: actionWidth, height: 18, cornerRadius: 8)
+            }
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(alignment: .top, spacing: 12) {
+                    ForEach(0..<3, id: \.self) { _ in
+                        VStack(alignment: .leading, spacing: 10) {
+                            SkeletonBar(width: 160, height: 240, cornerRadius: 16)
+                            SkeletonBar(width: 136, height: 16, cornerRadius: 8)
+                            SkeletonBar(width: 104, height: 14, cornerRadius: 7)
+                        }
+                        .frame(width: 160, alignment: .leading)
+                    }
+                }
+                .padding(.vertical, 4)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 

@@ -91,3 +91,19 @@ struct MangaDetailPublicationSectionSkeletonView: View {
         }
     }
 }
+
+// MARK: - Characters
+
+struct MangaDetailCharactersSectionSkeletonView: View {
+    var body: some View {
+        AnimeDetailHorizontalCardSectionSkeletonView(titleWidth: 48, actionWidth: 64)
+    }
+}
+
+// MARK: - Recommendations
+
+struct MangaDetailRecommendationsSectionSkeletonView: View {
+    var body: some View {
+        AnimeDetailHorizontalCardSectionSkeletonView(titleWidth: 112, actionWidth: 64)
+    }
+}

@@ -15,13 +15,36 @@ final class CharacterDetailViewModel: ObservableObject {
         case loading
         case loaded(CharacterDetailDTO)
         case error(String)
+
+        var detail: CharacterDetailDTO? {
+            switch self {
+            case .loaded(let detail):
+                return detail
+            case .loading, .error:
+                return nil
+            }
+        }
+    }
+
+    private enum LoadState {
+        case idle
+        case loading
+
+        var isLoading: Bool {
+            switch self {
+            case .idle:
+                return false
+            case .loading:
+                return true
+            }
+        }
     }
 
     @Published private(set) var screenState: ScreenState = .loading
 
     private let malId: Int
     private let service: CharacterDetailServicing
-    private var isLoading = false
+    private var loadState: LoadState = .idle
 
     init(malId: Int, service: CharacterDetailServicing = CharacterDetailService()) {
         self.malId = malId
@@ -29,20 +52,15 @@ final class CharacterDetailViewModel: ObservableObject {
     }
 
     var detail: CharacterDetailDTO? {
-        switch screenState {
-        case .loaded(let detail):
-            return detail
-        case .loading, .error:
-            return nil
-        }
+        screenState.detail
     }
 
     func load() async {
-        guard detail == nil, !isLoading else { return }
+        guard detail == nil, !loadState.isLoading else { return }
 
-        isLoading = true
+        loadState = .loading
         screenState = .loading
-        defer { isLoading = false }
+        defer { loadState = .idle }
 
         do {
             let response = try await service.fetchCharacterDetail(malId: malId)

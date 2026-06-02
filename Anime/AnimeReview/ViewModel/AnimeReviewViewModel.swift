@@ -15,6 +15,15 @@ final class AnimeReviewViewModel: ObservableObject {
         case error(String)
         case empty
         case content([AnimeReviewEntryDTO])
+
+        var reviews: [AnimeReviewEntryDTO] {
+            switch self {
+            case .content(let reviews):
+                return reviews
+            case .loading, .error, .empty:
+                return []
+            }
+        }
     }
 
     enum LoadMoreState: Equatable {
@@ -24,14 +33,28 @@ final class AnimeReviewViewModel: ObservableObject {
         case error(String)
     }
 
+    private enum LoadingPhase {
+        case idle
+        case initial
+        case loadingMore
+
+        var isIdle: Bool {
+            switch self {
+            case .idle:
+                return true
+            case .initial, .loadingMore:
+                return false
+            }
+        }
+    }
+
     @Published private(set) var screenState: ScreenState = .loading
     @Published private(set) var loadMoreState: LoadMoreState = .hidden
 
     private let malId: Int
     private let service: AnimeReviewServicing
     private var loadedPage = 0
-    private var isLoading = false
-    private var isLoadingMore = false
+    private var loadingPhase: LoadingPhase = .idle
     private var hasNextPage = false
 
     init(malId: Int, service: AnimeReviewServicing = AnimeReviewService()) {
@@ -40,21 +63,16 @@ final class AnimeReviewViewModel: ObservableObject {
     }
 
     var reviews: [AnimeReviewEntryDTO] {
-        switch screenState {
-        case .content(let reviews):
-            return reviews
-        case .loading, .error, .empty:
-            return []
-        }
+        screenState.reviews
     }
 
     // MARK: - Load
 
     func load() async {
-        guard !isLoading else { return }
-        isLoading = true
+        guard loadingPhase.isIdle else { return }
+        loadingPhase = .initial
         screenState = .loading
-        defer { isLoading = false }
+        defer { loadingPhase = .idle }
 
         loadedPage = 0
         hasNextPage = false
@@ -74,10 +92,10 @@ final class AnimeReviewViewModel: ObservableObject {
     }
 
     func loadMore() async {
-        guard hasNextPage, !isLoadingMore, !isLoading, loadedPage > 0 else { return }
-        isLoadingMore = true
+        guard hasNextPage, loadingPhase.isIdle, loadedPage > 0 else { return }
+        loadingPhase = .loadingMore
         loadMoreState = .loading
-        defer { isLoadingMore = false }
+        defer { loadingPhase = .idle }
 
         let nextPage = loadedPage + 1
         do {

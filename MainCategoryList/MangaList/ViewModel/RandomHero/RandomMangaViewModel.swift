@@ -26,24 +26,30 @@ final class RandomMangaViewModel: ObservableObject {
     @Published private(set) var randomPick: MangaListRandomDTO?
 
     var isDrawing: Bool {
-        if case .loading = drawState {
+        switch drawState {
+        case .loading:
             return true
+        case .idle, .ready, .failure, .cooldown:
+            return false
         }
-        return false
     }
 
     var drawError: String? {
-        if case .failure(let message) = drawState {
+        switch drawState {
+        case .failure(let message):
             return message
+        case .idle, .loading, .ready, .cooldown:
+            return nil
         }
-        return nil
     }
 
     var cooldownRemainingSeconds: Int {
-        if case .cooldown(let seconds) = drawState {
+        switch drawState {
+        case .cooldown(let seconds):
             return seconds
+        case .idle, .loading, .ready, .failure:
+            return 0
         }
-        return 0
     }
 
     var cooldownDisplayText: String {

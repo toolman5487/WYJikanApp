@@ -17,7 +17,7 @@ struct HomeTrendingMangaView: View {
 
     let showsHeader: Bool
 
-    private let cardWidth: CGFloat = 240 * (2.0 / 3.0)
+    private let cardSize = MainHomePosterCardMetrics.size
 
     // MARK: - Lifecycle
 
@@ -43,22 +43,22 @@ struct HomeTrendingMangaView: View {
             }
 
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 16) {
+                LazyHStack(spacing: 16) {
                     switch viewModel.screenState {
                     case .loading:
                         ForEach(0..<10, id: \.self) { _ in
                             BannerSkeletonView()
-                                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                                .frame(width: cardWidth, height: 240)
+                                .clipShape(RoundedRectangle(cornerRadius: MainHomePosterCardMetrics.cornerRadius, style: .continuous))
+                                .frame(width: cardSize.width, height: cardSize.height)
                         }
 
                     case .error(let errorMessage):
-                        ErrorMessageView(state: .network(errorMessage), height: 240)
-                            .frame(width: cardWidth)
+                        ErrorMessageView(state: .network(errorMessage), height: cardSize.height)
+                            .frame(width: cardSize.width)
 
                     case .empty:
-                        ErrorMessageView(state: .emptyCollection("尚無資料"), height: 240)
-                            .frame(width: cardWidth)
+                        ErrorMessageView(state: .emptyCollection("尚無資料"), height: cardSize.height)
+                            .frame(width: cardSize.width)
 
                     case .content:
                         ForEach(viewModel.items) { item in
@@ -66,9 +66,12 @@ struct HomeTrendingMangaView: View {
                                 router.push(.mangaDetail(malId: item.id))
                             } label: {
                                 PosterCardView(rank: item.rank) {
-                                    RemotePosterImageView(url: item.imageURL)
+                                    RemotePosterImageView(
+                                        url: item.imageURL,
+                                        fixedSize: cardSize
+                                    )
                                 }
-                                .frame(width: cardWidth, height: 240)
+                                .frame(width: cardSize.width, height: cardSize.height)
                                 .overlay(alignment: .bottomLeading) {
                                     PosterCardMetadataOverlayView(
                                         title: item.title,

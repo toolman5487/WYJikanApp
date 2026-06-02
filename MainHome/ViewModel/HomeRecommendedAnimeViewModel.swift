@@ -13,10 +13,51 @@ enum HomeRecommendedAnimeScreenState: Equatable {
     case error(String)
     case empty
     case content([HomeRecommendedAnimeCardItem])
+
+    var items: [HomeRecommendedAnimeCardItem] {
+        switch self {
+        case .content(let items):
+            return items
+        case .loading, .error, .empty:
+            return []
+        }
+    }
+
+    var hasContent: Bool {
+        switch self {
+        case .content:
+            return true
+        case .loading, .error, .empty:
+            return false
+        }
+    }
 }
 
 @MainActor
 final class HomeRecommendedAnimeViewModel: ObservableObject {
+    private enum LoadState {
+        case idle
+        case loading(Task<Void, Never>)
+
+        nonisolated var task: Task<Void, Never>? {
+            switch self {
+            case .idle:
+                return nil
+            case .loading(let task):
+                return task
+            }
+        }
+
+        nonisolated var isLoading: Bool {
+            switch self {
+            case .idle:
+                return false
+            case .loading:
+                return true
+            }
+        }
+    }
+
     private static let initialVisibleCards = 9
     private static let loadMoreStep = 9
     private static let maxCards = 30
@@ -27,26 +68,20 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
     @Published private(set) var visibleCount: Int = 9
 
     private let service: MainHomeServicing
-    private var loadTask: Task<Void, Never>?
+    private var loadState: LoadState = .idle
     private var titleEnrichmentTask: Task<Void, Never>?
-    private var isLoading = false
 
     init(service: MainHomeServicing = MainHomeService()) {
         self.service = service
     }
 
     deinit {
-        loadTask?.cancel()
+        loadState.task?.cancel()
         titleEnrichmentTask?.cancel()
     }
 
     private var allItems: [HomeRecommendedAnimeCardItem] {
-        switch screenState {
-        case .content(let items):
-            return items
-        case .loading, .error, .empty:
-            return []
-        }
+        screenState.items
     }
 
     var displayedItems: [HomeRecommendedAnimeCardItem] {
@@ -58,22 +93,22 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
     }
 
     func loadIfNeeded() {
-        guard allItems.isEmpty, !isLoading else { return }
+        guard allItems.isEmpty, !loadState.isLoading else { return }
         load()
     }
 
     func refresh() async {
-        if let loadTask, isLoading {
-            await loadTask.value
+        if let task = loadState.task {
+            await task.value
             return
         }
 
-        let task = startLoad(forceRefresh: true, showsLoadingState: !hasContent)
+        let task = startLoad(forceRefresh: true, showsLoadingState: !screenState.hasContent)
         await task.value
     }
 
     func load() {
-        guard !isLoading else { return }
+        guard !loadState.isLoading else { return }
         _ = startLoad(forceRefresh: false, showsLoadingState: true)
     }
 
@@ -81,23 +116,12 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
         visibleCount = min(visibleCount + Self.loadMoreStep, allItems.count)
     }
 
-    private var hasContent: Bool {
-        switch screenState {
-        case .content:
-            return true
-        case .loading, .error, .empty:
-            return false
-        }
-    }
-
     private func performLoad(forceRefresh: Bool, showsLoadingState: Bool) async {
         let previousState = screenState
         let previousVisibleCount = visibleCount
         titleEnrichmentTask?.cancel()
-        isLoading = true
         defer {
-            isLoading = false
-            loadTask = nil
+            loadState = .idle
         }
 
         if showsLoadingState {
@@ -139,14 +163,14 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
             visibleCount = resolvedVisibleCount(
                 itemCount: items.count,
                 previousVisibleCount: previousVisibleCount,
-                preservesExpandedState: forceRefresh && hasContentState(previousState)
+                preservesExpandedState: forceRefresh && previousState.hasContent
             )
             screenState = items.isEmpty ? .empty : .content(items)
             startTitleEnrichmentIfNeeded()
         } catch is CancellationError {
             return
         } catch {
-            if forceRefresh, hasContentState(previousState) {
+            if forceRefresh, previousState.hasContent {
                 screenState = previousState
                 visibleCount = previousVisibleCount
                 startTitleEnrichmentIfNeeded()
@@ -193,17 +217,8 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
             guard let self else { return }
             await self.performLoad(forceRefresh: forceRefresh, showsLoadingState: showsLoadingState)
         }
-        loadTask = task
+        loadState = .loading(task)
         return task
-    }
-
-    private func hasContentState(_ state: HomeRecommendedAnimeScreenState) -> Bool {
-        switch state {
-        case .content:
-            return true
-        case .loading, .error, .empty:
-            return false
-        }
     }
 
     private func resolvedVisibleCount(

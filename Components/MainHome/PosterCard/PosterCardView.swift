@@ -7,8 +7,17 @@
 
 import SwiftUI
 
+enum MainHomePosterCardMetrics {
+    static let width: CGFloat = 160
+    static let height: CGFloat = 240
+    static let cornerRadius: CGFloat = 16
+
+    static var size: CGSize {
+        CGSize(width: width, height: height)
+    }
+}
+
 struct PosterCardView<ImageContent: View>: View {
-    private static var cornerRadius: CGFloat { 16 }
     private static var rankPadding: CGFloat { 6 }
 
     let rank: Int?
@@ -52,7 +61,7 @@ struct PosterCardView<ImageContent: View>: View {
             }
         }
         .compositingGroup()
-        .clipShape(RoundedRectangle(cornerRadius: Self.cornerRadius, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: MainHomePosterCardMetrics.cornerRadius, style: .continuous))
     }
 }
 

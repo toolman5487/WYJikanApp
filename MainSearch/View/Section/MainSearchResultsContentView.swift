@@ -7,10 +7,11 @@
 
 import SwiftUI
 
-struct MainSearchResultsContentView: View {
+struct MainSearchResultsContentView<FilterHeader: View>: View {
 
     let screenState: MainSearchScreenState
     let loadMoreState: MainSearchLoadMoreState
+    @ViewBuilder let filterHeader: () -> FilterHeader
     let onRowAppear: (MainSearchResultRow) -> Void
     let onRetryLoadMore: () -> Void
 
@@ -18,38 +19,58 @@ struct MainSearchResultsContentView: View {
         Group {
             switch screenState {
             case .emptyPrompt:
-                ContentUnavailableView {
-                    Label("開始搜尋", systemImage: "magnifyingglass")
-                } description: {
-                    Text("選擇類型，輸入上方搜尋列關鍵字。")
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            case .loading:
-                MainSearchListSkeletonView()
+                VStack(spacing: 0) {
+                    filterHeader()
+                    ContentUnavailableView {
+                        Label("開始搜尋", systemImage: "magnifyingglass")
+                    } description: {
+                        Text("選擇類型，輸入上方搜尋列關鍵字。")
+                    }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
+            case .loading:
+                VStack(spacing: 0) {
+                    filterHeader()
+                    MainSearchListSkeletonView()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
             case .error(let message):
-                ContentUnavailableView {
-                    Label("搜尋失敗", systemImage: "exclamationmark.triangle")
-                } description: {
-                    Text(message)
+                VStack(spacing: 0) {
+                    filterHeader()
+                    ContentUnavailableView {
+                        Label("搜尋失敗", systemImage: "exclamationmark.triangle")
+                    } description: {
+                        Text(message)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
             case .emptyResults(let query):
-                ContentUnavailableView {
-                    Label("找不到結果", systemImage: "magnifyingglass")
-                } description: {
-                    Text("沒有符合「\(query)」的結果，請換個關鍵字試試。")
+                VStack(spacing: 0) {
+                    filterHeader()
+                    ContentUnavailableView {
+                        Label("找不到結果", systemImage: "magnifyingglass")
+                    } description: {
+                        Text("沒有符合「\(query)」的結果，請換個關鍵字試試。")
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
             case .content(let rows):
-                List(rows) { row in
-                    NavigationLink(value: row) {
-                        MainSearchResultRowView(row: row)
+                List {
+                    Section {
+                        ForEach(rows) { row in
+                            NavigationLink(value: row) {
+                                MainSearchResultRowView(row: row)
+                            }
+                            .onAppear {
+                                onRowAppear(row)
+                            }
+                            .listRowSeparator(.visible)
+                        }
+                    } header: {
+                        filterHeader()
+                            .textCase(nil)
+                            .listRowInsets(EdgeInsets())
                     }
-                    .onAppear {
-                        onRowAppear(row)
-                    }
-                    .listRowSeparator(.visible)
                 }
                 .overlay(alignment: .bottom) {
                     switch loadMoreState {

@@ -152,11 +152,14 @@ private actor JikanAPIResponseCache {
         case .some(let entry) where entry.expirationDate > now:
             return entry.data
         case .some:
-            storage.removeValue(forKey: key)
             return nil
         case .none:
             return nil
         }
+    }
+
+    func staleData(for key: String) -> Data? {
+        storage[key]?.data
     }
 
     func insert(_ data: Data, for key: String, ttl: TimeInterval, now: Date = Date()) {
@@ -421,6 +424,10 @@ final class JikanAPIService {
                     for: key,
                     cooldown: Self.transientFailureCooldown
                 )
+                if let staleData = await responseCache.staleData(for: key) {
+                    AppLogger.cache.debug("cache stale fallback HTTP \(statusCode) \(key, privacy: .public)")
+                    return staleData
+                }
                 throw JikanAPIError.serverError(statusCode: statusCode)
             } catch {
                 throw error

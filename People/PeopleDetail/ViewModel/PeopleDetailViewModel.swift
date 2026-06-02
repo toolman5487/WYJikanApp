@@ -15,13 +15,36 @@ final class PeopleDetailViewModel: ObservableObject {
         case loading
         case loaded(PeopleDetailDTO)
         case error(String)
+
+        var detail: PeopleDetailDTO? {
+            switch self {
+            case .loaded(let detail):
+                return detail
+            case .loading, .error:
+                return nil
+            }
+        }
+    }
+
+    private enum LoadState {
+        case idle
+        case loading
+
+        var isLoading: Bool {
+            switch self {
+            case .idle:
+                return false
+            case .loading:
+                return true
+            }
+        }
     }
 
     @Published private(set) var screenState: ScreenState = .loading
 
     private let malId: Int
     private let service: PeopleDetailServicing
-    private var isLoading = false
+    private var loadState: LoadState = .idle
 
     init(malId: Int, service: PeopleDetailServicing = PeopleDetailService()) {
         self.malId = malId
@@ -29,20 +52,15 @@ final class PeopleDetailViewModel: ObservableObject {
     }
 
     var detail: PeopleDetailDTO? {
-        switch screenState {
-        case .loaded(let detail):
-            return detail
-        case .loading, .error:
-            return nil
-        }
+        screenState.detail
     }
 
     func load() async {
-        guard detail == nil, !isLoading else { return }
+        guard detail == nil, !loadState.isLoading else { return }
 
-        isLoading = true
+        loadState = .loading
         screenState = .loading
-        defer { isLoading = false }
+        defer { loadState = .idle }
 
         do {
             let response = try await service.fetchPeopleDetail(malId: malId)
