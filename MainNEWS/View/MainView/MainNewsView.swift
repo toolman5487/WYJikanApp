@@ -8,6 +8,7 @@ import SwiftUI
 struct MainNewsView: View {
     @Environment(\.openURL) private var openURL
     @StateObject private var viewModel: MainNewsViewModel
+    @State private var reloadTask: Task<Void, Never>?
 
     init(viewModel: MainNewsViewModel = MainNewsViewModel()) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -41,21 +42,31 @@ struct MainNewsView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        Task { await viewModel.reload() }
-                    } label: {
-                        Image(systemName: "arrow.trianglehead.counterclockwise")
-                            .font(.body.weight(.bold))
-                            .foregroundStyle(ThemeColor.sakura)
-                            .frame(width: 44, height: 44)
-                    }
-                    .accessibilityLabel("重新載入動漫新知")
+                    reloadButton
                 }
             }
             .task {
                 await viewModel.loadIfNeeded()
             }
+            .onDisappear {
+                reloadTask?.cancel()
+                reloadTask = nil
+            }
         }
+    }
+
+    private var reloadButton: some View {
+        Button {
+            startReload()
+        } label: {
+            Image(systemName: "arrow.trianglehead.counterclockwise")
+                .font(.body.weight(.bold))
+                .foregroundStyle(viewModel.isRefreshing ? ThemeColor.textSecondary : ThemeColor.sakura)
+                .symbolEffect(.rotate, options: .repeating, isActive: viewModel.isRefreshing)
+                .opacity(viewModel.isRefreshing ? 0.7 : 1)
+                .frame(width: 44, height: 44)
+        }
+        .disabled(viewModel.isRefreshing)
     }
 
     @ViewBuilder
@@ -69,10 +80,10 @@ struct MainNewsView: View {
                 .transition(.opacity)
         case .error(let message):
             MainNewsErrorStateView(message: message) {
-                Task { await viewModel.reload() }
+                startReload()
             }
             .transition(.opacity)
-        case .content(let content):
+        case .content(let content), .refreshing(let content):
             LazyVStack(spacing: 12) {
                 ForEach(content.rows) { row in
                     MainNewsArticleRowView(row: row) {
@@ -81,6 +92,13 @@ struct MainNewsView: View {
                 }
             }
             .transition(.opacity)
+        }
+    }
+
+    private func startReload() {
+        reloadTask?.cancel()
+        reloadTask = Task {
+            await viewModel.reload()
         }
     }
 }

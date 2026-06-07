@@ -10,15 +10,8 @@ struct MainNewsErrorStateView: View {
     let onRetry: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("動漫新知暫時讀不到")
-                .font(.title3.weight(.bold))
-                .foregroundStyle(ThemeColor.textPrimary)
-
-            Text(message)
-                .font(.body)
-                .foregroundStyle(ThemeColor.textSecondary)
-                .fixedSize(horizontal: false, vertical: true)
+        VStack(spacing: 16) {
+            ErrorMessageView(state: .network(message))
 
             Button("重新載入", action: onRetry)
                 .buttonStyle(.borderedProminent)

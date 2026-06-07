@@ -27,25 +27,38 @@ nonisolated enum MainNewsServiceError: LocalizedError, Sendable {
     case invalidResponse(source: MainNewsSource)
     case serverError(source: MainNewsSource, statusCode: Int)
     case emptyFeed
+    case requestFailed(source: MainNewsSource, message: String)
     case parsingFailed(source: MainNewsSource, message: String)
 
     var errorDescription: String? {
         switch self {
         case .invalidFeedURL(let source):
-            return "\(source.displayName) RSS URL 格式錯誤。"
+            return "\(source.displayName) RSS URL is invalid."
         case .invalidResponse(let source):
-            return "\(source.displayName) 回應格式異常。"
+            return "\(source.displayName) returned an invalid response."
         case .serverError(let source, let statusCode):
-            return "\(source.displayName) 暫時無法取得新聞（HTTP \(statusCode)）。"
+            return "\(source.displayName) is temporarily unavailable (HTTP \(statusCode))."
         case .emptyFeed:
-            return "目前沒有可顯示的動漫新聞。"
+            return "No anime news is available right now."
+        case .requestFailed(let source, let message):
+            return "\(source.displayName) is temporarily unavailable. \(message)"
         case .parsingFailed(let source, let message):
-            return "\(source.displayName) RSS 解析失敗：\(message)"
+            return "\(source.displayName) RSS parsing failed: \(message)"
         }
     }
 }
 
 nonisolated final class MainNewsService: MainNewsServicing {
+    private struct SourceFetchFailure: Sendable {
+        let source: MainNewsSource
+        let message: String
+    }
+
+    private enum SourceFetchResult: Sendable {
+        case success(source: MainNewsSource, articles: [MainNewsArticle])
+        case failure(SourceFetchFailure)
+    }
+
     private static let cacheTTL: TimeInterval = 900
     private static let maximumArticleCount = 80
 
@@ -61,20 +74,19 @@ nonisolated final class MainNewsService: MainNewsServicing {
         forceRefresh: Bool = false
     ) async throws -> MainNewsFeed {
         var articles: [MainNewsArticle] = []
-        var errors: [Error] = []
+        var failures: [SourceFetchFailure] = []
 
-        for source in sources {
-            do {
-                let sourceArticles = try await fetchArticles(
-                    from: source,
-                    forceRefresh: forceRefresh
-                )
+        let sourceResults = try await fetchSourceResults(
+            from: sources,
+            forceRefresh: forceRefresh
+        )
+
+        for result in sourceResults {
+            switch result {
+            case .success(_, let sourceArticles):
                 articles.append(contentsOf: sourceArticles)
-            } catch {
-                errors.append(error)
-                AppLogger.network.warning(
-                    "news feed failed \(source.displayName, privacy: .public) \(error.localizedDescription, privacy: .public)"
-                )
+            case .failure(let failure):
+                failures.append(failure)
             }
         }
 
@@ -84,8 +96,11 @@ nonisolated final class MainNewsService: MainNewsServicing {
         .prefix(Self.maximumArticleCount)
 
         guard !visibleArticles.isEmpty else {
-            if let firstError = errors.first {
-                throw firstError
+            if let firstFailure = failures.first {
+                throw MainNewsServiceError.requestFailed(
+                    source: firstFailure.source,
+                    message: firstFailure.message
+                )
             }
             throw MainNewsServiceError.emptyFeed
         }
@@ -94,6 +109,73 @@ nonisolated final class MainNewsService: MainNewsServicing {
             updatedAt: Date(),
             articles: Array(visibleArticles)
         )
+    }
+
+    private func fetchSourceResults(
+        from sources: [MainNewsSource],
+        forceRefresh: Bool
+    ) async throws -> [SourceFetchResult] {
+        try await withThrowingTaskGroup(of: SourceFetchResult.self) { group in
+            for source in sources {
+                group.addTask { [self] in
+                    do {
+                        let articles = try await fetchArticles(
+                            from: source,
+                            forceRefresh: forceRefresh
+                        )
+                        return .success(source: source, articles: articles)
+                    } catch is CancellationError {
+                        throw CancellationError()
+                    } catch {
+                        let message = Self.failureMessage(from: error)
+                        AppLogger.network.warning(
+                            "news feed failed \(source.displayName, privacy: .public) \(message, privacy: .public)"
+                        )
+                        return .failure(
+                            SourceFetchFailure(
+                                source: source,
+                                message: message
+                            )
+                        )
+                    }
+                }
+            }
+
+            var results: [SourceFetchResult] = []
+            for try await result in group {
+                results.append(result)
+            }
+            return results
+        }
+    }
+
+    private static func failureMessage(from error: Error) -> String {
+        if let serviceError = error as? MainNewsServiceError {
+            return failureMessage(from: serviceError)
+        }
+
+        if let urlError = error as? URLError {
+            return "Network request failed (\(urlError.code.rawValue))."
+        }
+
+        return "The news request failed."
+    }
+
+    private static func failureMessage(from error: MainNewsServiceError) -> String {
+        switch error {
+        case .invalidFeedURL:
+            return "RSS URL is invalid."
+        case .invalidResponse:
+            return "The feed returned an invalid response."
+        case .serverError(_, let statusCode):
+            return "The server returned HTTP \(statusCode)."
+        case .emptyFeed:
+            return "No articles were found in the feed."
+        case .requestFailed(_, let message):
+            return message
+        case .parsingFailed(_, let message):
+            return "RSS parsing failed: \(message)"
+        }
     }
 
     private func fetchArticles(
@@ -212,6 +294,7 @@ private actor MainNewsResponseCache {
 
 private nonisolated final class MainNewsRSSParser: NSObject, XMLParserDelegate {
     private let source: MainNewsSource
+    private let dateParser = MainNewsDateParser()
     private var items: [MainNewsRSSItem] = []
     private var currentItem: MainNewsRSSItem?
     private var currentElementName: String?
@@ -362,7 +445,7 @@ private nonisolated final class MainNewsRSSParser: NSObject, XMLParserDelegate {
                 }
             }
         case "pubdate", "published", "updated":
-            guard let publishedAt = MainNewsDateParser.date(from: text) else { return }
+            guard let publishedAt = dateParser.date(from: text) else { return }
             updateCurrentItem { item in
                 if item.publishedAt == nil {
                     item.publishedAt = publishedAt
@@ -477,51 +560,52 @@ private nonisolated struct MainNewsRSSItem: Sendable {
     }
 }
 
-private nonisolated enum MainNewsDateParser {
-    static func date(from value: String) -> Date? {
+private nonisolated struct MainNewsDateParser {
+    private static let dateFormats = [
+        "EEE, d MMM yyyy HH:mm:ss Z",
+        "EEE, dd MMM yyyy HH:mm:ss Z",
+        "EEE, d MMM yyyy HH:mm Z",
+        "EEE, dd MMM yyyy HH:mm Z",
+        "yyyy-MM-dd HH:mm:ss Z"
+    ]
+
+    private static func makeISOFormatter(
+        fractionalSeconds: Bool
+    ) -> ISO8601DateFormatter {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = fractionalSeconds
+            ? [.withInternetDateTime, .withFractionalSeconds]
+            : [.withInternetDateTime]
+        return formatter
+    }
+
+    private static func makeDateFormatter(format: String) -> DateFormatter {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.dateFormat = format
+        return formatter
+    }
+
+    private let isoFormatterWithFractionalSeconds = Self.makeISOFormatter(fractionalSeconds: true)
+    private let isoFormatter = Self.makeISOFormatter(fractionalSeconds: false)
+    private let dateFormatters = Self.dateFormats.map(Self.makeDateFormatter(format:))
+
+    func date(from value: String) -> Date? {
         let trimmedValue = value.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedValue.isEmpty else { return nil }
 
-        if let isoDate = isoDate(from: trimmedValue) {
+        if let isoDate = isoFormatterWithFractionalSeconds.date(from: trimmedValue)
+            ?? isoFormatter.date(from: trimmedValue) {
             return isoDate
         }
 
-        for format in dateFormats {
-            let formatter = DateFormatter()
-            formatter.locale = Locale(identifier: "en_US_POSIX")
-            formatter.timeZone = TimeZone(secondsFromGMT: 0)
-            formatter.dateFormat = format
-
+        for formatter in dateFormatters {
             if let date = formatter.date(from: trimmedValue) {
                 return date
             }
         }
 
         return nil
-    }
-
-    private static var dateFormats: [String] {
-        [
-            "EEE, d MMM yyyy HH:mm:ss Z",
-            "EEE, dd MMM yyyy HH:mm:ss Z",
-            "EEE, d MMM yyyy HH:mm Z",
-            "EEE, dd MMM yyyy HH:mm Z",
-            "yyyy-MM-dd HH:mm:ss Z"
-        ]
-    }
-
-    private static func isoDate(from value: String) -> Date? {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [
-            .withInternetDateTime,
-            .withFractionalSeconds
-        ]
-
-        if let date = formatter.date(from: value) {
-            return date
-        }
-
-        formatter.formatOptions = [.withInternetDateTime]
-        return formatter.date(from: value)
     }
 }

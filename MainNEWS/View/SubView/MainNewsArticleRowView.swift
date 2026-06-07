@@ -56,7 +56,6 @@ struct MainNewsArticleRowView: View {
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("\(row.sourceName)，\(row.title)")
     }
 
     private var thumbnailView: some View {

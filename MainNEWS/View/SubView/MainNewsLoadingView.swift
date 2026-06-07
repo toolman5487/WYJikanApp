@@ -16,13 +16,17 @@ struct MainNewsLoadingView: View {
 
                     VStack(alignment: .leading, spacing: 10) {
                         HStack(spacing: 8) {
-                            SkeletonBar(width: index.isMultiple(of: 2) ? 104 : 132, height: 12, cornerRadius: 6)
+                            SkeletonBar(width: nil, height: 12, cornerRadius: 6)
+                                .frame(maxWidth: index.isMultiple(of: 2) ? 104 : 132, alignment: .leading)
                             SkeletonBar(width: 56, height: 12, cornerRadius: 6)
                         }
 
-                        SkeletonBar(width: 188, height: 16, cornerRadius: 8)
-                        SkeletonBar(width: 232, height: 16, cornerRadius: 8)
-                        SkeletonBar(width: 164, height: 12, cornerRadius: 6)
+                        SkeletonBar(width: nil, height: 16, cornerRadius: 8)
+                            .frame(maxWidth: 188, alignment: .leading)
+                        SkeletonBar(width: nil, height: 16, cornerRadius: 8)
+                            .frame(maxWidth: 232, alignment: .leading)
+                        SkeletonBar(width: nil, height: 12, cornerRadius: 6)
+                            .frame(maxWidth: 164, alignment: .leading)
                     }
 
                     Spacer(minLength: 0)

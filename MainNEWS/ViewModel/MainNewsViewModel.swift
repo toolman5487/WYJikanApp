@@ -30,6 +30,15 @@ final class MainNewsViewModel: ObservableObject {
         presentationBuilder.makeHeaderContent(for: screenState)
     }
 
+    var isRefreshing: Bool {
+        switch screenState {
+        case .refreshing:
+            return true
+        case .loading, .content, .empty, .error:
+            return false
+        }
+    }
+
     var filterItems: [MainNewsSourceFilter] {
         presentationBuilder.filterItems
     }
@@ -40,14 +49,15 @@ final class MainNewsViewModel: ObservableObject {
     }
 
     func reload() async {
-        await fetchLatestNews(forceRefresh: true, showLoading: true)
+        guard !isRefreshing else { return }
+        await fetchLatestNews(forceRefresh: true, showLoading: !hasLoaded)
     }
 
     func selectFilter(_ filter: MainNewsSourceFilter) {
         guard selectedFilter != filter else { return }
         selectedFilter = filter
         guard hasLoaded else { return }
-        applyPresentation()
+        applyPresentation(isRefreshing: isRefreshing)
     }
 
     private func fetchLatestNews(
@@ -55,8 +65,11 @@ final class MainNewsViewModel: ObservableObject {
         showLoading: Bool
     ) async {
         let generation = advanceRequestGeneration()
+        let existingContent = makeCurrentContent()
         if showLoading {
             screenState = .loading
+        } else if let existingContent {
+            screenState = .refreshing(existingContent)
         }
 
         do {
@@ -71,21 +84,29 @@ final class MainNewsViewModel: ObservableObject {
             return
         } catch {
             guard isCurrentGeneration(generation) else { return }
-            screenState = .error(message: error.localizedDescription)
+            if let existingContent, forceRefresh {
+                screenState = .content(existingContent)
+            } else {
+                screenState = .error(message: error.localizedDescription)
+            }
         }
     }
 
-    private func applyPresentation() {
-        guard let content = presentationBuilder.makeContent(
-            articles: articles,
-            selectedFilter: selectedFilter,
-            updatedAt: updatedAt
-        ) else {
+    private func applyPresentation(isRefreshing: Bool = false) {
+        guard let content = makeCurrentContent() else {
             screenState = .empty
             return
         }
 
-        screenState = .content(content)
+        screenState = isRefreshing ? .refreshing(content) : .content(content)
+    }
+
+    private func makeCurrentContent() -> MainNewsContent? {
+        presentationBuilder.makeContent(
+            articles: articles,
+            selectedFilter: selectedFilter,
+            updatedAt: updatedAt
+        )
     }
 
     private func advanceRequestGeneration() -> Int {

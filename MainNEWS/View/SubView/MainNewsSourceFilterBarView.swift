@@ -26,7 +26,6 @@ struct MainNewsSourceFilterBarView: View {
             }
             .padding(.vertical, 4)
         }
-        .accessibilityLabel("新聞來源篩選")
     }
 
     private func filterChip(_ filter: MainNewsSourceFilter) -> some View {
@@ -38,7 +37,7 @@ struct MainNewsSourceFilterBarView: View {
             .lineLimit(1)
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
-            .frame(minHeight: 40)
+            .frame(minHeight: 44)
             .background(
                 Capsule()
                     .fill(isSelected ? ThemeColor.sakura.opacity(0.32) : Color(.secondarySystemBackground))

@@ -8,6 +8,7 @@ import Foundation
 nonisolated enum MainNewsScreenState: Sendable {
     case loading
     case content(MainNewsContent)
+    case refreshing(MainNewsContent)
     case empty
     case error(message: String)
 }
@@ -86,7 +87,7 @@ nonisolated struct MainNewsPresentationBuilder: Sendable {
 
     func makeHeaderContent(for screenState: MainNewsScreenState) -> MainNewsHeaderContent {
         switch screenState {
-        case .content(let content):
+        case .content(let content), .refreshing(let content):
             return headerContent(
                 countText: content.countText,
                 updatedText: content.updatedText
