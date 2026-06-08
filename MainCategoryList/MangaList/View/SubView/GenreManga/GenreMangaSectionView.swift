@@ -20,6 +20,9 @@ struct GenreMangaSectionView: View {
 
     let section: MangaGenreSection
     let favoriteIDs: Set<Int>
+    let onOpenCategoryDetail: () -> Void
+
+    @State private var endBounceProgress: CGFloat = 0
 
     private static var cardWidth: CGFloat {
         cardHeight * posterAspectRatio
@@ -51,9 +54,33 @@ struct GenreMangaSectionView: View {
                         isFavorite: favoriteIDs.contains(item.id)
                     )
                 }
+
+                EndBounceHintView(
+                    axis: .horizontal,
+                    title: endBounceTitle,
+                    subtitle: "繼續往右拉查看分類",
+                    progress: endBounceProgress,
+                    width: Self.cardWidth,
+                    height: Self.cardHeight,
+                    cornerRadius: Self.cardCornerRadius
+                )
             }
             .padding(.horizontal, 16)
         }
+        .onEndBounce(
+            axis: .horizontal,
+            isEnabled: !section.items.isEmpty,
+            progress: $endBounceProgress
+        ) {
+            onOpenCategoryDetail()
+        }
+    }
+
+    private var endBounceTitle: String {
+        if let name = section.genre.name, !name.isEmpty {
+            return "完整\(name)"
+        }
+        return "完整分類"
     }
 
     private var contentSkeletonView: some View {

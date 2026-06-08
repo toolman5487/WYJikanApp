@@ -1516,8 +1516,8 @@
 		15AFDCA92FA6510500C707FD /* View */ = {
 			isa = PBXGroup;
 			children = (
-				15AFDCBE2FA6548600C707FD /* SubView */,
 				15AFDCAA2FA6510E00C707FD /* MainView */,
+				15AFDCBE2FA6548600C707FD /* SubView */,
 			);
 			path = View;
 			sourceTree = "<group>";

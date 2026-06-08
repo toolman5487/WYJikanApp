@@ -14,6 +14,8 @@ struct GenreAnimeListContainerView: View {
     @ObservedObject var viewModel: GenreAnimeViewModel
     let favoriteIDs: Set<Int>
 
+    @State private var selectedGenre: AnimeListGenreDTO?
+
     // MARK: - Body
 
     var body: some View {
@@ -52,7 +54,10 @@ struct GenreAnimeListContainerView: View {
                         Section {
                             GenreAnimeSectionView(
                                 section: section,
-                                favoriteIDs: favoriteIDs
+                                favoriteIDs: favoriteIDs,
+                                onOpenCategoryDetail: {
+                                    selectedGenre = section.genre
+                                }
                             )
                         } header: {
                             GenreAnimeSectionHeaderView(section: section)
@@ -68,6 +73,9 @@ struct GenreAnimeListContainerView: View {
                     }
                 }
             }
+        }
+        .navigationDestination(item: $selectedGenre) { genre in
+            AnimeCategoryDetailView(genre: genre)
         }
     }
 }

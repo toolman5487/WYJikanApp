@@ -16,6 +16,7 @@ final class MainCategoryListViewModel: ObservableObject {
     let characterListViewModel: CharacterListViewModel
 
     @Published var selectedKind: MainListKind = .anime
+    @Published private var childUpdateToken: Int = 0
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -53,10 +54,9 @@ final class MainCategoryListViewModel: ObservableObject {
             peopleListViewModel.objectWillChange.map { _ in },
             characterListViewModel.objectWillChange.map { _ in }
         )
-        .sink { [weak self] in
-            Task { @MainActor in
-                self?.objectWillChange.send()
-            }
+        .receive(on: RunLoop.main)
+        .sink { [weak self] _ in
+            self?.childUpdateToken += 1
         }
         .store(in: &cancellables)
     }
