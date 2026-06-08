@@ -106,10 +106,6 @@ struct EndBounceHintView: View {
         .frame(width: resolvedWidth, height: resolvedHeight)
         .frame(maxWidth: axis == .vertical ? .infinity : nil)
         .clipShape(cardShape)
-        .overlay {
-            cardShape
-                .strokeBorder(Color(.separator).opacity(0.36))
-        }
     }
 
     // MARK: - Private
@@ -160,7 +156,7 @@ struct EndBounceHintView: View {
         case .horizontal:
             return height ?? 240
         case .vertical:
-            return height ?? 116
+            return height ?? 120
         }
     }
 }

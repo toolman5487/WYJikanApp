@@ -235,7 +235,7 @@ struct MyListFormatDistributionChartCardView: View {
 
                     Spacer(minLength: 8)
 
-                    Text("\(slice.count)・\(percentageText(for: slice))")
+                    Text(percentageText(for: slice))
                         .font(.caption2.weight(.medium))
                         .foregroundStyle(ThemeColor.textSecondary)
                         .lineLimit(1)
@@ -277,12 +277,13 @@ struct MyListFormatDistributionChartCardView: View {
 
     private var chartColors: [Color] {
         [
-            .blue,
-            ThemeColor.sakura,
-            .green,
+            .red,
             .orange,
-            .purple,
-            .teal
+            .yellow,
+            .green,
+            .blue,
+            .indigo,
+            .purple
         ]
     }
 

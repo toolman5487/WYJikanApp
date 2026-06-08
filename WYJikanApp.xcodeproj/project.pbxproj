@@ -1736,8 +1736,8 @@
 				16E200052FAA200000000005 /* Model */,
 				16E201032FAA210000000003 /* Repository */,
 				16E201062FAA210000000006 /* Store */,
-				16E200062FAA200000000006 /* ViewModel */,
 				15FA49FE2F97C80500EC4C09 /* View */,
+				16E200062FAA200000000006 /* ViewModel */,
 			);
 			path = MainMyList;
 			sourceTree = "<group>";
