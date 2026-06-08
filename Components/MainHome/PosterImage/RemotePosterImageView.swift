@@ -32,10 +32,7 @@ struct RemotePosterImageView: View {
     var body: some View {
         WebImage(
             url: url,
-            options: [
-                .retryFailed,
-                .scaleDownLargeImages
-            ],
+            options: imageOptions,
             context: imageContext
         ) { image in
             configuredImage(image)
@@ -78,7 +75,19 @@ struct RemotePosterImageView: View {
         }
     }
 
+    private var imageOptions: SDWebImageOptions {
+        guard !usesWebPImage else {
+            return [.retryFailed]
+        }
+
+        return [
+            .retryFailed,
+            .scaleDownLargeImages
+        ]
+    }
+
     private var imageContext: [SDWebImageContextOption: Any]? {
+        guard !usesWebPImage else { return nil }
         guard let fixedSize else { return nil }
 
         return [
@@ -87,6 +96,10 @@ struct RemotePosterImageView: View {
                 height: fixedSize.height * displayScale
             )
         ]
+    }
+
+    private var usesWebPImage: Bool {
+        url.pathExtension.localizedCaseInsensitiveCompare("webp") == .orderedSame
     }
 
     private func configuredImage(_ image: Image) -> some View {
