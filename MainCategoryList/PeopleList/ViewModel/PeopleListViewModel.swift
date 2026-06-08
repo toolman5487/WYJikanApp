@@ -144,18 +144,7 @@ final class PeopleListViewModel: ObservableObject {
     private func sortedRows(from rows: [PeopleListRow], sort: PeopleListSort) -> [PeopleListRow] {
         switch sort {
         case .popularity:
-            return rows.sorted { lhs, rhs in
-                switch (lhs.favorites, rhs.favorites) {
-                case let (left?, right?) where left != right:
-                    return left > right
-                case (.some, nil):
-                    return true
-                case (nil, .some):
-                    return false
-                default:
-                    return lhs.sortTitle.localizedStandardCompare(rhs.sortTitle) == .orderedAscending
-                }
-            }
+            return rows
 
         case .nameAscending:
             return rows.sorted { lhs, rhs in

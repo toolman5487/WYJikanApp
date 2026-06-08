@@ -33,7 +33,7 @@ final class MainCategoryListService: MainCategoryListServicing {
             case .characters:
                 return APIConfig.Characters.list
             case .people:
-                return APIConfig.People.list
+                return APIConfig.Top.people
             }
         }
 

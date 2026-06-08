@@ -202,7 +202,6 @@
 		16A200312FB4000000D1E001 /* AnimeDetailEpisodesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A200302FB4000000D1E001 /* AnimeDetailEpisodesModel.swift */; };
 		16A200332FB4000000D1E001 /* AnimeDetailEpisodeRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A200322FB4000000D1E001 /* AnimeDetailEpisodeRowView.swift */; };
 		16A200342FB4000000D1E001 /* AnimeDetailEpisodesLoadMoreFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A200352FB4000000D1E001 /* AnimeDetailEpisodesLoadMoreFooterView.swift */; };
-		16B800012FD8000000000001 /* EndBounceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B800002FD8000000000001 /* EndBounceView.swift */; };
 		16AA10022FCF300000000002 /* MainNewsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AA10012FCF300000000001 /* MainNewsModel.swift */; };
 		16AA10042FCF300000000004 /* MainNewsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AA10032FCF300000000003 /* MainNewsService.swift */; };
 		16AA10122FCF310000000012 /* MainNewsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AA10112FCF310000000011 /* MainNewsViewModel.swift */; };
@@ -226,6 +225,7 @@
 		16B100182F8A000000000018 /* PeopleListLoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B100172F8A000000000017 /* PeopleListLoadingView.swift */; };
 		16B1001A2F8A10000000001A /* CharacterListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B100192F8A100000000019 /* CharacterListModel.swift */; };
 		16B1001C2F8A10000000001C /* PeopleListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B1001B2F8A10000000001B /* PeopleListModel.swift */; };
+		16B800012FD8000000000001 /* EndBounceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B800002FD8000000000001 /* EndBounceView.swift */; };
 		16C200022F99000000000002 /* CharacterDetailModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C200012F99000000000001 /* CharacterDetailModel.swift */; };
 		16C200022FAAA00000000002 /* CapsuleFilterBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C200012FAAA00000000001 /* CapsuleFilterBarView.swift */; };
 		16C200042F99000000000004 /* CharacterDetailService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16C200032F99000000000003 /* CharacterDetailService.swift */; };
@@ -494,7 +494,6 @@
 		16A200302FB4000000D1E001 /* AnimeDetailEpisodesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeDetailEpisodesModel.swift; sourceTree = "<group>"; };
 		16A200322FB4000000D1E001 /* AnimeDetailEpisodeRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeDetailEpisodeRowView.swift; sourceTree = "<group>"; };
 		16A200352FB4000000D1E001 /* AnimeDetailEpisodesLoadMoreFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeDetailEpisodesLoadMoreFooterView.swift; sourceTree = "<group>"; };
-		16B800002FD8000000000001 /* EndBounceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EndBounceView.swift; sourceTree = "<group>"; };
 		16AA10012FCF300000000001 /* MainNewsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainNewsModel.swift; sourceTree = "<group>"; };
 		16AA10032FCF300000000003 /* MainNewsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainNewsService.swift; sourceTree = "<group>"; };
 		16AA10112FCF310000000011 /* MainNewsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainNewsViewModel.swift; sourceTree = "<group>"; };
@@ -518,6 +517,7 @@
 		16B100172F8A000000000017 /* PeopleListLoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleListLoadingView.swift; sourceTree = "<group>"; };
 		16B100192F8A100000000019 /* CharacterListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterListModel.swift; sourceTree = "<group>"; };
 		16B1001B2F8A10000000001B /* PeopleListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleListModel.swift; sourceTree = "<group>"; };
+		16B800002FD8000000000001 /* EndBounceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EndBounceView.swift; sourceTree = "<group>"; };
 		16C200012F99000000000001 /* CharacterDetailModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterDetailModel.swift; sourceTree = "<group>"; };
 		16C200012FAAA00000000001 /* CapsuleFilterBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapsuleFilterBarView.swift; sourceTree = "<group>"; };
 		16C200032F99000000000003 /* CharacterDetailService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterDetailService.swift; sourceTree = "<group>"; };
@@ -2009,14 +2009,6 @@
 			path = MainHome;
 			sourceTree = "<group>";
 		};
-		16B800022FD8000000000002 /* EndBounce */ = {
-			isa = PBXGroup;
-			children = (
-				16B800002FD8000000000001 /* EndBounceView.swift */,
-			);
-			path = EndBounce;
-			sourceTree = "<group>";
-		};
 		15FF29662F763B1900D3241C /* Services */ = {
 			isa = PBXGroup;
 			children = (
@@ -2288,6 +2280,14 @@
 				16B1001B2F8A10000000001B /* PeopleListModel.swift */,
 			);
 			path = Model;
+			sourceTree = "<group>";
+		};
+		16B800022FD8000000000002 /* EndBounce */ = {
+			isa = PBXGroup;
+			children = (
+				16B800002FD8000000000001 /* EndBounceView.swift */,
+			);
+			path = EndBounce;
 			sourceTree = "<group>";
 		};
 		16C201002F99000000000100 /* CharacterDetail */ = {

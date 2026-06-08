@@ -32,7 +32,7 @@ struct PeopleListContentView: View {
                     .padding(.vertical, 48)
 
             case .content(let rows, let inlineError, let footer):
-                LazyVGrid(columns: PeopleListGridMetrics.columns, spacing: 16) {
+                LazyVStack(alignment: .leading, spacing: 12) {
                     ForEach(rows) { row in
                         NavigationLink {
                             PeopleDetailView(malId: row.malId)
@@ -60,13 +60,4 @@ struct PeopleListContentView: View {
         }
         .padding(.top, 8)
     }
-}
-
-// MARK: - PeopleListGridMetrics
-
-enum PeopleListGridMetrics {
-    static let columns = Array(
-        repeating: GridItem(.flexible(), spacing: 12, alignment: .top),
-        count: 3
-    )
 }

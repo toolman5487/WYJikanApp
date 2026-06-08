@@ -64,6 +64,7 @@ struct MainCategoryListView: View {
             .onEndBounce(
                 axis: .vertical,
                 isEnabled: viewModel.canLoadMoreSelectedKind,
+                threshold: 36,
                 progress: $loadMoreBounceProgress
             ) {
                 viewModel.loadMoreSelectedKind()
