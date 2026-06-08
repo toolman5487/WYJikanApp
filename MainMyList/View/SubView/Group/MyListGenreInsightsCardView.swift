@@ -20,9 +20,7 @@ struct MyListGenreInsightsCardView: View {
             subtitle: nil
         ) {
             VStack(alignment: .leading, spacing: 12) {
-                insightRow(for: statistics.allAnalysis)
-                insightRow(for: statistics.animeAnalysis)
-                insightRow(for: statistics.mangaAnalysis)
+                insightRow(for: statistics.selectedAnalysis)
             }
         }
     }

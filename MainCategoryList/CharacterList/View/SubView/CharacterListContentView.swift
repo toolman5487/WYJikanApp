@@ -32,7 +32,7 @@ struct CharacterListContentView: View {
                     .padding(.vertical, 48)
 
             case .content(let rows, let inlineError, let footer):
-                LazyVGrid(columns: CharacterListGridMetrics.columns, spacing: 16) {
+                LazyVStack(alignment: .leading, spacing: 12) {
                     ForEach(rows) { row in
                         NavigationLink {
                             CharacterDetailView(malId: row.malId)
@@ -60,13 +60,4 @@ struct CharacterListContentView: View {
         }
         .padding(.top, 8)
     }
-}
-
-// MARK: - CharacterListGridMetrics
-
-enum CharacterListGridMetrics {
-    static let columns = Array(
-        repeating: GridItem(.flexible(), spacing: 12, alignment: .top),
-        count: 3
-    )
 }

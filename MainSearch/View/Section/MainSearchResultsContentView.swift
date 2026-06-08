@@ -11,8 +11,10 @@ struct MainSearchResultsContentView<FilterHeader: View>: View {
 
     let screenState: MainSearchScreenState
     let loadMoreState: MainSearchLoadMoreState
+    let loadMoreProgress: CGFloat
     @ViewBuilder let filterHeader: () -> FilterHeader
     let onRowAppear: (MainSearchResultRow) -> Void
+    let onLoadMore: () -> Void
     let onRetryLoadMore: () -> Void
 
     var body: some View {
@@ -66,6 +68,8 @@ struct MainSearchResultsContentView<FilterHeader: View>: View {
                             }
                             .listRowSeparator(.visible)
                         }
+
+                        loadMoreFooterView
                     } header: {
                         filterHeader()
                             .textCase(nil)
@@ -74,11 +78,8 @@ struct MainSearchResultsContentView<FilterHeader: View>: View {
                 }
                 .overlay(alignment: .bottom) {
                     switch loadMoreState {
-                    case .hidden, .available:
+                    case .hidden, .available, .loading:
                         EmptyView()
-                    case .loading:
-                        ProgressView()
-                            .padding(.bottom, 12)
                     case .error(let loadMoreErrorMessage):
                         VStack(spacing: 8) {
                             Text(loadMoreErrorMessage)
@@ -103,6 +104,36 @@ struct MainSearchResultsContentView<FilterHeader: View>: View {
                 }
                 .listStyle(.plain)
             }
+        }
+    }
+
+    @ViewBuilder
+    private var loadMoreFooterView: some View {
+        switch loadMoreState {
+        case .hidden:
+            EmptyView()
+
+        case .available:
+            EndBounceHintView(
+                axis: .vertical,
+                title: "載入更多結果",
+                subtitle: "繼續往下拉展開更多",
+                progress: loadMoreProgress
+            )
+            .listRowSeparator(.hidden)
+            .listRowInsets(EdgeInsets(top: 12, leading: 16, bottom: 16, trailing: 16))
+            .onTapGesture {
+                onLoadMore()
+            }
+
+        case .loading:
+            ProgressView()
+                .frame(maxWidth: .infinity, minHeight: 116)
+                .listRowSeparator(.hidden)
+                .listRowInsets(EdgeInsets(top: 12, leading: 16, bottom: 16, trailing: 16))
+
+        case .error:
+            EmptyView()
         }
     }
 }

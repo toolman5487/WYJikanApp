@@ -105,7 +105,6 @@ struct EndBounceHintView: View {
         .padding(16)
         .frame(width: resolvedWidth, height: resolvedHeight)
         .frame(maxWidth: axis == .vertical ? .infinity : nil)
-        .background(Color(.secondarySystemBackground))
         .clipShape(cardShape)
         .overlay {
             cardShape
@@ -118,7 +117,7 @@ struct EndBounceHintView: View {
     private var progressIcon: some View {
         ZStack {
             Circle()
-                .strokeBorder(Color(.separator).opacity(0.36), lineWidth: 2)
+                .strokeBorder(Color(.separator), lineWidth: 2)
 
             Circle()
                 .trim(from: 0, to: clampedProgress)
@@ -290,14 +289,9 @@ struct EndBounceTriggerModifier: ViewModifier {
         progress.wrappedValue = sample.pullProgress
 
         guard canTrigger else { return }
-        guard sample.overscroll > 0 else { return }
+        maximumOverscroll = max(maximumOverscroll, sample.overscroll)
 
-        if sample.overscroll > maximumOverscroll {
-            maximumOverscroll = sample.overscroll
-            return
-        }
-
-        if maximumOverscroll >= threshold, sample.overscroll < maximumOverscroll {
+        if sample.pullProgress >= 1 {
             canTrigger = false
             action()
         }

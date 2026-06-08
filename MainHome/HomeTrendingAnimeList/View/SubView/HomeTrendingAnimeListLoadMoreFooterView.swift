@@ -12,6 +12,7 @@ struct HomeTrendingAnimeListLoadMoreFooterView: View {
     // MARK: - Properties
 
     let state: HomeTrendingAnimeListViewModel.LoadMoreState
+    var progress: CGFloat = 0
     let onLoadMore: () -> Void
     let onRetry: () -> Void
 
@@ -24,14 +25,16 @@ struct HomeTrendingAnimeListLoadMoreFooterView: View {
             EmptyView()
 
         case .available:
-            Button("載入更多作品", action: onLoadMore)
-                .buttonStyle(.borderedProminent)
-                .tint(ThemeColor.sakura)
-                .frame(maxWidth: .infinity, alignment: .center)
+            EndBounceHintView(
+                axis: .vertical,
+                title: "載入更多作品",
+                subtitle: "繼續往下拉展開更多",
+                progress: progress
+            )
 
         case .loading:
             ProgressView()
-                .frame(maxWidth: .infinity, minHeight: 44)
+                .frame(maxWidth: .infinity, minHeight: 116)
 
         case .error(let message):
             VStack(alignment: .leading, spacing: 12) {
@@ -39,9 +42,13 @@ struct HomeTrendingAnimeListLoadMoreFooterView: View {
                     .font(.footnote)
                     .foregroundStyle(ThemeColor.textSecondary)
 
-                Button("重試載入更多", action: onRetry)
-                    .buttonStyle(.borderedProminent)
-                    .tint(ThemeColor.sakura)
+                Button {
+                    onRetry()
+                } label: {
+                    Label("重試載入更多", systemImage: "arrow.trianglehead.counterclockwise")
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(ThemeColor.sakura)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }

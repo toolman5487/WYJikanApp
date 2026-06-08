@@ -16,18 +16,36 @@ struct CharacterPersonGridItemView: View {
     // MARK: - Body
 
     var body: some View {
-        VStack(spacing: 8) {
+        HStack(spacing: 12) {
             poster
-                .aspectRatio(1, contentMode: .fit)
-                .clipShape(Circle())
+                .frame(width: 72, height: 96)
+                .clipShape(imageShape)
 
-            Text(row.name)
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.primary)
-                .multilineTextAlignment(.center)
-                .lineLimit(2)
-                .frame(maxWidth: .infinity, minHeight: 32, alignment: .top)
+            VStack(alignment: .leading, spacing: 8) {
+                Text(row.name)
+                    .font(.headline.weight(.semibold))
+                    .foregroundStyle(ThemeColor.textPrimary)
+                    .multilineTextAlignment(.leading)
+                    .lineLimit(2)
+
+                if let favoritesText {
+                    Label(favoritesText, systemImage: "heart.fill")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            Image(systemName: "chevron.right")
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(.tertiary)
         }
+        .padding(12)
+        .background(Color(.secondarySystemBackground))
+        .clipShape(cardShape)
+        .contentShape(cardShape)
+        .accessibilityElement(children: .combine)
     }
 
     // MARK: - Private Methods
@@ -35,7 +53,10 @@ struct CharacterPersonGridItemView: View {
     @ViewBuilder
     private var poster: some View {
         if let imageURL = row.imageURL {
-            RemotePosterImageView(url: imageURL)
+            RemotePosterImageView(
+                url: imageURL,
+                contentMode: .fill
+            )
         } else {
             Color(.secondarySystemBackground)
                 .overlay {
@@ -43,5 +64,18 @@ struct CharacterPersonGridItemView: View {
                         .foregroundStyle(.secondary)
                 }
         }
+    }
+
+    private var cardShape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: 16, style: .continuous)
+    }
+
+    private var imageShape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: 12, style: .continuous)
+    }
+
+    private var favoritesText: String? {
+        guard let favorites = row.favorites, favorites > 0 else { return nil }
+        return favorites.formatted(.number.notation(.compactName))
     }
 }

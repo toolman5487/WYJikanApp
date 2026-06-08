@@ -66,6 +66,15 @@ final class MainSearchViewModel: ObservableObject {
         guard pagination.hasNextPage, pagination.canStartLoadMore else { return }
         loadMore()
     }
+
+    var canLoadMoreFromEndBounce: Bool {
+        loadMoreState == .available
+    }
+
+    func loadMoreFromEndBounce() {
+        guard canLoadMoreFromEndBounce else { return }
+        loadMore()
+    }
 }
 
 // MARK: - Combine

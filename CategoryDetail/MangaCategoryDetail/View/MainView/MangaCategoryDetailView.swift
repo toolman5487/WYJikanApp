@@ -57,8 +57,8 @@ struct MangaCategoryDetailView: View {
         .onEndBounce(
             axis: .vertical,
             isEnabled: canLoadMore,
-            threshold: 36,
-            revealDistance: 144,
+            threshold: 16,
+            revealDistance: 220,
             progress: $loadMoreBounceProgress
         ) {
             Task { await viewModel.loadMore() }

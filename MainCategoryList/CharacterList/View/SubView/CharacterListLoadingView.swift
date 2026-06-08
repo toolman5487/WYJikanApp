@@ -12,18 +12,27 @@ struct CharacterListLoadingView: View {
     // MARK: - Body
 
     var body: some View {
-        LazyVGrid(columns: CharacterListGridMetrics.columns, spacing: 16) {
+        LazyVStack(alignment: .leading, spacing: 12) {
             ForEach(0..<9, id: \.self) { _ in
-                VStack(spacing: 8) {
+                HStack(spacing: 12) {
                     RoundedRectangle(cornerRadius: 16)
                         .fill(Color(.secondarySystemBackground))
-                        .aspectRatio(1, contentMode: .fit)
-                        .clipShape(Circle())
+                        .frame(width: 72, height: 96)
 
-                    RoundedRectangle(cornerRadius: 8)
-                        .fill(Color(.secondarySystemBackground))
-                        .frame(height: 16)
+                    VStack(alignment: .leading, spacing: 8) {
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(Color(.secondarySystemBackground))
+                            .frame(height: 18)
+
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(Color(.secondarySystemBackground))
+                            .frame(width: 96, height: 14)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
+                .padding(12)
+                .background(Color(.tertiarySystemBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             }
         }
     }

@@ -13,6 +13,7 @@ struct HomeTrendingMangaListView: View {
 
     @EnvironmentObject private var favoriteStatusStore: FavoriteStatusStore
     @StateObject private var viewModel: HomeTrendingMangaListViewModel
+    @State private var loadMoreBounceProgress: CGFloat = 0
 
     // MARK: - Lifecycle
 
@@ -35,6 +36,15 @@ struct HomeTrendingMangaListView: View {
             .padding(.horizontal, 16)
             .padding(.top, 16)
             .padding(.bottom, 28)
+        }
+        .onEndBounce(
+            axis: .vertical,
+            isEnabled: canLoadMore,
+            threshold: 16,
+            revealDistance: 220,
+            progress: $loadMoreBounceProgress
+        ) {
+            Task { await viewModel.loadMore() }
         }
         .safeAreaInset(edge: .top, spacing: 0) {
             HomeTrendingMangaListControlBarContainerView(
@@ -76,6 +86,7 @@ struct HomeTrendingMangaListView: View {
 
                 MangaCategoryDetailLoadMoreFooterView(
                     state: viewModel.loadMoreState,
+                    progress: loadMoreBounceProgress,
                     onLoadMore: {
                         Task { await viewModel.loadMore() }
                     },
@@ -93,8 +104,8 @@ struct HomeTrendingMangaListView: View {
                 items: items,
                 favoriteIDs: favoriteStatusStore.favoriteIDs(for: .manga),
                 loadMoreState: viewModel.loadMoreState,
-                onItemAppear: { item in
-                    Task { await viewModel.loadMoreIfNeeded(currentItem: item) }
+                loadMoreProgress: loadMoreBounceProgress,
+                onItemAppear: { _ in
                 },
                 onLoadMore: {
                     Task { await viewModel.loadMore() }
@@ -157,6 +168,15 @@ struct HomeTrendingMangaListView: View {
         .padding(24)
         .background(Color(.secondarySystemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+    }
+
+    private var canLoadMore: Bool {
+        switch viewModel.loadMoreState {
+        case .available:
+            return true
+        case .hidden, .loading, .error:
+            return false
+        }
     }
 }
 

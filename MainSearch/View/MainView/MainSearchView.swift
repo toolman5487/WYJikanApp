@@ -10,16 +10,28 @@ import SwiftUI
 struct MainSearchView: View {
 
     @ObservedObject var viewModel: MainSearchViewModel
+    @State private var loadMoreBounceProgress: CGFloat = 0
 
     var body: some View {
         NavigationStack {
             MainSearchResultsContentView(
                 screenState: viewModel.screenState,
                 loadMoreState: viewModel.loadMoreState,
+                loadMoreProgress: loadMoreBounceProgress,
                 filterHeader: { filterHeader },
-                onRowAppear: viewModel.loadMoreIfNeeded(currentRow:),
+                onRowAppear: { _ in },
+                onLoadMore: viewModel.loadMoreFromEndBounce,
                 onRetryLoadMore: viewModel.retryLoadMore
             )
+            .onEndBounce(
+                axis: .vertical,
+                isEnabled: viewModel.canLoadMoreFromEndBounce,
+                threshold: 16,
+                revealDistance: 220,
+                progress: $loadMoreBounceProgress
+            ) {
+                viewModel.loadMoreFromEndBounce()
+            }
             .navigationDestination(for: MainSearchResultRow.self) { row in
                 MainSearchRouter.destination(for: row)
             }
