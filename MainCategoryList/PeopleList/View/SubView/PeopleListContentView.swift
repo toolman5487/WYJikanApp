@@ -53,21 +53,8 @@ struct PeopleListContentView: View {
                 case .hidden:
                     EmptyView()
 
-                case .loadMore:
-                    PeopleLoadMoreButton(
-                        title: "載入更多聲優",
-                        isLoading: false,
-                        isVisible: true,
-                        action: viewModel.loadMore
-                    )
-
-                case .loadingMore:
-                    PeopleLoadMoreButton(
-                        title: "載入更多聲優",
-                        isLoading: true,
-                        isVisible: true,
-                        action: viewModel.loadMore
-                    )
+                case .loadMore, .loadingMore:
+                    EmptyView()
                 }
             }
         }

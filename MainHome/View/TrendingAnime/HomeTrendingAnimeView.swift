@@ -90,16 +90,21 @@ struct HomeTrendingAnimeView: View {
                             .buttonStyle(.plain)
                         }
 
-                        HorizontalEndBounceNavigationHintView(
+                        EndBounceHintView(
+                            axis: .horizontal,
                             title: "完整熱門動畫",
                             subtitle: "繼續往右拉查看榜單",
-                            progress: endBounceProgress
+                            progress: endBounceProgress,
+                            width: cardSize.width,
+                            height: cardSize.height,
+                            cornerRadius: MainHomePosterCardMetrics.cornerRadius
                         )
                     }
                 }
                 .padding(.horizontal, 16)
             }
-            .onHorizontalEndBounce(
+            .onEndBounce(
+                axis: .horizontal,
                 isEnabled: viewModel.screenState.hasContent,
                 progress: $endBounceProgress
             ) {

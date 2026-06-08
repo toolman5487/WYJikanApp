@@ -17,6 +17,7 @@ struct MainHomeView: View {
     @StateObject private var trendingMangaViewModel: HomeTrendingMangaViewModel
     @StateObject private var trendingAnimeViewModel: HomeTrendingAnimeViewModel
     @StateObject private var recommendedAnimeViewModel: HomeRecommendedAnimeViewModel
+    @State private var loadMoreBounceProgress: CGFloat = 0
 
     enum HomeSection: Identifiable {
         case todayAnime
@@ -76,7 +77,26 @@ struct MainHomeView: View {
                             sectionHeaderView(section)
                         }
                     }
+
+                    if recommendedAnimeViewModel.canLoadMore {
+                        EndBounceHintView(
+                            axis: .vertical,
+                            title: "載入更多",
+                            subtitle: "繼續往下拉展開推薦",
+                            progress: loadMoreBounceProgress
+                        )
+                        .padding(.top, 16)
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 32)
+                    }
                 }
+            }
+            .onEndBounce(
+                axis: .vertical,
+                isEnabled: recommendedAnimeViewModel.canLoadMore,
+                progress: $loadMoreBounceProgress
+            ) {
+                recommendedAnimeViewModel.loadMore()
             }
             .refreshable {
                 await refreshAllContent()

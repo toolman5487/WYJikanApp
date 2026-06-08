@@ -12,6 +12,7 @@ struct MainCategoryListView: View {
     // MARK: - Properties
     
     @StateObject private var viewModel = MainCategoryListViewModel()
+    @State private var loadMoreBounceProgress: CGFloat = 0
     
     private let topAnchorId = "MainCategoryListTopAnchor"
     
@@ -41,6 +42,31 @@ struct MainCategoryListView: View {
                     .padding(.horizontal)
                     .padding(.bottom, 16)
                     .id(viewModel.selectedKind)
+
+                if viewModel.shouldShowLoadMoreFooter {
+                    Group {
+                        if viewModel.isLoadingMoreSelectedKind {
+                            ProgressView()
+                                .frame(maxWidth: .infinity, minHeight: 116)
+                        } else {
+                            EndBounceHintView(
+                                axis: .vertical,
+                                title: viewModel.loadMoreFooterTitle,
+                                subtitle: viewModel.loadMoreFooterSubtitle,
+                                progress: loadMoreBounceProgress
+                            )
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 24)
+                }
+            }
+            .onEndBounce(
+                axis: .vertical,
+                isEnabled: viewModel.canLoadMoreSelectedKind,
+                progress: $loadMoreBounceProgress
+            ) {
+                viewModel.loadMoreSelectedKind()
             }
             .safeAreaInset(edge: .top, spacing: 0) {
                 topFilterHeader

@@ -53,21 +53,8 @@ struct CharacterListContentView: View {
                 case .hidden:
                     EmptyView()
 
-                case .loadMore:
-                    CharacterLoadMoreButton(
-                        title: "載入更多角色",
-                        isLoading: false,
-                        isVisible: true,
-                        action: viewModel.loadMore
-                    )
-
-                case .loadingMore:
-                    CharacterLoadMoreButton(
-                        title: "載入更多角色",
-                        isLoading: true,
-                        isVisible: true,
-                        action: viewModel.loadMore
-                    )
+                case .loadMore, .loadingMore:
+                    EmptyView()
                 }
             }
         }

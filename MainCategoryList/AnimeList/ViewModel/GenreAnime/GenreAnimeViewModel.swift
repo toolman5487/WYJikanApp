@@ -152,6 +152,12 @@ private extension GenreAnimeViewModel {
     }
 }
 
+extension GenreAnimeViewModel {
+    var isLoadingMore: Bool {
+        loadState == .loadingMore
+    }
+}
+
 // MARK: - Task Management
 
 private extension GenreAnimeViewModel {

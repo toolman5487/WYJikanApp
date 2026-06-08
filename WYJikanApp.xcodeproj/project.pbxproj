@@ -202,7 +202,7 @@
 		16A200312FB4000000D1E001 /* AnimeDetailEpisodesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A200302FB4000000D1E001 /* AnimeDetailEpisodesModel.swift */; };
 		16A200332FB4000000D1E001 /* AnimeDetailEpisodeRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A200322FB4000000D1E001 /* AnimeDetailEpisodeRowView.swift */; };
 		16A200342FB4000000D1E001 /* AnimeDetailEpisodesLoadMoreFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A200352FB4000000D1E001 /* AnimeDetailEpisodesLoadMoreFooterView.swift */; };
-		16B800012FD8000000000001 /* HorizontalEndBounceNavigationTriggerModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B800002FD8000000000001 /* HorizontalEndBounceNavigationTriggerModifier.swift */; };
+		16B800012FD8000000000001 /* EndBounceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B800002FD8000000000001 /* EndBounceView.swift */; };
 		16AA10022FCF300000000002 /* MainNewsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AA10012FCF300000000001 /* MainNewsModel.swift */; };
 		16AA10042FCF300000000004 /* MainNewsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AA10032FCF300000000003 /* MainNewsService.swift */; };
 		16AA10122FCF310000000012 /* MainNewsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AA10112FCF310000000011 /* MainNewsViewModel.swift */; };
@@ -219,12 +219,10 @@
 		16B100062F8A000000000006 /* CharacterListContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B100052F8A000000000005 /* CharacterListContentView.swift */; };
 		16B100082F8A000000000008 /* CharacterPersonGridItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B100072F8A000000000007 /* CharacterPersonGridItemView.swift */; };
 		16B1000A2F8A00000000000A /* CharacterListLoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B100092F8A000000000009 /* CharacterListLoadingView.swift */; };
-		16B1000C2F8A00000000000C /* CharacterLoadMoreButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B1000B2F8A00000000000B /* CharacterLoadMoreButton.swift */; };
 		16B1000E2F8A00000000000E /* PeopleListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B1000D2F8A00000000000D /* PeopleListView.swift */; };
 		16B100102F8A000000000010 /* PeopleListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B1000F2F8A00000000000F /* PeopleListViewModel.swift */; };
 		16B100122F8A000000000012 /* PeopleListContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B100112F8A000000000011 /* PeopleListContentView.swift */; };
 		16B100142F8A000000000014 /* PeopleGridItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B100132F8A000000000013 /* PeopleGridItemView.swift */; };
-		16B100162F8A000000000016 /* PeopleLoadMoreButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B100152F8A000000000015 /* PeopleLoadMoreButton.swift */; };
 		16B100182F8A000000000018 /* PeopleListLoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B100172F8A000000000017 /* PeopleListLoadingView.swift */; };
 		16B1001A2F8A10000000001A /* CharacterListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B100192F8A100000000019 /* CharacterListModel.swift */; };
 		16B1001C2F8A10000000001C /* PeopleListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B1001B2F8A10000000001B /* PeopleListModel.swift */; };
@@ -496,7 +494,7 @@
 		16A200302FB4000000D1E001 /* AnimeDetailEpisodesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeDetailEpisodesModel.swift; sourceTree = "<group>"; };
 		16A200322FB4000000D1E001 /* AnimeDetailEpisodeRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeDetailEpisodeRowView.swift; sourceTree = "<group>"; };
 		16A200352FB4000000D1E001 /* AnimeDetailEpisodesLoadMoreFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeDetailEpisodesLoadMoreFooterView.swift; sourceTree = "<group>"; };
-		16B800002FD8000000000001 /* HorizontalEndBounceNavigationTriggerModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalEndBounceNavigationTriggerModifier.swift; sourceTree = "<group>"; };
+		16B800002FD8000000000001 /* EndBounceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EndBounceView.swift; sourceTree = "<group>"; };
 		16AA10012FCF300000000001 /* MainNewsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainNewsModel.swift; sourceTree = "<group>"; };
 		16AA10032FCF300000000003 /* MainNewsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainNewsService.swift; sourceTree = "<group>"; };
 		16AA10112FCF310000000011 /* MainNewsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainNewsViewModel.swift; sourceTree = "<group>"; };
@@ -513,12 +511,10 @@
 		16B100052F8A000000000005 /* CharacterListContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterListContentView.swift; sourceTree = "<group>"; };
 		16B100072F8A000000000007 /* CharacterPersonGridItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterPersonGridItemView.swift; sourceTree = "<group>"; };
 		16B100092F8A000000000009 /* CharacterListLoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterListLoadingView.swift; sourceTree = "<group>"; };
-		16B1000B2F8A00000000000B /* CharacterLoadMoreButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterLoadMoreButton.swift; sourceTree = "<group>"; };
 		16B1000D2F8A00000000000D /* PeopleListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleListView.swift; sourceTree = "<group>"; };
 		16B1000F2F8A00000000000F /* PeopleListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleListViewModel.swift; sourceTree = "<group>"; };
 		16B100112F8A000000000011 /* PeopleListContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleListContentView.swift; sourceTree = "<group>"; };
 		16B100132F8A000000000013 /* PeopleGridItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleGridItemView.swift; sourceTree = "<group>"; };
-		16B100152F8A000000000015 /* PeopleLoadMoreButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleLoadMoreButton.swift; sourceTree = "<group>"; };
 		16B100172F8A000000000017 /* PeopleListLoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleListLoadingView.swift; sourceTree = "<group>"; };
 		16B100192F8A100000000019 /* CharacterListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterListModel.swift; sourceTree = "<group>"; };
 		16B1001B2F8A10000000001B /* PeopleListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleListModel.swift; sourceTree = "<group>"; };
@@ -1844,6 +1840,7 @@
 				1576E4242F7B82680082CD46 /* WebView */,
 				15FF80272F765D3E00D3241C /* AnimeDetail */,
 				16D100022FAA100000000002 /* ImagePreview */,
+				16B800022FD8000000000002 /* EndBounce */,
 				15FF29652F76352D00D3241C /* MainHome */,
 				15MAL032F7F2000100MAL04 /* OpenMAL */,
 				15FC4F492F74E5130054153E /* Skeleton */,
@@ -2008,9 +2005,16 @@
 				15D0031F2FB069A000325AC6 /* SectionHeader */,
 				159667F32F8659AD0033410A /* PosterImage */,
 				15FF29632F76351700D3241C /* PosterCard */,
-				16B800002FD8000000000001 /* HorizontalEndBounceNavigationTriggerModifier.swift */,
 			);
 			path = MainHome;
+			sourceTree = "<group>";
+		};
+		16B800022FD8000000000002 /* EndBounce */ = {
+			isa = PBXGroup;
+			children = (
+				16B800002FD8000000000001 /* EndBounceView.swift */,
+			);
+			path = EndBounce;
 			sourceTree = "<group>";
 		};
 		15FF29662F763B1900D3241C /* Services */ = {
@@ -2223,7 +2227,6 @@
 				16B100052F8A000000000005 /* CharacterListContentView.swift */,
 				16B100072F8A000000000007 /* CharacterPersonGridItemView.swift */,
 				16B100092F8A000000000009 /* CharacterListLoadingView.swift */,
-				16B1000B2F8A00000000000B /* CharacterLoadMoreButton.swift */,
 			);
 			path = SubView;
 			sourceTree = "<group>";
@@ -2266,7 +2269,6 @@
 			children = (
 				16B100112F8A000000000011 /* PeopleListContentView.swift */,
 				16B100132F8A000000000013 /* PeopleGridItemView.swift */,
-				16B100152F8A000000000015 /* PeopleLoadMoreButton.swift */,
 				16B100172F8A000000000017 /* PeopleListLoadingView.swift */,
 			);
 			path = SubView;
@@ -2771,7 +2773,7 @@
 				1572FE0A2F762DE300756CBA /* HomeTodayAnimeView.swift in Sources */,
 				16F200042FAB400000000004 /* HomeTodayAnimeScheduleListView.swift in Sources */,
 				16F300082FAB500000000008 /* HomeTrendingAnimeListView.swift in Sources */,
-				16B800012FD8000000000001 /* HorizontalEndBounceNavigationTriggerModifier.swift in Sources */,
+				16B800012FD8000000000001 /* EndBounceView.swift in Sources */,
 				15FC4F412F73EB7B0054153E /* MainHomeService.swift in Sources */,
 				15AC996B2F879D8B008EAAEE /* GenreAnimeSectionView.swift in Sources */,
 				15FC4F452F74C7CF0054153E /* ErrorMessageView.swift in Sources */,
@@ -2840,7 +2842,6 @@
 				16C200122F99000000000012 /* CharacterDetailVoiceActorsSectionView.swift in Sources */,
 				16C200142F99000000000014 /* CharacterDetailSectionSkeletonViews.swift in Sources */,
 				16B1000A2F8A00000000000A /* CharacterListLoadingView.swift in Sources */,
-				16B1000C2F8A00000000000C /* CharacterLoadMoreButton.swift in Sources */,
 				16F100052FAB300000000005 /* HomeRecommendedAnimeViewModel.swift in Sources */,
 				15FC4F562F7507910054153E /* HomeTrendingAnimeViewModel.swift in Sources */,
 				15AC99802F87AA07008EAAEE /* AnimeListResponseModel.swift in Sources */,
@@ -2886,7 +2887,6 @@
 				15186B832FBEE4D2008C60D9 /* MyListStatisticsCardContainer.swift in Sources */,
 				16B100122F8A000000000012 /* PeopleListContentView.swift in Sources */,
 				16B100142F8A000000000014 /* PeopleGridItemView.swift in Sources */,
-				16B100162F8A000000000016 /* PeopleLoadMoreButton.swift in Sources */,
 				16B100182F8A000000000018 /* PeopleListLoadingView.swift in Sources */,
 				15FF80262F765C9500D3241C /* AnimeDetailHeaderSectionView.swift in Sources */,
 				15A295602F8631D60056071F /* MainCategoryListViewModel.swift in Sources */,

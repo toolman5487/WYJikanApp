@@ -31,6 +31,7 @@ final class MainCategoryListViewModel: ObservableObject {
         self.characterListViewModel = characterListViewModel
 
         bindSelectedKind()
+        bindChildViewModels()
     }
 
     private func bindSelectedKind() {
@@ -40,6 +41,19 @@ final class MainCategoryListViewModel: ObservableObject {
                 self?.loadIfNeeded(for: kind)
             }
             .store(in: &cancellables)
+    }
+
+    private func bindChildViewModels() {
+        Publishers.MergeMany(
+            animeListViewModel.genreAnimeViewModel.objectWillChange.map { _ in },
+            mangaListViewModel.genreMangaViewModel.objectWillChange.map { _ in },
+            peopleListViewModel.objectWillChange.map { _ in },
+            characterListViewModel.objectWillChange.map { _ in }
+        )
+        .sink { [weak self] in
+            self?.objectWillChange.send()
+        }
+        .store(in: &cancellables)
     }
 
     private func loadIfNeeded(for kind: MainListKind) {
@@ -65,6 +79,75 @@ final class MainCategoryListViewModel: ObservableObject {
             peopleListViewModel.reload()
         case .character:
             characterListViewModel.reload()
+        }
+    }
+
+    var canLoadMoreSelectedKind: Bool {
+        switch selectedKind {
+        case .anime:
+            return animeListViewModel.genreAnimeViewModel.canLoadMore &&
+                !animeListViewModel.genreAnimeViewModel.isLoadingMore
+        case .manga:
+            return mangaListViewModel.genreMangaViewModel.canLoadMore &&
+                !mangaListViewModel.genreMangaViewModel.isLoadingMore
+        case .people:
+            return peopleListViewModel.hasNextPage && peopleListViewModel.paginationState != .loadingMore
+        case .character:
+            return characterListViewModel.hasNextPage && characterListViewModel.paginationState != .loadingMore
+        }
+    }
+
+    var shouldShowLoadMoreFooter: Bool {
+        canLoadMoreSelectedKind || isLoadingMoreSelectedKind
+    }
+
+    var isLoadingMoreSelectedKind: Bool {
+        switch selectedKind {
+        case .anime:
+            return animeListViewModel.genreAnimeViewModel.isLoadingMore
+        case .manga:
+            return mangaListViewModel.genreMangaViewModel.isLoadingMore
+        case .people:
+            return peopleListViewModel.paginationState == .loadingMore
+        case .character:
+            return characterListViewModel.paginationState == .loadingMore
+        }
+    }
+
+    var loadMoreFooterTitle: String {
+        switch selectedKind {
+        case .anime, .manga:
+            return "載入更多種類"
+        case .people:
+            return "載入更多聲優"
+        case .character:
+            return "載入更多角色"
+        }
+    }
+
+    var loadMoreFooterSubtitle: String {
+        switch selectedKind {
+        case .anime:
+            return "繼續往下拉探索更多動畫分類"
+        case .manga:
+            return "繼續往下拉探索更多漫畫分類"
+        case .people:
+            return "繼續往下拉探索更多聲優"
+        case .character:
+            return "繼續往下拉探索更多角色"
+        }
+    }
+
+    func loadMoreSelectedKind() {
+        switch selectedKind {
+        case .anime:
+            animeListViewModel.genreAnimeViewModel.loadMoreSections()
+        case .manga:
+            mangaListViewModel.genreMangaViewModel.loadMoreSections()
+        case .people:
+            peopleListViewModel.loadMore()
+        case .character:
+            characterListViewModel.loadMore()
         }
     }
 

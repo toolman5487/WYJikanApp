@@ -60,22 +60,7 @@ struct GenreMangaListContainerView: View {
                     case .hidden:
                         EmptyView()
                     case .available, .loading:
-                        Button {
-                            viewModel.loadMoreSections()
-                        } label: {
-                            if loadMoreState == .loading {
-                                ProgressView()
-                                    .frame(maxWidth: .infinity, minHeight: 44)
-                            } else {
-                                Text("載入更多種類")
-                                    .frame(maxWidth: .infinity, minHeight: 44)
-                            }
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .tint(ThemeColor.sakura)
-                        .disabled(loadMoreState == .loading)
-                        .padding(.top, 8)
-                        .padding(.horizontal, 16)
+                        EmptyView()
                     }
                 }
             }

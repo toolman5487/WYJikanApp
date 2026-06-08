@@ -90,19 +90,6 @@ struct HomeRecommendedAnimeView: View {
                         }
                     }
                     .padding(.horizontal, 16)
-
-                    if viewModel.canLoadMore {
-                        Button("載入更多") {
-                            viewModel.loadMore()
-                        }
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(ThemeColor.textPrimary)
-                        .frame(maxWidth: .infinity, minHeight: 44)
-                        .background(ThemeColor.sakura)
-                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                        .padding(.top, 8)
-                        .padding(.horizontal, 16)
-                    }
                 }
             }
         }
