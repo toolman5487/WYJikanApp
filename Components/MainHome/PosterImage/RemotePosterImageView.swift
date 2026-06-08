@@ -43,11 +43,11 @@ struct RemotePosterImageView: View {
             Color(.systemBackground)
         }
         .onFailure { _ in
-            didFail = true
+            setDidFail(true)
         }
         .onSuccess { image, _, _ in
-            didFail = false
-            onImageSizeChange?(image.size)
+            setDidFail(false)
+            notifyImageSizeChange(image.size)
         }
         .overlay {
             if didFail {
@@ -61,7 +61,20 @@ struct RemotePosterImageView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .clipped()
         .onChange(of: url) { _, _ in
-            didFail = false
+            setDidFail(false)
+        }
+    }
+
+    private func setDidFail(_ value: Bool) {
+        Task { @MainActor in
+            didFail = value
+        }
+    }
+
+    private func notifyImageSizeChange(_ size: CGSize) {
+        guard let onImageSizeChange else { return }
+        Task { @MainActor in
+            onImageSizeChange(size)
         }
     }
 

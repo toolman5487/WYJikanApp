@@ -21,9 +21,6 @@ struct AnimeListView: View {
             viewModel: viewModel,
             favoriteIDs: favoriteStatusStore.favoriteIDs(for: .anime)
         )
-        .onAppear {
-            viewModel.loadIfNeeded()
-        }
     }
 }
 

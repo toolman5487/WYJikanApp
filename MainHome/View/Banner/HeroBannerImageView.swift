@@ -29,7 +29,9 @@ struct HeroBannerImageView: View {
                 .overlay(ProgressView())
         }
         .onFailure { _ in
-            didFail = true
+            Task { @MainActor in
+                didFail = true
+            }
         }
         .overlay {
             if didFail {
@@ -38,7 +40,9 @@ struct HeroBannerImageView: View {
             }
         }
         .onChange(of: url) { _, _ in
-            didFail = false
+            Task { @MainActor in
+                didFail = false
+            }
         }
     }
 }

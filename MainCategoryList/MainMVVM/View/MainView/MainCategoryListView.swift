@@ -22,6 +22,9 @@ struct MainCategoryListView: View {
         NavigationStack {
             scrollView
                 .toolbar(.hidden, for: .navigationBar)
+                .task {
+                    viewModel.loadSelectedKindIfNeeded()
+                }
                 .onDisappear {
                     viewModel.stopLoading()
                 }
@@ -65,6 +68,7 @@ struct MainCategoryListView: View {
                 axis: .vertical,
                 isEnabled: viewModel.canLoadMoreSelectedKind,
                 threshold: 36,
+                revealDistance: 144,
                 progress: $loadMoreBounceProgress
             ) {
                 viewModel.loadMoreSelectedKind()
@@ -73,12 +77,16 @@ struct MainCategoryListView: View {
                 topFilterHeader
             }
             .onChange(of: viewModel.selectedKind) { _, _ in
-                proxy.scrollTo(topAnchorId, anchor: .top)
+                Task { @MainActor in
+                    proxy.scrollTo(topAnchorId, anchor: .top)
+                }
             }
             .onChange(of: viewModel.activeTopFilterSelectionIdentifier) { _, _ in
                 guard viewModel.activeTopFilterSelectionIdentifier != nil else { return }
-                withAnimation(.easeInOut(duration: 0.2)) {
-                    proxy.scrollTo(topAnchorId, anchor: .top)
+                Task { @MainActor in
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        proxy.scrollTo(topAnchorId, anchor: .top)
+                    }
                 }
             }
         }

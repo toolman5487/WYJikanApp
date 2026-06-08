@@ -36,9 +36,12 @@ final class MainCategoryListViewModel: ObservableObject {
 
     private func bindSelectedKind() {
         $selectedKind
+            .dropFirst()
             .removeDuplicates()
             .sink { [weak self] kind in
-                self?.loadIfNeeded(for: kind)
+                Task { @MainActor in
+                    self?.loadIfNeeded(for: kind)
+                }
             }
             .store(in: &cancellables)
     }
@@ -51,9 +54,15 @@ final class MainCategoryListViewModel: ObservableObject {
             characterListViewModel.objectWillChange.map { _ in }
         )
         .sink { [weak self] in
-            self?.objectWillChange.send()
+            Task { @MainActor in
+                self?.objectWillChange.send()
+            }
         }
         .store(in: &cancellables)
+    }
+
+    func loadSelectedKindIfNeeded() {
+        loadIfNeeded(for: selectedKind)
     }
 
     private func loadIfNeeded(for kind: MainListKind) {

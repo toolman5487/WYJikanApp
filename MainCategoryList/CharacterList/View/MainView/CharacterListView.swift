@@ -17,9 +17,6 @@ struct CharacterListView: View {
 
     var body: some View {
         CharacterListContentView(viewModel: viewModel)
-            .onAppear {
-                viewModel.loadIfNeeded()
-            }
             .onDisappear {
                 viewModel.stop()
             }

@@ -17,9 +17,6 @@ struct PeopleListView: View {
 
     var body: some View {
         PeopleListContentView(viewModel: viewModel)
-            .onAppear {
-                viewModel.loadIfNeeded()
-            }
             .onDisappear {
                 viewModel.stop()
             }

@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import Dispatch
 
 // MARK: - EndBounceAxis
 
@@ -135,7 +134,9 @@ struct EndBounceHintView: View {
                 .rotationEffect(.degrees(180 * clampedProgress))
         }
         .frame(width: axis.iconSize, height: axis.iconSize)
-        .animation(.snappy(duration: 0.16), value: clampedProgress)
+        .transaction { transaction in
+            transaction.animation = nil
+        }
     }
 
     private var cardShape: RoundedRectangle {
@@ -165,6 +166,13 @@ struct EndBounceHintView: View {
     }
 }
 
+// MARK: - EndBounceScrollSample
+
+private struct EndBounceScrollSample: Equatable {
+    let pullProgress: CGFloat
+    let overscroll: CGFloat
+}
+
 // MARK: - EndBounceTriggerModifier
 
 struct EndBounceTriggerModifier: ViewModifier {
@@ -173,6 +181,7 @@ struct EndBounceTriggerModifier: ViewModifier {
     let axis: EndBounceAxis
     let isEnabled: Bool
     let threshold: CGFloat
+    let revealDistance: CGFloat?
     let progress: Binding<CGFloat>
     let action: () -> Void
 
@@ -183,55 +192,102 @@ struct EndBounceTriggerModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .onScrollGeometryChange(for: CGFloat.self) { geometry in
-                overscroll(from: geometry)
-            } action: { _, overscroll in
-                DispatchQueue.main.async {
-                    handleOverscrollChange(overscroll)
+            .onScrollGeometryChange(for: EndBounceScrollSample.self) { geometry in
+                scrollSample(from: geometry)
+            } action: { _, sample in
+                let transaction = Transaction(animation: nil)
+                withTransaction(transaction) {
+                    handleScrollChange(sample)
                 }
             }
     }
 
     // MARK: - Private Methods
 
-    private func overscroll(from geometry: ScrollGeometry) -> CGFloat {
+    private func scrollSample(from geometry: ScrollGeometry) -> EndBounceScrollSample {
         switch axis {
         case .horizontal:
-            let maximumOffsetX = max(
+            let maximumOffset = max(
                 geometry.contentSize.width - geometry.containerSize.width,
                 0
             )
-            return max(geometry.contentOffset.x - maximumOffsetX, 0)
+            let offset = geometry.contentOffset.x
+            let overscroll = max(offset - maximumOffset, 0)
+            let pullProgress = pullProgress(
+                offset: offset,
+                maximumOffset: maximumOffset,
+                overscroll: overscroll
+            )
+
+            return EndBounceScrollSample(
+                pullProgress: pullProgress,
+                overscroll: overscroll
+            )
+
         case .vertical:
-            let maximumOffsetY = max(
+            let maximumOffset = max(
                 geometry.contentSize.height - geometry.containerSize.height,
                 0
             )
-            return max(geometry.contentOffset.y - maximumOffsetY, 0)
+            let offset = geometry.contentOffset.y
+            let overscroll = max(offset - maximumOffset, 0)
+            let pullProgress = pullProgress(
+                offset: offset,
+                maximumOffset: maximumOffset,
+                overscroll: overscroll
+            )
+
+            return EndBounceScrollSample(
+                pullProgress: pullProgress,
+                overscroll: overscroll
+            )
         }
     }
 
-    private func handleOverscrollChange(_ overscroll: CGFloat) {
+    private func pullProgress(
+        offset: CGFloat,
+        maximumOffset: CGFloat,
+        overscroll: CGFloat
+    ) -> CGFloat {
+        if let revealDistance, revealDistance > 0 {
+            let revealStart = max(maximumOffset - revealDistance, 0)
+            let scrolledIntoRevealZone = max(offset - revealStart, 0)
+            let revealProgress = min(scrolledIntoRevealZone / revealDistance, 1)
+
+            guard overscroll > 0 else {
+                return revealProgress
+            }
+
+            let overscrollProgress = min(overscroll / threshold, 1)
+            return min(revealProgress + overscrollProgress * (1 - revealProgress), 1)
+        }
+
+        guard overscroll > 0 else { return 0 }
+        return min(overscroll / threshold, 1)
+    }
+
+    private func handleScrollChange(_ sample: EndBounceScrollSample) {
         guard isEnabled else {
             resetTrigger()
             return
         }
 
-        guard overscroll > 1 else {
+        guard sample.pullProgress > 0 || sample.overscroll > 0 else {
             resetTrigger()
             return
         }
 
-        progress.wrappedValue = min(overscroll / threshold, 1)
+        progress.wrappedValue = sample.pullProgress
 
         guard canTrigger else { return }
+        guard sample.overscroll > 0 else { return }
 
-        if overscroll > maximumOverscroll {
-            maximumOverscroll = overscroll
+        if sample.overscroll > maximumOverscroll {
+            maximumOverscroll = sample.overscroll
             return
         }
 
-        if maximumOverscroll >= threshold, overscroll < maximumOverscroll {
+        if maximumOverscroll >= threshold, sample.overscroll < maximumOverscroll {
             canTrigger = false
             action()
         }
@@ -251,6 +307,7 @@ extension View {
         axis: EndBounceAxis,
         isEnabled: Bool = true,
         threshold: CGFloat = 64,
+        revealDistance: CGFloat? = nil,
         progress: Binding<CGFloat> = .constant(0),
         perform action: @escaping () -> Void
     ) -> some View {
@@ -259,6 +316,7 @@ extension View {
                 axis: axis,
                 isEnabled: isEnabled,
                 threshold: threshold,
+                revealDistance: revealDistance,
                 progress: progress,
                 action: action
             )
