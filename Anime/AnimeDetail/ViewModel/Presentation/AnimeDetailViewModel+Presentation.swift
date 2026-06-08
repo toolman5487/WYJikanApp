@@ -114,6 +114,8 @@ extension AnimeDetailViewModel {
             ),
             imageURLString: posterURL(for: anime)?.absoluteString,
             genreNames: (anime.genres ?? []).compactMap(\.name),
+            type: anime.type,
+            year: anime.year,
             addedAt: Date()
         )
     }

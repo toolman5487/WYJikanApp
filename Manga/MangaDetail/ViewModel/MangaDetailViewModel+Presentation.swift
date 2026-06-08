@@ -111,6 +111,8 @@ extension MangaDetailViewModel {
             subtitle: manga.titleEnglish ?? manga.title,
             imageURLString: posterURL(for: manga)?.absoluteString,
             genreNames: (manga.genres ?? []).compactMap(\.name),
+            type: manga.type,
+            year: manga.published?.prop?.from?.year,
             addedAt: Date()
         )
     }

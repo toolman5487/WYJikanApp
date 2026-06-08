@@ -37,6 +37,8 @@ final class MyListCollectionItem {
     var subtitle: String?
     var imageURLString: String?
     var genreNamesRawValue: String?
+    var type: String?
+    var year: Int?
     var addedAt: Date
 
     init(
@@ -46,6 +48,8 @@ final class MyListCollectionItem {
         subtitle: String?,
         imageURLString: String?,
         genreNames: [String] = [],
+        type: String? = nil,
+        year: Int? = nil,
         addedAt: Date
     ) {
         self.malId = malId
@@ -54,6 +58,8 @@ final class MyListCollectionItem {
         self.subtitle = subtitle
         self.imageURLString = imageURLString
         self.genreNamesRawValue = Self.serializeGenreNames(genreNames)
+        self.type = Self.normalizedText(type)
+        self.year = year
         self.addedAt = addedAt
     }
 }
@@ -90,6 +96,12 @@ extension MyListCollectionItem {
         }
 
         return String(data: data, encoding: .utf8)
+    }
+
+    private static func normalizedText(_ text: String?) -> String? {
+        guard let text else { return nil }
+        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmedText.isEmpty ? nil : trimmedText
     }
 
     private static func normalizedGenreNames(from genreNames: [String]) -> [String] {

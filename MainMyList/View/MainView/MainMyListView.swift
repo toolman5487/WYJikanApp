@@ -17,6 +17,8 @@ struct MainMyListView: View {
         let subtitle: String?
         let imageURLString: String?
         let genreNamesRawValue: String?
+        let type: String?
+        let year: Int?
         let addedAt: Date
     }
 
@@ -62,6 +64,8 @@ struct MainMyListView: View {
                 subtitle: item.subtitle,
                 imageURLString: item.imageURLString,
                 genreNamesRawValue: item.genreNamesRawValue,
+                type: item.type,
+                year: item.year,
                 addedAt: item.addedAt
             )
         }

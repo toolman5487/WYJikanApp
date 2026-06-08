@@ -32,6 +32,7 @@ struct MyListStatisticsSectionView: View {
             case .populated:
                 VStack(alignment: .leading, spacing: 16) {
                     MyListDistributionChartCardView(statistics: presentation.statistics)
+                    MyListFormatDistributionChartCardView(statistics: presentation.statistics)
                 }
             }
         }
