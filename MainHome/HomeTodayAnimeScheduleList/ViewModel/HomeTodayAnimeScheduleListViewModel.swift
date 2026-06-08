@@ -164,11 +164,6 @@ final class HomeTodayAnimeScheduleListViewModel: ObservableObject {
         let generation = requestGeneration
         isLoadingMore = true
         loadMoreState = .loading
-        defer {
-            if isCurrentGeneration(generation) {
-                isLoadingMore = false
-            }
-        }
 
         do {
             let response = try await service.fetchSchedulePage(
@@ -181,11 +176,16 @@ final class HomeTodayAnimeScheduleListViewModel: ObservableObject {
             hasNextPage = response.pagination?.hasNextPage ?? !response.data.isEmpty
             let incoming = response.data.compactMap(Self.timelineItem(from:))
             sourceItems = mergedDeduplicatedItems(existing: sourceItems, incoming: incoming)
+            isLoadingMore = false
             applyPresentation()
         } catch is CancellationError {
+            if isCurrentGeneration(generation) {
+                isLoadingMore = false
+            }
             return
         } catch {
             guard isCurrentGeneration(generation) else { return }
+            isLoadingMore = false
             loadMoreState = .error(message: "載入更多失敗")
         }
     }

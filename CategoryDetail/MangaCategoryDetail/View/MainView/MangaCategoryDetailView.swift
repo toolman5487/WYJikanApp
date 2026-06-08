@@ -11,7 +11,9 @@ struct MangaCategoryDetailView: View {
 
     // MARK: - Properties
 
+    @EnvironmentObject private var favoriteStatusStore: FavoriteStatusStore
     @StateObject private var viewModel: MangaCategoryDetailViewModel
+    @State private var loadMoreBounceProgress: CGFloat = 0
 
     // MARK: - Initialization
 
@@ -40,21 +42,44 @@ struct MangaCategoryDetailView: View {
 
     private var scrollContent: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
+            LazyVStack(alignment: .leading, spacing: 8, pinnedViews: [.sectionHeaders]) {
                 MangaCategoryDetailHeaderView(
                     title: viewModel.genreTitle,
                     subtitle: viewModel.headerSubtitle,
                     loadedCountText: viewModel.loadedCountText
-                )
-                MangaCategoryDetailControlBarView(
-                    selectedSort: $viewModel.selectedSort,
-                    selectedFormat: $viewModel.selectedFormat
                 )
                 stateContentView
             }
             .padding(.horizontal, 16)
             .padding(.top, 16)
             .padding(.bottom, 28)
+        }
+        .onEndBounce(
+            axis: .vertical,
+            isEnabled: canLoadMore,
+            threshold: 36,
+            revealDistance: 144,
+            progress: $loadMoreBounceProgress
+        ) {
+            Task { await viewModel.loadMore() }
+        }
+        .safeAreaInset(edge: .top, spacing: 0) {
+            MangaCategoryDetailControlBarContainerView(
+                selectedSort: $viewModel.selectedSort,
+                selectedFormat: $viewModel.selectedFormat
+            )
+        }
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    Task { await viewModel.reload() }
+                } label: {
+                    Image(systemName: "arrow.trianglehead.counterclockwise")
+                        .font(.body.weight(.bold))
+                        .foregroundStyle(ThemeColor.sakura)
+                        .frame(width: 44, height: 44)
+                }
+            }
         }
     }
 
@@ -77,9 +102,10 @@ struct MangaCategoryDetailView: View {
         case let .content(items):
             MangaCategoryDetailGridSectionView(
                 items: items,
+                favoriteIDs: favoriteStatusStore.favoriteIDs(for: .manga),
                 loadMoreState: viewModel.loadMoreState,
-                onItemAppear: { item in
-                    Task { await viewModel.loadMoreIfNeeded(currentItem: item) }
+                loadMoreProgress: loadMoreBounceProgress,
+                onItemAppear: { _ in
                 },
                 onLoadMore: {
                     Task { await viewModel.loadMore() }
@@ -88,6 +114,15 @@ struct MangaCategoryDetailView: View {
                     Task { await viewModel.retryLoadMore() }
                 }
             )
+        }
+    }
+
+    private var canLoadMore: Bool {
+        switch viewModel.loadMoreState {
+        case .available:
+            return true
+        case .hidden, .loading, .error:
+            return false
         }
     }
 }

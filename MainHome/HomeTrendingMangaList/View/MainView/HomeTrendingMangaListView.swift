@@ -11,6 +11,7 @@ struct HomeTrendingMangaListView: View {
 
     // MARK: - Properties
 
+    @EnvironmentObject private var favoriteStatusStore: FavoriteStatusStore
     @StateObject private var viewModel: HomeTrendingMangaListViewModel
 
     // MARK: - Lifecycle
@@ -90,6 +91,7 @@ struct HomeTrendingMangaListView: View {
         case .content(let items):
             MangaCategoryDetailGridSectionView(
                 items: items,
+                favoriteIDs: favoriteStatusStore.favoriteIDs(for: .manga),
                 loadMoreState: viewModel.loadMoreState,
                 onItemAppear: { item in
                     Task { await viewModel.loadMoreIfNeeded(currentItem: item) }

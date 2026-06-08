@@ -11,13 +11,10 @@ struct AnimeCategoryDetailGridSectionView: View {
 
     // MARK: - Properties
 
-    private let gridColumns = [
-        GridItem(.flexible(), spacing: 16),
-        GridItem(.flexible(), spacing: 16)
-    ]
-
     let items: [AnimeCategoryItemDTO]
+    let favoriteIDs: Set<Int>
     let loadMoreState: AnimeCategoryDetailViewModel.LoadMoreState
+    var loadMoreProgress: CGFloat = 0
     let onItemAppear: (AnimeCategoryItemDTO) -> Void
     let onLoadMore: () -> Void
     let onRetryLoadMore: () -> Void
@@ -25,23 +22,25 @@ struct AnimeCategoryDetailGridSectionView: View {
     // MARK: - Body
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            LazyVGrid(columns: gridColumns, spacing: 20) {
-                ForEach(items) { item in
-                    NavigationLink {
-                        AnimeDetailView(malId: item.id)
-                    } label: {
-                        AnimeCategoryDetailGridCardView(item: item)
-                    }
-                    .buttonStyle(.plain)
-                    .onAppear {
-                        onItemAppear(item)
-                    }
+        LazyVStack(alignment: .leading, spacing: 12) {
+            ForEach(items) { item in
+                NavigationLink {
+                    AnimeDetailView(malId: item.id)
+                } label: {
+                    AnimeCategoryDetailGridCardView(
+                        item: item,
+                        isFavorite: favoriteIDs.contains(item.id)
+                    )
+                }
+                .buttonStyle(.plain)
+                .onAppear {
+                    onItemAppear(item)
                 }
             }
 
             AnimeCategoryDetailLoadMoreFooterView(
                 state: loadMoreState,
+                progress: loadMoreProgress,
                 onLoadMore: onLoadMore,
                 onRetry: onRetryLoadMore
             )

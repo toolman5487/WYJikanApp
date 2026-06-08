@@ -12,6 +12,7 @@ struct MangaCategoryDetailLoadMoreFooterView: View {
     // MARK: - Properties
 
     let state: MangaCategoryDetailViewModel.LoadMoreState
+    var progress: CGFloat = 0
     let onLoadMore: () -> Void
     let onRetry: () -> Void
 
@@ -24,16 +25,16 @@ struct MangaCategoryDetailLoadMoreFooterView: View {
             EmptyView()
 
         case .available:
-            Button("載入更多作品") {
-                onLoadMore()
-            }
-            .buttonStyle(.borderedProminent)
-            .tint(ThemeColor.sakura)
-            .frame(maxWidth: .infinity, alignment: .center)
+            EndBounceHintView(
+                axis: .vertical,
+                title: "載入更多作品",
+                subtitle: "繼續往下拉展開更多",
+                progress: progress
+            )
 
         case .loading:
             ProgressView()
-                .frame(maxWidth: .infinity, minHeight: 44)
+                .frame(maxWidth: .infinity, minHeight: 116)
 
         case let .error(message):
             VStack(alignment: .leading, spacing: 12) {
@@ -41,8 +42,10 @@ struct MangaCategoryDetailLoadMoreFooterView: View {
                     .font(.footnote)
                     .foregroundStyle(ThemeColor.textSecondary)
 
-                Button("重試載入更多") {
+                Button {
                     onRetry()
+                } label: {
+                    Label("重試載入更多", systemImage: "arrow.trianglehead.counterclockwise")
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(ThemeColor.sakura)

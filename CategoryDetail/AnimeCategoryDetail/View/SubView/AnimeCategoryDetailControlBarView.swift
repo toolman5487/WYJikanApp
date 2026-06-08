@@ -7,6 +7,30 @@
 
 import SwiftUI
 
+struct AnimeCategoryDetailControlBarContainerView: View {
+
+    // MARK: - Properties
+
+    @Binding var selectedSort: AnimeCategoryFilter.Sort
+    @Binding var selectedFormat: AnimeCategoryFilter.Format
+
+    // MARK: - Body
+
+    var body: some View {
+        VStack(spacing: 12) {
+            AnimeCategoryDetailControlBarView(
+                selectedSort: $selectedSort,
+                selectedFormat: $selectedFormat
+            )
+            .padding(.horizontal, 16)
+
+            Divider()
+        }
+        .padding(.top, 8)
+        .background(.ultraThinMaterial)
+    }
+}
+
 struct AnimeCategoryDetailControlBarView: View {
 
     // MARK: - Properties
@@ -17,11 +41,7 @@ struct AnimeCategoryDetailControlBarView: View {
     // MARK: - Body
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("探索條件")
-                .font(.headline)
-                .foregroundStyle(ThemeColor.textPrimary)
-
+        ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 12) {
                 Menu {
                     ForEach(AnimeCategoryFilter.Sort.allCases) { option in
@@ -50,6 +70,7 @@ struct AnimeCategoryDetailControlBarView: View {
                 }
             }
         }
+        .scrollClipDisabled()
     }
 
     // MARK: - Private Methods

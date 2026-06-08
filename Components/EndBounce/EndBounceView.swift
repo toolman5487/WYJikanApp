@@ -195,9 +195,19 @@ struct EndBounceTriggerModifier: ViewModifier {
             .onScrollGeometryChange(for: EndBounceScrollSample.self) { geometry in
                 scrollSample(from: geometry)
             } action: { _, sample in
-                let transaction = Transaction(animation: nil)
-                withTransaction(transaction) {
-                    handleScrollChange(sample)
+                DispatchQueue.main.async {
+                    let transaction = Transaction(animation: nil)
+                    withTransaction(transaction) {
+                        handleScrollChange(sample)
+                    }
+                }
+            }
+            .onChange(of: isEnabled) { _, _ in
+                DispatchQueue.main.async {
+                    let transaction = Transaction(animation: nil)
+                    withTransaction(transaction) {
+                        resetTrigger()
+                    }
                 }
             }
     }

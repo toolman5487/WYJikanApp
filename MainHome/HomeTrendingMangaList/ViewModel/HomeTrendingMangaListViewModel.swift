@@ -122,12 +122,6 @@ final class HomeTrendingMangaListViewModel: ObservableObject {
         isLoadingMore = true
         loadMoreState = .loading
 
-        defer {
-            if isCurrentGeneration(generation) {
-                isLoadingMore = false
-            }
-        }
-
         do {
             let page = try await service.fetchPage(page: currentPage + 1, limit: pageSize)
             guard isCurrentGeneration(generation) else { return }
@@ -138,11 +132,16 @@ final class HomeTrendingMangaListViewModel: ObservableObject {
 
             hasNextPage = appendedNewItems && page.hasNextPage
             sourceItems = mergedItems
+            isLoadingMore = false
             applyPresentation()
         } catch is CancellationError {
+            if isCurrentGeneration(generation) {
+                isLoadingMore = false
+            }
             return
         } catch {
             guard isCurrentGeneration(generation) else { return }
+            isLoadingMore = false
             loadMoreState = .error(message: "載入更多失敗")
         }
     }
