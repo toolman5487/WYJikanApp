@@ -14,6 +14,7 @@ struct HomeTrendingAnimeView: View {
     @EnvironmentObject private var router: MainHomeRouter
     @EnvironmentObject private var favoriteStatusStore: FavoriteStatusStore
     @ObservedObject private var viewModel: HomeTrendingAnimeViewModel
+    @State private var endBounceProgress: CGFloat = 0
 
     let showsHeader: Bool
 
@@ -88,9 +89,21 @@ struct HomeTrendingAnimeView: View {
                             }
                             .buttonStyle(.plain)
                         }
+
+                        HorizontalEndBounceNavigationHintView(
+                            title: "完整熱門動畫",
+                            subtitle: "繼續往右拉查看榜單",
+                            progress: endBounceProgress
+                        )
                     }
                 }
                 .padding(.horizontal, 16)
+            }
+            .onHorizontalEndBounce(
+                isEnabled: viewModel.screenState.hasContent,
+                progress: $endBounceProgress
+            ) {
+                router.push(.trendingAnimeList)
             }
         }
         .onAppear {

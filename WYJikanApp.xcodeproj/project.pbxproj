@@ -202,6 +202,7 @@
 		16A200312FB4000000D1E001 /* AnimeDetailEpisodesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A200302FB4000000D1E001 /* AnimeDetailEpisodesModel.swift */; };
 		16A200332FB4000000D1E001 /* AnimeDetailEpisodeRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A200322FB4000000D1E001 /* AnimeDetailEpisodeRowView.swift */; };
 		16A200342FB4000000D1E001 /* AnimeDetailEpisodesLoadMoreFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A200352FB4000000D1E001 /* AnimeDetailEpisodesLoadMoreFooterView.swift */; };
+		16B800012FD8000000000001 /* HorizontalEndBounceNavigationTriggerModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B800002FD8000000000001 /* HorizontalEndBounceNavigationTriggerModifier.swift */; };
 		16AA10022FCF300000000002 /* MainNewsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AA10012FCF300000000001 /* MainNewsModel.swift */; };
 		16AA10042FCF300000000004 /* MainNewsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AA10032FCF300000000003 /* MainNewsService.swift */; };
 		16AA10122FCF310000000012 /* MainNewsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AA10112FCF310000000011 /* MainNewsViewModel.swift */; };
@@ -495,6 +496,7 @@
 		16A200302FB4000000D1E001 /* AnimeDetailEpisodesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeDetailEpisodesModel.swift; sourceTree = "<group>"; };
 		16A200322FB4000000D1E001 /* AnimeDetailEpisodeRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeDetailEpisodeRowView.swift; sourceTree = "<group>"; };
 		16A200352FB4000000D1E001 /* AnimeDetailEpisodesLoadMoreFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeDetailEpisodesLoadMoreFooterView.swift; sourceTree = "<group>"; };
+		16B800002FD8000000000001 /* HorizontalEndBounceNavigationTriggerModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalEndBounceNavigationTriggerModifier.swift; sourceTree = "<group>"; };
 		16AA10012FCF300000000001 /* MainNewsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainNewsModel.swift; sourceTree = "<group>"; };
 		16AA10032FCF300000000003 /* MainNewsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainNewsService.swift; sourceTree = "<group>"; };
 		16AA10112FCF310000000011 /* MainNewsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainNewsViewModel.swift; sourceTree = "<group>"; };
@@ -2006,6 +2008,7 @@
 				15D0031F2FB069A000325AC6 /* SectionHeader */,
 				159667F32F8659AD0033410A /* PosterImage */,
 				15FF29632F76351700D3241C /* PosterCard */,
+				16B800002FD8000000000001 /* HorizontalEndBounceNavigationTriggerModifier.swift */,
 			);
 			path = MainHome;
 			sourceTree = "<group>";
@@ -2768,6 +2771,7 @@
 				1572FE0A2F762DE300756CBA /* HomeTodayAnimeView.swift in Sources */,
 				16F200042FAB400000000004 /* HomeTodayAnimeScheduleListView.swift in Sources */,
 				16F300082FAB500000000008 /* HomeTrendingAnimeListView.swift in Sources */,
+				16B800012FD8000000000001 /* HorizontalEndBounceNavigationTriggerModifier.swift in Sources */,
 				15FC4F412F73EB7B0054153E /* MainHomeService.swift in Sources */,
 				15AC996B2F879D8B008EAAEE /* GenreAnimeSectionView.swift in Sources */,
 				15FC4F452F74C7CF0054153E /* ErrorMessageView.swift in Sources */,

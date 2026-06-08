@@ -14,6 +14,7 @@ struct HomeTodayAnimeView: View {
     @EnvironmentObject private var router: MainHomeRouter
     @EnvironmentObject private var favoriteStatusStore: FavoriteStatusStore
     @ObservedObject private var viewModel: HomeTodayAnimeViewModel
+    @State private var endBounceProgress: CGFloat = 0
 
     let showsHeader: Bool
 
@@ -72,9 +73,21 @@ struct HomeTodayAnimeView: View {
                             }
                             .buttonStyle(.plain)
                         }
+
+                        HorizontalEndBounceNavigationHintView(
+                            title: "完整今日動畫",
+                            subtitle: "繼續往右拉查看時刻表",
+                            progress: endBounceProgress
+                        )
                     }
                 }
                 .padding(.horizontal, 16)
+            }
+            .onHorizontalEndBounce(
+                isEnabled: viewModel.screenState.hasContent,
+                progress: $endBounceProgress
+            ) {
+                router.push(.todayAnimeSchedule)
             }
         }
         .onAppear {
