@@ -175,7 +175,7 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
                 visibleCount = previousVisibleCount
                 startTitleEnrichmentIfNeeded()
             } else {
-                screenState = .error(error.localizedDescription)
+                screenState = .error(error.userFacingMessage)
             }
         }
     }

@@ -132,7 +132,7 @@ final class CharacterListViewModel: ObservableObject {
                 paginationState = .idle
             } catch {
                 guard !Task.isCancelled else { return }
-                paginationState = .error(error.localizedDescription)
+                paginationState = .error(error.userFacingMessage)
             }
         }
     }

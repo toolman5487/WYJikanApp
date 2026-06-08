@@ -22,7 +22,7 @@ nonisolated extension MainNewsServicing {
     }
 }
 
-nonisolated enum MainNewsServiceError: LocalizedError, Sendable {
+nonisolated enum MainNewsServiceError: LocalizedError, AppUserFacingError, Sendable {
     case invalidFeedURL(source: MainNewsSource)
     case invalidResponse(source: MainNewsSource)
     case serverError(source: MainNewsSource, statusCode: Int)
@@ -30,7 +30,7 @@ nonisolated enum MainNewsServiceError: LocalizedError, Sendable {
     case requestFailed(source: MainNewsSource, message: String)
     case parsingFailed(source: MainNewsSource, message: String)
 
-    var errorDescription: String? {
+    nonisolated var errorDescription: String? {
         switch self {
         case .invalidFeedURL(let source):
             return "\(source.displayName) RSS URL is invalid."
@@ -44,6 +44,17 @@ nonisolated enum MainNewsServiceError: LocalizedError, Sendable {
             return "\(source.displayName) is temporarily unavailable. \(message)"
         case .parsingFailed(let source, let message):
             return "\(source.displayName) RSS parsing failed: \(message)"
+        }
+    }
+
+    nonisolated var userMessage: String {
+        switch self {
+        case .invalidFeedURL:
+            return "新聞來源設定暫時異常，請稍後再試。"
+        case .invalidResponse, .serverError, .requestFailed, .parsingFailed:
+            return "目前無法更新新聞，請稍後再試。"
+        case .emptyFeed:
+            return "目前沒有可顯示的新聞。"
         }
     }
 }

@@ -156,7 +156,7 @@ final class MangaCategoryDetailViewModel: ObservableObject {
             return
         } catch {
             guard isCurrentGeneration(generation) else { return }
-            screenState = .error(message: error.localizedDescription)
+            screenState = .error(message: error.userFacingMessage)
             loadMoreState = .hidden
         }
     }

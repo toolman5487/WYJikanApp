@@ -157,7 +157,7 @@ final class RandomHeroViewModel: ObservableObject {
                 if isAutomatic, self.randomPick == nil {
                     self.drawState = .idle
                 } else {
-                    self.drawState = .failure(message: error.localizedDescription)
+                    self.drawState = .failure(message: error.userFacingMessage)
                 }
             }
         }
