@@ -9,14 +9,14 @@ import OSLog
 
 // MARK: - JikanAPIError
 
-enum JikanAPIError: LocalizedError {
+nonisolated enum JikanAPIError: LocalizedError, AppUserFacingError {
     case invalidURL
     case noData
     case decodingError(Error)
     case networkError(Error)
     case serverError(statusCode: Int)
     
-    var errorDescription: String? {
+    nonisolated var errorDescription: String? {
         switch self {
         case .invalidURL:
             return "The URL is invalid and the request could not be created."
@@ -28,6 +28,28 @@ enum JikanAPIError: LocalizedError {
             return "Network error: \(error.localizedDescription)"
         case .serverError(let statusCode):
             return "Server error (HTTP \(statusCode))."
+        }
+    }
+
+    nonisolated var userMessage: String {
+        switch self {
+        case .invalidURL:
+            return "資料來源設定暫時異常，請稍後再試。"
+        case .noData:
+            return "目前沒有可顯示的資料。"
+        case .decodingError:
+            return "資料格式暫時無法讀取，請稍後再試。"
+        case .networkError(let error):
+            return error.userFacingMessage
+        case .serverError(let statusCode):
+            switch statusCode {
+            case 429:
+                return "請求太頻繁，請稍候再試。"
+            case 500...599:
+                return "伺服器暫時無法回應，請稍後再試。"
+            default:
+                return "目前無法載入資料，請稍後再試。"
+            }
         }
     }
 }

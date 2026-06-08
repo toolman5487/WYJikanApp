@@ -212,7 +212,7 @@ private extension MainSearchViewModel {
                 self.applySortedResults()
             } catch {
                 guard !Task.isCancelled else { return }
-                self.pagination.failLoadMore(message: error.localizedDescription)
+                self.pagination.failLoadMore(message: error.userFacingMessage)
                 self.loadMoreState = self.presentationBuilder.loadMoreState(
                     requestState: self.pagination.requestState,
                     hasNextPage: self.pagination.hasNextPage

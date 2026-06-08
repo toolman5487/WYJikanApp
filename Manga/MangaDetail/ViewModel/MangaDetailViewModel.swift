@@ -86,7 +86,7 @@ final class MangaDetailViewModel: ObservableObject {
             if let existingDetail, forceRefresh {
                 screenState = .loaded(existingDetail)
             } else {
-                screenState = .error(error.localizedDescription)
+                screenState = .error(error.userFacingMessage)
                 resetSupplementaryContent()
             }
         }

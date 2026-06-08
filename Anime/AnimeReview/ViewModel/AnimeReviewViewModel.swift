@@ -87,7 +87,7 @@ final class AnimeReviewViewModel: ObservableObject {
         } catch is CancellationError {
             return
         } catch {
-            screenState = .error(error.localizedDescription)
+            screenState = .error(error.userFacingMessage)
         }
     }
 

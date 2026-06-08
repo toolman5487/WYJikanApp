@@ -201,7 +201,7 @@ final class HeroBannerViewModel: ObservableObject {
                 startAutoScrollIfNeeded()
             } else {
                 currentIndex = 0
-                screenState = .error(error.localizedDescription)
+                screenState = .error(error.userFacingMessage)
                 stopAutoScroll()
             }
         }

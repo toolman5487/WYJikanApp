@@ -80,7 +80,7 @@ struct MainSearchSearchPublisherFactory {
                                 currentPage: 1,
                                 hasNextPage: false
                             ),
-                            error: error.localizedDescription
+                            error: error.userFacingMessage
                         )
                     )
                 }

@@ -144,7 +144,7 @@ final class HomeTodayAnimeViewModel: ObservableObject {
             if forceRefresh, previousState.hasContent {
                 screenState = previousState
             } else {
-                screenState = .error(error.localizedDescription)
+                screenState = .error(error.userFacingMessage)
             }
         }
     }

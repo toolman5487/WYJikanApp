@@ -103,7 +103,7 @@ final class AnimeDetailEpisodesListViewModel: ObservableObject {
             rebuildEpisodeRows()
         } catch {
             episodeDetailStates[episodeNumber] = .error(
-                error.localizedDescription,
+                error.userFacingMessage,
                 rowPresenter.expandedPresentation(for: episode)
             )
             rebuildEpisodeRows()
@@ -129,7 +129,7 @@ final class AnimeDetailEpisodesListViewModel: ObservableObject {
             loadMoreState = resolvedLoadMoreState()
         } catch is CancellationError {
         } catch {
-            screenState = .error(error.localizedDescription)
+            screenState = .error(error.userFacingMessage)
             loadMoreState = .hidden
         }
     }
