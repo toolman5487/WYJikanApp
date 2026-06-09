@@ -80,6 +80,15 @@ nonisolated enum APIConfig {
         static let manga = "/recommendations/manga"
     }
 
+    // MARK: - Watch
+
+    enum Watch {
+        static let episodes = "/watch/episodes"
+        static let popularEpisodes = "/watch/episodes/popular"
+        static let promos = "/watch/promos"
+        static let popularPromos = "/watch/promos/popular"
+    }
+
     // MARK: - Users
 
     enum Users {

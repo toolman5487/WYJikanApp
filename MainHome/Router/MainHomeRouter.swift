@@ -10,6 +10,8 @@ import Foundation
 import SwiftUI
 
 enum MainHomeRoute: Hashable {
+    case watch(feed: HomeWatchFeedKind)
+    case webPage(BaseWebPage)
     case todayAnimeSchedule
     case trendingAnimeList
     case trendingMangaList

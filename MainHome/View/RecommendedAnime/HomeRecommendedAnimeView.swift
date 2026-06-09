@@ -17,10 +17,13 @@ struct HomeRecommendedAnimeView: View {
 
     let showsHeader: Bool
 
-    private let columns = Array(
-        repeating: GridItem(.flexible(), spacing: 16, alignment: .top),
-        count: 3
-    )
+    private var columns: [GridItem] {
+        [
+            GridItem(.flexible(), spacing: 16),
+            GridItem(.flexible(), spacing: 16),
+            GridItem(.flexible(), spacing: 16)
+        ]
+    }
 
     // MARK: - Lifecycle
 
@@ -47,9 +50,7 @@ struct HomeRecommendedAnimeView: View {
                 case .loading:
                     LazyVGrid(columns: columns, alignment: .leading, spacing: 16) {
                         ForEach(0..<9, id: \.self) { _ in
-                            BannerSkeletonView()
-                                .aspectRatio(2.0 / 3.0, contentMode: .fit)
-                                .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                            HomeRecommendedAnimeSkeletonCardView()
                         }
                     }
                     .padding(.horizontal, 16)
@@ -65,28 +66,12 @@ struct HomeRecommendedAnimeView: View {
                 case .content:
                     LazyVGrid(columns: columns, alignment: .leading, spacing: 16) {
                         ForEach(viewModel.displayedItems) { item in
-                            Button {
+                            HomeRecommendedAnimeCardView(
+                                item: item,
+                                isFavorite: favoriteIDs.contains(item.detailMalId)
+                            ) {
                                 router.push(.animeDetail(malId: item.detailMalId))
-                            } label: {
-                                PosterCardView {
-                                    RemotePosterImageView(url: item.imageURL)
-                                }
-                                .aspectRatio(2.0 / 3.0, contentMode: .fit)
-                                .overlay(alignment: .bottomLeading) {
-                                    PosterCardMetadataOverlayView(
-                                        title: "",
-                                        type: item.username.map { "@\($0)" },
-                                        score: nil
-                                    )
-                                }
-                                .overlay(alignment: .topTrailing) {
-                                    MyListCollectionStatusBadgeView(
-                                        isFavorite: favoriteIDs.contains(item.detailMalId)
-                                    )
-                                    .padding(8)
-                                }
                             }
-                            .buttonStyle(.plain)
                         }
                     }
                     .padding(.horizontal, 16)
@@ -96,6 +81,68 @@ struct HomeRecommendedAnimeView: View {
         .onAppear {
             viewModel.loadIfNeeded()
         }
+    }
+}
+
+private struct HomeRecommendedAnimeCardView: View {
+
+    private static let aspectRatio: CGFloat = 2.0 / 3.0
+
+    let item: HomeRecommendedAnimeCardItem
+    let isFavorite: Bool
+    let onTap: () -> Void
+
+    var body: some View {
+        Button(action: onTap) {
+            Rectangle()
+                .fill(Color(.systemBackground))
+                .aspectRatio(Self.aspectRatio, contentMode: .fit)
+                .overlay {
+                    GeometryReader { proxy in
+                        PosterCardView {
+                            RemotePosterImageView(
+                                url: item.imageURL,
+                                contentMode: .fill,
+                                fixedSize: proxy.size
+                            )
+                        }
+                    }
+                }
+                .overlay(alignment: .bottomLeading) {
+                    PosterCardMetadataOverlayView(
+                        title: "",
+                        type: item.username.map { "@\($0)" },
+                        score: nil
+                    )
+                }
+                .overlay(alignment: .topTrailing) {
+                    MyListCollectionStatusBadgeView(isFavorite: isFavorite)
+                        .padding(8)
+                }
+                .frame(maxWidth: .infinity)
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+private struct HomeRecommendedAnimeSkeletonCardView: View {
+
+    private static let aspectRatio: CGFloat = 2.0 / 3.0
+
+    var body: some View {
+        Rectangle()
+            .fill(Color(.systemBackground))
+            .aspectRatio(Self.aspectRatio, contentMode: .fit)
+            .overlay {
+                BannerSkeletonView()
+                    .clipShape(
+                        RoundedRectangle(
+                            cornerRadius: MainHomePosterCardMetrics.cornerRadius,
+                            style: .continuous
+                        )
+                    )
+            }
+            .frame(maxWidth: .infinity)
     }
 }
 

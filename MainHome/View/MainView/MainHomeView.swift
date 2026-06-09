@@ -13,21 +13,27 @@ struct MainHomeView: View {
 
     @EnvironmentObject private var router: MainHomeRouter
     @StateObject private var heroBannerViewModel: HeroBannerViewModel
+    @StateObject private var watchPromosViewModel: HomeWatchPromosViewModel
     @StateObject private var todayAnimeViewModel: HomeTodayAnimeViewModel
+    @StateObject private var watchEpisodesViewModel: HomeWatchEpisodesViewModel
     @StateObject private var trendingMangaViewModel: HomeTrendingMangaViewModel
     @StateObject private var trendingAnimeViewModel: HomeTrendingAnimeViewModel
     @StateObject private var recommendedAnimeViewModel: HomeRecommendedAnimeViewModel
     @State private var loadMoreBounceProgress: CGFloat = 0
 
     enum HomeSection: Identifiable {
+        case watchPromos
         case todayAnime
+        case watchEpisodes
         case trendingAnime
         case trendingManga
         case recommendedAnime
 
         var id: String {
             switch self {
+            case .watchPromos: return "watchPromos"
             case .todayAnime: return "todayAnime"
+            case .watchEpisodes: return "watchEpisodes"
             case .trendingAnime: return "trendingAnime"
             case .trendingManga: return "trendingManga"
             case .recommendedAnime: return "recommendedAnime"
@@ -36,7 +42,9 @@ struct MainHomeView: View {
 
         var title: String {
             switch self {
+            case .watchPromos: return "最新預告"
             case .todayAnime: return "今日動畫"
+            case .watchEpisodes: return "新上架集數"
             case .trendingAnime: return "熱門動畫"
             case .trendingManga: return "熱門漫畫"
             case .recommendedAnime: return "作品推薦"
@@ -48,14 +56,21 @@ struct MainHomeView: View {
         .todayAnime,
         .trendingAnime,
         .trendingManga,
+        .watchPromos,
+        .watchEpisodes,
         .recommendedAnime
     ]
 
     // MARK: - Lifecycle
 
-    init(service: MainHomeServicing = MainHomeService()) {
+    init(
+        service: MainHomeServicing = MainHomeService(),
+        watchService: HomeWatchServicing = HomeWatchService()
+    ) {
         _heroBannerViewModel = StateObject(wrappedValue: HeroBannerViewModel(service: service))
+        _watchPromosViewModel = StateObject(wrappedValue: HomeWatchPromosViewModel(service: watchService))
         _todayAnimeViewModel = StateObject(wrappedValue: HomeTodayAnimeViewModel(service: service))
+        _watchEpisodesViewModel = StateObject(wrappedValue: HomeWatchEpisodesViewModel(service: watchService))
         _trendingAnimeViewModel = StateObject(wrappedValue: HomeTrendingAnimeViewModel(service: service))
         _trendingMangaViewModel = StateObject(wrappedValue: HomeTrendingMangaViewModel(service: service))
         _recommendedAnimeViewModel = StateObject(wrappedValue: HomeRecommendedAnimeViewModel(service: service))
@@ -104,6 +119,12 @@ struct MainHomeView: View {
             .toolbarBackground(.hidden, for: .navigationBar)
             .navigationDestination(for: MainHomeRoute.self) { route in
                 switch route {
+                case .watch(let feed):
+                    HomeWatchListView(
+                        viewModel: HomeWatchListViewModel(initialFeed: feed)
+                    )
+                case .webPage(let page):
+                    BaseWebView(page: page)
                 case .todayAnimeSchedule:
                     HomeTodayAnimeScheduleListView()
                 case .trendingAnimeList:
@@ -124,9 +145,19 @@ struct MainHomeView: View {
     @ViewBuilder
     private func sectionView(_ section: HomeSection) -> some View {
         switch section {
+        case .watchPromos:
+            HomeWatchPromosView(
+                viewModel: watchPromosViewModel,
+                showsHeader: false
+            )
         case .todayAnime:
             HomeTodayAnimeView(
                 viewModel: todayAnimeViewModel,
+                showsHeader: false
+            )
+        case .watchEpisodes:
+            HomeWatchEpisodesView(
+                viewModel: watchEpisodesViewModel,
                 showsHeader: false
             )
         case .trendingAnime:
@@ -155,8 +186,12 @@ struct MainHomeView: View {
 
     private func state(for section: HomeSection) -> GlassSectionHeaderView.State {
         switch section {
+        case .watchPromos:
+            return .navigable(action: { router.push(.watch(feed: .latestPromos)) })
         case .todayAnime:
             return .navigable(action: { router.push(.todayAnimeSchedule) })
+        case .watchEpisodes:
+            return .navigable(action: { router.push(.watch(feed: .latestEpisodes)) })
         case .trendingAnime:
             return .navigable(action: { router.push(.trendingAnimeList) })
         case .trendingManga:
@@ -168,14 +203,18 @@ struct MainHomeView: View {
 
     private func refreshAllContent() async {
         async let heroBannerRefresh = heroBannerViewModel.refresh()
+        async let watchPromosRefresh = watchPromosViewModel.refresh()
         async let todayAnimeRefresh = todayAnimeViewModel.refresh()
+        async let watchEpisodesRefresh = watchEpisodesViewModel.refresh()
         async let trendingAnimeRefresh = trendingAnimeViewModel.refresh()
         async let trendingMangaRefresh = trendingMangaViewModel.refresh()
         async let recommendedAnimeRefresh = recommendedAnimeViewModel.refresh()
 
         _ = await (
             heroBannerRefresh,
+            watchPromosRefresh,
             todayAnimeRefresh,
+            watchEpisodesRefresh,
             trendingAnimeRefresh,
             trendingMangaRefresh,
             recommendedAnimeRefresh

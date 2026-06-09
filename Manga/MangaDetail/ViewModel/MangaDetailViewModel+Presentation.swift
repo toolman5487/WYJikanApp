@@ -38,7 +38,12 @@ extension MangaDetailViewModel {
     // MARK: - Header & Media
 
     func displayTitle(for manga: MangaDetailDTO) -> String {
-        manga.titleJapanese ?? manga.titleEnglish ?? manga.title ?? "📖"
+        preferredTitle(
+            japaneseTitle: manga.titleJapanese,
+            englishTitle: manga.titleEnglish,
+            fallbackTitle: manga.title,
+            emptyFallback: "未命名作品"
+        )
     }
 
     func posterURL(for manga: MangaDetailDTO) -> URL? {
