@@ -165,30 +165,63 @@ private actor JikanAPIResponseCache {
     private struct Entry: Sendable {
         let data: Data
         let expirationDate: Date
+        let staleFallbackExpirationDate: Date
     }
 
     private var storage: [String: Entry] = [:]
+    private var nextCleanupDate = Date.distantPast
 
     func data(for key: String, now: Date = Date()) -> Data? {
-        switch storage[key] {
-        case .some(let entry) where entry.expirationDate > now:
+        guard let entry = storage[key] else { return nil }
+
+        if entry.expirationDate > now {
             return entry.data
-        case .some:
-            return nil
-        case .none:
+        }
+
+        removeIfStaleFallbackExpired(for: key, entry: entry, now: now)
+        return nil
+    }
+
+    func staleData(for key: String, now: Date = Date()) -> Data? {
+        guard let entry = storage[key] else { return nil }
+
+        guard entry.staleFallbackExpirationDate > now else {
+            storage.removeValue(forKey: key)
             return nil
         }
+
+        return entry.data
     }
 
-    func staleData(for key: String) -> Data? {
-        storage[key]?.data
-    }
+    func insert(
+        _ data: Data,
+        for key: String,
+        ttl: TimeInterval,
+        staleFallbackRetention: TimeInterval,
+        cleanupInterval: TimeInterval,
+        now: Date = Date()
+    ) {
+        removeExpiredStaleFallbacksIfNeeded(now: now, cleanupInterval: cleanupInterval)
 
-    func insert(_ data: Data, for key: String, ttl: TimeInterval, now: Date = Date()) {
         storage[key] = Entry(
             data: data,
-            expirationDate: now.addingTimeInterval(ttl)
+            expirationDate: now.addingTimeInterval(ttl),
+            staleFallbackExpirationDate: now.addingTimeInterval(ttl + staleFallbackRetention)
         )
+    }
+
+    private func removeIfStaleFallbackExpired(for key: String, entry: Entry, now: Date) {
+        guard entry.staleFallbackExpirationDate <= now else { return }
+        storage.removeValue(forKey: key)
+    }
+
+    private func removeExpiredStaleFallbacksIfNeeded(now: Date, cleanupInterval: TimeInterval) {
+        guard now >= nextCleanupDate else { return }
+
+        storage = storage.filter { _, entry in
+            entry.staleFallbackExpirationDate > now
+        }
+        nextCleanupDate = now.addingTimeInterval(cleanupInterval)
     }
 }
 
@@ -225,6 +258,7 @@ private actor JikanAPITransientFailureBackoffStore {
     }
 
     private var storage: [String: Entry] = [:]
+    private var nextCleanupDate = Date.distantPast
 
     func statusCode(for key: String, now: Date = Date()) -> Int? {
         switch storage[key] {
@@ -238,7 +272,15 @@ private actor JikanAPITransientFailureBackoffStore {
         }
     }
 
-    func record(statusCode: Int, for key: String, cooldown: TimeInterval, now: Date = Date()) {
+    func record(
+        statusCode: Int,
+        for key: String,
+        cooldown: TimeInterval,
+        cleanupInterval: TimeInterval,
+        now: Date = Date()
+    ) {
+        removeExpiredEntriesIfNeeded(now: now, cleanupInterval: cleanupInterval)
+
         storage[key] = Entry(
             statusCode: statusCode,
             expirationDate: now.addingTimeInterval(cooldown)
@@ -247,6 +289,15 @@ private actor JikanAPITransientFailureBackoffStore {
 
     func remove(for key: String) {
         storage.removeValue(forKey: key)
+    }
+
+    private func removeExpiredEntriesIfNeeded(now: Date, cleanupInterval: TimeInterval) {
+        guard now >= nextCleanupDate else { return }
+
+        storage = storage.filter { _, entry in
+            entry.expirationDate > now
+        }
+        nextCleanupDate = now.addingTimeInterval(cleanupInterval)
     }
 }
 
@@ -258,6 +309,8 @@ nonisolated final class JikanAPIService: @unchecked Sendable {
     static let shared = JikanAPIService()
 
     private static let transientFailureCooldown: TimeInterval = 60
+    private static let staleResponseFallbackRetention: TimeInterval = 3_600
+    private static let storeCleanupInterval: TimeInterval = 300
     private static let transientRetryDelays: [UInt64] = [
         400_000_000,
         900_000_000
@@ -438,14 +491,21 @@ nonisolated final class JikanAPIService: @unchecked Sendable {
             AppLogger.cache.debug("cache miss \(key, privacy: .public)")
             do {
                 let freshData = try await sharedDataTask(for: urlRequest, key: key)
-                await responseCache.insert(freshData, for: key, ttl: ttl)
+                await responseCache.insert(
+                    freshData,
+                    for: key,
+                    ttl: ttl,
+                    staleFallbackRetention: Self.staleResponseFallbackRetention,
+                    cleanupInterval: Self.storeCleanupInterval
+                )
                 await transientFailureBackoffStore.remove(for: key)
                 return freshData
             } catch JikanAPIError.serverError(let statusCode) where isTransientStatusCode(statusCode) {
                 await transientFailureBackoffStore.record(
                     statusCode: statusCode,
                     for: key,
-                    cooldown: Self.transientFailureCooldown
+                    cooldown: Self.transientFailureCooldown,
+                    cleanupInterval: Self.storeCleanupInterval
                 )
                 if let staleData = await responseCache.staleData(for: key) {
                     AppLogger.cache.debug("cache stale fallback HTTP \(statusCode) \(key, privacy: .public)")
@@ -473,15 +533,19 @@ nonisolated final class JikanAPIService: @unchecked Sendable {
             AppLogger.performance.debug("in-flight join \(key, privacy: .public)")
         }
 
-        defer {
-            if taskState.isNew {
-                Task {
-                    await self.inFlightRequestStore.removeTask(for: key)
-                }
-            }
+        do {
+            let data = try await taskState.task.value
+            await removeSharedDataTaskIfNeeded(isNew: taskState.isNew, key: key)
+            return data
+        } catch {
+            await removeSharedDataTaskIfNeeded(isNew: taskState.isNew, key: key)
+            throw error
         }
+    }
 
-        return try await taskState.task.value
+    private func removeSharedDataTaskIfNeeded(isNew: Bool, key: String) async {
+        guard isNew else { return }
+        await inFlightRequestStore.removeTask(for: key)
     }
 
     // MARK: - Public API

@@ -5,8 +5,8 @@
 //  Created by Willy Hsu on 2026/4/10.
 //
 
+import Foundation
 import SwiftUI
-import SDWebImageSwiftUI
 
 // MARK: - RandomMangaSectionView
 
@@ -102,11 +102,16 @@ struct RandomMangaSectionView: View {
 
 private struct RandomMangaCardView: View {
 
-    // MARK: - Constants
+    // MARK: - Style
 
-    private static let heroHeight: CGFloat = 320
-    private static let horizontalPadding: CGFloat = 16
-    private static let verticalPadding: CGFloat = 16
+    private static let style = RandomPickHeroStyle(
+        emptyBadgeText: "隨機推薦",
+        readyBadgeText: "MANGA RANDOM PICK",
+        emptySystemImageName: "books.vertical.fill",
+        emptyTitle: "今天抽這部",
+        emptyDescription: "按下按鈕，交給系統幫你抽出下一部值得開追的漫畫作品。",
+        drawingText: "正在幫你抽選下一部作品..."
+    )
 
     // MARK: - Properties
 
@@ -123,307 +128,19 @@ private struct RandomMangaCardView: View {
     // MARK: - Body
 
     var body: some View {
-        GeometryReader { proxy in
-            ZStack {
-                heroBackground
-                    .frame(width: proxy.size.width, height: proxy.size.height)
-                    .clipped()
-
-                LinearGradient(
-                    colors: [
-                        Color.black.opacity(0.18),
-                        Color.black.opacity(0.74)
-                    ],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-
-                VStack(alignment: .leading, spacing: 12) {
-                    heroBadge
-                        .padding(.trailing, 48)
-
-                    Spacer(minLength: 0)
-
-                    HStack(alignment: .bottom, spacing: 16) {
-                        posterPanel(width: posterWidth(for: proxy.size.width))
-
-                        VStack(alignment: .leading, spacing: 8) {
-                            heroHeadline
-                            heroMetadata
-                            heroSynopsis
-
-                            if let cooldownText, !cooldownText.isEmpty {
-                                Text(cooldownText)
-                                    .font(.footnote.weight(.semibold))
-                                    .foregroundStyle(ThemeColor.textPrimary.opacity(0.86))
-                                    .lineLimit(1)
-                            }
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .layoutPriority(1)
-                    }
-
-                    RandomMangaActionButtonsView(
-                        drawButtonTitle: drawButtonTitle,
-                        canDraw: canDraw,
-                        detailMalId: detailMalId,
-                        onDrawTap: onDrawTap
-                    )
-                }
-                .padding(.horizontal, Self.horizontalPadding)
-                .padding(.vertical, Self.verticalPadding)
-            }
-        }
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .frame(maxWidth: .infinity)
-        .frame(height: Self.heroHeight)
-        .overlay(alignment: .topTrailing) {
-            if pick != nil {
-                MyListCollectionStatusBadgeView(isFavorite: isFavorite)
-                    .padding(12)
-            }
-        }
-        .overlay {
-            if isDrawing {
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .fill(.ultraThinMaterial)
-
-                VStack(spacing: 12) {
-                    ProgressView()
-                        .tint(ThemeColor.sakura)
-
-                    Text("正在幫你抽選下一部作品…")
-                        .font(.footnote.weight(.medium))
-                        .foregroundStyle(ThemeColor.textPrimary)
-                }
-            }
-        }
-        .overlay {
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .strokeBorder(Color.white.opacity(0.08))
-        }
-    }
-
-    // MARK: - Private Methods
-
-    private func posterWidth(for containerWidth: CGFloat) -> CGFloat {
-        min(118, max(92, containerWidth * 0.32))
-    }
-
-    @ViewBuilder
-    private var heroBackground: some View {
-        if let url = pick?.posterURL {
-            WebImage(url: url) { image in
-                image
-                    .resizable()
-                    .scaledToFill()
-            } placeholder: {
-                Color(.secondarySystemFill)
-            }
-            .blur(radius: 18)
-            .scaleEffect(1.08)
-            .overlay(Color.black.opacity(0.18))
-        } else {
-            LinearGradient(
-                colors: [
-                    ThemeColor.sakura.opacity(0.45),
-                    Color(.secondarySystemFill)
-                ],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .overlay {
-                Image(systemName: "books.vertical.fill")
-                    .font(.system(size: 48, weight: .semibold))
-                    .foregroundStyle(Color.white.opacity(0.38))
-            }
-        }
-    }
-
-    private var heroBadge: some View {
-        Text(pick == nil ? "隨機推薦" : "MANGA RANDOM PICK")
-            .font(.caption.weight(.black))
-            .kerning(0.8)
-            .foregroundStyle(ThemeColor.textPrimary)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            .background(ThemeColor.sakura.opacity(0.84))
-            .clipShape(Capsule())
-    }
-
-    private func posterPanel(width: CGFloat) -> some View {
-        Group {
-            if let url = pick?.posterURL {
-                WebImage(url: url) { image in
-                    image
-                        .resizable()
-                        .scaledToFit()
-                } placeholder: {
-                    Color(.systemBackground)
-                }
-                .frame(width: width, height: width * 1.48)
-            } else {
-                Color(.secondarySystemFill)
-                    .overlay {
-                        Image(systemName: "photo")
-                            .font(.title2.weight(.semibold))
-                            .foregroundStyle(.secondary)
-                    }
-            }
-        }
-        .frame(width: width, height: width * 1.48)
-        .background(Color.black.opacity(0.18))
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .overlay {
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .strokeBorder(Color.white.opacity(0.14))
-        }
-        .shadow(color: Color.black.opacity(0.22), radius: 18, y: 10)
-    }
-
-    private var heroHeadline: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            if let pick {
-                Text(pick.displayTitle)
-                    .font(.system(.title2, design: .rounded).weight(.bold))
-                    .foregroundStyle(ThemeColor.textPrimary)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.88)
-                    .multilineTextAlignment(.leading)
-            } else if let errorMessage {
-                Text("載入失敗")
-                    .font(.system(.title2, design: .rounded).weight(.bold))
-                    .foregroundStyle(ThemeColor.textPrimary)
-
-                Text(errorMessage)
-                    .font(.footnote)
-                    .foregroundStyle(ThemeColor.textPrimary.opacity(0.9))
-                    .lineLimit(2)
-            } else {
-                Text("今天抽這部")
-                    .font(.system(.title2, design: .rounded).weight(.bold))
-                    .foregroundStyle(ThemeColor.textPrimary)
-
-                Text("按下按鈕，交給系統幫你抽出下一部值得開追的漫畫作品。")
-                    .font(.footnote)
-                    .foregroundStyle(ThemeColor.textPrimary.opacity(0.9))
-                    .lineLimit(2)
-            }
-        }
-    }
-
-    private var heroMetadata: some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(spacing: 8) {
-                metadataChips
-            }
-
-            HStack(spacing: 8) {
-                if let type = pick?.type, !type.isEmpty {
-                    chip(text: type)
-                }
-                if let score = pick?.score {
-                    chip(text: String(format: "★ %.1f", score))
-                }
-            }
-        }
-    }
-
-    @ViewBuilder
-    private var metadataChips: some View {
-        if let type = pick?.type, !type.isEmpty {
-            chip(text: type)
-        }
-        if let score = pick?.score {
-            chip(text: String(format: "★ %.1f", score))
-        }
-        if let chapters = pick?.chapters {
-            chip(text: "\(chapters) 話")
-        } else if let volumes = pick?.volumes {
-            chip(text: "\(volumes) 卷")
-        }
-    }
-
-    private var shouldShowSynopsis: Bool {
-        switch (pick?.synopsisPreview, errorMessage) {
-        case (.some, nil):
-            return true
-        default:
-            return false
-        }
-    }
-
-    @ViewBuilder
-    private var heroSynopsis: some View {
-        if shouldShowSynopsis, let synopsis = pick?.synopsisPreview {
-            Text(synopsis)
-                .font(.footnote)
-                .foregroundStyle(ThemeColor.textPrimary.opacity(0.9))
-                .lineLimit(2)
-                .multilineTextAlignment(.leading)
-        }
-    }
-
-    private func chip(text: String) -> some View {
-        Text(text)
-            .font(.caption2.weight(.semibold))
-            .foregroundStyle(ThemeColor.textPrimary)
-            .lineLimit(1)
-            .minimumScaleFactor(0.82)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
-            .background(Color.white.opacity(0.16))
-            .clipShape(Capsule())
-    }
-}
-
-// MARK: - RandomMangaActionButtonsView
-
-private struct RandomMangaActionButtonsView: View {
-
-    // MARK: - Properties
-
-    let drawButtonTitle: String
-    let canDraw: Bool
-    let detailMalId: Int?
-    let onDrawTap: () -> Void
-
-    // MARK: - Body
-
-    var body: some View {
-        if let id = detailMalId {
-            HStack(spacing: 12) {
-                Button(action: onDrawTap) {
-                    Text(drawButtonTitle)
-                        .frame(maxWidth: .infinity, minHeight: 44)
-                }
-                .buttonStyle(.borderedProminent)
-                .tint(ThemeColor.sakura)
-                .disabled(!canDraw)
-
-                NavigationLink {
-                    MangaDetailView(malId: id)
-                } label: {
-                    HStack(spacing: 8) {
-                        Text("查看詳情")
-                        Image(systemName: "arrow.right")
-                            .font(.caption.weight(.bold))
-                    }
-                    .frame(maxWidth: .infinity, minHeight: 44)
-                }
-                .buttonStyle(.bordered)
-                .tint(ThemeColor.sakura)
-            }
-        } else {
-            Button(action: onDrawTap) {
-                Text(drawButtonTitle)
-                    .frame(maxWidth: .infinity, minHeight: 44)
-            }
-            .buttonStyle(.borderedProminent)
-            .tint(ThemeColor.sakura)
-            .disabled(!canDraw)
-            .frame(maxWidth: .infinity)
-        }
+        RandomPickHeroCardView(
+            item: pick.map(RandomPickHeroItem.init(manga:)),
+            style: Self.style,
+            isDrawing: isDrawing,
+            errorMessage: errorMessage,
+            cooldownText: cooldownText,
+            drawButtonTitle: drawButtonTitle,
+            canDraw: canDraw,
+            detailID: detailMalId,
+            isFavorite: isFavorite,
+            onDrawTap: onDrawTap,
+            detailDestination: { MangaDetailView(malId: $0) }
+        )
     }
 }
 
@@ -434,8 +151,38 @@ private struct RandomMangaSkeletonView: View {
     // MARK: - Body
 
     var body: some View {
-        BannerSkeletonView()
-            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-            .frame(height: 368)
+        RandomPickHeroSkeletonView(height: 368)
+    }
+}
+
+// MARK: - RandomPickHeroItem
+
+private extension RandomPickHeroItem {
+    init(manga: MangaListRandomDTO) {
+        self.init(
+            id: manga.id,
+            displayTitle: manga.displayTitle,
+            posterURL: manga.posterURL,
+            metadataTexts: Self.metadataTexts(from: manga),
+            synopsisPreview: manga.synopsisPreview
+        )
+    }
+
+    static func metadataTexts(from manga: MangaListRandomDTO) -> [String] {
+        var texts: [String] = []
+
+        if let type = manga.type, !type.isEmpty {
+            texts.append(type)
+        }
+        if let score = manga.score {
+            texts.append(String(format: "★ %.1f", score))
+        }
+        if let chapters = manga.chapters {
+            texts.append("\(chapters) 話")
+        } else if let volumes = manga.volumes {
+            texts.append("\(volumes) 卷")
+        }
+
+        return texts
     }
 }

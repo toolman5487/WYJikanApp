@@ -17,12 +17,7 @@ final class HomeTodayAnimeScheduleListViewModel: ObservableObject {
         case error(message: String)
     }
 
-    enum LoadMoreState: Equatable {
-        case hidden
-        case available
-        case loading
-        case error(message: String)
-    }
+    typealias LoadMoreState = PaginationFooterState
 
     // MARK: - Published State
 
@@ -37,12 +32,7 @@ final class HomeTodayAnimeScheduleListViewModel: ObservableObject {
     // MARK: - Pagination State
 
     private let pageSize = 25
-    private var sourceItems: [HomeTodayAnimeTimelineItem] = []
-    private var currentPage = 0
-    private var hasNextPage = false
-    private var hasLoaded = false
-    private var isLoadingMore = false
-    private var requestGeneration = 0
+    private var pagination = PaginatedListState<HomeTodayAnimeTimelineItem>()
     private var loadMoreTriggerIDs: Set<Int> = []
     private var cancellables: Set<AnyCancellable> = []
     private var dayRequestTask: Task<Void, Never>?
@@ -69,13 +59,13 @@ final class HomeTodayAnimeScheduleListViewModel: ObservableObject {
     }
 
     var loadedCountText: String {
-        "已載入 \(sourceItems.count) 部"
+        "已載入 \(pagination.items.count) 部"
     }
 
     // MARK: - Public Methods
 
     func loadIfNeeded() async {
-        guard !hasLoaded else { return }
+        guard !pagination.hasLoaded else { return }
         await fetchFirstPage(showSkeleton: true)
     }
 
@@ -121,20 +111,12 @@ final class HomeTodayAnimeScheduleListViewModel: ObservableObject {
 
     // MARK: - Loading
 
-    private func resetPagination() {
-        currentPage = 0
-        hasNextPage = false
-        isLoadingMore = false
-        loadMoreTriggerIDs = []
-        loadMoreState = .hidden
-    }
-
     private func fetchFirstPage(showSkeleton: Bool) async {
-        let generation = advanceRequestGeneration()
-        resetPagination()
+        let generation = pagination.beginReload(clearItems: showSkeleton)
+        loadMoreTriggerIDs = []
+        loadMoreState = pagination.footerState
         dayRequestTask = nil
         if showSkeleton {
-            sourceItems = []
             screenState = .loading
         }
 
@@ -144,77 +126,67 @@ final class HomeTodayAnimeScheduleListViewModel: ObservableObject {
                 page: 1,
                 limit: pageSize
             )
-            guard isCurrentGeneration(generation) else { return }
-            hasLoaded = true
-            currentPage = response.pagination?.currentPage ?? 1
-            hasNextPage = response.pagination?.hasNextPage ?? !response.data.isEmpty
-            sourceItems = deduplicatedItems(response.data.compactMap(Self.timelineItem(from:)))
+            let page = PaginatedPage(
+                items: response.data.compactMap(Self.timelineItem(from:)),
+                currentPage: response.pagination?.currentPage ?? 1,
+                hasNextPage: response.pagination?.hasNextPage ?? !response.data.isEmpty
+            )
+            guard pagination.finishReload(page, generation: generation) else { return }
             applyPresentation()
         } catch is CancellationError {
             return
         } catch {
-            guard isCurrentGeneration(generation) else { return }
+            guard pagination.isCurrent(generation) else { return }
             screenState = .error(message: error.userFacingMessage)
             loadMoreState = .hidden
         }
     }
 
     private func loadMorePage() async {
-        guard hasLoaded, hasNextPage, !isLoadingMore else { return }
-        let generation = requestGeneration
-        isLoadingMore = true
-        loadMoreState = .loading
+        guard let generation = pagination.beginLoadMore() else { return }
+        loadMoreState = pagination.footerState
 
         do {
+            let nextPage = pagination.currentPage + 1
             let response = try await service.fetchSchedulePage(
                 day: selectedDay,
-                page: currentPage + 1,
+                page: nextPage,
                 limit: pageSize
             )
-            guard isCurrentGeneration(generation) else { return }
-            currentPage = response.pagination?.currentPage ?? currentPage + 1
-            hasNextPage = response.pagination?.hasNextPage ?? !response.data.isEmpty
-            let incoming = response.data.compactMap(Self.timelineItem(from:))
-            sourceItems = mergedDeduplicatedItems(existing: sourceItems, incoming: incoming)
-            isLoadingMore = false
+            let page = PaginatedPage(
+                items: response.data.compactMap(Self.timelineItem(from:)),
+                currentPage: response.pagination?.currentPage ?? nextPage,
+                hasNextPage: response.pagination?.hasNextPage ?? !response.data.isEmpty
+            )
+            guard pagination.finishLoadMore(page, generation: generation) else { return }
             applyPresentation()
         } catch is CancellationError {
-            if isCurrentGeneration(generation) {
-                isLoadingMore = false
+            if pagination.cancelLoadMore(generation: generation) {
+                loadMoreState = pagination.footerState
             }
             return
         } catch {
-            guard isCurrentGeneration(generation) else { return }
-            isLoadingMore = false
-            loadMoreState = .error(message: "載入更多失敗")
+            guard pagination.failLoadMore(message: "載入更多失敗", generation: generation) else { return }
+            loadMoreState = pagination.footerState
         }
     }
 
     private func applyPresentation() {
-        guard !sourceItems.isEmpty else {
+        let items = pagination.items
+        guard !items.isEmpty else {
             screenState = .empty
-            loadMoreState = .hidden
+            loadMoreState = pagination.footerState
             return
         }
 
-        screenState = .content(sections: groupedSections(from: sourceItems))
-        loadMoreTriggerIDs = Set(sourceItems.suffix(5).map(\.id))
-        loadMoreState = resolvedLoadMoreState()
+        screenState = .content(sections: groupedSections(from: items))
+        loadMoreTriggerIDs = Set(items.suffix(5).map(\.id))
+        loadMoreState = pagination.footerState
     }
 
     private func shouldLoadMore(after item: HomeTodayAnimeTimelineItem) -> Bool {
-        guard hasLoaded, hasNextPage, !isLoadingMore else { return false }
+        guard pagination.canLoadMore else { return false }
         return loadMoreTriggerIDs.contains(item.id)
-    }
-
-    private func resolvedLoadMoreState() -> LoadMoreState {
-        if isLoadingMore {
-            return .loading
-        }
-        if case .error(let message) = loadMoreState {
-            return .error(message: message)
-        }
-        return hasNextPage ? .available : .hidden
     }
 
     // MARK: - Presentation Mapping
@@ -372,28 +344,4 @@ final class HomeTodayAnimeScheduleListViewModel: ObservableObject {
         return String(trimmed[..<idx]) + "..."
     }
 
-    // MARK: - Request State
-
-    private func advanceRequestGeneration() -> Int {
-        requestGeneration += 1
-        return requestGeneration
-    }
-
-    private func isCurrentGeneration(_ generation: Int) -> Bool {
-        generation == requestGeneration
-    }
-
-    private func deduplicatedItems(_ items: [HomeTodayAnimeTimelineItem]) -> [HomeTodayAnimeTimelineItem] {
-        var seenIDs: Set<Int> = []
-        return items.filter { item in
-            seenIDs.insert(item.id).inserted
-        }
-    }
-
-    private func mergedDeduplicatedItems(
-        existing: [HomeTodayAnimeTimelineItem],
-        incoming: [HomeTodayAnimeTimelineItem]
-    ) -> [HomeTodayAnimeTimelineItem] {
-        deduplicatedItems(existing + incoming)
-    }
 }

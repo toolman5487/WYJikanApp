@@ -17,7 +17,7 @@ final class HomeTrendingMangaListViewModel: ObservableObject {
         case error(message: String)
     }
 
-    typealias LoadMoreState = MangaCategoryDetailViewModel.LoadMoreState
+    typealias LoadMoreState = PaginationFooterState
 
     @Published var selectedSort: HomeTrendingMangaListSort = .apiDefault
     @Published var selectedFormat: HomeTrendingMangaListFormat = .all
@@ -27,12 +27,7 @@ final class HomeTrendingMangaListViewModel: ObservableObject {
     private let service: HomeTrendingMangaListServicing
     private let pageSize = 24
 
-    private var sourceItems: [MangaCategoryItemDTO] = []
-    private var currentPage = 0
-    private var hasNextPage = false
-    private var hasLoaded = false
-    private var isLoadingMore = false
-    private var requestGeneration = 0
+    private var pagination = PaginatedListState<MangaCategoryItemDTO>()
     private var cancellables: Set<AnyCancellable> = []
 
     init(service: HomeTrendingMangaListServicing = HomeTrendingMangaListService()) {
@@ -49,11 +44,11 @@ final class HomeTrendingMangaListViewModel: ObservableObject {
     }
 
     var loadedCountText: String {
-        "已載入 \(sourceItems.count) 部"
+        "已載入 \(pagination.items.count) 部"
     }
 
     func loadIfNeeded() async {
-        guard !hasLoaded else { return }
+        guard !pagination.hasLoaded else { return }
         await fetchFirstPage(showSkeleton: true)
     }
 
@@ -82,80 +77,77 @@ final class HomeTrendingMangaListViewModel: ObservableObject {
         )
             .dropFirst()
             .sink { [weak self] _, _ in
-                guard let self, self.hasLoaded else { return }
+                guard let self, self.pagination.hasLoaded else { return }
                 self.applyPresentation()
             }
             .store(in: &cancellables)
     }
 
     private func fetchFirstPage(showSkeleton: Bool) async {
-        let generation = advanceRequestGeneration()
-        resetPagination()
+        let generation = pagination.beginReload(clearItems: showSkeleton)
 
         if showSkeleton {
-            sourceItems = []
             screenState = .loading
+            loadMoreState = pagination.footerState
         }
 
         do {
             let page = try await service.fetchPage(page: 1, limit: pageSize)
-            guard isCurrentGeneration(generation) else { return }
-
-            hasLoaded = true
-            currentPage = page.currentPage
-            hasNextPage = page.hasNextPage
-            sourceItems = deduplicatedItems(page.items)
+            guard pagination.finishReload(
+                PaginatedPage(
+                    items: page.items,
+                    currentPage: page.currentPage,
+                    hasNextPage: page.hasNextPage
+                ),
+                generation: generation
+            ) else { return }
             applyPresentation()
         } catch is CancellationError {
             return
         } catch {
-            guard isCurrentGeneration(generation) else { return }
+            guard pagination.isCurrent(generation) else { return }
             screenState = .error(message: error.userFacingMessage)
             loadMoreState = .hidden
         }
     }
 
     private func loadMorePage() async {
-        guard hasLoaded, hasNextPage, !isLoadingMore else { return }
-
-        let generation = requestGeneration
-        isLoadingMore = true
-        loadMoreState = .loading
+        guard let generation = pagination.beginLoadMore() else { return }
+        loadMoreState = pagination.footerState
 
         do {
-            let page = try await service.fetchPage(page: currentPage + 1, limit: pageSize)
-            guard isCurrentGeneration(generation) else { return }
-
-            currentPage = page.currentPage
-            let mergedItems = mergedDeduplicatedItems(existing: sourceItems, incoming: page.items)
-            let appendedNewItems = mergedItems.count > sourceItems.count
-
-            hasNextPage = appendedNewItems && page.hasNextPage
-            sourceItems = mergedItems
-            isLoadingMore = false
+            let page = try await service.fetchPage(page: pagination.currentPage + 1, limit: pageSize)
+            guard pagination.finishLoadMore(
+                PaginatedPage(
+                    items: page.items,
+                    currentPage: page.currentPage,
+                    hasNextPage: page.hasNextPage
+                ),
+                generation: generation,
+                requiresNewItemsForNextPage: true
+            ) else { return }
             applyPresentation()
         } catch is CancellationError {
-            if isCurrentGeneration(generation) {
-                isLoadingMore = false
+            if pagination.cancelLoadMore(generation: generation) {
+                loadMoreState = pagination.footerState
             }
             return
         } catch {
-            guard isCurrentGeneration(generation) else { return }
-            isLoadingMore = false
-            loadMoreState = .error(message: "載入更多失敗")
+            guard pagination.failLoadMore(message: "載入更多失敗", generation: generation) else { return }
+            loadMoreState = pagination.footerState
         }
     }
 
     private func applyPresentation() {
-        guard !sourceItems.isEmpty else {
+        guard !pagination.items.isEmpty else {
             screenState = .empty
-            loadMoreState = resolvedLoadMoreState()
+            loadMoreState = pagination.footerState
             return
         }
 
-        let presentedItems = presentedItems(from: sourceItems)
+        let presentedItems = presentedItems(from: pagination.items)
         screenState = presentedItems.isEmpty ? .empty : .content(items: presentedItems)
-        loadMoreState = resolvedLoadMoreState()
+        loadMoreState = pagination.footerState
     }
 
     private func presentedItems(from items: [MangaCategoryItemDTO]) -> [MangaCategoryItemDTO] {
@@ -197,10 +189,8 @@ final class HomeTrendingMangaListViewModel: ObservableObject {
     }
 
     private func shouldLoadMore(after item: MangaCategoryItemDTO) -> Bool {
-        guard hasLoaded, hasNextPage, !isLoadingMore else { return false }
         let visibleItems = visibleItemsForPagination()
-        guard let index = visibleItems.firstIndex(where: { $0.id == item.id }) else { return false }
-        return index >= max(visibleItems.count - 5, 0)
+        return pagination.shouldLoadMore(after: item, visibleItems: visibleItems)
     }
 
     private func visibleItemsForPagination() -> [MangaCategoryItemDTO] {
@@ -208,18 +198,8 @@ final class HomeTrendingMangaListViewModel: ObservableObject {
         case .content(let items):
             return items
         case .loading, .empty, .error:
-            return presentedItems(from: sourceItems)
+            return presentedItems(from: pagination.items)
         }
-    }
-
-    private func resolvedLoadMoreState() -> LoadMoreState {
-        if isLoadingMore {
-            return .loading
-        }
-        if case .error(let message) = loadMoreState {
-            return .error(message: message)
-        }
-        return hasNextPage ? .available : .hidden
     }
 
     private func headerTitle(sort: HomeTrendingMangaListSort, format: HomeTrendingMangaListFormat) -> String {
@@ -262,36 +242,6 @@ final class HomeTrendingMangaListViewModel: ObservableObject {
         case (.score, _):
             return "把高評價的\(format.title)作品拉到前面，想先看口碑穩、分數亮眼的類型可以從這裡開始。"
         }
-    }
-
-    private func resetPagination() {
-        currentPage = 0
-        hasNextPage = false
-        isLoadingMore = false
-        loadMoreState = .hidden
-    }
-
-    private func advanceRequestGeneration() -> Int {
-        requestGeneration += 1
-        return requestGeneration
-    }
-
-    private func isCurrentGeneration(_ generation: Int) -> Bool {
-        generation == requestGeneration
-    }
-
-    private func deduplicatedItems(_ items: [MangaCategoryItemDTO]) -> [MangaCategoryItemDTO] {
-        var seenIDs: Set<Int> = []
-        return items.filter { item in
-            seenIDs.insert(item.id).inserted
-        }
-    }
-
-    private func mergedDeduplicatedItems(
-        existing: [MangaCategoryItemDTO],
-        incoming: [MangaCategoryItemDTO]
-    ) -> [MangaCategoryItemDTO] {
-        deduplicatedItems(existing + incoming)
     }
 
     private func compareOptionalAscending<T: Comparable>(

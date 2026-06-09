@@ -153,14 +153,9 @@ struct MangaDetailPicturesSectionView: View {
         AnimeDetailSectionCard("圖片") {
             LazyVGrid(columns: gridColumns, alignment: .center, spacing: 12) {
                 ForEach(Array(viewModel.pictureItems.enumerated()), id: \.element.id) { index, item in
-                    RemotePosterImageView(url: item.url)
-                        .aspectRatio(2.0 / 3.0, contentMode: .fill)
-                        .frame(maxWidth: .infinity)
-                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            onTapImage(index)
-                        }
+                    DetailPictureGridItemView(url: item.url) {
+                        onTapImage(index)
+                    }
                 }
             }
         }

@@ -17,12 +17,7 @@ final class AnimeCategoryDetailViewModel: ObservableObject {
         case error(message: String)
     }
 
-    enum LoadMoreState: Equatable {
-        case hidden
-        case available
-        case loading
-        case error(message: String)
-    }
+    typealias LoadMoreState = PaginationFooterState
 
     // MARK: - Published State
 
@@ -40,12 +35,7 @@ final class AnimeCategoryDetailViewModel: ObservableObject {
     // MARK: - Pagination State
 
     private let pageSize = 24
-    private var hasLoaded = false
-    private var currentPage = 0
-    private var hasNextPage = false
-    private var isLoadingMore = false
-    private var sourceItems: [AnimeCategoryItemDTO] = []
-    private var requestGeneration = 0
+    private var pagination = PaginatedListState<AnimeCategoryItemDTO>()
     private var cancellables: Set<AnyCancellable> = []
     private var filterRequestTask: Task<Void, Never>?
 
@@ -71,13 +61,13 @@ final class AnimeCategoryDetailViewModel: ObservableObject {
     }
 
     var loadedCountText: String {
-        "已載入 \(sourceItems.count) 部"
+        "已載入 \(pagination.items.count) 部"
     }
 
     // MARK: - Public Methods
 
     func loadIfNeeded() async {
-        guard !hasLoaded else { return }
+        guard !pagination.hasLoaded else { return }
         await fetchFirstPage(showSkeleton: true)
     }
 
@@ -112,7 +102,7 @@ final class AnimeCategoryDetailViewModel: ObservableObject {
         )
         .dropFirst()
         .sink { [weak self] _, _ in
-            guard let self, self.hasLoaded else { return }
+            guard let self, self.pagination.hasLoaded else { return }
             self.filterRequestTask?.cancel()
             self.filterRequestTask = Task { [weak self] in
                 guard let self else { return }
@@ -124,20 +114,13 @@ final class AnimeCategoryDetailViewModel: ObservableObject {
 
     // MARK: - Loading
 
-    private func resetPagination() {
-        currentPage = 0
-        hasNextPage = false
-        isLoadingMore = false
-        loadMoreState = .hidden
-    }
-
     private func fetchFirstPage(showSkeleton: Bool) async {
-        let generation = advanceRequestGeneration()
-        resetPagination()
+        let generation = pagination.beginReload(clearItems: showSkeleton)
         filterRequestTask = nil
+
         if showSkeleton {
-            sourceItems = []
             screenState = .loading
+            loadMoreState = pagination.footerState
         }
 
         do {
@@ -146,104 +129,69 @@ final class AnimeCategoryDetailViewModel: ObservableObject {
                 pageSize: pageSize,
                 filter: currentFilter
             )
-            guard isCurrentGeneration(generation) else { return }
-            hasLoaded = true
-            currentPage = page.currentPage
-            hasNextPage = page.hasNextPage
-            sourceItems = deduplicatedItems(page.items)
+            guard pagination.finishReload(
+                PaginatedPage(
+                    items: page.items,
+                    currentPage: page.currentPage,
+                    hasNextPage: page.hasNextPage
+                ),
+                generation: generation
+            ) else { return }
             applyPresentation()
         } catch is CancellationError {
             return
         } catch {
-            guard isCurrentGeneration(generation) else { return }
+            guard pagination.isCurrent(generation) else { return }
             screenState = .error(message: error.userFacingMessage)
-            loadMoreState = .hidden
+            loadMoreState = pagination.footerState
         }
     }
 
     private func loadMorePage() async {
-        guard hasLoaded, hasNextPage, !isLoadingMore else { return }
-        let generation = requestGeneration
-        isLoadingMore = true
-        loadMoreState = .loading
+        guard let generation = pagination.beginLoadMore() else { return }
+        loadMoreState = pagination.footerState
 
         do {
             let page = try await service.fetchPage(
                 genreId: genre.id,
-                page: currentPage + 1,
+                page: pagination.currentPage + 1,
                 pageSize: pageSize,
                 filter: currentFilter
             )
-            guard isCurrentGeneration(generation) else { return }
-            currentPage = page.currentPage
-            hasNextPage = page.hasNextPage
-            sourceItems = mergedDeduplicatedItems(
-                existing: sourceItems,
-                incoming: page.items
-            )
-            isLoadingMore = false
+            guard pagination.finishLoadMore(
+                PaginatedPage(
+                    items: page.items,
+                    currentPage: page.currentPage,
+                    hasNextPage: page.hasNextPage
+                ),
+                generation: generation
+            ) else { return }
             applyPresentation()
         } catch is CancellationError {
-            if isCurrentGeneration(generation) {
-                isLoadingMore = false
+            if pagination.cancelLoadMore(generation: generation) {
+                loadMoreState = pagination.footerState
             }
             return
         } catch {
-            guard isCurrentGeneration(generation) else { return }
-            isLoadingMore = false
-            loadMoreState = .error(message: "載入更多失敗")
+            guard pagination.failLoadMore(message: "載入更多失敗", generation: generation) else { return }
+            loadMoreState = pagination.footerState
         }
     }
 
     private func applyPresentation() {
-        guard !sourceItems.isEmpty else {
+        guard !pagination.items.isEmpty else {
             screenState = .empty
             loadMoreState = .hidden
             return
         }
 
-        screenState = .content(items: sourceItems)
-        loadMoreState = resolvedLoadMoreState()
+        screenState = .content(items: pagination.items)
+        loadMoreState = pagination.footerState
     }
 
     private func shouldLoadMore(after item: AnimeCategoryItemDTO) -> Bool {
-        guard hasLoaded, hasNextPage, !isLoadingMore else { return false }
         guard case .content(let items) = screenState else { return false }
-        guard let index = items.firstIndex(where: { $0.id == item.id }) else { return false }
-        return index >= max(items.count - 5, 0)
-    }
-
-    private func resolvedLoadMoreState() -> LoadMoreState {
-        if isLoadingMore {
-            return .loading
-        }
-        if case .error(let message) = loadMoreState {
-            return .error(message: message)
-        }
-        return hasNextPage ? .available : .hidden
-    }
-
-    private func advanceRequestGeneration() -> Int {
-        requestGeneration += 1
-        return requestGeneration
-    }
-
-    private func isCurrentGeneration(_ generation: Int) -> Bool {
-        generation == requestGeneration
-    }
-
-    private func deduplicatedItems(_ items: [AnimeCategoryItemDTO]) -> [AnimeCategoryItemDTO] {
-        var seenIDs: Set<Int> = []
-        return items.filter { item in
-            seenIDs.insert(item.id).inserted
-        }
-    }
-
-    private func mergedDeduplicatedItems(
-        existing: [AnimeCategoryItemDTO],
-        incoming: [AnimeCategoryItemDTO]
-    ) -> [AnimeCategoryItemDTO] {
-        deduplicatedItems(existing + incoming)
+        return pagination.shouldLoadMore(after: item, visibleItems: items)
     }
 
     private func headerSubtitle(for genreTitle: String) -> String {

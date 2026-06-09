@@ -17,12 +17,7 @@ final class HomeTrendingAnimeListViewModel: ObservableObject {
         case error(message: String)
     }
 
-    enum LoadMoreState: Equatable {
-        case hidden
-        case available
-        case loading
-        case error(message: String)
-    }
+    typealias LoadMoreState = PaginationFooterState
 
     @Published var selectedSort: HomeTrendingAnimeListSort = .apiDefault
     @Published private(set) var screenState: ScreenState = .loading
@@ -31,12 +26,7 @@ final class HomeTrendingAnimeListViewModel: ObservableObject {
     private let service: HomeTrendingAnimeListServicing
     private let pageSize = 12
 
-    private var sourceItems: [HomeTrendingAnimeListItem] = []
-    private var currentPage = 0
-    private var hasNextPage = false
-    private var hasLoaded = false
-    private var isLoadingMore = false
-    private var requestGeneration = 0
+    private var pagination = PaginatedListState<HomeTrendingAnimeListItem>()
     private var cancellables: Set<AnyCancellable> = []
 
     init(service: HomeTrendingAnimeListServicing = HomeTrendingAnimeListService()) {
@@ -48,7 +38,7 @@ final class HomeTrendingAnimeListViewModel: ObservableObject {
         HomeTrendingAnimeListHeaderContent(
             title: headerTitle(for: selectedSort),
             subtitle: headerSubtitle(for: selectedSort),
-            loadedCountText: "已載入 \(sourceItems.count) 部"
+            loadedCountText: "已載入 \(pagination.items.count) 部"
         )
     }
 
@@ -62,7 +52,7 @@ final class HomeTrendingAnimeListViewModel: ObservableObject {
     }
 
     func loadIfNeeded() async {
-        guard !hasLoaded else { return }
+        guard !pagination.hasLoaded else { return }
         await fetchFirstPage(showSkeleton: true)
     }
 
@@ -89,79 +79,75 @@ final class HomeTrendingAnimeListViewModel: ObservableObject {
             .removeDuplicates()
             .dropFirst()
             .sink { [weak self] _ in
-                guard let self, self.hasLoaded else { return }
+                guard let self, self.pagination.hasLoaded else { return }
                 self.applyPresentation()
             }
             .store(in: &cancellables)
     }
 
     private func fetchFirstPage(showSkeleton: Bool) async {
-        let generation = advanceRequestGeneration()
-        resetPagination()
+        let generation = pagination.beginReload(clearItems: showSkeleton)
 
         if showSkeleton {
-            sourceItems = []
             screenState = .loading
+            loadMoreState = pagination.footerState
         }
 
         do {
             let response = try await service.fetchPage(page: 1, limit: pageSize)
-            guard isCurrentGeneration(generation) else { return }
-
-            hasLoaded = true
-            currentPage = response.pagination?.currentPage ?? 1
-            hasNextPage = response.pagination?.hasNextPage ?? !response.data.isEmpty
-            sourceItems = deduplicatedItems(response.data.compactMap(Self.item(from:)))
+            guard pagination.finishReload(
+                PaginatedPage(
+                    items: response.data.compactMap(Self.item(from:)),
+                    currentPage: response.pagination?.currentPage ?? 1,
+                    hasNextPage: response.pagination?.hasNextPage ?? !response.data.isEmpty
+                ),
+                generation: generation
+            ) else { return }
             applyPresentation()
         } catch is CancellationError {
             return
         } catch {
-            guard isCurrentGeneration(generation) else { return }
+            guard pagination.isCurrent(generation) else { return }
             screenState = .error(message: error.userFacingMessage)
             loadMoreState = .hidden
         }
     }
 
     private func loadMorePage() async {
-        guard hasLoaded, hasNextPage, !isLoadingMore else { return }
-
-        let generation = requestGeneration
-        isLoadingMore = true
-        loadMoreState = .loading
+        guard let generation = pagination.beginLoadMore() else { return }
+        loadMoreState = pagination.footerState
 
         do {
-            let response = try await service.fetchPage(page: currentPage + 1, limit: pageSize)
-            guard isCurrentGeneration(generation) else { return }
-
-            currentPage = response.pagination?.currentPage ?? currentPage + 1
-            let incoming = response.data.compactMap(Self.item(from:))
-            let mergedItems = mergedDeduplicatedItems(existing: sourceItems, incoming: incoming)
-            let appendedNewItems = mergedItems.count > sourceItems.count
-
-            hasNextPage = appendedNewItems && (response.pagination?.hasNextPage ?? !response.data.isEmpty)
-            sourceItems = mergedItems
-            isLoadingMore = false
+            let response = try await service.fetchPage(page: pagination.currentPage + 1, limit: pageSize)
+            guard pagination.finishLoadMore(
+                PaginatedPage(
+                    items: response.data.compactMap(Self.item(from:)),
+                    currentPage: response.pagination?.currentPage ?? pagination.currentPage + 1,
+                    hasNextPage: response.pagination?.hasNextPage ?? !response.data.isEmpty
+                ),
+                generation: generation,
+                requiresNewItemsForNextPage: true
+            ) else { return }
             applyPresentation()
         } catch is CancellationError {
-            if isCurrentGeneration(generation) {
-                isLoadingMore = false
+            if pagination.cancelLoadMore(generation: generation) {
+                loadMoreState = pagination.footerState
             }
             return
         } catch {
-            guard isCurrentGeneration(generation) else { return }
-            isLoadingMore = false
-            loadMoreState = .error(message: "載入更多失敗")
+            guard pagination.failLoadMore(message: "載入更多失敗", generation: generation) else { return }
+            loadMoreState = pagination.footerState
         }
     }
 
     private func applyPresentation() {
-        guard !sourceItems.isEmpty else {
+        guard !pagination.items.isEmpty else {
             screenState = .empty
             loadMoreState = .hidden
             return
         }
 
-        let rankedItems = sortedItems(from: sourceItems)
+        let rankedItems = sortedItems(from: pagination.items)
         let sections = buildSections(from: rankedItems, sort: selectedSort)
 
         screenState = .content(
@@ -169,47 +155,7 @@ final class HomeTrendingAnimeListViewModel: ObservableObject {
                 sections: sections
             )
         )
-        loadMoreState = resolvedLoadMoreState()
-    }
-
-    private func resetPagination() {
-        currentPage = 0
-        hasNextPage = false
-        isLoadingMore = false
-        loadMoreState = .hidden
-    }
-
-    private func resolvedLoadMoreState() -> LoadMoreState {
-        if isLoadingMore {
-            return .loading
-        }
-        if case .error(let message) = loadMoreState {
-            return .error(message: message)
-        }
-        return hasNextPage ? .available : .hidden
-    }
-
-    private func advanceRequestGeneration() -> Int {
-        requestGeneration += 1
-        return requestGeneration
-    }
-
-    private func isCurrentGeneration(_ generation: Int) -> Bool {
-        generation == requestGeneration
-    }
-
-    private func deduplicatedItems(_ items: [HomeTrendingAnimeListItem]) -> [HomeTrendingAnimeListItem] {
-        var seenIDs: Set<Int> = []
-        return items.filter { item in
-            seenIDs.insert(item.id).inserted
-        }
-    }
-
-    private func mergedDeduplicatedItems(
-        existing: [HomeTrendingAnimeListItem],
-        incoming: [HomeTrendingAnimeListItem]
-    ) -> [HomeTrendingAnimeListItem] {
-        deduplicatedItems(existing + incoming)
+        loadMoreState = pagination.footerState
     }
 
     private func headerTitle(for sort: HomeTrendingAnimeListSort) -> String {
