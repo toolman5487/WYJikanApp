@@ -209,7 +209,9 @@ nonisolated enum YouTubeVideoURLResolver {
         host == "youtu.be" ||
         host.hasSuffix(".youtu.be") ||
         host == "youtube.com" ||
-        host.hasSuffix(".youtube.com")
+        host.hasSuffix(".youtube.com") ||
+        host == "youtube-nocookie.com" ||
+        host.hasSuffix(".youtube-nocookie.com")
     }
 
     private static func firstPathComponent(from url: URL) -> String? {

@@ -296,15 +296,28 @@ nonisolated enum HomeWatchPresentationBuilder {
     }
 
     private static func watchURL(from trailer: HomeWatchTrailerDTO?) -> URL? {
+        if let youtubeID = HomeWatchPresentationText.normalizedText(trailer?.youtubeId),
+           let watchURL = YouTubeVideoURLResolver.watchURL(videoID: youtubeID) {
+            return watchURL
+        }
+
         if let url = url(from: trailer?.url) {
-            return url
+            return normalizedYouTubeWatchURL(from: url) ?? url
         }
 
-        if let youtubeID = HomeWatchPresentationText.normalizedText(trailer?.youtubeId) {
-            return URL(string: "https://www.youtube.com/watch?v=\(youtubeID)")
+        if let embedURL = url(from: trailer?.embedUrl) {
+            return normalizedYouTubeWatchURL(from: embedURL) ?? embedURL
         }
 
-        return url(from: trailer?.embedUrl)
+        return nil
+    }
+
+    private static func normalizedYouTubeWatchURL(from url: URL) -> URL? {
+        guard let videoID = YouTubeVideoURLResolver.videoID(from: url) else {
+            return nil
+        }
+
+        return YouTubeVideoURLResolver.watchURL(videoID: videoID)
     }
 
     private static func thumbnailURL(from trailer: HomeWatchTrailerDTO?) -> URL? {

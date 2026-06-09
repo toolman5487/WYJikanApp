@@ -152,26 +152,16 @@ extension AnimeDetailViewModel {
     // MARK: - Trailer
 
     func hasTrailer(for anime: AnimeDetailDTO) -> Bool {
-        trailerEmbedURL(for: anime) != nil
+        trailerWatchURL(for: anime) != nil
     }
 
     func trailerEmbedURL(for anime: AnimeDetailDTO) -> URL? {
         guard let trailer = anime.trailer else { return nil }
         if let id = resolvedYouTubeVideoId(from: trailer),
-           var components = URLComponents(string: "https://www.youtube.com/embed/\(id)") {
-            components.queryItems = [
-                URLQueryItem(name: "playsinline", value: "1"),
-                URLQueryItem(name: "rel", value: "0"),
-                URLQueryItem(name: "modestbranding", value: "1"),
-                URLQueryItem(name: "autoplay", value: "0")
-            ]
-            if let url = components.url {
-                return url
-            }
+           let url = YouTubeVideoURLResolver.embedURL(videoID: id) {
+            return url
         }
-        if let embed = trailer.embedUrl?.trimmingCharacters(in: .whitespacesAndNewlines),
-           !embed.isEmpty,
-           let url = URL(string: embed) {
+        if let url = url(from: trailer.embedUrl) {
             return url
         }
         return nil
@@ -179,13 +169,11 @@ extension AnimeDetailViewModel {
 
     func trailerWatchURL(for anime: AnimeDetailDTO) -> URL? {
         guard let trailer = anime.trailer else { return nil }
-        if let raw = trailer.url?.trimmingCharacters(in: .whitespacesAndNewlines),
-           !raw.isEmpty,
-           let url = URL(string: raw) {
+        if let id = resolvedYouTubeVideoId(from: trailer),
+           let url = YouTubeVideoURLResolver.watchURL(videoID: id) {
             return url
         }
-        guard let id = resolvedYouTubeVideoId(from: trailer) else { return nil }
-        return URL(string: "https://www.youtube.com/watch?v=\(id)")
+        return url(from: trailer.url)
     }
 
     func trailerThumbnailURL(for anime: AnimeDetailDTO) -> URL? {
@@ -646,26 +634,26 @@ extension AnimeDetailViewModel {
     // MARK: - Private Methods
 
     private func resolvedYouTubeVideoId(from trailer: AnimeDetailTrailerDTO) -> String? {
-        if let embed = trailer.embedUrl?.trimmingCharacters(in: .whitespacesAndNewlines),
-           !embed.isEmpty,
-           let url = URL(string: embed) {
-            let path = url.path
-            if let range = path.range(of: "/embed/") {
-                let rest = String(path[range.upperBound...])
-                let segment = rest.split(separator: "/").first.map(String.init) ?? String(rest)
-                let withoutQuery = segment.split(separator: "?").first.map(String.init) ?? segment
-                if !withoutQuery.isEmpty { return withoutQuery }
-            }
-        }
-        if let id = trailer.youtubeId?.trimmingCharacters(in: .whitespacesAndNewlines), !id.isEmpty {
+        if let id = trimmedText(trailer.youtubeId) {
             return id
         }
-        if let watch = trailer.url,
-           let url = URL(string: watch),
-           let components = URLComponents(url: url, resolvingAgainstBaseURL: false) {
-            return components.queryItems?.first(where: { $0.name == "v" })?.value
+
+        if let embedURL = url(from: trailer.embedUrl),
+           let id = YouTubeVideoURLResolver.videoID(from: embedURL) {
+            return id
         }
+
+        if let watchURL = url(from: trailer.url),
+           let id = YouTubeVideoURLResolver.videoID(from: watchURL) {
+            return id
+        }
+
         return nil
+    }
+
+    private func url(from value: String?) -> URL? {
+        guard let text = trimmedText(value) else { return nil }
+        return URL(string: text)
     }
 
     private func cleanedSynopsis(for anime: AnimeDetailDTO) -> String? {
