@@ -101,10 +101,22 @@ struct HomeWatchEpisodesView: View {
 
     private func openEpisode(_ item: HomeWatchEpisodeItem) {
         if let episodeURL = item.episodeURL {
-            router.push(.webPage(.watchEpisode(url: episodeURL)))
+            open(.watchEpisode(url: episodeURL))
         } else {
             router.push(.animeDetail(malId: item.id))
         }
+    }
+
+    private func open(_ page: BaseWebPage) {
+        if page.opensExternally {
+            openExternally(page)
+        } else {
+            router.push(.webPage(page))
+        }
+    }
+
+    private func openExternally(_ page: BaseWebPage) {
+        ExternalURLOpener.open(page.externalURLCandidates)
     }
 }
 

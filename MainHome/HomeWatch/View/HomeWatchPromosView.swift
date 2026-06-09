@@ -100,10 +100,14 @@ struct HomeWatchPromosView: View {
 
     private func openPromo(_ item: HomeWatchPromoItem) {
         if let watchURL = item.watchURL {
-            router.push(.webPage(.watchPromo(url: watchURL)))
+            openExternally(.watchPromo(url: watchURL))
         } else {
             router.push(.animeDetail(malId: item.animeID))
         }
+    }
+
+    private func openExternally(_ page: BaseWebPage) {
+        ExternalURLOpener.open(page.externalURLCandidates)
     }
 }
 

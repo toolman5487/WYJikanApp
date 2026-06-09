@@ -45,17 +45,20 @@ struct MainNewsArticleRowView: View {
 
                     metadataView
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
 
                 Image(systemName: "arrow.up.right")
                     .font(.caption.weight(.bold))
                     .foregroundStyle(ThemeColor.textSecondary)
                     .frame(width: 24, height: 24)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(12)
             .background(Color(.secondarySystemBackground))
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         }
         .buttonStyle(.plain)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var thumbnailView: some View {

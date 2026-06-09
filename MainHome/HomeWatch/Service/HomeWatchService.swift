@@ -7,6 +7,24 @@
 
 import Foundation
 
+nonisolated enum HomeWatchServiceError: LocalizedError, AppUserFacingError {
+    case invalidPagination(page: Int, limit: Int)
+
+    nonisolated var errorDescription: String? {
+        switch self {
+        case .invalidPagination(let page, let limit):
+            return "Invalid HomeWatch pagination values: page \(page), limit \(limit)."
+        }
+    }
+
+    nonisolated var userMessage: String {
+        switch self {
+        case .invalidPagination:
+            return "影音列表參數暫時異常，請稍後再試。"
+        }
+    }
+}
+
 nonisolated protocol HomeWatchServicing: Sendable {
     func fetchLatestPromos(forceRefresh: Bool) async throws -> HomeWatchPromosResponse
     func fetchLatestEpisodes(forceRefresh: Bool) async throws -> HomeWatchEpisodesResponse
@@ -35,6 +53,14 @@ nonisolated extension HomeWatchServicing {
 }
 
 nonisolated final class HomeWatchService: HomeWatchServicing {
+    private enum Constants {
+        static let firstPage = 1
+        static let latestPromosLimit = 8
+        static let latestEpisodesLimit = 10
+        static let latestFeedCacheTTL: TimeInterval = 300
+        static let popularFeedCacheTTL: TimeInterval = 600
+    }
+
     private let apiService: JikanAPIServicing
 
     init(apiService: JikanAPIServicing = JikanAPIService.shared) {
@@ -44,8 +70,8 @@ nonisolated final class HomeWatchService: HomeWatchServicing {
     func fetchLatestPromos(forceRefresh: Bool) async throws -> HomeWatchPromosResponse {
         try await fetchPromos(
             feed: .latest,
-            page: 1,
-            limit: 8,
+            page: Constants.firstPage,
+            limit: Constants.latestPromosLimit,
             forceRefresh: forceRefresh
         )
     }
@@ -53,8 +79,8 @@ nonisolated final class HomeWatchService: HomeWatchServicing {
     func fetchLatestEpisodes(forceRefresh: Bool) async throws -> HomeWatchEpisodesResponse {
         try await fetchEpisodes(
             feed: .latest,
-            page: 1,
-            limit: 10,
+            page: Constants.firstPage,
+            limit: Constants.latestEpisodesLimit,
             forceRefresh: forceRefresh
         )
     }
@@ -65,11 +91,14 @@ nonisolated final class HomeWatchService: HomeWatchServicing {
         limit: Int,
         forceRefresh: Bool
     ) async throws -> HomeWatchPromosResponse {
-        try await apiService.fetch(
+        try validate(page: page, limit: limit)
+
+        let response: HomeWatchPromosResponse = try await apiService.fetch(
             endpoint: endpoint(for: feed),
             cachePolicy: cachePolicy(forceRefresh: forceRefresh, ttl: ttl(for: feed)),
             queryItems: queryItems(page: page, limit: limit)
         )
+        return response
     }
 
     func fetchEpisodes(
@@ -78,11 +107,14 @@ nonisolated final class HomeWatchService: HomeWatchServicing {
         limit: Int,
         forceRefresh: Bool
     ) async throws -> HomeWatchEpisodesResponse {
-        try await apiService.fetch(
+        try validate(page: page, limit: limit)
+
+        let response: HomeWatchEpisodesResponse = try await apiService.fetch(
             endpoint: endpoint(for: feed),
             cachePolicy: cachePolicy(forceRefresh: forceRefresh, ttl: ttl(for: feed)),
             queryItems: queryItems(page: page, limit: limit)
         )
+        return response
     }
 
     private func endpoint(for feed: HomeWatchPromoFeed) -> String {
@@ -106,18 +138,24 @@ nonisolated final class HomeWatchService: HomeWatchServicing {
     private func ttl(for feed: HomeWatchPromoFeed) -> TimeInterval {
         switch feed {
         case .latest:
-            return 300
+            return Constants.latestFeedCacheTTL
         case .popular:
-            return 600
+            return Constants.popularFeedCacheTTL
         }
     }
 
     private func ttl(for feed: HomeWatchEpisodeFeed) -> TimeInterval {
         switch feed {
         case .latest:
-            return 300
+            return Constants.latestFeedCacheTTL
         case .popular:
-            return 600
+            return Constants.popularFeedCacheTTL
+        }
+    }
+
+    private func validate(page: Int, limit: Int) throws {
+        guard page > 0, limit > 0 else {
+            throw HomeWatchServiceError.invalidPagination(page: page, limit: limit)
         }
     }
 
@@ -129,6 +167,6 @@ nonisolated final class HomeWatchService: HomeWatchServicing {
     }
 
     private func cachePolicy(forceRefresh: Bool, ttl: TimeInterval) -> JikanAPICachePolicy {
-        forceRefresh ? .remoteOnly : .cacheFirst(ttl: ttl)
+        forceRefresh ? .reloadIgnoringCache(ttl: ttl) : .cacheFirst(ttl: ttl)
     }
 }

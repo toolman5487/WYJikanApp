@@ -311,6 +311,8 @@
 		16F900182FEA100000000018 /* HomeWatchListRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F900172FEA100000000017 /* HomeWatchListRowView.swift */; };
 		16F9001A2FEA10000000001A /* HomeWatchListStateViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F900192FEA100000000019 /* HomeWatchListStateViews.swift */; };
 		16F9001C2FEA10000000001C /* HomeWatchListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F9001B2FEA10000000001B /* HomeWatchListView.swift */; };
+		16F9001E2FEA20000000001E /* HomeWatchFeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F9001D2FEA20000000001D /* HomeWatchFeed.swift */; };
+		16F900202FEA200000000020 /* HomeWatchPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F9001F2FEA20000000001F /* HomeWatchPresentation.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -618,6 +620,8 @@
 		16F900172FEA100000000017 /* HomeWatchListRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeWatchListRowView.swift; sourceTree = "<group>"; };
 		16F900192FEA100000000019 /* HomeWatchListStateViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeWatchListStateViews.swift; sourceTree = "<group>"; };
 		16F9001B2FEA10000000001B /* HomeWatchListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeWatchListView.swift; sourceTree = "<group>"; };
+		16F9001D2FEA20000000001D /* HomeWatchFeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeWatchFeed.swift; sourceTree = "<group>"; };
+		16F9001F2FEA20000000001F /* HomeWatchPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeWatchPresentation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -2651,7 +2655,9 @@
 		16F9000E2FEA00000000000E /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				16F9001D2FEA20000000001D /* HomeWatchFeed.swift */,
 				16F900012FEA000000000001 /* HomeWatchModel.swift */,
+				16F9001F2FEA20000000001F /* HomeWatchPresentation.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -2819,6 +2825,7 @@
 				15A295482F86297D0056071F /* AppLogger.swift in Sources */,
 				1572FE052F762D7000756CBA /* HomeTodayAnimeViewModel.swift in Sources */,
 				16F900082FEA000000000008 /* HomeWatchEpisodesViewModel.swift in Sources */,
+				16F9001E2FEA20000000001E /* HomeWatchFeed.swift in Sources */,
 				16F2000A2FAB40000000000A /* HomeTodayAnimeScheduleListModel.swift in Sources */,
 				16F2000C2FAB40000000000C /* HomeTodayAnimeScheduleListService.swift in Sources */,
 				16F200242FAB400000000024 /* HomeTodayAnimeNotificationScheduler.swift in Sources */,
@@ -2888,6 +2895,7 @@
 				16F200042FAB400000000004 /* HomeTodayAnimeScheduleListView.swift in Sources */,
 				16F300082FAB500000000008 /* HomeTrendingAnimeListView.swift in Sources */,
 				16F9000C2FEA00000000000C /* HomeWatchEpisodesView.swift in Sources */,
+				16F900202FEA200000000020 /* HomeWatchPresentation.swift in Sources */,
 				16F9001A2FEA10000000001A /* HomeWatchListStateViews.swift in Sources */,
 				16B800012FD8000000000001 /* EndBounceView.swift in Sources */,
 				16F700022FDB000000000002 /* PaginatedListState.swift in Sources */,

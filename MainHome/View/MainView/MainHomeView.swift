@@ -20,6 +20,7 @@ struct MainHomeView: View {
     @StateObject private var trendingAnimeViewModel: HomeTrendingAnimeViewModel
     @StateObject private var recommendedAnimeViewModel: HomeRecommendedAnimeViewModel
     @State private var loadMoreBounceProgress: CGFloat = 0
+    private let watchService: any HomeWatchServicing
 
     enum HomeSection: Identifiable {
         case watchPromos
@@ -67,6 +68,7 @@ struct MainHomeView: View {
         service: MainHomeServicing = MainHomeService(),
         watchService: HomeWatchServicing = HomeWatchService()
     ) {
+        self.watchService = watchService
         _heroBannerViewModel = StateObject(wrappedValue: HeroBannerViewModel(service: service))
         _watchPromosViewModel = StateObject(wrappedValue: HomeWatchPromosViewModel(service: watchService))
         _todayAnimeViewModel = StateObject(wrappedValue: HomeTodayAnimeViewModel(service: service))
@@ -121,7 +123,10 @@ struct MainHomeView: View {
                 switch route {
                 case .watch(let feed):
                     HomeWatchListView(
-                        viewModel: HomeWatchListViewModel(initialFeed: feed)
+                        viewModel: HomeWatchListViewModel(
+                            initialFeed: feed,
+                            service: watchService
+                        )
                     )
                 case .webPage(let page):
                     BaseWebView(page: page)

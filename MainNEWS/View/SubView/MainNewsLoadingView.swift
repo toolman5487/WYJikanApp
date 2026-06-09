@@ -7,7 +7,7 @@ import SwiftUI
 
 struct MainNewsLoadingView: View {
     var body: some View {
-        VStack(spacing: 12) {
+        VStack(alignment: .leading, spacing: 12) {
             ForEach(0..<6, id: \.self) { index in
                 HStack(alignment: .top, spacing: 12) {
                     RoundedRectangle(cornerRadius: 12, style: .continuous)
@@ -31,10 +31,12 @@ struct MainNewsLoadingView: View {
 
                     Spacer(minLength: 0)
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(12)
                 .background(Color(.secondarySystemBackground))
                 .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }

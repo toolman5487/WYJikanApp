@@ -128,20 +128,28 @@ struct HomeWatchListView: View {
     }
 
     private func open(_ item: HomeWatchListItem) {
-        if let actionURL = item.actionURL {
-            router.push(.webPage(webPage(for: item, url: actionURL)))
-        } else {
+        switch (item.contentKind, item.actionURL) {
+        case (.episode, .some(let actionURL)):
+            open(.watchEpisode(url: actionURL))
+
+        case (.promo, .some(let actionURL)):
+            openExternally(.watchPromo(url: actionURL))
+
+        case (.episode, .none), (.promo, .none):
             router.push(.animeDetail(malId: item.animeID))
         }
     }
 
-    private func webPage(for item: HomeWatchListItem, url: URL) -> BaseWebPage {
-        switch item.contentKind {
-        case .episode:
-            return .watchEpisode(url: url)
-        case .promo:
-            return .watchPromo(url: url)
+    private func open(_ page: BaseWebPage) {
+        if page.opensExternally {
+            openExternally(page)
+        } else {
+            router.push(.webPage(page))
         }
+    }
+
+    private func openExternally(_ page: BaseWebPage) {
+        ExternalURLOpener.open(page.externalURLCandidates)
     }
 
     private var canLoadMore: Bool {

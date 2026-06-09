@@ -33,6 +33,7 @@ struct MainNewsView: View {
                 .padding(.horizontal, 16)
                 .padding(.top, 16)
                 .padding(.bottom, 28)
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
             .navigationTitle("動漫新知")
             .navigationBarTitleDisplayMode(.inline)
@@ -84,13 +85,14 @@ struct MainNewsView: View {
             }
             .transition(.opacity)
         case .content(let content), .refreshing(let content):
-            LazyVStack(spacing: 12) {
+            LazyVStack(alignment: .leading, spacing: 12) {
                 ForEach(content.rows) { row in
                     MainNewsArticleRowView(row: row) {
                         openURL(row.linkURL)
                     }
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .transition(.opacity)
         }
     }

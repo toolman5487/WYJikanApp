@@ -66,6 +66,7 @@ nonisolated enum JikanAPIRequestTarget: Sendable {
 nonisolated enum JikanAPICachePolicy: Sendable {
     case remoteOnly
     case cacheFirst(ttl: TimeInterval)
+    case reloadIgnoringCache(ttl: TimeInterval)
 }
 
 // MARK: - JikanAPIResponseState
@@ -489,32 +490,51 @@ nonisolated final class JikanAPIService: @unchecked Sendable {
             }
 
             AppLogger.cache.debug("cache miss \(key, privacy: .public)")
-            do {
-                let freshData = try await sharedDataTask(for: urlRequest, key: key)
-                await responseCache.insert(
-                    freshData,
-                    for: key,
-                    ttl: ttl,
-                    staleFallbackRetention: Self.staleResponseFallbackRetention,
-                    cleanupInterval: Self.storeCleanupInterval
-                )
-                await transientFailureBackoffStore.remove(for: key)
-                return freshData
-            } catch JikanAPIError.serverError(let statusCode) where isTransientStatusCode(statusCode) {
-                await transientFailureBackoffStore.record(
-                    statusCode: statusCode,
-                    for: key,
-                    cooldown: Self.transientFailureCooldown,
-                    cleanupInterval: Self.storeCleanupInterval
-                )
-                if let staleData = await responseCache.staleData(for: key) {
-                    AppLogger.cache.debug("cache stale fallback HTTP \(statusCode) \(key, privacy: .public)")
-                    return staleData
-                }
-                throw JikanAPIError.serverError(statusCode: statusCode)
-            } catch {
-                throw error
+            return try await loadRemoteCachingResponse(
+                for: urlRequest,
+                key: key,
+                ttl: ttl
+            )
+        case .reloadIgnoringCache(let ttl):
+            AppLogger.cache.debug("cache reload \(key, privacy: .public)")
+            return try await loadRemoteCachingResponse(
+                for: urlRequest,
+                key: key,
+                ttl: ttl
+            )
+        }
+    }
+
+    private func loadRemoteCachingResponse(
+        for urlRequest: URLRequest,
+        key: String,
+        ttl: TimeInterval
+    ) async throws -> Data {
+        do {
+            let freshData = try await sharedDataTask(for: urlRequest, key: key)
+            await responseCache.insert(
+                freshData,
+                for: key,
+                ttl: ttl,
+                staleFallbackRetention: Self.staleResponseFallbackRetention,
+                cleanupInterval: Self.storeCleanupInterval
+            )
+            await transientFailureBackoffStore.remove(for: key)
+            return freshData
+        } catch JikanAPIError.serverError(let statusCode) where isTransientStatusCode(statusCode) {
+            await transientFailureBackoffStore.record(
+                statusCode: statusCode,
+                for: key,
+                cooldown: Self.transientFailureCooldown,
+                cleanupInterval: Self.storeCleanupInterval
+            )
+            if let staleData = await responseCache.staleData(for: key) {
+                AppLogger.cache.debug("cache stale fallback HTTP \(statusCode) \(key, privacy: .public)")
+                return staleData
             }
+            throw JikanAPIError.serverError(statusCode: statusCode)
+        } catch {
+            throw error
         }
     }
 
