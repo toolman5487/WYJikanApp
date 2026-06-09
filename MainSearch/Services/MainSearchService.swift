@@ -7,12 +7,12 @@
 
 import Foundation
 
-protocol MainSearchServicing {
+nonisolated protocol MainSearchServicing: Sendable {
     func search(kind: MainSearchKind, query: String, limit: Int) async throws -> [MainSearchResultRow]
     func searchPage(kind: MainSearchKind, query: String, page: Int, limit: Int) async throws -> MainSearchPage
 }
 
-final class MainSearchService: MainSearchServicing {
+nonisolated final class MainSearchService: MainSearchServicing {
 
     // MARK: - SearchRequestSpec
     

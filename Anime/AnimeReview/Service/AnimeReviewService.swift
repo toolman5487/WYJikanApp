@@ -7,11 +7,11 @@
 
 import Foundation
 
-protocol AnimeReviewServicing {
+nonisolated protocol AnimeReviewServicing: Sendable {
     func fetchReviews(malId: Int, page: Int) async throws -> AnimeReviewsListResponse
 }
 
-final class AnimeReviewService: AnimeReviewServicing {
+nonisolated final class AnimeReviewService: AnimeReviewServicing {
 
     private let apiService: JikanAPIServicing
 

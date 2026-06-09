@@ -9,7 +9,7 @@ import Foundation
 
 // MARK: - Presentation
 
-struct HomeTodayAnimeCardItem: Identifiable, Hashable, Sendable {
+nonisolated struct HomeTodayAnimeCardItem: Identifiable, Hashable, Sendable {
     let id: Int
     let title: String
     let type: String?

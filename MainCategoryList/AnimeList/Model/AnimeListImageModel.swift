@@ -9,12 +9,12 @@ import Foundation
 
 // MARK: - Images
 
-struct AnimeListImagesDTO: Codable, Hashable {
+nonisolated struct AnimeListImagesDTO: Codable, Hashable, Sendable {
     let jpg: AnimeListImageURLDTO?
     let webp: AnimeListImageURLDTO?
 }
 
-struct AnimeListImageURLDTO: Codable, Hashable {
+nonisolated struct AnimeListImageURLDTO: Codable, Hashable, Sendable {
     let imageUrl: String?
     let smallImageUrl: String?
     let largeImageUrl: String?

@@ -9,7 +9,7 @@ import Foundation
 
 // MARK: - Random Anime Item
 
-struct AnimeListRandomDTO: Codable, Identifiable, Hashable {
+nonisolated struct AnimeListRandomDTO: Codable, Identifiable, Hashable, Sendable {
     let malId: Int
     let title: String?
     let titleEnglish: String?

@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum PeopleListSort: String, CaseIterable, Hashable, Sendable {
+nonisolated enum PeopleListSort: String, CaseIterable, Hashable, Sendable {
     case popularity
     case nameAscending
     case nameDescending
@@ -35,18 +35,18 @@ enum PeopleListSort: String, CaseIterable, Hashable, Sendable {
     }
 }
 
-struct PeopleListResponse: Codable, Sendable {
+nonisolated struct PeopleListResponse: Codable, Sendable {
     let pagination: PeopleListPagination?
     let data: [PeopleListDTO]
 }
 
-struct PeopleListPagination: Codable, Hashable, Sendable {
+nonisolated struct PeopleListPagination: Codable, Hashable, Sendable {
     let currentPage: Int?
     let hasNextPage: Bool?
     let lastVisiblePage: Int?
 }
 
-struct PeopleListDTO: Codable, Identifiable, Hashable, Sendable {
+nonisolated struct PeopleListDTO: Codable, Identifiable, Hashable, Sendable {
     let malId: Int
     let url: String?
     let images: AnimeImagesDTO?
@@ -58,7 +58,7 @@ struct PeopleListDTO: Codable, Identifiable, Hashable, Sendable {
     var id: Int { malId }
 }
 
-struct PeopleListRow: Identifiable, Hashable, Sendable {
+nonisolated struct PeopleListRow: Identifiable, Hashable, Sendable {
     let id: Int
     let malId: Int
     let name: String

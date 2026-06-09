@@ -9,7 +9,7 @@ import Foundation
 
 // MARK: - Presentation
 
-struct HomeTrendingMangaCardItem: Identifiable, Hashable, Sendable {
+nonisolated struct HomeTrendingMangaCardItem: Identifiable, Hashable, Sendable {
     let id: Int
     let title: String
     let type: String?
@@ -20,11 +20,11 @@ struct HomeTrendingMangaCardItem: Identifiable, Hashable, Sendable {
 
 // MARK: - Response (Jikan /top/manga)
 
-struct HomeTrendingMangaResponse: Codable {
+nonisolated struct HomeTrendingMangaResponse: Codable, Sendable {
     let data: [HomeTrendingMangaDTO]
 }
 
-struct HomeTrendingMangaDTO: Codable, Identifiable, Hashable {
+nonisolated struct HomeTrendingMangaDTO: Codable, Identifiable, Hashable, Sendable {
     let malId: Int
     let title: String?
     let titleEnglish: String?

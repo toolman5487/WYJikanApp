@@ -9,12 +9,12 @@ import Foundation
 
 // MARK: - Response (Jikan /manga/{id}/reviews)
 
-struct MangaReviewsListResponse: Codable {
+nonisolated struct MangaReviewsListResponse: Codable, Sendable {
     let pagination: AnimeReviewsPaginationDTO?
     let data: [MangaReviewEntryDTO]
 }
 
-struct MangaReviewEntryDTO: Codable, Identifiable, Hashable {
+nonisolated struct MangaReviewEntryDTO: Codable, Identifiable, Hashable, Sendable {
     let malId: Int
     let url: String?
     let type: String?

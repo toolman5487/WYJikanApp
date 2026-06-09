@@ -9,14 +9,14 @@ import Foundation
 
 // MARK: - Genre
 
-struct MangaListGenreDTO: Codable, Identifiable, Hashable {
+nonisolated struct MangaListGenreDTO: Codable, Identifiable, Hashable, Sendable {
     let malId: Int
     let name: String?
 
     var id: Int { malId }
 }
 
-struct MangaGenreSection: Identifiable, Hashable {
+nonisolated struct MangaGenreSection: Identifiable, Hashable, Sendable {
     let genre: MangaListGenreDTO
     let items: [MangaListRandomDTO]
 
@@ -25,12 +25,12 @@ struct MangaGenreSection: Identifiable, Hashable {
 
 // MARK: - Images
 
-struct MangaListImagesDTO: Codable, Hashable {
+nonisolated struct MangaListImagesDTO: Codable, Hashable, Sendable {
     let jpg: MangaListImageURLDTO?
     let webp: MangaListImageURLDTO?
 }
 
-struct MangaListImageURLDTO: Codable, Hashable {
+nonisolated struct MangaListImageURLDTO: Codable, Hashable, Sendable {
     let imageUrl: String?
     let smallImageUrl: String?
     let largeImageUrl: String?
@@ -38,7 +38,7 @@ struct MangaListImageURLDTO: Codable, Hashable {
 
 // MARK: - Item
 
-struct MangaListRandomDTO: Codable, Identifiable, Hashable {
+nonisolated struct MangaListRandomDTO: Codable, Identifiable, Hashable, Sendable {
     let malId: Int
     let title: String?
     let titleEnglish: String?
@@ -59,21 +59,21 @@ struct MangaListRandomDTO: Codable, Identifiable, Hashable {
 
 // MARK: - Response
 
-struct MangaGenreListResponse: Codable {
+nonisolated struct MangaGenreListResponse: Codable, Sendable {
     let data: [MangaListGenreDTO]
 }
 
-struct MangaListResponse: Codable {
+nonisolated struct MangaListResponse: Codable, Sendable {
     let data: [MangaListRandomDTO]
 }
 
-struct MangaListRandomResponse: Codable {
+nonisolated struct MangaListRandomResponse: Codable, Sendable {
     let data: MangaListRandomDTO
 }
 
 // MARK: - Display
 
-extension MangaListRandomDTO {
+nonisolated extension MangaListRandomDTO {
     var displayTitle: String {
         if let t = titleJapanese?.trimmingCharacters(in: .whitespacesAndNewlines), !t.isEmpty { return t }
         if let t = title?.trimmingCharacters(in: .whitespacesAndNewlines), !t.isEmpty { return t }
@@ -112,7 +112,7 @@ extension MangaListRandomDTO {
 
 // MARK: - Localization
 
-enum MangaGenreLocalizationModel {
+nonisolated enum MangaGenreLocalizationModel {
     static func localizedName(for englishName: String) -> String {
         AnimeGenreLocalizationModel.localizedName(for: englishName)
     }

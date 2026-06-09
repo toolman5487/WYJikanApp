@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum HomeTrendingMangaListSort: String, CaseIterable, Identifiable, Sendable {
+nonisolated enum HomeTrendingMangaListSort: String, CaseIterable, Identifiable, Sendable {
     case apiDefault
     case rank
     case popularity
@@ -25,7 +25,7 @@ enum HomeTrendingMangaListSort: String, CaseIterable, Identifiable, Sendable {
     }
 }
 
-enum HomeTrendingMangaListFormat: String, CaseIterable, Identifiable, Sendable {
+nonisolated enum HomeTrendingMangaListFormat: String, CaseIterable, Identifiable, Sendable {
     case all
     case manga
     case novel

@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum HomeScheduleDay: String, CaseIterable, Identifiable, Sendable {
+nonisolated enum HomeScheduleDay: String, CaseIterable, Identifiable, Sendable {
     case monday
     case tuesday
     case wednesday
@@ -51,18 +51,18 @@ enum HomeScheduleDay: String, CaseIterable, Identifiable, Sendable {
     }
 }
 
-struct HomeTodayAnimeResponse: Codable {
+nonisolated struct HomeTodayAnimeResponse: Codable, Sendable {
     let pagination: HomeTodayAnimePaginationDTO?
     let data: [HomeTodayAnimeDTO]
 }
 
-struct HomeTodayAnimePaginationDTO: Codable, Hashable, Sendable {
+nonisolated struct HomeTodayAnimePaginationDTO: Codable, Hashable, Sendable {
     let currentPage: Int?
     let hasNextPage: Bool?
     let lastVisiblePage: Int?
 }
 
-struct HomeTodayAnimeDTO: Codable, Identifiable, Hashable {
+nonisolated struct HomeTodayAnimeDTO: Codable, Identifiable, Hashable, Sendable {
     let malId: Int
     let title: String?
     let titleEnglish: String?
@@ -81,7 +81,7 @@ struct HomeTodayAnimeDTO: Codable, Identifiable, Hashable {
     var id: Int { malId }
 }
 
-struct HomeTodayAnimeTimelineItem: Identifiable, Hashable, Sendable {
+nonisolated struct HomeTodayAnimeTimelineItem: Identifiable, Hashable, Sendable {
     let id: Int
     let title: String
     let typeText: String?
@@ -96,7 +96,7 @@ struct HomeTodayAnimeTimelineItem: Identifiable, Hashable, Sendable {
     let broadcastText: String
 }
 
-struct HomeTodayAnimeTimeSection: Identifiable, Hashable, Sendable {
+nonisolated struct HomeTodayAnimeTimeSection: Identifiable, Hashable, Sendable {
     let title: String
     let items: [HomeTodayAnimeTimelineItem]
 

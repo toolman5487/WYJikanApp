@@ -9,13 +9,13 @@ import Foundation
 
 // MARK: - Response (Jikan /manga/{id})
 
-struct MangaDetailResponse: Codable {
+nonisolated struct MangaDetailResponse: Codable, Sendable {
     let data: MangaDetailDTO
 }
 
 // MARK: - Manga detail
 
-struct MangaDetailDTO: Codable, Identifiable, Hashable {
+nonisolated struct MangaDetailDTO: Codable, Identifiable, Hashable, Sendable {
     let malId: Int
     let url: String?
     let images: AnimeImagesDTO?
@@ -52,16 +52,16 @@ struct MangaDetailDTO: Codable, Identifiable, Hashable {
 
 // MARK: - Pictures
 
-struct MangaPicturesResponse: Codable {
+nonisolated struct MangaPicturesResponse: Codable, Sendable {
     let data: [AnimeImagesDTO]
 }
 
-struct MangaDetailPictureItem: Identifiable, Hashable, Sendable {
+nonisolated struct MangaDetailPictureItem: Identifiable, Hashable, Sendable {
     let id: Int
     let url: URL
 }
 
-enum MangaDetailPictureMapping {
+nonisolated enum MangaDetailPictureMapping {
 
     static func items(from response: MangaPicturesResponse) -> [MangaDetailPictureItem] {
         response.data.enumerated().compactMap { index, images in
@@ -94,11 +94,11 @@ enum MangaDetailPictureMapping {
 
 // MARK: - Characters
 
-struct MangaCharactersResponse: Codable {
+nonisolated struct MangaCharactersResponse: Codable, Sendable {
     let data: [MangaCharacterRoleDTO]
 }
 
-struct MangaCharacterRoleDTO: Codable, Identifiable, Hashable {
+nonisolated struct MangaCharacterRoleDTO: Codable, Identifiable, Hashable, Sendable {
     let role: String?
     let favorites: Int?
     let character: AnimeCharacterEntryDTO?
@@ -108,11 +108,11 @@ struct MangaCharacterRoleDTO: Codable, Identifiable, Hashable {
 
 // MARK: - Recommendations
 
-struct MangaRecommendationsResponse: Codable {
+nonisolated struct MangaRecommendationsResponse: Codable, Sendable {
     let data: [MangaRecommendationDTO]
 }
 
-struct MangaRecommendationDTO: Codable, Identifiable, Hashable {
+nonisolated struct MangaRecommendationDTO: Codable, Identifiable, Hashable, Sendable {
     let entry: MangaRecommendationEntryDTO?
     let content: String?
     let votes: Int?
@@ -120,7 +120,7 @@ struct MangaRecommendationDTO: Codable, Identifiable, Hashable {
     var id: Int { entry?.malId ?? content.hashValue }
 }
 
-struct MangaRecommendationEntryDTO: Codable, Identifiable, Hashable {
+nonisolated struct MangaRecommendationEntryDTO: Codable, Identifiable, Hashable, Sendable {
     let malId: Int
     let url: String?
     let images: AnimeImagesDTO?

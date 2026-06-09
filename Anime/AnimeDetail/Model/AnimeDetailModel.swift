@@ -9,13 +9,13 @@ import Foundation
 
 // MARK: - Response (Jikan /anime/{id})
 
-struct AnimeDetailResponse: Codable {
+nonisolated struct AnimeDetailResponse: Codable, Sendable {
     let data: AnimeDetailDTO
 }
 
 // MARK: - Anime detail
 
-struct AnimeDetailDTO: Codable, Identifiable, Hashable {
+nonisolated struct AnimeDetailDTO: Codable, Identifiable, Hashable, Sendable {
     let malId: Int
     let url: String?
     let images: AnimeImagesDTO?
@@ -58,14 +58,14 @@ struct AnimeDetailDTO: Codable, Identifiable, Hashable {
 
 // MARK: - Trailer
 
-struct AnimeDetailTrailerDTO: Codable, Hashable {
+nonisolated struct AnimeDetailTrailerDTO: Codable, Hashable, Sendable {
     let youtubeId: String?
     let url: String?
     let embedUrl: String?
     let images: AnimeTrailerImagesDTO?
 }
 
-struct AnimeTrailerImagesDTO: Codable, Hashable {
+nonisolated struct AnimeTrailerImagesDTO: Codable, Hashable, Sendable {
     let imageUrl: String?
     let smallImageUrl: String?
     let mediumImageUrl: String?
@@ -75,26 +75,26 @@ struct AnimeTrailerImagesDTO: Codable, Hashable {
 
 // MARK: - Titles
 
-struct AnimeTitleEntryDTO: Codable, Hashable {
+nonisolated struct AnimeTitleEntryDTO: Codable, Hashable, Sendable {
     let type: String?
     let title: String?
 }
 
 // MARK: - Aired
 
-struct AnimeAiredDTO: Codable, Hashable {
+nonisolated struct AnimeAiredDTO: Codable, Hashable, Sendable {
     let from: String?
     let to: String?
     let prop: AnimeAiredPropDTO?
     let string: String?
 }
 
-struct AnimeAiredPropDTO: Codable, Hashable {
+nonisolated struct AnimeAiredPropDTO: Codable, Hashable, Sendable {
     let from: AnimeDatePartsDTO?
     let to: AnimeDatePartsDTO?
 }
 
-struct AnimeDatePartsDTO: Codable, Hashable {
+nonisolated struct AnimeDatePartsDTO: Codable, Hashable, Sendable {
     let day: Int?
     let month: Int?
     let year: Int?
@@ -102,7 +102,7 @@ struct AnimeDatePartsDTO: Codable, Hashable {
 
 // MARK: - Broadcast
 
-struct AnimeBroadcastDTO: Codable, Hashable {
+nonisolated struct AnimeBroadcastDTO: Codable, Hashable, Sendable {
     let day: String?
     let time: String?
     let timezone: String?
@@ -111,7 +111,7 @@ struct AnimeBroadcastDTO: Codable, Hashable {
 
 // MARK: - Producer / studio / genre …
 
-struct AnimeRelatedEntityDTO: Codable, Identifiable, Hashable {
+nonisolated struct AnimeRelatedEntityDTO: Codable, Identifiable, Hashable, Sendable {
     let malId: Int
     let type: String?
     let name: String?
@@ -122,11 +122,11 @@ struct AnimeRelatedEntityDTO: Codable, Identifiable, Hashable {
 
 // MARK: - Characters
 
-struct AnimeCharactersResponse: Codable {
+nonisolated struct AnimeCharactersResponse: Codable, Sendable {
     let data: [AnimeCharacterRoleDTO]
 }
 
-struct AnimeCharacterRoleDTO: Codable, Identifiable, Hashable {
+nonisolated struct AnimeCharacterRoleDTO: Codable, Identifiable, Hashable, Sendable {
     let role: String?
     let favorites: Int?
     let character: AnimeCharacterEntryDTO?
@@ -135,7 +135,7 @@ struct AnimeCharacterRoleDTO: Codable, Identifiable, Hashable {
     var id: Int { character?.malId ?? role.hashValue }
 }
 
-struct AnimeCharacterEntryDTO: Codable, Identifiable, Hashable {
+nonisolated struct AnimeCharacterEntryDTO: Codable, Identifiable, Hashable, Sendable {
     let malId: Int
     let url: String?
     let images: AnimeImagesDTO?
@@ -145,14 +145,14 @@ struct AnimeCharacterEntryDTO: Codable, Identifiable, Hashable {
     var id: Int { malId }
 }
 
-struct AnimeCharacterVoiceActorDTO: Codable, Identifiable, Hashable {
+nonisolated struct AnimeCharacterVoiceActorDTO: Codable, Identifiable, Hashable, Sendable {
     let language: String?
     let person: AnimeCharacterVoicePersonDTO?
 
     var id: Int { person?.malId ?? language.hashValue }
 }
 
-struct AnimeCharacterVoicePersonDTO: Codable, Identifiable, Hashable {
+nonisolated struct AnimeCharacterVoicePersonDTO: Codable, Identifiable, Hashable, Sendable {
     let malId: Int
     let url: String?
     let images: AnimeImagesDTO?
@@ -164,11 +164,11 @@ struct AnimeCharacterVoicePersonDTO: Codable, Identifiable, Hashable {
 
 // MARK: - Recommendations
 
-struct AnimeRecommendationsResponse: Codable {
+nonisolated struct AnimeRecommendationsResponse: Codable, Sendable {
     let data: [AnimeRecommendationDTO]
 }
 
-struct AnimeRecommendationDTO: Codable, Identifiable, Hashable {
+nonisolated struct AnimeRecommendationDTO: Codable, Identifiable, Hashable, Sendable {
     let entry: AnimeRecommendationEntryDTO?
     let content: String?
     let votes: Int?
@@ -176,7 +176,7 @@ struct AnimeRecommendationDTO: Codable, Identifiable, Hashable {
     var id: Int { entry?.malId ?? content.hashValue }
 }
 
-struct AnimeRecommendationEntryDTO: Codable, Identifiable, Hashable {
+nonisolated struct AnimeRecommendationEntryDTO: Codable, Identifiable, Hashable, Sendable {
     let malId: Int
     let url: String?
     let images: AnimeImagesDTO?

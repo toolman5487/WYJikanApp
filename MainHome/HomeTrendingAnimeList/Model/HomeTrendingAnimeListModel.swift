@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum HomeTrendingAnimeListSort: String, CaseIterable, Identifiable, Sendable {
+nonisolated enum HomeTrendingAnimeListSort: String, CaseIterable, Identifiable, Sendable {
     case apiDefault
     case rank
     case popularity
@@ -34,18 +34,18 @@ enum HomeTrendingAnimeListSort: String, CaseIterable, Identifiable, Sendable {
     }
 }
 
-struct HomeTrendingAnimeListResponse: Codable {
+nonisolated struct HomeTrendingAnimeListResponse: Codable, Sendable {
     let pagination: HomeTrendingAnimeListPaginationDTO?
     let data: [HomeTrendingAnimeListDTO]
 }
 
-struct HomeTrendingAnimeListPaginationDTO: Codable, Hashable, Sendable {
+nonisolated struct HomeTrendingAnimeListPaginationDTO: Codable, Hashable, Sendable {
     let currentPage: Int?
     let hasNextPage: Bool?
     let lastVisiblePage: Int?
 }
 
-struct HomeTrendingAnimeListDTO: Codable, Identifiable, Hashable {
+nonisolated struct HomeTrendingAnimeListDTO: Codable, Identifiable, Hashable, Sendable {
     let malId: Int
     let title: String?
     let titleEnglish: String?
@@ -65,7 +65,7 @@ struct HomeTrendingAnimeListDTO: Codable, Identifiable, Hashable {
     var id: Int { malId }
 }
 
-struct HomeTrendingAnimeListItem: Identifiable, Hashable, Sendable {
+nonisolated struct HomeTrendingAnimeListItem: Identifiable, Hashable, Sendable {
     let id: Int
     let title: String
     let typeText: String?
@@ -80,13 +80,13 @@ struct HomeTrendingAnimeListItem: Identifiable, Hashable, Sendable {
     let imageURL: URL?
 }
 
-struct HomeTrendingAnimeListHeaderContent: Hashable, Sendable {
+nonisolated struct HomeTrendingAnimeListHeaderContent: Hashable, Sendable {
     let title: String
     let subtitle: String
     let loadedCountText: String
 }
 
-struct HomeTrendingAnimeListSortChipItem: Identifiable, Hashable, Sendable {
+nonisolated struct HomeTrendingAnimeListSortChipItem: Identifiable, Hashable, Sendable {
     let sort: HomeTrendingAnimeListSort
     let isSelected: Bool
 
@@ -95,7 +95,7 @@ struct HomeTrendingAnimeListSortChipItem: Identifiable, Hashable, Sendable {
     var systemImageName: String { sort.systemImageName }
 }
 
-struct HomeTrendingAnimeListSectionContent: Identifiable, Hashable, Sendable {
+nonisolated struct HomeTrendingAnimeListSectionContent: Identifiable, Hashable, Sendable {
     let id: String
     let title: String
     let subtitle: String
@@ -103,6 +103,6 @@ struct HomeTrendingAnimeListSectionContent: Identifiable, Hashable, Sendable {
     let items: [HomeTrendingAnimeListItem]
 }
 
-struct HomeTrendingAnimeListContent: Hashable, Sendable {
+nonisolated struct HomeTrendingAnimeListContent: Hashable, Sendable {
     let sections: [HomeTrendingAnimeListSectionContent]
 }

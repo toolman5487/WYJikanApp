@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol MainCategoryListServicing {
+nonisolated protocol MainCategoryListServicing: Sendable {
     func fetchRandomAnime() async throws -> AnimeListRandomResponse
     func fetchRandomManga() async throws -> MangaListRandomResponse
     func fetchAnimeGenres() async throws -> AnimeGenreListResponse
@@ -18,7 +18,7 @@ protocol MainCategoryListServicing {
     func fetchPeople(page: Int, limit: Int) async throws -> PeopleListResponse
 }
 
-final class MainCategoryListService: MainCategoryListServicing {
+nonisolated final class MainCategoryListService: MainCategoryListServicing {
 
     // MARK: - PaginatedListRequest
     

@@ -56,21 +56,21 @@ nonisolated enum JikanAPIError: LocalizedError, AppUserFacingError {
 
 // MARK: - JikanAPIRequestTarget
 
-enum JikanAPIRequestTarget: Sendable {
+nonisolated enum JikanAPIRequestTarget: Sendable {
     case path(String)
     case absoluteURL(String)
 }
 
 // MARK: - JikanAPICachePolicy
 
-enum JikanAPICachePolicy: Sendable {
+nonisolated enum JikanAPICachePolicy: Sendable {
     case remoteOnly
     case cacheFirst(ttl: TimeInterval)
 }
 
 // MARK: - JikanAPIResponseState
 
-enum JikanAPIResponseState: Sendable {
+nonisolated enum JikanAPIResponseState: Sendable {
     case success
     case emptyBody
     case serverError(statusCode: Int)
@@ -78,7 +78,7 @@ enum JikanAPIResponseState: Sendable {
 
 // MARK: - JikanAPIRequest
 
-struct JikanAPIRequest: Sendable {
+nonisolated struct JikanAPIRequest: Sendable {
     let target: JikanAPIRequestTarget
     let queryItems: [URLQueryItem]
     let method: String
@@ -111,20 +111,20 @@ struct JikanAPIRequest: Sendable {
 
 // MARK: - JikanAPIServicing
 
-protocol JikanAPIServicing {
-    func send<T: Decodable>(_ request: JikanAPIRequest) async throws -> T
-    func fetch<T: Decodable>(
+nonisolated protocol JikanAPIServicing: Sendable {
+    func send<T: Decodable & Sendable>(_ request: JikanAPIRequest) async throws -> T
+    func fetch<T: Decodable & Sendable>(
         endpoint: String,
         cachePolicy: JikanAPICachePolicy,
         queryItems: [URLQueryItem]?
     ) async throws -> T
-    func fetchFromURL<T: Decodable>(_ urlString: String, cachePolicy: JikanAPICachePolicy) async throws -> T
+    func fetchFromURL<T: Decodable & Sendable>(_ urlString: String, cachePolicy: JikanAPICachePolicy) async throws -> T
 }
 
 // MARK: - JikanAPIServicing Convenience
 
-extension JikanAPIServicing {
-    func fetch<T: Decodable>(
+nonisolated extension JikanAPIServicing {
+    func fetch<T: Decodable & Sendable>(
         endpoint: String,
         queryItems: [URLQueryItem]? = nil
     ) async throws -> T {
@@ -135,7 +135,7 @@ extension JikanAPIServicing {
         )
     }
 
-    func fetch<T: Decodable>(endpoint: String) async throws -> T {
+    func fetch<T: Decodable & Sendable>(endpoint: String) async throws -> T {
         try await fetch(
             endpoint: endpoint,
             cachePolicy: .remoteOnly,
@@ -143,7 +143,7 @@ extension JikanAPIServicing {
         )
     }
 
-    func fetch<T: Decodable>(
+    func fetch<T: Decodable & Sendable>(
         endpoint: String,
         cachePolicy: JikanAPICachePolicy
     ) async throws -> T {
@@ -154,7 +154,7 @@ extension JikanAPIServicing {
         )
     }
 
-    func fetchFromURL<T: Decodable>(_ urlString: String) async throws -> T {
+    func fetchFromURL<T: Decodable & Sendable>(_ urlString: String) async throws -> T {
         try await fetchFromURL(urlString, cachePolicy: .remoteOnly)
     }
 }
@@ -252,7 +252,8 @@ private actor JikanAPITransientFailureBackoffStore {
 
 // MARK: - JikanAPIService
 
-final class JikanAPIService {
+// Shared mutable state is actor-isolated; the remaining stored references are immutable.
+nonisolated final class JikanAPIService: @unchecked Sendable {
     
     static let shared = JikanAPIService()
 
@@ -485,7 +486,7 @@ final class JikanAPIService {
 
     // MARK: - Public API
 
-    func send<T: Decodable>(_ request: JikanAPIRequest) async throws -> T {
+    func send<T: Decodable & Sendable>(_ request: JikanAPIRequest) async throws -> T {
         let urlRequest = try makeURLRequest(for: request)
         let data = try await data(
             for: urlRequest,
@@ -501,7 +502,7 @@ final class JikanAPIService {
         }
     }
 
-    func fetch<T: Decodable>(
+    func fetch<T: Decodable & Sendable>(
         endpoint: String,
         cachePolicy: JikanAPICachePolicy,
         queryItems: [URLQueryItem]? = nil
@@ -515,7 +516,7 @@ final class JikanAPIService {
         )
     }
 
-    func fetchFromURL<T: Decodable>(_ urlString: String, cachePolicy: JikanAPICachePolicy) async throws -> T {
+    func fetchFromURL<T: Decodable & Sendable>(_ urlString: String, cachePolicy: JikanAPICachePolicy) async throws -> T {
         try await send(
             JikanAPIRequest(
                 absoluteURL: urlString,
@@ -527,4 +528,4 @@ final class JikanAPIService {
 
 // MARK: - JikanAPIServicing Conformance
 
-extension JikanAPIService: JikanAPIServicing {}
+nonisolated extension JikanAPIService: JikanAPIServicing {}

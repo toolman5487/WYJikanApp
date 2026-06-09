@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol AnimeDetailServicing {
+nonisolated protocol AnimeDetailServicing: Sendable {
     func fetchAnimeDetail(malId: Int) async throws -> AnimeDetailResponse
     func fetchAnimePictures(malId: Int) async throws -> AnimePicturesResponse
     func fetchAnimeCharacters(malId: Int) async throws -> AnimeCharactersResponse
@@ -16,7 +16,7 @@ protocol AnimeDetailServicing {
     func fetchAnimeEpisodeDetail(malId: Int, episodeNumber: Int) async throws -> AnimeEpisodeDetailResponse
 }
 
-final class AnimeDetailService: AnimeDetailServicing {
+nonisolated final class AnimeDetailService: AnimeDetailServicing {
 
     private let apiService: JikanAPIServicing
 

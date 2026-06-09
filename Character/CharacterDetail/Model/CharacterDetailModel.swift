@@ -7,11 +7,11 @@
 
 import Foundation
 
-struct CharacterDetailResponse: Codable {
+nonisolated struct CharacterDetailResponse: Codable, Sendable {
     let data: CharacterDetailDTO
 }
 
-struct CharacterDetailDTO: Codable, Identifiable, Hashable {
+nonisolated struct CharacterDetailDTO: Codable, Identifiable, Hashable, Sendable {
     let malId: Int
     let url: String?
     let images: AnimeImagesDTO?
@@ -27,21 +27,21 @@ struct CharacterDetailDTO: Codable, Identifiable, Hashable {
     var id: Int { malId }
 }
 
-struct CharacterAnimeRoleDTO: Codable, Identifiable, Hashable {
+nonisolated struct CharacterAnimeRoleDTO: Codable, Identifiable, Hashable, Sendable {
     let role: String?
     let anime: CharacterRelatedWorkDTO?
 
     var id: Int { anime?.malId ?? role.hashValue }
 }
 
-struct CharacterMangaRoleDTO: Codable, Identifiable, Hashable {
+nonisolated struct CharacterMangaRoleDTO: Codable, Identifiable, Hashable, Sendable {
     let role: String?
     let manga: CharacterRelatedWorkDTO?
 
     var id: Int { manga?.malId ?? role.hashValue }
 }
 
-struct CharacterRelatedWorkDTO: Codable, Identifiable, Hashable {
+nonisolated struct CharacterRelatedWorkDTO: Codable, Identifiable, Hashable, Sendable {
     let malId: Int
     let url: String?
     let images: AnimeImagesDTO?
@@ -50,14 +50,14 @@ struct CharacterRelatedWorkDTO: Codable, Identifiable, Hashable {
     var id: Int { malId }
 }
 
-struct CharacterVoiceActorDTO: Codable, Identifiable, Hashable {
+nonisolated struct CharacterVoiceActorDTO: Codable, Identifiable, Hashable, Sendable {
     let language: String?
     let person: CharacterPersonDTO?
 
     var id: Int { person?.malId ?? language.hashValue }
 }
 
-struct CharacterPersonDTO: Codable, Identifiable, Hashable {
+nonisolated struct CharacterPersonDTO: Codable, Identifiable, Hashable, Sendable {
     let malId: Int
     let url: String?
     let images: AnimeImagesDTO?

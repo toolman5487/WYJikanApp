@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol MainHomeServicing {
+nonisolated protocol MainHomeServicing: Sendable {
     func fetchHeroBanner(forceRefresh: Bool) async throws -> HeroBannerResponse
     func fetchTopAnime(limit: Int, forceRefresh: Bool) async throws -> HomeTrendingAnimeResponse
     func fetchTopManga(limit: Int, forceRefresh: Bool) async throws -> HomeTrendingMangaResponse
@@ -16,7 +16,7 @@ protocol MainHomeServicing {
     func fetchAnimeDetail(malId: Int, forceRefresh: Bool) async throws -> AnimeDetailResponse
 }
 
-extension MainHomeServicing {
+nonisolated extension MainHomeServicing {
     func fetchHeroBanner() async throws -> HeroBannerResponse {
         try await fetchHeroBanner(forceRefresh: false)
     }
@@ -42,7 +42,7 @@ extension MainHomeServicing {
     }
 }
 
-final class MainHomeService: MainHomeServicing {
+nonisolated final class MainHomeService: MainHomeServicing {
 
     private let apiService: JikanAPIServicing
 

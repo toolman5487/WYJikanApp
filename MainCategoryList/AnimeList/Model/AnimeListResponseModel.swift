@@ -9,18 +9,18 @@ import Foundation
 
 // MARK: - Genre List Response
 
-struct AnimeGenreListResponse: Codable {
+nonisolated struct AnimeGenreListResponse: Codable, Sendable {
     let data: [AnimeListGenreDTO]
 }
 
 // MARK: - Anime List Response
 
-struct AnimeListResponse: Codable {
+nonisolated struct AnimeListResponse: Codable, Sendable {
     let data: [AnimeListRandomDTO]
 }
 
 // MARK: - Random Anime Response
 
-struct AnimeListRandomResponse: Codable {
+nonisolated struct AnimeListRandomResponse: Codable, Sendable {
     let data: AnimeListRandomDTO
 }

@@ -7,11 +7,11 @@
 
 import Foundation
 
-struct HomeRecommendedAnimeResponse: Codable {
+nonisolated struct HomeRecommendedAnimeResponse: Codable, Sendable {
     let data: [HomeRecommendedAnimeDTO]
 }
 
-struct HomeRecommendedAnimeDTO: Codable, Identifiable, Hashable {
+nonisolated struct HomeRecommendedAnimeDTO: Codable, Identifiable, Hashable, Sendable {
     let malId: String
     let entry: [HomeRecommendedAnimeEntryDTO]
     let content: String?
@@ -20,7 +20,7 @@ struct HomeRecommendedAnimeDTO: Codable, Identifiable, Hashable {
     var id: String { malId }
 }
 
-struct HomeRecommendedAnimeEntryDTO: Codable, Identifiable, Hashable {
+nonisolated struct HomeRecommendedAnimeEntryDTO: Codable, Identifiable, Hashable, Sendable {
     let malId: Int
     let title: String?
     let images: AnimeImagesDTO?
@@ -28,11 +28,11 @@ struct HomeRecommendedAnimeEntryDTO: Codable, Identifiable, Hashable {
     var id: Int { malId }
 }
 
-struct HomeRecommendedAnimeUserDTO: Codable, Hashable {
+nonisolated struct HomeRecommendedAnimeUserDTO: Codable, Hashable, Sendable {
     let username: String?
 }
 
-struct HomeRecommendedAnimeCardItem: Identifiable, Hashable, Sendable {
+nonisolated struct HomeRecommendedAnimeCardItem: Identifiable, Hashable, Sendable {
     let id: String
     let sourceTitle: String
     let recommendedTitle: String

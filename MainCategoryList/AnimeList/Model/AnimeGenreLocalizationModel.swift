@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum AnimeGenreLocalizationModel {
+nonisolated enum AnimeGenreLocalizationModel {
     static let translations: [String: String] = [
         "Action": "動作",
         "Adventure": "冒險",

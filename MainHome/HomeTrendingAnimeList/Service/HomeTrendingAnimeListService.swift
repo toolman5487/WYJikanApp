@@ -7,11 +7,11 @@
 
 import Foundation
 
-protocol HomeTrendingAnimeListServicing {
+nonisolated protocol HomeTrendingAnimeListServicing: Sendable {
     func fetchPage(page: Int, limit: Int) async throws -> HomeTrendingAnimeListResponse
 }
 
-final class HomeTrendingAnimeListService: HomeTrendingAnimeListServicing {
+nonisolated final class HomeTrendingAnimeListService: HomeTrendingAnimeListServicing {
     private let apiService: JikanAPIServicing
 
     init(apiService: JikanAPIServicing = JikanAPIService.shared) {

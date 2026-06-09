@@ -9,18 +9,18 @@ import Foundation
 
 // MARK: - Response
 
-struct AnimePicturesResponse: Codable {
+nonisolated struct AnimePicturesResponse: Codable, Sendable {
     let data: [AnimeImagesDTO]
 }
 
 // MARK: - Presentation
 
-struct AnimeDetailPictureItem: Identifiable, Hashable, Sendable {
+nonisolated struct AnimeDetailPictureItem: Identifiable, Hashable, Sendable {
     let id: Int
     let url: URL
 }
 
-enum AnimeDetailPictureMapping {
+nonisolated enum AnimeDetailPictureMapping {
 
     static func items(from response: AnimePicturesResponse) -> [AnimeDetailPictureItem] {
         response.data.enumerated().compactMap { index, images in

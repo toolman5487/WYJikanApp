@@ -9,7 +9,7 @@ import Foundation
 
 // MARK: - Presentation
 
-struct BannerItem: Identifiable, Hashable, Sendable {
+nonisolated struct BannerItem: Identifiable, Hashable, Sendable {
     let id: Int
     let title: String
     let type: String?
@@ -19,13 +19,13 @@ struct BannerItem: Identifiable, Hashable, Sendable {
 
 // MARK: - Response
 
-struct HeroBannerResponse: Codable {
+nonisolated struct HeroBannerResponse: Codable, Sendable {
     let data: [HeroBannerAnimeDTO]
 }
 
 // MARK: - Anime
 
-struct HeroBannerAnimeDTO: Codable, Identifiable, Hashable {
+nonisolated struct HeroBannerAnimeDTO: Codable, Identifiable, Hashable, Sendable {
     let malId: Int
     let title: String?
     let titleEnglish: String?
@@ -39,12 +39,12 @@ struct HeroBannerAnimeDTO: Codable, Identifiable, Hashable {
 
 // MARK: - Images
 
-struct AnimeImagesDTO: Codable, Hashable {
+nonisolated struct AnimeImagesDTO: Codable, Hashable, Sendable {
     let jpg: AnimeImageVariantDTO?
     let webp: AnimeImageVariantDTO?
 }
 
-struct AnimeImageVariantDTO: Codable, Hashable {
+nonisolated struct AnimeImageVariantDTO: Codable, Hashable, Sendable {
     let imageUrl: String?
     let smallImageUrl: String?
     let largeImageUrl: String?

@@ -9,18 +9,18 @@ import Foundation
 
 // MARK: - Response (Jikan /anime/{id}/reviews)
 
-struct AnimeReviewsListResponse: Codable {
+nonisolated struct AnimeReviewsListResponse: Codable, Sendable {
     let pagination: AnimeReviewsPaginationDTO?
     let data: [AnimeReviewEntryDTO]
 }
 
-struct AnimeReviewsPaginationDTO: Codable {
+nonisolated struct AnimeReviewsPaginationDTO: Codable, Sendable {
     let lastVisiblePage: Int?
     let hasNextPage: Bool?
     let currentPage: Int?
 }
 
-struct AnimeReviewEntryDTO: Codable, Identifiable, Hashable {
+nonisolated struct AnimeReviewEntryDTO: Codable, Identifiable, Hashable, Sendable {
     let malId: Int
     let url: String?
     let type: String?
@@ -37,7 +37,7 @@ struct AnimeReviewEntryDTO: Codable, Identifiable, Hashable {
     var id: Int { malId }
 }
 
-struct AnimeReviewReactionsDTO: Codable, Hashable {
+nonisolated struct AnimeReviewReactionsDTO: Codable, Hashable, Sendable {
     let overall: Int?
     let nice: Int?
     let loveIt: Int?
@@ -48,7 +48,7 @@ struct AnimeReviewReactionsDTO: Codable, Hashable {
     let creative: Int?
 }
 
-struct AnimeReviewUserDTO: Codable, Hashable {
+nonisolated struct AnimeReviewUserDTO: Codable, Hashable, Sendable {
     let url: String?
     let username: String?
     let images: AnimeImagesDTO?

@@ -7,11 +7,11 @@
 
 import Foundation
 
-protocol CharacterDetailServicing {
+nonisolated protocol CharacterDetailServicing: Sendable {
     func fetchCharacterDetail(malId: Int) async throws -> CharacterDetailResponse
 }
 
-final class CharacterDetailService: CharacterDetailServicing {
+nonisolated final class CharacterDetailService: CharacterDetailServicing {
 
     private let apiService: JikanAPIServicing
 

@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol HomeTodayAnimeScheduleListServicing {
+nonisolated protocol HomeTodayAnimeScheduleListServicing: Sendable {
     func fetchSchedulePage(
         day: HomeScheduleDay,
         page: Int,
@@ -15,7 +15,7 @@ protocol HomeTodayAnimeScheduleListServicing {
     ) async throws -> HomeTodayAnimeResponse
 }
 
-final class HomeTodayAnimeScheduleListService: HomeTodayAnimeScheduleListServicing {
+nonisolated final class HomeTodayAnimeScheduleListService: HomeTodayAnimeScheduleListServicing {
     private let apiService: JikanAPIServicing
 
     init(apiService: JikanAPIServicing = JikanAPIService.shared) {

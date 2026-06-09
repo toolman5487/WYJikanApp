@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum APIConfig {
+nonisolated enum APIConfig {
 
     static let jikanBaseURL = "https://api.jikan.moe/v4"
 

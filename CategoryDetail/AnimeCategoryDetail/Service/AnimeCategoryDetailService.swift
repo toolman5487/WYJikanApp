@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol AnimeCategoryDetailServicing {
+nonisolated protocol AnimeCategoryDetailServicing: Sendable {
     func fetchInitialPage(
         genreId: Int,
         pageSize: Int,
@@ -22,7 +22,7 @@ protocol AnimeCategoryDetailServicing {
     ) async throws -> AnimeCategoryPage
 }
 
-final class AnimeCategoryDetailService: AnimeCategoryDetailServicing {
+nonisolated final class AnimeCategoryDetailService: AnimeCategoryDetailServicing {
     // MARK: - Request
 
     private enum AnimeGenreRequest {

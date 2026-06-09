@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol MangaCategoryDetailServicing {
+nonisolated protocol MangaCategoryDetailServicing: Sendable {
     func fetchInitialPage(
         genreId: Int,
         pageSize: Int,
@@ -22,7 +22,7 @@ protocol MangaCategoryDetailServicing {
     ) async throws -> MangaCategoryPage
 }
 
-final class MangaCategoryDetailService: MangaCategoryDetailServicing {
+nonisolated final class MangaCategoryDetailService: MangaCategoryDetailServicing {
     // MARK: - Request
 
     private enum MangaGenreRequest {

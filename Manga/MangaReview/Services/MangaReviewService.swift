@@ -7,11 +7,11 @@
 
 import Foundation
 
-protocol MangaReviewServicing {
+nonisolated protocol MangaReviewServicing: Sendable {
     func fetchReviews(malId: Int, page: Int) async throws -> MangaReviewsListResponse
 }
 
-final class MangaReviewService: MangaReviewServicing {
+nonisolated final class MangaReviewService: MangaReviewServicing {
 
     private let apiService: JikanAPIServicing
 

@@ -7,11 +7,11 @@
 
 import Foundation
 
-struct AnimeCategoryFilter: Equatable, Sendable {
+nonisolated struct AnimeCategoryFilter: Equatable, Sendable {
     let sort: Sort
     let format: Format
 
-    enum Sort: String, CaseIterable, Equatable, Identifiable, Sendable {
+    nonisolated enum Sort: String, CaseIterable, Equatable, Identifiable, Sendable {
         case `default`
         case popularity
         case score
@@ -33,7 +33,7 @@ struct AnimeCategoryFilter: Equatable, Sendable {
         }
     }
 
-    enum Format: String, CaseIterable, Equatable, Identifiable, Sendable {
+    nonisolated enum Format: String, CaseIterable, Equatable, Identifiable, Sendable {
         case all
         case tv
         case movie
@@ -70,24 +70,24 @@ struct AnimeCategoryFilter: Equatable, Sendable {
     }
 }
 
-struct AnimeCategoryPage: Sendable {
+nonisolated struct AnimeCategoryPage: Sendable {
     let items: [AnimeCategoryItemDTO]
     let currentPage: Int
     let hasNextPage: Bool
 }
 
-struct AnimeCategoryResponse: Decodable, Sendable {
+nonisolated struct AnimeCategoryResponse: Decodable, Sendable {
     let pagination: AnimeCategoryPaginationDTO?
     let data: [AnimeCategoryItemDTO]
 }
 
-struct AnimeCategoryPaginationDTO: Decodable, Hashable, Sendable {
+nonisolated struct AnimeCategoryPaginationDTO: Decodable, Hashable, Sendable {
     let currentPage: Int?
     let hasNextPage: Bool?
     let lastVisiblePage: Int?
 }
 
-struct AnimeCategoryItemDTO: Decodable, Identifiable, Hashable, Sendable {
+nonisolated struct AnimeCategoryItemDTO: Decodable, Identifiable, Hashable, Sendable {
     let malId: Int
     let title: String?
     let titleEnglish: String?
@@ -106,25 +106,25 @@ struct AnimeCategoryItemDTO: Decodable, Identifiable, Hashable, Sendable {
     var id: Int { malId }
 }
 
-struct AnimeCategoryGenreDTO: Decodable, Hashable, Sendable {
+nonisolated struct AnimeCategoryGenreDTO: Decodable, Hashable, Sendable {
     let malId: Int
     let name: String?
 
     var id: Int { malId }
 }
 
-struct AnimeCategoryImagesDTO: Decodable, Hashable, Sendable {
+nonisolated struct AnimeCategoryImagesDTO: Decodable, Hashable, Sendable {
     let jpg: AnimeCategoryImageURLDTO?
     let webp: AnimeCategoryImageURLDTO?
 }
 
-struct AnimeCategoryImageURLDTO: Decodable, Hashable, Sendable {
+nonisolated struct AnimeCategoryImageURLDTO: Decodable, Hashable, Sendable {
     let imageUrl: String?
     let smallImageUrl: String?
     let largeImageUrl: String?
 }
 
-extension AnimeCategoryItemDTO {
+nonisolated extension AnimeCategoryItemDTO {
     var displayTitle: String {
         if let t = titleJapanese?.trimmingCharacters(in: .whitespacesAndNewlines), !t.isEmpty { return t }
         if let t = title?.trimmingCharacters(in: .whitespacesAndNewlines), !t.isEmpty { return t }

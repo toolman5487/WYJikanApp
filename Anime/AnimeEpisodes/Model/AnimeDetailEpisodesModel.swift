@@ -7,21 +7,21 @@
 
 import Foundation
 
-struct AnimeEpisodesResponse: Codable, Sendable {
+nonisolated struct AnimeEpisodesResponse: Codable, Sendable {
     let pagination: AnimeEpisodesPaginationDTO?
     let data: [AnimeEpisodeDTO]
 }
 
-struct AnimeEpisodeDetailResponse: Codable, Sendable {
+nonisolated struct AnimeEpisodeDetailResponse: Codable, Sendable {
     let data: AnimeEpisodeDTO
 }
 
-struct AnimeEpisodesPaginationDTO: Codable, Hashable, Sendable {
+nonisolated struct AnimeEpisodesPaginationDTO: Codable, Hashable, Sendable {
     let lastVisiblePage: Int?
     let hasNextPage: Bool?
 }
 
-struct AnimeEpisodeDTO: Codable, Identifiable, Hashable, Sendable {
+nonisolated struct AnimeEpisodeDTO: Codable, Identifiable, Hashable, Sendable {
     let malId: Int?
     let url: String?
     let title: String?
@@ -55,7 +55,7 @@ struct AnimeEpisodeDTO: Codable, Identifiable, Hashable, Sendable {
     }
 }
 
-struct AnimeDetailEpisodeRowPresentation: Identifiable, Sendable, Equatable {
+nonisolated struct AnimeDetailEpisodeRowPresentation: Identifiable, Sendable, Equatable {
     let id: Int
     let summary: AnimeDetailEpisodeSummaryPresentation
     let detail: AnimeDetailEpisodeDetailPresentation?
@@ -63,7 +63,7 @@ struct AnimeDetailEpisodeRowPresentation: Identifiable, Sendable, Equatable {
     let canExpand: Bool
 }
 
-struct AnimeDetailEpisodeSummaryPresentation: Sendable, Equatable {
+nonisolated struct AnimeDetailEpisodeSummaryPresentation: Sendable, Equatable {
     let episodeNumberText: String
     let title: String
     let airedText: String?
@@ -71,20 +71,20 @@ struct AnimeDetailEpisodeSummaryPresentation: Sendable, Equatable {
     let tagTexts: [String]
 }
 
-enum AnimeDetailEpisodeDetailPresentation: Sendable, Equatable {
+nonisolated enum AnimeDetailEpisodeDetailPresentation: Sendable, Equatable {
     case loading(AnimeDetailEpisodeExpandedPresentation)
     case content(AnimeDetailEpisodeExpandedPresentation)
     case error(String, AnimeDetailEpisodeExpandedPresentation)
 }
 
-struct AnimeDetailEpisodeExpandedPresentation: Sendable, Equatable {
+nonisolated struct AnimeDetailEpisodeExpandedPresentation: Sendable, Equatable {
     let alternateTitle: String?
     let infoItems: [AnimeDetailEpisodeInfoItem]
     let synopsisText: String?
     let externalLinks: [AnimeDetailEpisodeExternalLink]
 }
 
-struct AnimeDetailEpisodeInfoItem: Identifiable, Sendable, Equatable {
+nonisolated struct AnimeDetailEpisodeInfoItem: Identifiable, Sendable, Equatable {
     let title: String
     let value: String
 
@@ -93,8 +93,8 @@ struct AnimeDetailEpisodeInfoItem: Identifiable, Sendable, Equatable {
     }
 }
 
-struct AnimeDetailEpisodeExternalLink: Identifiable, Sendable, Equatable {
-    enum Kind: Sendable, Equatable {
+nonisolated struct AnimeDetailEpisodeExternalLink: Identifiable, Sendable, Equatable {
+    nonisolated enum Kind: Sendable, Equatable {
         case myAnimeList
         case discussion
     }

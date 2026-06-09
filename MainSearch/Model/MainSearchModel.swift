@@ -9,7 +9,7 @@ import Foundation
 
 // MARK: - Search Kind
 
-enum MainSearchKind: String, CaseIterable, Hashable, Sendable {
+nonisolated enum MainSearchKind: String, CaseIterable, Hashable, Sendable {
     case anime
     case manga
     case character
@@ -45,7 +45,7 @@ enum MainSearchKind: String, CaseIterable, Hashable, Sendable {
 
 // MARK: - Search Sort
 
-enum MainSearchSortOption: String, CaseIterable, Hashable, Sendable {
+nonisolated enum MainSearchSortOption: String, CaseIterable, Hashable, Sendable {
     case `default`
     case titleAscending
     case titleDescending
@@ -92,7 +92,7 @@ enum MainSearchSortOption: String, CaseIterable, Hashable, Sendable {
 
 // MARK: Pagination
 
-struct MainSearchPaginationDTO: Codable, Hashable, Sendable {
+nonisolated struct MainSearchPaginationDTO: Codable, Hashable, Sendable {
     let lastVisiblePage: Int?
     let hasNextPage: Bool?
     let currentPage: Int?
@@ -100,7 +100,7 @@ struct MainSearchPaginationDTO: Codable, Hashable, Sendable {
 
 // MARK: List Item DTOs
 
-struct MainSearchAnimeListDTO: Codable, Identifiable, Hashable, Sendable {
+nonisolated struct MainSearchAnimeListDTO: Codable, Identifiable, Hashable, Sendable {
     let malId: Int
     let url: String?
     let images: AnimeImagesDTO?
@@ -115,7 +115,7 @@ struct MainSearchAnimeListDTO: Codable, Identifiable, Hashable, Sendable {
     var id: Int { malId }
 }
 
-struct MainSearchMangaListDTO: Codable, Identifiable, Hashable, Sendable {
+nonisolated struct MainSearchMangaListDTO: Codable, Identifiable, Hashable, Sendable {
     let malId: Int
     let url: String?
     let images: AnimeImagesDTO?
@@ -130,7 +130,7 @@ struct MainSearchMangaListDTO: Codable, Identifiable, Hashable, Sendable {
     var id: Int { malId }
 }
 
-struct MainSearchCharacterListDTO: Codable, Identifiable, Hashable, Sendable {
+nonisolated struct MainSearchCharacterListDTO: Codable, Identifiable, Hashable, Sendable {
     let malId: Int
     let url: String?
     let images: AnimeImagesDTO?
@@ -141,7 +141,7 @@ struct MainSearchCharacterListDTO: Codable, Identifiable, Hashable, Sendable {
     var id: Int { malId }
 }
 
-struct MainSearchPersonListDTO: Codable, Identifiable, Hashable, Sendable {
+nonisolated struct MainSearchPersonListDTO: Codable, Identifiable, Hashable, Sendable {
     let malId: Int
     let url: String?
     let images: AnimeImagesDTO?
@@ -153,27 +153,27 @@ struct MainSearchPersonListDTO: Codable, Identifiable, Hashable, Sendable {
 
 // MARK: Search Responses
 
-struct MainSearchAnimeSearchResponse: Codable, Sendable {
+nonisolated struct MainSearchAnimeSearchResponse: Codable, Sendable {
     let pagination: MainSearchPaginationDTO?
     let data: [MainSearchAnimeListDTO]
 }
 
-struct MainSearchMangaSearchResponse: Codable, Sendable {
+nonisolated struct MainSearchMangaSearchResponse: Codable, Sendable {
     let pagination: MainSearchPaginationDTO?
     let data: [MainSearchMangaListDTO]
 }
 
-struct MainSearchCharacterSearchResponse: Codable, Sendable {
+nonisolated struct MainSearchCharacterSearchResponse: Codable, Sendable {
     let pagination: MainSearchPaginationDTO?
     let data: [MainSearchCharacterListDTO]
 }
 
-struct MainSearchPersonSearchResponse: Codable, Sendable {
+nonisolated struct MainSearchPersonSearchResponse: Codable, Sendable {
     let pagination: MainSearchPaginationDTO?
     let data: [MainSearchPersonListDTO]
 }
 
-struct MainSearchPage: Sendable {
+nonisolated struct MainSearchPage: Sendable {
     let rows: [MainSearchResultRow]
     let currentPage: Int
     let hasNextPage: Bool
@@ -181,7 +181,7 @@ struct MainSearchPage: Sendable {
 
 // MARK: - Result Row
 
-struct MainSearchResultRow: Identifiable, Hashable, Sendable {
+nonisolated struct MainSearchResultRow: Identifiable, Hashable, Sendable {
     let id: String
     let malId: Int
     let kind: MainSearchKind

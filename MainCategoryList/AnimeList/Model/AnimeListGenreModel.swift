@@ -9,7 +9,7 @@ import Foundation
 
 // MARK: - Genre
 
-struct AnimeListGenreDTO: Codable, Identifiable, Hashable {
+nonisolated struct AnimeListGenreDTO: Codable, Identifiable, Hashable, Sendable {
     let malId: Int
     let name: String?
 
@@ -18,7 +18,7 @@ struct AnimeListGenreDTO: Codable, Identifiable, Hashable {
 
 // MARK: - Genre Section
 
-struct AnimeGenreSection: Identifiable, Hashable {
+nonisolated struct AnimeGenreSection: Identifiable, Hashable, Sendable {
     let genre: AnimeListGenreDTO
     let items: [AnimeListRandomDTO]
 
