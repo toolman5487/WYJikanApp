@@ -48,7 +48,7 @@ struct MainTabBarView: View {
         .tint(ThemeColor.sakura)
         .tabViewStyle(.sidebarAdaptable)
         .toolbarBackground(.visible, for: .tabBar)
-        .tabBarMinimizeBehavior(.automatic)
+        .tabBarMinimizeBehavior(.onScrollDown)
     }
 }
 

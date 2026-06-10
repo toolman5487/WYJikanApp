@@ -9,10 +9,14 @@ import SwiftData
 import SwiftUI
 
 struct MainMyListView: View {
+    // MARK: - Types
+
     private enum ContentState {
         case empty
         case populated
     }
+
+    // MARK: - Properties
 
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \MyListCollectionItem.addedAt, order: .reverse)
@@ -20,6 +24,8 @@ struct MainMyListView: View {
     @StateObject private var viewModel = MainMyListViewModel()
     @State private var genreCollectionsRoute: MyListGenreCollectionsRoute?
     @State private var formatCollectionsRoute: MyListFormatCollectionsRoute?
+
+    // MARK: - Body
 
     var body: some View {
         let presentation = viewModel.presentation
@@ -54,22 +60,7 @@ struct MainMyListView: View {
         }
     }
 
-    private var itemRevisions: [MyListItemRevision] {
-        items.map { item in
-            MyListItemRevision(
-                id: item.persistentModelID,
-                malId: item.malId,
-                mediaKindRawValue: item.mediaKindRawValue,
-                title: item.title,
-                subtitle: item.subtitle,
-                imageURLString: item.imageURLString,
-                genreNamesRawValue: item.genreNamesRawValue,
-                type: item.type,
-                year: item.year,
-                addedAt: item.addedAt
-            )
-        }
-    }
+    // MARK: - Private Views
 
     private var headerView: some View {
         Text("把想追的動畫與漫畫集中在這裡。")
@@ -131,10 +122,6 @@ struct MainMyListView: View {
         }
     }
 
-    private func contentState(for presentation: MyListPresentation) -> ContentState {
-        presentation.filteredItems.isEmpty ? .empty : .populated
-    }
-
     @ViewBuilder
     private func destinationView(for item: MyListCollectionItem) -> some View {
         switch item.mediaKind {
@@ -143,6 +130,29 @@ struct MainMyListView: View {
         case .manga:
             MangaDetailView(malId: item.malId)
         }
+    }
+
+    // MARK: - Private Methods
+
+    private var itemRevisions: [MyListItemRevision] {
+        items.map { item in
+            MyListItemRevision(
+                id: item.persistentModelID,
+                malId: item.malId,
+                mediaKindRawValue: item.mediaKindRawValue,
+                title: item.title,
+                subtitle: item.subtitle,
+                imageURLString: item.imageURLString,
+                genreNamesRawValue: item.genreNamesRawValue,
+                type: item.type,
+                year: item.year,
+                addedAt: item.addedAt
+            )
+        }
+    }
+
+    private func contentState(for presentation: MyListPresentation) -> ContentState {
+        presentation.filteredItems.isEmpty ? .empty : .populated
     }
 
     private func showGenreCollectionsDetail(
