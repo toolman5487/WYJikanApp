@@ -47,7 +47,7 @@ struct MainNewsArticleRowView: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-                Image(systemName: "arrow.up.right")
+                Image(systemName: "chevron.right")
                     .font(.caption.weight(.bold))
                     .foregroundStyle(ThemeColor.textSecondary)
                     .frame(width: 24, height: 24)

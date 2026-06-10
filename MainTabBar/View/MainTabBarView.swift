@@ -6,9 +6,14 @@
 import SwiftUI
 
 struct MainTabBarView: View {
+
+    // MARK: - Properties
+
     @EnvironmentObject private var viewModel: MainTabBarViewModel
     @StateObject private var mainSearchViewModel = MainSearchViewModel()
-    
+
+    // MARK: - Body
+
     var body: some View {
         TabView(selection: $viewModel.selectedTab) {
             TabSection("主頁") {
@@ -17,7 +22,7 @@ struct MainTabBarView: View {
                 } label: {
                     Image(systemName: viewModel.selectedTab == .home ? "square.grid.3x3.fill" : "square.grid.3x3")
                 }
-                
+
                 Tab(value: AppTab.categorylist) {
                     MainCategoryListView()
                 } label: {
@@ -29,19 +34,19 @@ struct MainTabBarView: View {
                 } label: {
                     Image(systemName: viewModel.selectedTab == .news ? "lightbulb.max.fill" : "lightbulb.max")
                 }
-                
+
                 Tab(value: AppTab.myList) {
                     MainMyListView()
                 } label: {
                     Image(systemName: viewModel.selectedTab == .myList ? "heart.fill" : "heart")
                 }
             }
-            
+
             TabSection("搜尋") {
                 Tab(value: AppTab.searchLiquidGlass, role: .search) {
                     MainSearchView(viewModel: mainSearchViewModel)
                 } label: {
-                    Image(systemName: viewModel.selectedTab == .searchLiquidGlass ? "magnifyingglass" : "magnifyingglass")
+                    Image(systemName: "magnifyingglass")
                 }
             }
         }

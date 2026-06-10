@@ -29,6 +29,10 @@ nonisolated struct BaseWebPage: Hashable, Sendable {
         BaseWebPage(title: "觀看集數", content: content(for: url))
     }
 
+    static func newsArticle(sourceName: String, url: URL) -> BaseWebPage {
+        BaseWebPage(title: sourceName, content: .web(url))
+    }
+
     var fallbackURL: URL {
         switch content {
         case .web(let url):

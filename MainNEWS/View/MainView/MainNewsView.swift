@@ -6,21 +6,32 @@
 import SwiftUI
 
 struct MainNewsView: View {
-    @Environment(\.openURL) private var openURL
+
+    // MARK: - Properties
+
     @StateObject private var viewModel: MainNewsViewModel
     @State private var reloadTask: Task<Void, Never>?
+    @State private var selectedArticle: MainNewsRow?
+
+    // MARK: - Lifecycle
 
     init(viewModel: MainNewsViewModel = MainNewsViewModel()) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
 
+    // MARK: - Body
+
     var body: some View {
+        newsNavigationStack
+    }
+
+    // MARK: - Private Views
+
+    private var newsNavigationStack: some View {
         NavigationStack {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 16) {
-                    MainNewsHeaderView(
-                        content: viewModel.headerContent
-                    )
+                    MainNewsHeaderView(content: viewModel.headerContent)
 
                     MainNewsSourceFilterBarView(
                         filters: viewModel.filterItems,
@@ -52,6 +63,9 @@ struct MainNewsView: View {
             .onDisappear {
                 reloadTask?.cancel()
                 reloadTask = nil
+            }
+            .navigationDestination(item: $selectedArticle) { row in
+                BaseWebView(page: .newsArticle(sourceName: row.sourceName, url: row.linkURL))
             }
         }
     }
@@ -88,7 +102,7 @@ struct MainNewsView: View {
             LazyVStack(alignment: .leading, spacing: 12) {
                 ForEach(content.rows) { row in
                     MainNewsArticleRowView(row: row) {
-                        openURL(row.linkURL)
+                        selectedArticle = row
                     }
                 }
             }
@@ -96,6 +110,8 @@ struct MainNewsView: View {
             .transition(.opacity)
         }
     }
+
+    // MARK: - Private Methods
 
     private func startReload() {
         reloadTask?.cancel()

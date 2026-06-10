@@ -11,10 +11,15 @@ import OSLog
 
 @main
 struct WYJikanAppApp: App {
+
+    // MARK: - Types
+
     private enum StartupState {
         case ready(ModelContainer)
         case failed(message: String)
     }
+
+    // MARK: - Properties
 
     @UIApplicationDelegateAdaptor(AppNotificationDelegate.self) private var appDelegate
     private let startupState: StartupState
@@ -22,6 +27,8 @@ struct WYJikanAppApp: App {
     @StateObject private var todayAnimeNotificationScheduler: HomeTodayAnimeNotificationScheduler
     @StateObject private var mainTabBarViewModel: MainTabBarViewModel
     @StateObject private var mainHomeRouter: MainHomeRouter
+
+    // MARK: - Lifecycle
 
     init() {
         let favoriteStatusStore = FavoriteStatusStore()
@@ -43,18 +50,10 @@ struct WYJikanAppApp: App {
             )
         }
 
-        _favoriteStatusStore = StateObject(
-            wrappedValue: favoriteStatusStore
-        )
-        _todayAnimeNotificationScheduler = StateObject(
-            wrappedValue: todayAnimeNotificationScheduler
-        )
-        _mainTabBarViewModel = StateObject(
-            wrappedValue: MainTabBarViewModel.shared
-        )
-        _mainHomeRouter = StateObject(
-            wrappedValue: MainHomeRouter.shared
-        )
+        _favoriteStatusStore = StateObject(wrappedValue: favoriteStatusStore)
+        _todayAnimeNotificationScheduler = StateObject(wrappedValue: todayAnimeNotificationScheduler)
+        _mainTabBarViewModel = StateObject(wrappedValue: MainTabBarViewModel.shared)
+        _mainHomeRouter = StateObject(wrappedValue: MainHomeRouter.shared)
 
         MainActor.assumeIsolated {
             AppNotificationDelegate.onNotificationOpened = { response in
@@ -63,11 +62,15 @@ struct WYJikanAppApp: App {
         }
     }
 
+    // MARK: - Body
+
     var body: some Scene {
         WindowGroup {
             rootContent
         }
     }
+
+    // MARK: - Private Views
 
     @ViewBuilder
     private var rootContent: some View {
@@ -86,8 +89,15 @@ struct WYJikanAppApp: App {
     }
 }
 
+// MARK: - AppLaunchFailureView
+
 private struct AppLaunchFailureView: View {
+
+    // MARK: - Properties
+
     let message: String
+
+    // MARK: - Body
 
     var body: some View {
         VStack(spacing: 16) {

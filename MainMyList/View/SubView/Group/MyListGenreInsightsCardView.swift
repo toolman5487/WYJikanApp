@@ -81,13 +81,17 @@ struct MyListGenreInsightsCardView: View {
             return nil
         }
 
-        var text = "最常收藏的是 \(topGenreSlice.genreName)，共 \(topGenreSlice.count) 筆。"
+        var text = "最常收藏的是 \(localizedGenreName(topGenreSlice.genreName))，共 \(topGenreSlice.count) 筆。"
         if let secondGenreSlice = analysis.genreSlices.dropFirst().first {
-            text += " 接著是 \(secondGenreSlice.genreName) \(secondGenreSlice.count) 筆。"
+            text += " 接著是 \(localizedGenreName(secondGenreSlice.genreName)) \(secondGenreSlice.count) 筆。"
         }
         if analysis.missingGenreItemCount > 0 {
             text += " 另有 \(analysis.missingGenreItemCount) 筆舊收藏尚未記錄種類。"
         }
         return text
+    }
+
+    private func localizedGenreName(_ genreName: String) -> String {
+        AnimeGenreLocalizationModel.localizedName(for: genreName)
     }
 }

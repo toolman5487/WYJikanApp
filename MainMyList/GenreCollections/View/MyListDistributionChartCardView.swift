@@ -32,7 +32,7 @@ struct MyListDistributionChartCardView: View {
                         .frame(height: chartHeight)
 
                     if let topGenreSlice = statistics.selectedAnalysis.topGenreSlice {
-                        Text("\(topGenreSlice.genreName) 佔 \(percentageText(for: topGenreSlice))，是目前收藏中最明顯的種類。")
+                        Text("\(localizedGenreName(topGenreSlice.genreName)) 佔 \(percentageText(for: topGenreSlice))，是目前收藏中最明顯的種類。")
                             .font(.footnote)
                             .foregroundStyle(ThemeColor.textSecondary)
                             .fixedSize(horizontal: false, vertical: true)
@@ -92,7 +92,7 @@ struct MyListDistributionChartCardView: View {
                 AxisTick().foregroundStyle(.clear)
                 AxisValueLabel {
                     if let genreName = value.as(String.self) {
-                        Text(genreName)
+                        Text(localizedGenreName(genreName))
                             .font(.caption)
                             .foregroundStyle(ThemeColor.textPrimary)
                     }
@@ -126,7 +126,7 @@ struct MyListDistributionChartCardView: View {
             return nil
         }
 
-        var subtitle = "\(topGenreSlice.genreName) 最多，\(topGenreSlice.count) 筆"
+        var subtitle = "\(localizedGenreName(topGenreSlice.genreName)) 最多，\(topGenreSlice.count) 筆"
         if statistics.selectedAnalysis.missingGenreItemCount > 0 {
             subtitle += " ・\(statistics.selectedAnalysis.missingGenreItemCount) 筆未分類"
         }
@@ -164,6 +164,10 @@ struct MyListDistributionChartCardView: View {
         }
 
         onSelectGenre(genreName)
+    }
+
+    private func localizedGenreName(_ genreName: String) -> String {
+        AnimeGenreLocalizationModel.localizedName(for: genreName)
     }
 
     private func percentageText(

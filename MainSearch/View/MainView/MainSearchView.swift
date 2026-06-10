@@ -9,10 +9,21 @@ import SwiftUI
 
 struct MainSearchView: View {
 
+    // MARK: - Properties
+
     @ObservedObject var viewModel: MainSearchViewModel
     @State private var loadMoreBounceProgress: CGFloat = 0
 
+    // MARK: - Body
+
     var body: some View {
+        searchNavigationStack
+            .searchable(text: $viewModel.query, prompt: viewModel.kind.searchPrompt)
+    }
+
+    // MARK: - Private Views
+
+    private var searchNavigationStack: some View {
         NavigationStack {
             MainSearchResultsContentView(
                 screenState: viewModel.screenState,
@@ -36,7 +47,6 @@ struct MainSearchView: View {
                 MainSearchRouter.destination(for: row)
             }
         }
-        .searchable(text: $viewModel.query, prompt: viewModel.kind.searchPrompt)
     }
 
     private var filterHeader: some View {
@@ -76,9 +86,11 @@ struct MainSearchView: View {
 #Preview {
     struct MainSearchPreview: View {
         @StateObject private var viewModel = MainSearchViewModel()
+
         var body: some View {
             MainSearchView(viewModel: viewModel)
         }
     }
+
     return MainSearchPreview()
 }

@@ -5,23 +5,29 @@
 //  Created by Willy Hsu on 2026/3/27.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct AnimeDetailView: View {
+
+    // MARK: - Types
 
     private struct ImagePreviewSession: Identifiable {
         let id = UUID()
         let items: [ImagePreviewItem]
         var selectedIndex: Int
     }
-    
+
+    // MARK: - Properties
+
     let malId: Int
     @StateObject private var viewModel: AnimeDetailViewModel
     @EnvironmentObject private var favoriteStatusStore: FavoriteStatusStore
     @Environment(\.modelContext) private var modelContext
     @State private var imagePreviewSession: ImagePreviewSession?
     private let detailService: any AnimeDetailServicing
+
+    // MARK: - Lifecycle
 
     init(
         malId: Int,
@@ -39,8 +45,103 @@ struct AnimeDetailView: View {
         )
     }
 
+    // MARK: - Body
+
+    var body: some View {
+        Group {
+            switch viewModel.screenState {
+            case let .refreshing(anime), let .loaded(anime):
+                detailScroll {
+                    ForEach(viewModel.sections(for: anime)) { section in
+                        sectionView(section, viewModel: viewModel, anime: anime)
+                    }
+                }
+            case let .error(message):
+                ErrorMessageView(state: .network(message), height: 200)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            case .idle, .loading:
+                detailScroll {
+                    AnimeDetailHeaderSectionSkeletonView()
+                    AnimeDetailHighlightsSectionSkeletonView()
+                    AnimeDetailBasicInfoSectionSkeletonView()
+                    AnimeDetailEpisodesEntrySectionSkeletonView()
+                    AnimeDetailScoreSectionSkeletonView()
+                    AnimeDetailTrailerSectionSkeletonView()
+                    AnimeDetailSynopsisSectionSkeletonView()
+                    AnimeDetailCharactersSectionSkeletonView()
+                    AnimeDetailStaffSectionSkeletonView()
+                    AnimeDetailPicturesSectionSkeletonView()
+                    AnimeDetailRecommendationsSectionSkeletonView()
+                }
+            }
+        }
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            DetailNavigationToolbar(
+                isFavorite: isFavorite,
+                isFavoriteActionEnabled: viewModel.isFavoriteActionEnabled,
+                shareState: viewModel.shareNavigationState(),
+                reviewState: viewModel.reviewNavigationState(),
+                isRefreshing: viewModel.isRefreshing,
+                onFavoriteTap: {
+                    viewModel.toggleFavorite(
+                        isFavorite: isFavorite,
+                        modelContext: modelContext
+                    )
+                },
+                onRefreshTap: {
+                    Task {
+                        await viewModel.load(forceRefresh: true)
+                    }
+                },
+                reviewDestination: { title in
+                    AnimeReviewView(
+                        malId: malId,
+                        animeTitle: title
+                    )
+                }
+            )
+        }
+        .fullScreenCover(item: $imagePreviewSession) { session in
+            ImagePreviewViewer(
+                items: session.items,
+                selectedIndex: imagePreviewSelectedIndexBinding(for: session)
+            )
+        }
+        .task(id: malId) {
+            await viewModel.load()
+        }
+    }
+
+    // MARK: - Private Methods
+
+    private var isFavorite: Bool {
+        favoriteStatusStore.isFavorite(malId: malId, mediaKind: .anime)
+    }
+
+    private func detailScroll<Content: View>(@ViewBuilder content: () -> Content) -> some View {
+        ScrollView {
+            LazyVStack(alignment: .leading, spacing: 20) {
+                content()
+            }
+            .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    private func imagePreviewSelectedIndexBinding(for session: ImagePreviewSession) -> Binding<Int> {
+        Binding(
+            get: { imagePreviewSession?.selectedIndex ?? session.selectedIndex },
+            set: { imagePreviewSession?.selectedIndex = $0 }
+        )
+    }
+
     @ViewBuilder
-    private func sectionView(_ section: AnimeDetailViewModel.Section, viewModel: AnimeDetailViewModel, anime: AnimeDetailDTO) -> some View {
+    private func sectionView(
+        _ section: AnimeDetailViewModel.Section,
+        viewModel: AnimeDetailViewModel,
+        anime: AnimeDetailDTO
+    ) -> some View {
         switch section {
         case .header:
             AnimeDetailHeaderSectionView(
@@ -104,89 +205,6 @@ struct AnimeDetailView: View {
             selectedPictureIndex: selectedPictureIndex
         )
         imagePreviewSession = ImagePreviewSession(items: items, selectedIndex: selectedIndex)
-    }
-
-    private var isFavorite: Bool {
-        favoriteStatusStore.isFavorite(malId: malId, mediaKind: .anime)
-    }
-
-    var body: some View {
-        Group {
-            switch viewModel.screenState {
-            case let .refreshing(anime), let .loaded(anime):
-                ScrollView {
-                    LazyVStack(alignment: .leading, spacing: 20) {
-                        ForEach(viewModel.sections(for: anime)) { section in
-                            sectionView(section, viewModel: viewModel, anime: anime)
-                        }
-                    }
-                    .padding()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                }
-            case let .error(message):
-                ErrorMessageView(state: .network(message), height: 200)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            case .idle, .loading:
-                ScrollView {
-                    LazyVStack(alignment: .leading, spacing: 20) {
-                        AnimeDetailHeaderSectionSkeletonView()
-                        AnimeDetailHighlightsSectionSkeletonView()
-                        AnimeDetailBasicInfoSectionSkeletonView()
-                        AnimeDetailEpisodesEntrySectionSkeletonView()
-                        AnimeDetailScoreSectionSkeletonView()
-                        AnimeDetailTrailerSectionSkeletonView()
-                        AnimeDetailSynopsisSectionSkeletonView()
-                        AnimeDetailCharactersSectionSkeletonView()
-                        AnimeDetailStaffSectionSkeletonView()
-                        AnimeDetailPicturesSectionSkeletonView()
-                        AnimeDetailRecommendationsSectionSkeletonView()
-                    }
-                    .padding()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                }
-            }
-        }
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            DetailNavigationToolbar(
-                isFavorite: isFavorite,
-                isFavoriteActionEnabled: viewModel.isFavoriteActionEnabled,
-                shareState: viewModel.shareNavigationState(),
-                reviewState: viewModel.reviewNavigationState(),
-                isRefreshing: viewModel.isRefreshing,
-                onFavoriteTap: {
-                    viewModel.toggleFavorite(
-                        isFavorite: isFavorite,
-                        modelContext: modelContext
-                    )
-                },
-                onRefreshTap: {
-                    Task {
-                        await viewModel.load(forceRefresh: true)
-                    }
-                },
-                reviewDestination: { title in
-                    AnimeReviewView(
-                        malId: malId,
-                        animeTitle: title
-                    )
-                }
-            )
-        }
-        .fullScreenCover(item: $imagePreviewSession) { session in
-            ImagePreviewViewer(
-                items: session.items,
-                selectedIndex: Binding(
-                    get: { imagePreviewSession?.selectedIndex ?? session.selectedIndex },
-                    set: { newValue in
-                        imagePreviewSession?.selectedIndex = newValue
-                    }
-                )
-            )
-        }
-        .task(id: malId) {
-            await viewModel.load()
-        }
     }
 }
 
