@@ -11,7 +11,8 @@ import SwiftUI
 struct MyListDistributionChartCardView: View {
     // MARK: - Properties
 
-    let statistics: MainMyListViewModel.Presentation.Statistics
+    let statistics: MyListStatistics
+    let onSelectGenre: (String) -> Void
 
     // MARK: - Body
 
@@ -98,6 +99,20 @@ struct MyListDistributionChartCardView: View {
                 }
             }
         }
+        .chartOverlay { chartProxy in
+            GeometryReader { geometryProxy in
+                Rectangle()
+                    .fill(.clear)
+                    .contentShape(Rectangle())
+                    .onTapGesture { location in
+                        selectGenre(
+                            at: location,
+                            chartProxy: chartProxy,
+                            geometryProxy: geometryProxy
+                        )
+                    }
+            }
+        }
     }
 
     // MARK: - Private Methods
@@ -131,167 +146,31 @@ struct MyListDistributionChartCardView: View {
         return CGFloat(rowCount) * 32 + 32
     }
 
+    private func selectGenre(
+        at location: CGPoint,
+        chartProxy: ChartProxy,
+        geometryProxy: GeometryProxy
+    ) {
+        guard let plotFrameAnchor = chartProxy.plotFrame else { return }
+        let plotFrame = geometryProxy[plotFrameAnchor]
+        guard plotFrame.contains(location) else { return }
+
+        let plotY = location.y - plotFrame.origin.y
+        guard
+            let genreName = chartProxy.value(atY: plotY, as: String.self),
+            statistics.selectedAnalysis.genreSlices.contains(where: { $0.genreName == genreName })
+        else {
+            return
+        }
+
+        onSelectGenre(genreName)
+    }
+
     private func percentageText(
-        for slice: MainMyListViewModel.Presentation.Statistics.GenreSlice
+        for slice: MyListGenreSlice
     ) -> String {
         guard statistics.selectedAnalysis.itemCount > 0 else { return "0%" }
         let percentage = Double(slice.count) / Double(statistics.selectedAnalysis.itemCount)
-        return percentage.formatted(.percent.precision(.fractionLength(0)))
-    }
-}
-
-struct MyListFormatDistributionChartCardView: View {
-    // MARK: - Properties
-
-    let statistics: MainMyListViewModel.Presentation.Statistics
-
-    // MARK: - Body
-
-    var body: some View {
-        MyListStatisticsCardContainer(
-            title: "\(statistics.formatAnalysis.scope.title)收藏形式比例",
-            subtitle: distributionSubtitle
-        ) {
-            if statistics.formatAnalysis.formatSlices.isEmpty {
-                ErrorMessageView(
-                    state: .emptyCollection(emptyStateMessage),
-                    height: 120
-                )
-            } else {
-                VStack(alignment: .leading, spacing: 16) {
-                    HStack(alignment: .center, spacing: 20) {
-                        chartView
-                            .frame(width: 164, height: 164)
-
-                        legendView
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-
-                    if let topFormatSlice = statistics.formatAnalysis.topFormatSlice {
-                        Text("\(topFormatSlice.title) 佔 \(percentageText(for: topFormatSlice))，是目前收藏中最主要的作品形式。")
-                            .font(.footnote)
-                            .foregroundStyle(ThemeColor.textSecondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-
-                    if statistics.formatAnalysis.missingTypeItemCount > 0 {
-                        Text("有 \(statistics.formatAnalysis.missingTypeItemCount) 筆舊收藏尚未記錄作品形式，重新收藏後會納入統計。")
-                            .font(.footnote)
-                            .foregroundStyle(ThemeColor.textSecondary)
-                    }
-                }
-            }
-        }
-    }
-
-    // MARK: - Private Views
-
-    private var chartView: some View {
-        Chart(statistics.formatAnalysis.formatSlices) { slice in
-            SectorMark(
-                angle: .value("收藏數量", slice.count),
-                innerRadius: .ratio(0.58),
-                angularInset: 2
-            )
-            .cornerRadius(4)
-            .foregroundStyle(by: .value("作品形式", slice.title))
-        }
-        .chartLegend(.hidden)
-        .chartForegroundStyleScale(
-            domain: statistics.formatAnalysis.formatSlices.map(\.title),
-            range: chartColors
-        )
-        .chartBackground { _ in
-            VStack(spacing: 2) {
-                Text("\(statistics.formatAnalysis.itemCount)")
-                    .font(.title3.weight(.bold))
-                    .foregroundStyle(ThemeColor.textPrimary)
-
-                Text("收藏")
-                    .font(.caption2.weight(.medium))
-                    .foregroundStyle(ThemeColor.textSecondary)
-            }
-        }
-    }
-
-    private var legendView: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            ForEach(Array(statistics.formatAnalysis.formatSlices.enumerated()), id: \.element.id) { index, slice in
-                HStack(spacing: 8) {
-                    ZStack {
-                        Circle()
-                            .fill(color(for: index).opacity(0.18))
-                            .frame(width: 24, height: 24)
-
-                        Image(systemName: slice.iconName)
-                            .font(.caption2.weight(.bold))
-                            .foregroundStyle(color(for: index))
-                    }
-
-                    Text(slice.title)
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(ThemeColor.textPrimary)
-                        .lineLimit(1)
-
-                    Spacer(minLength: 8)
-
-                    Text(percentageText(for: slice))
-                        .font(.caption2.weight(.medium))
-                        .foregroundStyle(ThemeColor.textSecondary)
-                        .lineLimit(1)
-                }
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
-    // MARK: - Private Methods
-
-    private var distributionSubtitle: String? {
-        guard let topFormatSlice = statistics.formatAnalysis.topFormatSlice else {
-            if statistics.formatAnalysis.missingTypeItemCount > 0 {
-                return "尚無可用形式資料"
-            }
-
-            return nil
-        }
-
-        var subtitle = "\(topFormatSlice.title) 最多，\(topFormatSlice.count) 筆"
-        if statistics.formatAnalysis.missingTypeItemCount > 0 {
-            subtitle += " ・\(statistics.formatAnalysis.missingTypeItemCount) 筆未記錄形式"
-        }
-        return subtitle
-    }
-
-    private var emptyStateMessage: String {
-        if statistics.formatAnalysis.missingTypeItemCount > 0 {
-            return "尚無可用形式資料"
-        }
-
-        return "尚無作品形式資料"
-    }
-
-    private func color(for index: Int) -> Color {
-        chartColors[index % chartColors.count]
-    }
-
-    private var chartColors: [Color] {
-        [
-            .red,
-            .orange,
-            .yellow,
-            .green,
-            .blue,
-            .indigo,
-            .purple
-        ]
-    }
-
-    private func percentageText(
-        for slice: MainMyListViewModel.Presentation.Statistics.FormatSlice
-    ) -> String {
-        guard statistics.formatAnalysis.itemCount > 0 else { return "0%" }
-        let percentage = Double(slice.count) / Double(statistics.formatAnalysis.itemCount)
         return percentage.formatted(.percent.precision(.fractionLength(0)))
     }
 }

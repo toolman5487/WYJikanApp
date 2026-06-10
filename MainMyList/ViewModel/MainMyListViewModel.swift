@@ -12,109 +12,8 @@ import SwiftData
 
 @MainActor
 final class MainMyListViewModel: ObservableObject {
-    struct Presentation {
-        enum StatisticsScope: String, CaseIterable, Identifiable {
-            case all
-            case anime
-            case manga
-
-            var id: String { rawValue }
-
-            var title: String {
-                switch self {
-                case .all:
-                    return "全部"
-                case .anime:
-                    return "動畫"
-                case .manga:
-                    return "漫畫"
-                }
-            }
-        }
-
-        struct SummaryTile {
-            let title: String
-            let value: Int
-            let iconName: String
-            let detail: String
-        }
-
-        struct Statistics {
-            struct GenreSlice: Identifiable {
-                let genreName: String
-                let count: Int
-
-                var id: String { genreName }
-            }
-
-            struct FormatSlice: Identifiable {
-                let title: String
-                let iconName: String
-                let count: Int
-
-                var id: String { title }
-            }
-
-            struct GenreAnalysis: Identifiable {
-                let scope: StatisticsScope
-                let itemCount: Int
-                let genreSlices: [GenreSlice]
-                let missingGenreItemCount: Int
-
-                var id: StatisticsScope { scope }
-                var topGenreSlice: GenreSlice? { genreSlices.first }
-            }
-
-            struct FormatAnalysis {
-                let scope: StatisticsScope
-                let itemCount: Int
-                let formatSlices: [FormatSlice]
-                let missingTypeItemCount: Int
-
-                var topFormatSlice: FormatSlice? { formatSlices.first }
-            }
-
-            let totalCount: Int
-            let animeCount: Int
-            let mangaCount: Int
-            let allAnalysis: GenreAnalysis
-            let animeAnalysis: GenreAnalysis
-            let mangaAnalysis: GenreAnalysis
-            let selectedAnalysis: GenreAnalysis
-            let formatAnalysis: FormatAnalysis
-        }
-
-        let filteredItems: [MyListCollectionItem]
-        let statistics: Statistics
-        let summaryTile: SummaryTile
-    }
-
-    enum Filter: String, CaseIterable, Identifiable {
-        case all
-        case anime
-        case manga
-
-        var id: String { rawValue }
-
-        var title: String {
-            switch self {
-            case .all: return "全部"
-            case .anime: return "動畫"
-            case .manga: return "漫畫"
-            }
-        }
-
-        var mediaKind: MyListMediaKind? {
-            switch self {
-            case .all: return nil
-            case .anime: return .anime
-            case .manga: return .manga
-            }
-        }
-    }
-
-    @Published private(set) var presentation: Presentation
-    @Published var selectedFilter: Filter = .all {
+    @Published private(set) var presentation: MyListPresentation
+    @Published var selectedFilter: MyListFilter = .all {
         didSet {
             guard selectedFilter != oldValue else { return }
             rebuildPresentationFromCachedItems()
@@ -143,8 +42,8 @@ final class MainMyListViewModel: ObservableObject {
 
     private func makePresentation(
         from items: [MyListCollectionItem],
-        selectedFilter: Filter
-    ) -> Presentation {
+        selectedFilter: MyListFilter
+    ) -> MyListPresentation {
         let calendar = Calendar.current
         let now = Date()
         let weekStartDate = calendar.date(byAdding: .day, value: -6, to: calendar.startOfDay(for: now))
@@ -195,7 +94,7 @@ final class MainMyListViewModel: ObservableObject {
             from: items.filter { $0.mediaKind == .manga },
             scope: .manga
         )
-        let selectedAnalysis: Presentation.Statistics.GenreAnalysis
+        let selectedAnalysis: MyListGenreAnalysis
         switch selectedFilter {
         case .all:
             selectedAnalysis = allAnalysis
@@ -209,7 +108,7 @@ final class MainMyListViewModel: ObservableObject {
             scope: selectedAnalysis.scope
         )
 
-        let statistics = Presentation.Statistics(
+        let statistics = MyListStatistics(
             totalCount: items.count,
             animeCount: animeCount,
             mangaCount: mangaCount,
@@ -220,7 +119,7 @@ final class MainMyListViewModel: ObservableObject {
             formatAnalysis: formatAnalysis
         )
 
-        let summaryTile: Presentation.SummaryTile
+        let summaryTile: MyListSummaryContent
         switch selectedFilter {
         case .all:
             summaryTile = .init(
@@ -239,7 +138,7 @@ final class MainMyListViewModel: ObservableObject {
                 iconName: MyListMediaKind.anime.iconName,
                 detail: weeklyAddedSummary(
                     count: weeklyAnimeAddedCount,
-                    filterTitle: Filter.anime.title
+                    filterTitle: MyListFilter.anime.title
                 )
             )
         case .manga:
@@ -249,13 +148,14 @@ final class MainMyListViewModel: ObservableObject {
                 iconName: MyListMediaKind.manga.iconName,
                 detail: weeklyAddedSummary(
                     count: weeklyMangaAddedCount,
-                    filterTitle: Filter.manga.title
+                    filterTitle: MyListFilter.manga.title
                 )
             )
         }
 
-        return Presentation(
+        return MyListPresentation(
             filteredItems: filteredItems,
+            genreSections: makeGenreSections(from: filteredItems),
             statistics: statistics,
             summaryTile: summaryTile
         )
@@ -269,7 +169,7 @@ final class MainMyListViewModel: ObservableObject {
         }
     }
 
-    func emptyTitle(for filter: Filter) -> String {
+    func emptyTitle(for filter: MyListFilter) -> String {
         filter == .all ? "還沒有收藏" : "還沒有收藏\(filter.title)"
     }
 
@@ -282,28 +182,28 @@ final class MainMyListViewModel: ObservableObject {
         }
     }
 
-    private static func emptyPresentation(selectedFilter: Filter) -> Presentation {
-        let emptyAllAnalysis = Presentation.Statistics.GenreAnalysis(
+    private static func emptyPresentation(selectedFilter: MyListFilter) -> MyListPresentation {
+        let emptyAllAnalysis = MyListGenreAnalysis(
             scope: .all,
             itemCount: 0,
             genreSlices: [],
             missingGenreItemCount: 0
         )
-        let emptyAnimeAnalysis = Presentation.Statistics.GenreAnalysis(
+        let emptyAnimeAnalysis = MyListGenreAnalysis(
             scope: .anime,
             itemCount: 0,
             genreSlices: [],
             missingGenreItemCount: 0
         )
-        let emptyMangaAnalysis = Presentation.Statistics.GenreAnalysis(
+        let emptyMangaAnalysis = MyListGenreAnalysis(
             scope: .manga,
             itemCount: 0,
             genreSlices: [],
             missingGenreItemCount: 0
         )
 
-        let selectedAnalysis: Presentation.Statistics.GenreAnalysis
-        let summaryTile: Presentation.SummaryTile
+        let selectedAnalysis: MyListGenreAnalysis
+        let summaryTile: MyListSummaryContent
         switch selectedFilter {
         case .all:
             selectedAnalysis = emptyAllAnalysis
@@ -331,7 +231,7 @@ final class MainMyListViewModel: ObservableObject {
             )
         }
 
-        let statistics = Presentation.Statistics(
+        let statistics = MyListStatistics(
             totalCount: 0,
             animeCount: 0,
             mangaCount: 0,
@@ -339,7 +239,7 @@ final class MainMyListViewModel: ObservableObject {
             animeAnalysis: emptyAnimeAnalysis,
             mangaAnalysis: emptyMangaAnalysis,
             selectedAnalysis: selectedAnalysis,
-            formatAnalysis: Presentation.Statistics.FormatAnalysis(
+            formatAnalysis: MyListFormatAnalysis(
                 scope: selectedAnalysis.scope,
                 itemCount: 0,
                 formatSlices: [],
@@ -347,8 +247,9 @@ final class MainMyListViewModel: ObservableObject {
             )
         )
 
-        return Presentation(
+        return MyListPresentation(
             filteredItems: [],
+            genreSections: [],
             statistics: statistics,
             summaryTile: summaryTile
         )
@@ -356,8 +257,8 @@ final class MainMyListViewModel: ObservableObject {
 
     private func makeGenreAnalysis(
         from items: [MyListCollectionItem],
-        scope: Presentation.StatisticsScope
-    ) -> Presentation.Statistics.GenreAnalysis {
+        scope: MyListStatisticsScope
+    ) -> MyListGenreAnalysis {
         var genreCounts: [String: Int] = [:]
         var missingGenreItemCount = 0
 
@@ -374,7 +275,7 @@ final class MainMyListViewModel: ObservableObject {
 
         let genreSlices = genreCounts
             .map { genreName, count in
-                Presentation.Statistics.GenreSlice(genreName: genreName, count: count)
+                MyListGenreSlice(genreName: genreName, count: count)
             }
             .sorted { lhs, rhs in
                 if lhs.count == rhs.count {
@@ -383,7 +284,7 @@ final class MainMyListViewModel: ObservableObject {
                 return lhs.count > rhs.count
             }
 
-        return Presentation.Statistics.GenreAnalysis(
+        return MyListGenreAnalysis(
             scope: scope,
             itemCount: items.count,
             genreSlices: Array(genreSlices.prefix(6)),
@@ -391,15 +292,41 @@ final class MainMyListViewModel: ObservableObject {
         )
     }
 
+    private func makeGenreSections(
+        from items: [MyListCollectionItem]
+    ) -> [MyListGenreCollectionSection] {
+        var groupedItems: [String: [MyListCollectionItem]] = [:]
+
+        for item in items {
+            for genreName in item.genreNames {
+                groupedItems[genreName, default: []].append(item)
+            }
+        }
+
+        return groupedItems
+            .map { genreName, items in
+                MyListGenreCollectionSection(
+                    genreName: genreName,
+                    items: items.sorted { lhs, rhs in lhs.addedAt > rhs.addedAt }
+                )
+            }
+            .sorted { lhs, rhs in
+                if lhs.count == rhs.count {
+                    return lhs.genreName.localizedStandardCompare(rhs.genreName) == .orderedAscending
+                }
+                return lhs.count > rhs.count
+            }
+    }
+
     private func makeFormatAnalysis(
         from items: [MyListCollectionItem],
-        scope: Presentation.StatisticsScope
-    ) -> Presentation.Statistics.FormatAnalysis {
+        scope: MyListStatisticsScope
+    ) -> MyListFormatAnalysis {
         var formatCounts: [String: Int] = [:]
         var missingTypeItemCount = 0
 
         for item in items {
-            guard let format = Self.formatDisplayItem(
+            guard let format = MyListFormatDisplay.displayItem(
                 type: item.type,
                 mediaKind: item.mediaKind
             ) else {
@@ -412,9 +339,9 @@ final class MainMyListViewModel: ObservableObject {
 
         let formatSlices = formatCounts
             .map { title, count in
-                Presentation.Statistics.FormatSlice(
+                MyListFormatSlice(
                     title: title,
-                    iconName: Self.iconName(forFormatTitle: title),
+                    iconName: MyListFormatDisplay.iconName(forFormatTitle: title),
                     count: count
                 )
             }
@@ -425,100 +352,11 @@ final class MainMyListViewModel: ObservableObject {
                 return lhs.count > rhs.count
             }
 
-        return Presentation.Statistics.FormatAnalysis(
+        return MyListFormatAnalysis(
             scope: scope,
             itemCount: items.count,
             formatSlices: Array(formatSlices.prefix(6)),
             missingTypeItemCount: missingTypeItemCount
         )
-    }
-
-    private static func formatDisplayItem(
-        type: String?,
-        mediaKind: MyListMediaKind
-    ) -> (title: String, iconName: String)? {
-        guard let type else { return nil }
-        let normalizedType = type.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !normalizedType.isEmpty else { return nil }
-
-        switch mediaKind {
-        case .anime:
-            return animeFormatDisplayItem(type: normalizedType)
-        case .manga:
-            return mangaFormatDisplayItem(type: normalizedType)
-        }
-    }
-
-    private static func animeFormatDisplayItem(type: String) -> (title: String, iconName: String) {
-        switch type.lowercased() {
-        case "tv":
-            return ("電視動畫", "tv.fill")
-        case "movie":
-            return ("電影", "film.fill")
-        case "ova":
-            return ("OVA", "opticaldisc.fill")
-        case "ona":
-            return ("ONA", "play.rectangle.on.rectangle.fill")
-        case "special", "tv special":
-            return ("特別篇", "sparkles.tv.fill")
-        case "music":
-            return ("音樂", "music.note")
-        default:
-            return (type, MyListMediaKind.anime.iconName)
-        }
-    }
-
-    private static func mangaFormatDisplayItem(type: String) -> (title: String, iconName: String) {
-        switch type.lowercased() {
-        case "manga":
-            return ("漫畫", "book.closed.fill")
-        case "manhwa":
-            return ("韓漫", "book.pages.fill")
-        case "manhua":
-            return ("華語漫畫", "books.vertical.fill")
-        case "novel":
-            return ("小說", "text.book.closed.fill")
-        case "light novel":
-            return ("輕小說", "book.fill")
-        case "one-shot":
-            return ("短篇", "doc.text.fill")
-        case "doujinshi":
-            return ("同人誌", "person.2.fill")
-        default:
-            return (type, MyListMediaKind.manga.iconName)
-        }
-    }
-
-    private static func iconName(forFormatTitle title: String) -> String {
-        switch title {
-        case "電視動畫":
-            return "tv.fill"
-        case "電影":
-            return "film.fill"
-        case "OVA":
-            return "opticaldisc.fill"
-        case "ONA":
-            return "play.rectangle.on.rectangle.fill"
-        case "特別篇":
-            return "sparkles.tv.fill"
-        case "音樂":
-            return "music.note"
-        case "漫畫":
-            return "book.closed.fill"
-        case "韓漫":
-            return "book.pages.fill"
-        case "華語漫畫":
-            return "books.vertical.fill"
-        case "小說":
-            return "text.book.closed.fill"
-        case "輕小說":
-            return "book.fill"
-        case "短篇":
-            return "doc.text.fill"
-        case "同人誌":
-            return "person.2.fill"
-        default:
-            return "square.grid.2x2.fill"
-        }
     }
 }

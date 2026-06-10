@@ -8,27 +8,6 @@
 import Foundation
 import SwiftData
 
-enum MyListMediaKind: String, Codable, CaseIterable, Identifiable {
-    case anime
-    case manga
-
-    var id: String { rawValue }
-
-    var title: String {
-        switch self {
-        case .anime: return "動畫"
-        case .manga: return "漫畫"
-        }
-    }
-
-    var iconName: String {
-        switch self {
-        case .anime: return "play.rectangle.fill"
-        case .manga: return "book.closed.fill"
-        }
-    }
-}
-
 @Model
 final class MyListCollectionItem {
     var malId: Int

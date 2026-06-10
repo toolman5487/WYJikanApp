@@ -10,7 +10,7 @@ import SwiftUI
 struct MyListGenreInsightsCardView: View {
     // MARK: - Properties
 
-    let statistics: MainMyListViewModel.Presentation.Statistics
+    let statistics: MyListStatistics
 
     // MARK: - Body
 
@@ -28,7 +28,7 @@ struct MyListGenreInsightsCardView: View {
     // MARK: - Private Views
 
     private func insightRow(
-        for analysis: MainMyListViewModel.Presentation.Statistics.GenreAnalysis
+        for analysis: MyListGenreAnalysis
     ) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(alignment: .firstTextBaseline, spacing: 8) {
@@ -74,7 +74,7 @@ struct MyListGenreInsightsCardView: View {
     // MARK: - Private Methods
 
     private func insightDescription(
-        for analysis: MainMyListViewModel.Presentation.Statistics.GenreAnalysis
+        for analysis: MyListGenreAnalysis
     ) -> String? {
         guard analysis.itemCount > 0,
               let topGenreSlice = analysis.topGenreSlice else {

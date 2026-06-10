@@ -9,24 +9,12 @@ import SwiftData
 import SwiftUI
 
 struct MainMyListView: View {
-    private struct ItemRevision: Equatable {
-        let id: PersistentIdentifier
-        let malId: Int
-        let mediaKindRawValue: String
-        let title: String
-        let subtitle: String?
-        let imageURLString: String?
-        let genreNamesRawValue: String?
-        let type: String?
-        let year: Int?
-        let addedAt: Date
-    }
-
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \MyListCollectionItem.addedAt, order: .reverse)
     private var items: [MyListCollectionItem]
     @StateObject private var viewModel = MainMyListViewModel()
-    
+    @State private var genreCollectionsRoute: MyListGenreCollectionsRoute?
+
     var body: some View {
         let presentation = viewModel.presentation
 
@@ -45,6 +33,13 @@ struct MainMyListView: View {
             .background(Color(.systemBackground))
             .navigationTitle("我的收藏")
             .navigationBarTitleDisplayMode(.large)
+            .navigationDestination(item: $genreCollectionsRoute) { route in
+                MyListGenreCollectionsDetailView(
+                    scopeTitle: route.scopeTitle,
+                    genreSections: route.genreSections,
+                    selectedGenreName: route.selectedGenreName
+                )
+            }
         }
         .onAppear {
             viewModel.refreshPresentation(from: items)
@@ -54,9 +49,9 @@ struct MainMyListView: View {
         }
     }
 
-    private var itemRevisions: [ItemRevision] {
+    private var itemRevisions: [MyListItemRevision] {
         items.map { item in
-            ItemRevision(
+            MyListItemRevision(
                 id: item.persistentModelID,
                 malId: item.malId,
                 mediaKindRawValue: item.mediaKindRawValue,
@@ -70,28 +65,33 @@ struct MainMyListView: View {
             )
         }
     }
-    
+
     private var headerView: some View {
         Text("把想追的動畫與漫畫集中在這裡。")
             .font(.subheadline)
             .foregroundStyle(ThemeColor.textSecondary)
     }
-    
+
     private var filterView: some View {
         CapsuleFilterBarView(
-            tags: MainMyListViewModel.Filter.allCases,
+            tags: MyListFilter.allCases,
             title: { $0.title },
             selection: $viewModel.selectedFilter
         )
         .frame(maxWidth: .infinity, alignment: .leading)
     }
-    
-    private func summaryView(presentation: MainMyListViewModel.Presentation) -> some View {
-        MyListStatisticsSectionView(presentation: presentation)
+
+    private func summaryView(presentation: MyListPresentation) -> some View {
+        MyListStatisticsSectionView(presentation: presentation) { genreName in
+            showGenreCollectionsDetail(
+                selectedGenreName: genreName,
+                presentation: presentation
+            )
+        }
     }
-    
+
     @ViewBuilder
-    private func contentView(presentation: MainMyListViewModel.Presentation) -> some View {
+    private func contentView(presentation: MyListPresentation) -> some View {
         if presentation.filteredItems.isEmpty {
             MyListEmptyStateView(title: viewModel.emptyTitle(for: viewModel.selectedFilter))
         } else {
@@ -114,7 +114,7 @@ struct MainMyListView: View {
             }
         }
     }
-    
+
     @ViewBuilder
     private func destinationView(for item: MyListCollectionItem) -> some View {
         switch item.mediaKind {
@@ -123,6 +123,17 @@ struct MainMyListView: View {
         case .manga:
             MangaDetailView(malId: item.malId)
         }
+    }
+
+    private func showGenreCollectionsDetail(
+        selectedGenreName: String,
+        presentation: MyListPresentation
+    ) {
+        genreCollectionsRoute = MyListGenreCollectionsRoute(
+            scopeTitle: presentation.statistics.selectedAnalysis.scope.title,
+            genreSections: presentation.genreSections,
+            selectedGenreName: selectedGenreName
+        )
     }
 }
 

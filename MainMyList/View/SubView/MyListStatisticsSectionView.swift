@@ -1,7 +1,8 @@
 import SwiftUI
 
 struct MyListStatisticsSectionView: View {
-    let presentation: MainMyListViewModel.Presentation
+    let presentation: MyListPresentation
+    let onSelectGenre: (String) -> Void
 
     private enum ContentState {
         case empty
@@ -31,7 +32,10 @@ struct MyListStatisticsSectionView: View {
 
             case .populated:
                 VStack(alignment: .leading, spacing: 16) {
-                    MyListDistributionChartCardView(statistics: presentation.statistics)
+                    MyListDistributionChartCardView(
+                        statistics: presentation.statistics,
+                        onSelectGenre: onSelectGenre
+                    )
                     MyListFormatDistributionChartCardView(statistics: presentation.statistics)
                 }
             }
