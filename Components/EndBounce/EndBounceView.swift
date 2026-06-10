@@ -181,12 +181,17 @@ struct EndBounceTriggerModifier: ViewModifier {
     let action: () -> Void
 
     @State private var canTrigger = true
+    @State private var feedbackTriggerCount = 0
     @State private var maximumOverscroll: CGFloat = 0
 
     // MARK: - Body
 
     func body(content: Content) -> some View {
         content
+            .sensoryFeedback(
+                .impact(weight: .medium, intensity: 0.8),
+                trigger: feedbackTriggerCount
+            )
             .onScrollGeometryChange(for: EndBounceScrollSample.self) { geometry in
                 scrollSample(from: geometry)
             } action: { _, sample in
@@ -289,6 +294,7 @@ struct EndBounceTriggerModifier: ViewModifier {
 
         if sample.pullProgress >= 1 {
             canTrigger = false
+            feedbackTriggerCount += 1
             action()
         }
     }
