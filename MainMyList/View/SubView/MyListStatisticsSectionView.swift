@@ -3,6 +3,7 @@ import SwiftUI
 struct MyListStatisticsSectionView: View {
     let presentation: MyListPresentation
     let onSelectGenre: (String) -> Void
+    let onSelectFormat: (String) -> Void
 
     private enum ContentState {
         case empty
@@ -36,7 +37,10 @@ struct MyListStatisticsSectionView: View {
                         statistics: presentation.statistics,
                         onSelectGenre: onSelectGenre
                     )
-                    MyListFormatDistributionChartCardView(statistics: presentation.statistics)
+                    MyListFormatDistributionChartCardView(
+                        statistics: presentation.statistics,
+                        onSelectFormat: onSelectFormat
+                    )
                 }
             }
         }

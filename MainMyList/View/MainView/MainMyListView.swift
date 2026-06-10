@@ -9,11 +9,17 @@ import SwiftData
 import SwiftUI
 
 struct MainMyListView: View {
+    private enum ContentState {
+        case empty
+        case populated
+    }
+
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \MyListCollectionItem.addedAt, order: .reverse)
     private var items: [MyListCollectionItem]
     @StateObject private var viewModel = MainMyListViewModel()
     @State private var genreCollectionsRoute: MyListGenreCollectionsRoute?
+    @State private var formatCollectionsRoute: MyListFormatCollectionsRoute?
 
     var body: some View {
         let presentation = viewModel.presentation
@@ -34,11 +40,10 @@ struct MainMyListView: View {
             .navigationTitle("我的收藏")
             .navigationBarTitleDisplayMode(.large)
             .navigationDestination(item: $genreCollectionsRoute) { route in
-                MyListGenreCollectionsDetailView(
-                    scopeTitle: route.scopeTitle,
-                    genreSections: route.genreSections,
-                    selectedGenreName: route.selectedGenreName
-                )
+                MyListGenreCollectionsDetailView(route: route)
+            }
+            .navigationDestination(item: $formatCollectionsRoute) { route in
+                MyListFormatCollectionsDetailView(route: route)
             }
         }
         .onAppear {
@@ -82,19 +87,30 @@ struct MainMyListView: View {
     }
 
     private func summaryView(presentation: MyListPresentation) -> some View {
-        MyListStatisticsSectionView(presentation: presentation) { genreName in
-            showGenreCollectionsDetail(
-                selectedGenreName: genreName,
-                presentation: presentation
-            )
-        }
+        MyListStatisticsSectionView(
+            presentation: presentation,
+            onSelectGenre: { genreName in
+                showGenreCollectionsDetail(
+                    selectedGenreName: genreName,
+                    presentation: presentation
+                )
+            },
+            onSelectFormat: { formatTitle in
+                showFormatCollectionsDetail(
+                    selectedFormatTitle: formatTitle,
+                    presentation: presentation
+                )
+            }
+        )
     }
 
     @ViewBuilder
     private func contentView(presentation: MyListPresentation) -> some View {
-        if presentation.filteredItems.isEmpty {
+        switch contentState(for: presentation) {
+        case .empty:
             MyListEmptyStateView(title: viewModel.emptyTitle(for: viewModel.selectedFilter))
-        } else {
+
+        case .populated:
             LazyVStack(spacing: 12) {
                 ForEach(presentation.filteredItems, id: \.persistentModelID) { item in
                     NavigationLink {
@@ -115,6 +131,10 @@ struct MainMyListView: View {
         }
     }
 
+    private func contentState(for presentation: MyListPresentation) -> ContentState {
+        presentation.filteredItems.isEmpty ? .empty : .populated
+    }
+
     @ViewBuilder
     private func destinationView(for item: MyListCollectionItem) -> some View {
         switch item.mediaKind {
@@ -133,6 +153,17 @@ struct MainMyListView: View {
             scopeTitle: presentation.statistics.selectedAnalysis.scope.title,
             genreSections: presentation.genreSections,
             selectedGenreName: selectedGenreName
+        )
+    }
+
+    private func showFormatCollectionsDetail(
+        selectedFormatTitle: String,
+        presentation: MyListPresentation
+    ) {
+        formatCollectionsRoute = MyListFormatCollectionsRoute(
+            scopeTitle: presentation.statistics.formatAnalysis.scope.title,
+            formatSections: presentation.formatSections,
+            selectedFormatTitle: selectedFormatTitle
         )
     }
 }

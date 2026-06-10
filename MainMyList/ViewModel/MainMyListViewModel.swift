@@ -155,7 +155,8 @@ final class MainMyListViewModel: ObservableObject {
 
         return MyListPresentation(
             filteredItems: filteredItems,
-            genreSections: makeGenreSections(from: filteredItems),
+            genreSections: MyListGenreCollectionsSectionBuilder.makeSections(from: filteredItems),
+            formatSections: MyListFormatCollectionsSectionBuilder.makeSections(from: filteredItems),
             statistics: statistics,
             summaryTile: summaryTile
         )
@@ -250,6 +251,7 @@ final class MainMyListViewModel: ObservableObject {
         return MyListPresentation(
             filteredItems: [],
             genreSections: [],
+            formatSections: [],
             statistics: statistics,
             summaryTile: summaryTile
         )
@@ -290,32 +292,6 @@ final class MainMyListViewModel: ObservableObject {
             genreSlices: Array(genreSlices.prefix(6)),
             missingGenreItemCount: missingGenreItemCount
         )
-    }
-
-    private func makeGenreSections(
-        from items: [MyListCollectionItem]
-    ) -> [MyListGenreCollectionSection] {
-        var groupedItems: [String: [MyListCollectionItem]] = [:]
-
-        for item in items {
-            for genreName in item.genreNames {
-                groupedItems[genreName, default: []].append(item)
-            }
-        }
-
-        return groupedItems
-            .map { genreName, items in
-                MyListGenreCollectionSection(
-                    genreName: genreName,
-                    items: items.sorted { lhs, rhs in lhs.addedAt > rhs.addedAt }
-                )
-            }
-            .sorted { lhs, rhs in
-                if lhs.count == rhs.count {
-                    return lhs.genreName.localizedStandardCompare(rhs.genreName) == .orderedAscending
-                }
-                return lhs.count > rhs.count
-            }
     }
 
     private func makeFormatAnalysis(

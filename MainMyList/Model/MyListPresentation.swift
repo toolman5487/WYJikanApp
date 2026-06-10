@@ -10,6 +10,7 @@ import Foundation
 struct MyListPresentation {
     let filteredItems: [MyListCollectionItem]
     let genreSections: [MyListGenreCollectionSection]
+    let formatSections: [MyListFormatCollectionSection]
     let statistics: MyListStatistics
     let summaryTile: MyListSummaryContent
 }

@@ -12,10 +12,25 @@ struct MyListFormatDistributionChartCardView: View {
     // MARK: - Properties
 
     let statistics: MyListStatistics
+    let onSelectFormat: (String) -> Void
 
     // MARK: - Body
 
+    @ViewBuilder
     var body: some View {
+        if statistics.formatAnalysis.formatSlices.isEmpty {
+            cardContent
+        } else {
+            Button {
+                selectDefaultFormat()
+            } label: {
+                cardContent
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    private var cardContent: some View {
         MyListStatisticsCardContainer(
             title: "\(statistics.formatAnalysis.scope.title)收藏形式比例",
             subtitle: distributionSubtitle
@@ -153,6 +168,11 @@ struct MyListFormatDistributionChartCardView: View {
             .indigo,
             .purple
         ]
+    }
+
+    private func selectDefaultFormat() {
+        guard let topFormatSlice = statistics.formatAnalysis.topFormatSlice else { return }
+        onSelectFormat(topFormatSlice.title)
     }
 
     private func percentageText(
