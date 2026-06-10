@@ -27,7 +27,7 @@ struct MainTabBarView: View {
                 Tab(value: AppTab.news) {
                     MainNewsView()
                 } label: {
-                    Image(systemName: viewModel.selectedTab == .news ? "newspaper.fill" : "newspaper")
+                    Image(systemName: viewModel.selectedTab == .news ? "lightbulb.max.fill" : "lightbulb.max")
                 }
                 
                 Tab(value: AppTab.myList) {

@@ -11,17 +11,15 @@ import SwiftUI
 struct AnimeDetailRecommendationsSectionView: View {
     let viewModel: AnimeDetailViewModel
     let animeTitle: String
+    @State private var recommendationListBounceProgress: CGFloat = 0
+    @State private var isShowingRecommendationList = false
 
     var body: some View {
         AnimeDetailLinkedSection(
             title: "你可能也喜歡",
             actionTitle: "更多推薦"
         ) {
-            AnimeDetailRecommendationsListView(
-                animeTitle: animeTitle,
-                recommendations: viewModel.allRecommendations,
-                viewModel: viewModel
-            )
+            recommendationListDestination
         } content: {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(alignment: .top, spacing: 12) {
@@ -43,10 +41,44 @@ struct AnimeDetailRecommendationsSectionView: View {
                             .buttonStyle(.plain)
                         }
                     }
+
+                    if canShowRecommendationList {
+                        EndBounceHintView(
+                            axis: .horizontal,
+                            title: "更多推薦",
+                            subtitle: "繼續向右滑看完整清單",
+                            progress: recommendationListBounceProgress,
+                            width: 160,
+                            height: 240,
+                            cornerRadius: 16
+                        )
+                    }
                 }
                 .padding(.vertical, 4)
             }
+            .onEndBounce(
+                axis: .horizontal,
+                isEnabled: canShowRecommendationList,
+                progress: $recommendationListBounceProgress
+            ) {
+                isShowingRecommendationList = true
+            }
         }
+        .navigationDestination(isPresented: $isShowingRecommendationList) {
+            recommendationListDestination
+        }
+    }
+
+    private var canShowRecommendationList: Bool {
+        viewModel.allRecommendations.count > viewModel.previewRecommendations.count
+    }
+
+    private var recommendationListDestination: some View {
+        AnimeDetailRecommendationsListView(
+            animeTitle: animeTitle,
+            recommendations: viewModel.allRecommendations,
+            viewModel: viewModel
+        )
     }
 }
 

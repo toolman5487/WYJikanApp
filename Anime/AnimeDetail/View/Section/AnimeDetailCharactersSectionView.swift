@@ -11,17 +11,15 @@ import SwiftUI
 struct AnimeDetailCharactersSectionView: View {
     let viewModel: AnimeDetailViewModel
     let animeTitle: String
+    @State private var characterListBounceProgress: CGFloat = 0
+    @State private var isShowingCharacterList = false
 
     var body: some View {
         AnimeDetailLinkedSection(
             title: "角色與聲優",
             actionTitle: "查看全部"
         ) {
-            AnimeDetailCharactersListView(
-                animeTitle: animeTitle,
-                roles: viewModel.allCharacterRoles,
-                viewModel: viewModel
-            )
+            characterListDestination
         } content: {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(alignment: .top, spacing: 12) {
@@ -44,10 +42,44 @@ struct AnimeDetailCharactersSectionView: View {
                             .buttonStyle(.plain)
                         }
                     }
+
+                    if canShowCharacterList {
+                        EndBounceHintView(
+                            axis: .horizontal,
+                            title: "完整角色",
+                            subtitle: "繼續向右滑查看全部",
+                            progress: characterListBounceProgress,
+                            width: 160,
+                            height: 240,
+                            cornerRadius: 16
+                        )
+                    }
                 }
                 .padding(.vertical, 4)
             }
+            .onEndBounce(
+                axis: .horizontal,
+                isEnabled: canShowCharacterList,
+                progress: $characterListBounceProgress
+            ) {
+                isShowingCharacterList = true
+            }
         }
+        .navigationDestination(isPresented: $isShowingCharacterList) {
+            characterListDestination
+        }
+    }
+
+    private var canShowCharacterList: Bool {
+        viewModel.allCharacterRoles.count > viewModel.previewCharacterRoles.count
+    }
+
+    private var characterListDestination: some View {
+        AnimeDetailCharactersListView(
+            animeTitle: animeTitle,
+            roles: viewModel.allCharacterRoles,
+            viewModel: viewModel
+        )
     }
 }
 

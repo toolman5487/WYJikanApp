@@ -1963,10 +1963,10 @@
 		15FCF8832F73C25A0054153E /* MainHome */ = {
 			isa = PBXGroup;
 			children = (
-				16F9000D2FEA00000000000D /* HomeWatch */,
 				16F200052FAB400000000005 /* HomeTodayAnimeScheduleList */,
 				16F300192FAB500000000019 /* HomeTrendingAnimeList */,
 				1504E4F72FAB8A51009EB340 /* HomeTrendingMangaList */,
+				16F9000D2FEA00000000000D /* HomeWatch */,
 				15FC4F342F73E6480054153E /* Model */,
 				15FF80142F7653E200D3241C /* Router */,
 				15FC4F3F2F73EAE20054153E /* Service */,
