@@ -200,11 +200,18 @@ struct AnimeDetailInfoRow: View {
     let title: String
     let value: String
     var subtitle: String?
+    var isValueCopyable: Bool
 
-    init(title: String, value: String, subtitle: String? = nil) {
+    init(
+        title: String,
+        value: String,
+        subtitle: String? = nil,
+        isValueCopyable: Bool = false
+    ) {
         self.title = title
         self.value = value
         self.subtitle = subtitle
+        self.isValueCopyable = isValueCopyable
     }
 
     var body: some View {
@@ -217,21 +224,28 @@ struct AnimeDetailInfoRow: View {
             Group {
                 if let subtitle, !subtitle.isEmpty {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(value)
-                            .font(.subheadline)
-                            .foregroundStyle(ThemeColor.textPrimary)
+                        valueContent
                         Text(subtitle)
                             .font(.footnote)
                             .foregroundStyle(ThemeColor.textTertiary)
                     }
                 } else {
-                    Text(value)
-                        .font(.subheadline)
-                        .foregroundStyle(ThemeColor.textPrimary)
+                    valueContent
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .accessibilityElement(children: .combine)
+    }
+
+    @ViewBuilder
+    private var valueContent: some View {
+        if isValueCopyable, value != "-" {
+            DetailCopyableText(text: value, style: .info)
+        } else {
+            Text(value)
+                .font(.subheadline)
+                .foregroundStyle(ThemeColor.textPrimary)
+        }
     }
 }

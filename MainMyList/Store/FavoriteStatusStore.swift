@@ -56,6 +56,10 @@ final class FavoriteStatusStore: ObservableObject {
         favoriteIDs(for: mediaKind).contains(malId)
     }
 
+    var totalFavoriteCount: Int {
+        animeFavoriteIDs.count + mangaFavoriteIDs.count
+    }
+
     private func apply(snapshot: FavoriteSnapshot) {
         if animeFavoriteIDs != snapshot.animeIDs {
             animeFavoriteIDs = snapshot.animeIDs

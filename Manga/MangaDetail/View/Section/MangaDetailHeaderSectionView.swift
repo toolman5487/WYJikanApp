@@ -26,13 +26,12 @@ struct MangaDetailHeaderSectionView: View {
         HStack(alignment: .top, spacing: 16) {
             posterView
             VStack(alignment: .leading, spacing: 8) {
-                Text(viewModel.displayTitle(for: manga))
-                    .font(.title2.weight(.bold))
-                    .foregroundStyle(ThemeColor.textPrimary)
+                DetailCopyableText(
+                    text: viewModel.displayTitle(for: manga),
+                    style: .primary
+                )
                 if let english = manga.titleEnglish, !english.isEmpty {
-                    Text(english)
-                        .font(.subheadline)
-                        .foregroundStyle(ThemeColor.textSecondary)
+                    DetailCopyableText(text: english, style: .secondary)
                 }
                 if let sensitiveContent = viewModel.sensitiveContentText(for: manga) {
                     Text(sensitiveContent)

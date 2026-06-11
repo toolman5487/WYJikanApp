@@ -16,14 +16,13 @@ struct CharacterDetailHeaderSectionView: View {
             posterView
 
             VStack(alignment: .leading, spacing: 8) {
-                Text(viewModel.displayName(for: character))
-                    .font(.title2.weight(.bold))
-                    .foregroundStyle(ThemeColor.textPrimary)
+                DetailCopyableText(
+                    text: viewModel.displayName(for: character),
+                    style: .primary
+                )
 
                 if let englishName = viewModel.englishName(for: character) {
-                    Text(englishName)
-                        .font(.subheadline)
-                        .foregroundStyle(ThemeColor.textSecondary)
+                    DetailCopyableText(text: englishName, style: .secondary)
                 }
 
                 Text("\(viewModel.favoritesText(for: character)) 收藏")

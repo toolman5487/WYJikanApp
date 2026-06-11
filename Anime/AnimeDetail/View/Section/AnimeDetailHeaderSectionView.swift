@@ -26,13 +26,12 @@ struct AnimeDetailHeaderSectionView: View {
         HStack(alignment: .top, spacing: 16) {
             posterView
             VStack(alignment: .leading, spacing: 8) {
-                Text(viewModel.displayTitle(for: anime))
-                    .font(.title2.weight(.bold))
-                    .foregroundStyle(ThemeColor.textPrimary)
+                DetailCopyableText(
+                    text: viewModel.displayTitle(for: anime),
+                    style: .primary
+                )
                 if let english = anime.titleEnglish, !english.isEmpty {
-                    Text(english)
-                        .font(.subheadline)
-                        .foregroundStyle(ThemeColor.textSecondary)
+                    DetailCopyableText(text: english, style: .secondary)
                 }
                 if let sensitiveContent = viewModel.sensitiveContentText(for: anime) {
                     Text(sensitiveContent)

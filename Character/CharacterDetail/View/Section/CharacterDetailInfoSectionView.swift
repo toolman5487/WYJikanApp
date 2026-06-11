@@ -14,12 +14,24 @@ struct CharacterDetailInfoSectionView: View {
     var body: some View {
         AnimeDetailSectionCard("角色資訊") {
             VStack(alignment: .leading, spacing: 12) {
-                AnimeDetailInfoRow(title: "日文名", value: character.nameKanji ?? "-")
-                AnimeDetailInfoRow(title: "英文名", value: character.name ?? "-")
+                AnimeDetailInfoRow(
+                    title: "日文名",
+                    value: character.nameKanji ?? "-",
+                    isValueCopyable: true
+                )
+                AnimeDetailInfoRow(
+                    title: "英文名",
+                    value: character.name ?? "-",
+                    isValueCopyable: true
+                )
                 AnimeDetailInfoRow(title: "收藏", value: viewModel.favoritesText(for: character))
 
                 if let nicknames = viewModel.nicknamesText(for: character) {
-                    AnimeDetailInfoRow(title: "別名", value: nicknames)
+                    AnimeDetailInfoRow(
+                        title: "別名",
+                        value: nicknames,
+                        isValueCopyable: true
+                    )
                 }
             }
         }

@@ -155,6 +155,11 @@
 		15B3C7412FDA69AB0021D375 /* MangaReadingProgressEditorDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15B3C7402FDA69AB0021D375 /* MangaReadingProgressEditorDraft.swift */; };
 		15B3C7632FDA81860021D375 /* AnimeDetailRecommendationsListLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15B3C7622FDA81860021D375 /* AnimeDetailRecommendationsListLayout.swift */; };
 		15B3C7652FDA85530021D375 /* DetailRecommendationPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15B3C7642FDA85530021D375 /* DetailRecommendationPresentation.swift */; };
+		15B3C76E2FDA91E10021D375 /* DetailCopyableTextStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15B3C76A2FDA91E10021D375 /* DetailCopyableTextStyle.swift */; };
+		15B3C76F2FDA91E10021D375 /* DetailCopyableTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15B3C76B2FDA91E10021D375 /* DetailCopyableTextView.swift */; };
+		15B3C7702FDA91E10021D375 /* DetailCopySuccessIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15B3C76D2FDA91E10021D375 /* DetailCopySuccessIndicator.swift */; };
+		15B3C7712FDA91E10021D375 /* DetailCopyableTextViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15B3C76C2FDA91E10021D375 /* DetailCopyableTextViewModel.swift */; };
+		15B3C7722FDA91E10021D375 /* DetailClipboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15B3C7692FDA91E10021D375 /* DetailClipboard.swift */; };
 		15B80E602F8E100100DDB201 /* MainSearchResultsContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15B80E642F8E100100DDB201 /* MainSearchResultsContentView.swift */; };
 		15B80E612F8E100200DDB201 /* MainSearchListSkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15B80E652F8E100200DDB201 /* MainSearchListSkeletonView.swift */; };
 		15B80E622F8E100300DDB201 /* MainSearchResultRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15B80E662F8E100300DDB201 /* MainSearchResultRowView.swift */; };
@@ -497,6 +502,11 @@
 		15B3C7402FDA69AB0021D375 /* MangaReadingProgressEditorDraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MangaReadingProgressEditorDraft.swift; sourceTree = "<group>"; };
 		15B3C7622FDA81860021D375 /* AnimeDetailRecommendationsListLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeDetailRecommendationsListLayout.swift; sourceTree = "<group>"; };
 		15B3C7642FDA85530021D375 /* DetailRecommendationPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailRecommendationPresentation.swift; sourceTree = "<group>"; };
+		15B3C7692FDA91E10021D375 /* DetailClipboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailClipboard.swift; sourceTree = "<group>"; };
+		15B3C76A2FDA91E10021D375 /* DetailCopyableTextStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailCopyableTextStyle.swift; sourceTree = "<group>"; };
+		15B3C76B2FDA91E10021D375 /* DetailCopyableTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailCopyableTextView.swift; sourceTree = "<group>"; };
+		15B3C76C2FDA91E10021D375 /* DetailCopyableTextViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailCopyableTextViewModel.swift; sourceTree = "<group>"; };
+		15B3C76D2FDA91E10021D375 /* DetailCopySuccessIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailCopySuccessIndicator.swift; sourceTree = "<group>"; };
 		15B80E642F8E100100DDB201 /* MainSearchResultsContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSearchResultsContentView.swift; sourceTree = "<group>"; };
 		15B80E652F8E100200DDB201 /* MainSearchListSkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSearchListSkeletonView.swift; sourceTree = "<group>"; };
 		15B80E662F8E100300DDB201 /* MainSearchResultRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSearchResultRowView.swift; sourceTree = "<group>"; };
@@ -1744,6 +1754,18 @@
 			path = SubView;
 			sourceTree = "<group>";
 		};
+		15B3C7672FDA8D450021D375 /* Detail */ = {
+			isa = PBXGroup;
+			children = (
+				15B3C7692FDA91E10021D375 /* DetailClipboard.swift */,
+				15B3C76A2FDA91E10021D375 /* DetailCopyableTextStyle.swift */,
+				15B3C76B2FDA91E10021D375 /* DetailCopyableTextView.swift */,
+				15B3C76C2FDA91E10021D375 /* DetailCopyableTextViewModel.swift */,
+				15B3C76D2FDA91E10021D375 /* DetailCopySuccessIndicator.swift */,
+			);
+			path = Detail;
+			sourceTree = "<group>";
+		};
 		15B80E682F8E100500DDB201 /* MainView */ = {
 			isa = PBXGroup;
 			children = (
@@ -2020,6 +2042,7 @@
 			children = (
 				15FF80272F765D3E00D3241C /* AnimeDetail */,
 				15CF35712F8100D900384C5C /* CapsuleTagScroll */,
+				15B3C7672FDA8D450021D375 /* Detail */,
 				16B800022FD8000000000002 /* EndBounce */,
 				15FC4F422F74C79F0054153E /* ErrorMessage */,
 				16D100022FAA100000000002 /* ImagePreview */,
@@ -3258,6 +3281,11 @@
 				159667FF2F865AC60033410A /* RandomHeroSkeletonView.swift in Sources */,
 				159668002F865AC60033410A /* RandomHeroCardView.swift in Sources */,
 				16F800062FDB100000000006 /* RandomPickHeroSkeletonView.swift in Sources */,
+				15B3C76E2FDA91E10021D375 /* DetailCopyableTextStyle.swift in Sources */,
+				15B3C76F2FDA91E10021D375 /* DetailCopyableTextView.swift in Sources */,
+				15B3C7702FDA91E10021D375 /* DetailCopySuccessIndicator.swift in Sources */,
+				15B3C7712FDA91E10021D375 /* DetailCopyableTextViewModel.swift in Sources */,
+				15B3C7722FDA91E10021D375 /* DetailClipboard.swift in Sources */,
 				1574EC562F7BCCA000E37AE8 /* AnimeReviewViewModel+Presentation.swift in Sources */,
 				15A8C0112F7E0E0100E20002 /* MangaReviewView.swift in Sources */,
 				15A8C0132F7E0E0100E20004 /* MangaReviewModel.swift in Sources */,
