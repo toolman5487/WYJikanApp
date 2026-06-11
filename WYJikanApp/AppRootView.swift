@@ -5,9 +5,12 @@
 //  Created by Codex on 2026/5/13.
 //
 
+import SwiftData
 import SwiftUI
 
 struct AppRootView: View {
+    @Environment(\.modelContext) private var modelContext
+    @EnvironmentObject private var broadcastReminderStatusStore: AnimeBroadcastReminderStatusStore
     @EnvironmentObject private var todayAnimeNotificationScheduler: HomeTodayAnimeNotificationScheduler
 
     var body: some View {
@@ -20,7 +23,13 @@ struct AppRootView: View {
     }
 
     private func bootstrap() async {
-        await todayAnimeNotificationScheduler.requestAuthorizationOnLaunchIfNeeded()
+        await AnimeBroadcastReminderReconciler.reconcileAll(
+            subscriptions: broadcastReminderStatusStore.subscriptions,
+            service: AnimeDetailService(),
+            repository: SwiftDataAnimeBroadcastReminderRepository.shared,
+            scheduler: todayAnimeNotificationScheduler,
+            modelContext: modelContext
+        )
         await todayAnimeNotificationScheduler.refreshScheduledNotificationIfNeeded()
     }
 }
@@ -28,6 +37,7 @@ struct AppRootView: View {
 #Preview {
     AppRootView()
         .environmentObject(FavoriteStatusStore())
+        .environmentObject(AnimeBroadcastReminderStatusStore())
         .environmentObject(HomeTodayAnimeNotificationScheduler())
         .environmentObject(MainTabBarViewModel.shared)
         .environmentObject(MainHomeRouter.shared)

@@ -14,6 +14,7 @@ import UserNotifications
 final class HomeTodayAnimeNotificationScheduler: BaseUserNotificationManager {
     private let reminderFactory: HomeTodayAnimeBroadcastReminderFactory
     private let requestFactory: HomeTodayAnimeNotificationRequestFactory
+    private let subscriptionProvider: () -> [AnimeBroadcastReminderSnapshot]
 
     private var lastRefreshDate: Date? {
         userDefaults.object(forKey: HomeTodayAnimeNotificationConfig.lastRefreshDateKey) as? Date
@@ -24,12 +25,13 @@ final class HomeTodayAnimeNotificationScheduler: BaseUserNotificationManager {
     }
 
     init(
-        service: HomeTodayAnimeScheduleListServicing = HomeTodayAnimeScheduleListService(),
+        subscriptionProvider: @escaping @MainActor () -> [AnimeBroadcastReminderSnapshot] = { [] },
         notificationCenter: UNUserNotificationCenter = UNUserNotificationCenter.current(),
         userDefaults: UserDefaults = .standard,
         calendar: Calendar = .autoupdatingCurrent
     ) {
-        self.reminderFactory = HomeTodayAnimeBroadcastReminderFactory(service: service)
+        self.subscriptionProvider = subscriptionProvider
+        self.reminderFactory = HomeTodayAnimeBroadcastReminderFactory()
         self.requestFactory = HomeTodayAnimeNotificationRequestFactory(calendar: calendar)
         super.init(
             enabledKey: HomeTodayAnimeNotificationConfig.enabledKey,
@@ -40,21 +42,6 @@ final class HomeTodayAnimeNotificationScheduler: BaseUserNotificationManager {
             notificationCenter: notificationCenter,
             userDefaults: userDefaults
         )
-    }
-
-    func requestAuthorizationOnLaunchIfNeeded() async {
-        guard await refreshAuthorizationState() == .notDetermined else { return }
-
-        do {
-            try await ensureAuthorization()
-            setState(.enabled)
-        } catch BaseUserNotificationError.permissionDenied {
-            setState(.disabled)
-        } catch {
-            AppLogger.notifications.error(
-                "Launch notification authorization failed: \(error.localizedDescription, privacy: .public)"
-            )
-        }
     }
 
     func refreshAuthorizationStatus() async {
@@ -79,9 +66,8 @@ final class HomeTodayAnimeNotificationScheduler: BaseUserNotificationManager {
     }
 
     func refreshScheduledNotificationIfNeeded() async {
-        guard state == .enabled else { return }
+        _ = await refreshAuthorizationState()
         await refreshAuthorizationStatus()
-        guard authorizationState.allowsScheduling else { return }
         guard await shouldRefreshSchedule() else { return }
 
         do {
@@ -96,8 +82,50 @@ final class HomeTodayAnimeNotificationScheduler: BaseUserNotificationManager {
         }
     }
 
+    func refreshScheduledNotificationsImmediately() async {
+        do {
+            markLastRefreshAttemptDate()
+            try await withProcessingState(.refreshing) {
+                _ = try await scheduleBroadcastReminderNotifications()
+            }
+        } catch {
+            AppLogger.notifications.error(
+                "Immediate today anime notification refresh failed: \(error.localizedDescription, privacy: .public)"
+            )
+        }
+    }
+
+    func ensureAuthorizationForSubscription() async throws {
+        try await ensureAuthorization()
+        setState(.enabled)
+    }
+
+    func removeReminders(forAnimeID animeID: Int) async {
+        let prefix = HomeTodayAnimeNotificationConfig.broadcastReminderIdentifierPrefix(forAnimeID: animeID)
+        _ = await removeManagedNotifications { $0.hasPrefix(prefix) }
+    }
+
+    func handleSubscriptionsEmptied() async {
+        await removeManagedPendingNotificationRequests()
+        setState(.disabled)
+        clearLastRefreshDate()
+    }
+
     private func scheduleBroadcastReminderNotifications() async throws -> Int {
-        let requests = try await scheduledRequests()
+        let subscriptions = subscriptionProvider()
+
+        guard !subscriptions.isEmpty else {
+            await removeManagedPendingNotificationRequests()
+            setState(.disabled)
+            clearLastRefreshDate()
+            return 0
+        }
+
+        guard authorizationState.allowsScheduling else {
+            return 0
+        }
+
+        let requests = try scheduledRequests(from: subscriptions)
         let retainedIdentifiers = Set(requests.map(\.identifier))
 
         switch try await addNotificationRequests(requests) {
@@ -114,8 +142,10 @@ final class HomeTodayAnimeNotificationScheduler: BaseUserNotificationManager {
         }
     }
 
-    private func scheduledRequests() async throws -> [UNNotificationRequest] {
-        let reminders = try await reminderFactory.makeReminders()
+    private func scheduledRequests(
+        from subscriptions: [AnimeBroadcastReminderSnapshot]
+    ) throws -> [UNNotificationRequest] {
+        let reminders = reminderFactory.makeReminders(from: subscriptions)
             .sorted { $0.scheduledDate < $1.scheduledDate }
             .prefix(HomeTodayAnimeNotificationConfig.maxScheduledNotifications)
         return reminders.map(requestFactory.makeRequest(for:))
@@ -124,6 +154,16 @@ final class HomeTodayAnimeNotificationScheduler: BaseUserNotificationManager {
     private func shouldRefreshSchedule() async -> Bool {
         if let lastRefreshAttemptDate,
            Date().timeIntervalSince(lastRefreshAttemptDate) < HomeTodayAnimeNotificationConfig.failedScheduleRefreshRetryInterval {
+            return false
+        }
+
+        let subscriptions = subscriptionProvider()
+        if subscriptions.isEmpty {
+            let pendingRequests = await pendingManagedNotificationRequests()
+            return !pendingRequests.isEmpty
+        }
+
+        guard authorizationState.allowsScheduling else {
             return false
         }
 

@@ -24,6 +24,7 @@ struct WYJikanAppApp: App {
     @UIApplicationDelegateAdaptor(AppNotificationDelegate.self) private var appDelegate
     private let startupState: StartupState
     @StateObject private var favoriteStatusStore: FavoriteStatusStore
+    @StateObject private var broadcastReminderStatusStore: AnimeBroadcastReminderStatusStore
     @StateObject private var todayAnimeNotificationScheduler: HomeTodayAnimeNotificationScheduler
     @StateObject private var mainTabBarViewModel: MainTabBarViewModel
     @StateObject private var mainHomeRouter: MainHomeRouter
@@ -32,13 +33,24 @@ struct WYJikanAppApp: App {
 
     init() {
         let favoriteStatusStore = FavoriteStatusStore()
-        let todayAnimeNotificationScheduler = HomeTodayAnimeNotificationScheduler()
+        let broadcastReminderStatusStore = AnimeBroadcastReminderStatusStore()
+        let todayAnimeNotificationScheduler = HomeTodayAnimeNotificationScheduler(
+            subscriptionProvider: { broadcastReminderStatusStore.subscriptions }
+        )
 
         do {
-            let sharedModelContainer = try ModelContainer(for: MyListCollectionItem.self)
+            let sharedModelContainer = try ModelContainer(
+                for: MyListCollectionItem.self,
+                AnimeBroadcastReminderSubscription.self
+            )
+            let modelContext = ModelContext(sharedModelContainer)
             favoriteStatusStore.connect(
                 to: SwiftDataFavoriteRepository.shared,
-                modelContext: ModelContext(sharedModelContainer)
+                modelContext: modelContext
+            )
+            broadcastReminderStatusStore.connect(
+                to: SwiftDataAnimeBroadcastReminderRepository.shared,
+                modelContext: modelContext
             )
             startupState = .ready(sharedModelContainer)
         } catch {
@@ -51,6 +63,7 @@ struct WYJikanAppApp: App {
         }
 
         _favoriteStatusStore = StateObject(wrappedValue: favoriteStatusStore)
+        _broadcastReminderStatusStore = StateObject(wrappedValue: broadcastReminderStatusStore)
         _todayAnimeNotificationScheduler = StateObject(wrappedValue: todayAnimeNotificationScheduler)
         _mainTabBarViewModel = StateObject(wrappedValue: MainTabBarViewModel.shared)
         _mainHomeRouter = StateObject(wrappedValue: MainHomeRouter.shared)
@@ -78,6 +91,7 @@ struct WYJikanAppApp: App {
         case .ready(let modelContainer):
             AppRootView()
                 .environmentObject(favoriteStatusStore)
+                .environmentObject(broadcastReminderStatusStore)
                 .environmentObject(todayAnimeNotificationScheduler)
                 .environmentObject(mainTabBarViewModel)
                 .environmentObject(mainHomeRouter)

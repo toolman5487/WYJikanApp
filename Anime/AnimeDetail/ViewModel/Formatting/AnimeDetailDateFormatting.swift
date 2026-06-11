@@ -7,13 +7,13 @@
 
 import Foundation
 
-struct AnimeLocalBroadcastPresentation: Equatable {
+nonisolated struct AnimeLocalBroadcastPresentation: Equatable {
     let sectionTitle: String
     let sortValue: Int
     let displayText: String
 }
 
-enum AnimeDetailDateFormatting {
+nonisolated enum AnimeDetailDateFormatting {
 
     // MARK: - Aired Period
 

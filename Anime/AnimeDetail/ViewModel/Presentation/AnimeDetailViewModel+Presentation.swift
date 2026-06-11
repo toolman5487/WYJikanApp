@@ -6,6 +6,8 @@
 //
 
 import Foundation
+import OSLog
+import SwiftData
 
 extension AnimeDetailViewModel {
 
@@ -77,20 +79,19 @@ extension AnimeDetailViewModel {
     }
 
     func reviewNavigationState() -> DetailNavigationToolbarReviewState {
-        guard let detail else { return .loading }
-        return .available(title: reviewTitle(for: detail))
+        DetailToolbarPresentation.reviewState(
+            title: detail.map { reviewTitle(for: $0) }
+        )
     }
 
     func shareNavigationState() -> DetailNavigationToolbarShareState {
-        guard let detail,
-              let url = malWorkPageURL(for: detail) else {
-            return .loading
+        guard let detail else {
+            return DetailToolbarPresentation.shareState(title: nil, message: nil, url: nil)
         }
-        let title = displayTitle(for: detail)
-        return .available(
-            title: title,
+        return DetailToolbarPresentation.shareState(
+            title: displayTitle(for: detail),
             message: shareMessageText(for: detail),
-            url: url
+            url: malWorkPageURL(for: detail)
         )
     }
 
@@ -719,5 +720,73 @@ extension AnimeDetailViewModel {
         )
         let trimmed = synopsis.trimmingCharacters(in: .whitespacesAndNewlines)
         return trimmed.isEmpty ? nil : trimmed
+    }
+}
+
+// MARK: - Broadcast Reminder
+
+enum AnimeDetailBroadcastReminderError: LocalizedError, Equatable {
+    case detailUnavailable
+    case broadcastUnavailable
+    case permissionDenied
+
+    var errorDescription: String? {
+        switch self {
+        case .detailUnavailable:
+            return "動畫資料尚未載入，請稍後再試。"
+        case .broadcastUnavailable:
+            return "僅播出中且具備播出時間的作品可設定提醒。"
+        case .permissionDenied:
+            return "請在系統設定中允許通知，才能接收播出提醒。"
+        }
+    }
+}
+
+extension AnimeDetailViewModel {
+    func toggleBroadcastReminder(
+        isSubscribed: Bool,
+        subscribedCount: Int,
+        reminderRepository: any AnimeBroadcastReminderRepository,
+        notificationScheduler: HomeTodayAnimeNotificationScheduler,
+        modelContext: ModelContext
+    ) async -> AnimeDetailBroadcastReminderError? {
+        guard let detail else {
+            return .detailUnavailable
+        }
+
+        do {
+            if isSubscribed {
+                await AnimeBroadcastReminderReconciler.unsubscribe(
+                    malId: detail.id,
+                    remainingSubscriptionCount: subscribedCount - 1,
+                    repository: reminderRepository,
+                    scheduler: notificationScheduler,
+                    modelContext: modelContext
+                )
+                return nil
+            }
+
+            guard let snapshot = AnimeBroadcastReminderSnapshot(
+                anime: detail,
+                title: displayTitle(for: detail)
+            ) else {
+                return .broadcastUnavailable
+            }
+
+            do {
+                try await notificationScheduler.ensureAuthorizationForSubscription()
+            } catch BaseUserNotificationError.permissionDenied {
+                return .permissionDenied
+            }
+
+            try reminderRepository.subscribe(snapshot: snapshot, modelContext: modelContext)
+            await notificationScheduler.refreshScheduledNotificationsImmediately()
+            return nil
+        } catch {
+            AppLogger.persistence.error(
+                "Anime broadcast reminder update failed: \(error.localizedDescription, privacy: .public)"
+            )
+            return .broadcastUnavailable
+        }
     }
 }

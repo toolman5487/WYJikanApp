@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftData
 
 nonisolated enum HomeScheduleDay: String, CaseIterable, Identifiable, Sendable {
     case monday
@@ -101,4 +102,106 @@ nonisolated struct HomeTodayAnimeTimeSection: Identifiable, Hashable, Sendable {
     let items: [HomeTodayAnimeTimelineItem]
 
     var id: String { title }
+}
+
+// MARK: - Broadcast Reminder
+
+@Model
+final class AnimeBroadcastReminderSubscription {
+    var malId: Int
+    var title: String
+    var broadcastDay: String?
+    var broadcastTime: String?
+    var broadcastTimezone: String?
+    var broadcastString: String?
+    var subscribedAt: Date
+
+    init(
+        malId: Int,
+        title: String,
+        broadcastDay: String?,
+        broadcastTime: String?,
+        broadcastTimezone: String?,
+        broadcastString: String?,
+        subscribedAt: Date
+    ) {
+        self.malId = malId
+        self.title = title
+        self.broadcastDay = broadcastDay
+        self.broadcastTime = broadcastTime
+        self.broadcastTimezone = broadcastTimezone
+        self.broadcastString = broadcastString
+        self.subscribedAt = subscribedAt
+    }
+}
+
+nonisolated struct AnimeBroadcastReminderSnapshot: Identifiable, Hashable, Sendable {
+    let malId: Int
+    let title: String
+    let broadcastDay: String?
+    let broadcastTime: String?
+    let broadcastTimezone: String?
+    let broadcastString: String?
+
+    var id: Int { malId }
+
+    var broadcast: AnimeBroadcastDTO {
+        AnimeBroadcastDTO(
+            day: broadcastDay,
+            time: broadcastTime,
+            timezone: broadcastTimezone,
+            string: broadcastString
+        )
+    }
+
+    init(
+        malId: Int,
+        title: String,
+        broadcastDay: String?,
+        broadcastTime: String?,
+        broadcastTimezone: String?,
+        broadcastString: String?
+    ) {
+        self.malId = malId
+        self.title = title
+        self.broadcastDay = broadcastDay
+        self.broadcastTime = broadcastTime
+        self.broadcastTimezone = broadcastTimezone
+        self.broadcastString = broadcastString
+    }
+
+    init(subscription: AnimeBroadcastReminderSubscription) {
+        self.init(
+            malId: subscription.malId,
+            title: subscription.title,
+            broadcastDay: subscription.broadcastDay,
+            broadcastTime: subscription.broadcastTime,
+            broadcastTimezone: subscription.broadcastTimezone,
+            broadcastString: subscription.broadcastString
+        )
+    }
+
+    init?(anime: AnimeDetailDTO, title: String) {
+        guard AnimeBroadcastReminderScheduling.canSubscribe(to: anime) else {
+            return nil
+        }
+
+        let broadcast = anime.broadcast
+        self.init(
+            malId: anime.id,
+            title: title,
+            broadcastDay: broadcast?.day,
+            broadcastTime: broadcast?.time,
+            broadcastTimezone: broadcast?.timezone,
+            broadcastString: broadcast?.string
+        )
+    }
+}
+
+nonisolated struct AnimeBroadcastReminderSnapshotSet: Equatable, Sendable {
+    let subscriptions: [AnimeBroadcastReminderSnapshot]
+
+    var animeIDs: Set<Int> {
+        Set(subscriptions.map(\.malId))
+    }
 }

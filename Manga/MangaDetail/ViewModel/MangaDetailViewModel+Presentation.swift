@@ -84,20 +84,19 @@ extension MangaDetailViewModel {
     }
 
     func reviewNavigationState() -> DetailNavigationToolbarReviewState {
-        guard let detail else { return .loading }
-        return .available(title: reviewTitle(for: detail))
+        DetailToolbarPresentation.reviewState(
+            title: detail.map { reviewTitle(for: $0) }
+        )
     }
 
     func shareNavigationState() -> DetailNavigationToolbarShareState {
-        guard let detail,
-              let url = malWorkPageURL(for: detail) else {
-            return .loading
+        guard let detail else {
+            return DetailToolbarPresentation.shareState(title: nil, message: nil, url: nil)
         }
-        let title = displayTitle(for: detail)
-        return .available(
-            title: title,
+        return DetailToolbarPresentation.shareState(
+            title: displayTitle(for: detail),
             message: shareMessageText(for: detail),
-            url: url
+            url: malWorkPageURL(for: detail)
         )
     }
 
