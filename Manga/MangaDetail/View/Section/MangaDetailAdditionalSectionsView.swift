@@ -16,8 +16,7 @@ struct MangaDetailBasicInfoSectionView: View {
             VStack(spacing: 12) {
                 AnimeDetailInfoRow(
                     title: "連載期間",
-                    value: viewModel.publishedPeriodDisplayText(for: manga),
-                    subtitle: viewModel.publishingStateText(for: manga)
+                    value: viewModel.publishedPeriodDisplayText(for: manga)
                 )
                 AnimeDetailInfoRow(title: "卷數", value: viewModel.volumesDisplayText(for: manga))
                 AnimeDetailInfoRow(title: "話數", value: viewModel.chaptersDisplayText(for: manga))
@@ -30,8 +29,8 @@ struct MangaDetailBasicInfoSectionView: View {
 struct MangaDetailCharactersSectionView: View {
     let viewModel: MangaDetailViewModel
     let mangaTitle: String
+    @Binding var isShowingCharacterList: Bool
     @State private var characterListBounceProgress: CGFloat = 0
-    @State private var isShowingCharacterList = false
 
     var body: some View {
         AnimeDetailLinkedSection(
@@ -84,9 +83,6 @@ struct MangaDetailCharactersSectionView: View {
                 isShowingCharacterList = true
             }
         }
-        .navigationDestination(isPresented: $isShowingCharacterList) {
-            characterListDestination
-        }
     }
 
     private var canShowCharacterList: Bool {
@@ -102,7 +98,7 @@ struct MangaDetailCharactersSectionView: View {
     }
 }
 
-private struct MangaDetailCharactersListView: View {
+struct MangaDetailCharactersListView: View {
     let mangaTitle: String
     let roles: [MangaCharacterRoleDTO]
     let viewModel: MangaDetailViewModel
@@ -197,8 +193,8 @@ struct MangaDetailPicturesSectionView: View {
 struct MangaDetailRecommendationsSectionView: View {
     let viewModel: MangaDetailViewModel
     let mangaTitle: String
+    @Binding var isShowingRecommendationList: Bool
     @State private var recommendationListBounceProgress: CGFloat = 0
-    @State private var isShowingRecommendationList = false
 
     var body: some View {
         AnimeDetailLinkedSection(
@@ -250,9 +246,6 @@ struct MangaDetailRecommendationsSectionView: View {
                 isShowingRecommendationList = true
             }
         }
-        .navigationDestination(isPresented: $isShowingRecommendationList) {
-            recommendationListDestination
-        }
     }
 
     private var canShowRecommendationList: Bool {
@@ -268,7 +261,7 @@ struct MangaDetailRecommendationsSectionView: View {
     }
 }
 
-private struct MangaDetailRecommendationsListView: View {
+struct MangaDetailRecommendationsListView: View {
     let mangaTitle: String
     let recommendations: [MangaRecommendationDTO]
     let viewModel: MangaDetailViewModel

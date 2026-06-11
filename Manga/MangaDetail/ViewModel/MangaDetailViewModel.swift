@@ -168,4 +168,25 @@ final class MangaDetailViewModel: ObservableObject {
             AppLogger.persistence.error("Manga favorite update failed: \(error.localizedDescription, privacy: .public)")
         }
     }
+
+    func updateReadingProgress(
+        for item: MyListCollectionItem,
+        status: MangaReadingStatus,
+        currentChapter: Int?,
+        totalChapters: Int?,
+        modelContext: ModelContext
+    ) {
+        item.updateMangaReadingProgress(
+            status: status,
+            currentChapter: currentChapter,
+            totalChapters: totalChapters
+        )
+
+        do {
+            try modelContext.save()
+        } catch {
+            modelContext.rollback()
+            AppLogger.persistence.error("Manga reading progress update failed: \(error.localizedDescription, privacy: .public)")
+        }
+    }
 }

@@ -11,8 +11,8 @@ import SwiftUI
 struct AnimeDetailCharactersSectionView: View {
     let viewModel: AnimeDetailViewModel
     let animeTitle: String
+    @Binding var isShowingCharacterList: Bool
     @State private var characterListBounceProgress: CGFloat = 0
-    @State private var isShowingCharacterList = false
 
     var body: some View {
         AnimeDetailLinkedSection(
@@ -65,9 +65,6 @@ struct AnimeDetailCharactersSectionView: View {
                 isShowingCharacterList = true
             }
         }
-        .navigationDestination(isPresented: $isShowingCharacterList) {
-            characterListDestination
-        }
     }
 
     private var canShowCharacterList: Bool {
@@ -83,7 +80,7 @@ struct AnimeDetailCharactersSectionView: View {
     }
 }
 
-private struct AnimeDetailCharactersListView: View {
+struct AnimeDetailCharactersListView: View {
     let animeTitle: String
     let roles: [AnimeCharacterRoleDTO]
     let viewModel: AnimeDetailViewModel

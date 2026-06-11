@@ -118,7 +118,9 @@ extension MangaDetailViewModel {
             genreNames: (manga.genres ?? []).compactMap(\.name),
             type: manga.type,
             year: manga.published?.prop?.from?.year,
-            addedAt: Date()
+            addedAt: Date(),
+            mangaReadingStatus: .planned,
+            totalChaptersSnapshot: manga.chapters
         )
     }
 
@@ -177,11 +179,6 @@ extension MangaDetailViewModel {
 
     func publishedPeriodDisplayText(for manga: MangaDetailDTO) -> String {
         AnimeDetailDateFormatting.slashSeparatedPeriod(from: manga.published) ?? "-"
-    }
-
-    func publishingStateText(for manga: MangaDetailDTO) -> String? {
-        guard let publishing = manga.publishing else { return nil }
-        return publishing ? "目前連載中" : "非連載中"
     }
 
     // MARK: - Lists & Numbers

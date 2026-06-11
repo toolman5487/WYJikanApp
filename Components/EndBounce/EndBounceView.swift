@@ -189,7 +189,7 @@ struct EndBounceTriggerModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .sensoryFeedback(
-                .impact(weight: .medium, intensity: 0.8),
+                .impact(weight: .heavy, intensity: 1.0),
                 trigger: feedbackTriggerCount
             )
             .onScrollGeometryChange(for: EndBounceScrollSample.self) { geometry in

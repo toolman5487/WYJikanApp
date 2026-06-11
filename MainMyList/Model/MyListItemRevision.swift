@@ -19,4 +19,8 @@ struct MyListItemRevision: Equatable {
     let type: String?
     let year: Int?
     let addedAt: Date
+    let mangaReadingStatusRawValue: String?
+    let currentChapter: Int?
+    let totalChaptersSnapshot: Int?
+    let progressUpdatedAt: Date?
 }

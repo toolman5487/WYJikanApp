@@ -32,6 +32,10 @@ struct MyListItemRowView: View {
                         .foregroundStyle(ThemeColor.textSecondary)
                         .lineLimit(1)
                 }
+
+                if item.mediaKind == .manga {
+                    mangaReadingProgressView
+                }
             }
             Spacer(minLength: 0)
             Image(systemName: "chevron.right")
@@ -58,5 +62,27 @@ struct MyListItemRowView: View {
                         .foregroundStyle(ThemeColor.textTertiary)
                 }
         }
+    }
+
+    private var mangaReadingProgressView: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 6) {
+                Image(systemName: item.mangaReadingStatus.systemImageName)
+                    .font(.caption.weight(.semibold))
+                Text(item.readingProgressSummary())
+                    .font(.caption.weight(.semibold))
+                    .lineLimit(1)
+            }
+            .foregroundStyle(ThemeColor.textSecondary)
+
+            if let progress = item.readingProgressFraction() {
+                ProgressView(value: progress)
+                    .progressViewStyle(.linear)
+                    .tint(ThemeColor.sakura)
+                    .frame(height: 4)
+            }
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("閱讀進度，\(item.readingProgressSummary())")
     }
 }

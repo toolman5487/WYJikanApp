@@ -22,7 +22,12 @@ struct MangaDetailView: View {
     @StateObject private var viewModel: MangaDetailViewModel
     @EnvironmentObject private var favoriteStatusStore: FavoriteStatusStore
     @Environment(\.modelContext) private var modelContext
+    @Query(sort: \MyListCollectionItem.addedAt, order: .reverse)
+    private var collectionItems: [MyListCollectionItem]
     @State private var imagePreviewSession: ImagePreviewSession?
+    @State private var progressEditorDraft: MangaReadingProgressEditorDraft?
+    @State private var isShowingCharacterList = false
+    @State private var isShowingRecommendationList = false
     
     // MARK: - Initialization
     
@@ -45,13 +50,33 @@ struct MangaDetailView: View {
     private func sectionView(_ section: MangaDetailViewModel.Section, viewModel: MangaDetailViewModel, manga: MangaDetailDTO) -> some View {
         switch section {
         case .header:
-            MangaDetailHeaderSectionView(
-                viewModel: viewModel,
-                manga: manga,
-                onTapPoster: {
-                    showImagePreview(for: manga, selectedImageURL: viewModel.posterURL(for: manga))
+            VStack(alignment: .leading, spacing: 20) {
+                MangaDetailHeaderSectionView(
+                    viewModel: viewModel,
+                    manga: manga,
+                    onTapPoster: {
+                        showImagePreview(for: manga, selectedImageURL: viewModel.posterURL(for: manga))
+                    }
+                )
+                if let favoriteItem {
+                    MangaReadingProgressSectionView(
+                        item: favoriteItem,
+                        manga: manga,
+                        onIncrement: { item in
+                            incrementReadingProgress(for: item, manga: manga)
+                        },
+                        onDecrement: { item in
+                            decrementReadingProgress(for: item, manga: manga)
+                        },
+                        onEdit: { item in
+                            progressEditorDraft = MangaReadingProgressEditorDraft(
+                                item: item,
+                                totalChapters: normalizedTotalChapters(for: manga)
+                            )
+                        }
+                    )
                 }
-            )
+            }
         case .highlights:
             MangaDetailHighlightsSectionView(viewModel: viewModel, manga: manga)
         case .basicInfo:
@@ -63,7 +88,8 @@ struct MangaDetailView: View {
         case .characters:
             MangaDetailCharactersSectionView(
                 viewModel: viewModel,
-                mangaTitle: viewModel.displayTitle(for: manga)
+                mangaTitle: viewModel.displayTitle(for: manga),
+                isShowingCharacterList: $isShowingCharacterList
             )
         case .publication:
             MangaDetailPublicationSectionView(viewModel: viewModel, manga: manga)
@@ -77,7 +103,8 @@ struct MangaDetailView: View {
         case .recommendations:
             MangaDetailRecommendationsSectionView(
                 viewModel: viewModel,
-                mangaTitle: viewModel.displayTitle(for: manga)
+                mangaTitle: viewModel.displayTitle(for: manga),
+                isShowingRecommendationList: $isShowingRecommendationList
             )
         }
     }
@@ -102,6 +129,21 @@ struct MangaDetailView: View {
     
     private var isFavorite: Bool {
         favoriteStatusStore.isFavorite(malId: malId, mediaKind: .manga)
+    }
+
+    private var favoriteItem: MyListCollectionItem? {
+        collectionItems.first { item in
+            item.malId == malId && item.mediaKind == .manga
+        }
+    }
+
+    private var currentManga: MangaDetailDTO? {
+        switch viewModel.screenState {
+        case let .loaded(manga), let .refreshing(manga):
+            return manga
+        case .idle, .loading, .error:
+            return nil
+        }
     }
     
     // MARK: - Body
@@ -141,6 +183,24 @@ struct MangaDetailView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
+        .navigationDestination(isPresented: $isShowingCharacterList) {
+            if let manga = currentManga {
+                MangaDetailCharactersListView(
+                    mangaTitle: viewModel.displayTitle(for: manga),
+                    roles: viewModel.allCharacterRoles,
+                    viewModel: viewModel
+                )
+            }
+        }
+        .navigationDestination(isPresented: $isShowingRecommendationList) {
+            if let manga = currentManga {
+                MangaDetailRecommendationsListView(
+                    mangaTitle: viewModel.displayTitle(for: manga),
+                    recommendations: viewModel.allRecommendations,
+                    viewModel: viewModel
+                )
+            }
+        }
         .toolbar {
             DetailNavigationToolbar(
                 isFavorite: isFavorite,
@@ -178,9 +238,68 @@ struct MangaDetailView: View {
                 )
             )
         }
+        .sheet(item: $progressEditorDraft) { draft in
+            MangaReadingProgressEditorView(draft: draft) { updatedDraft in
+                guard let favoriteItem else { return }
+                viewModel.updateReadingProgress(
+                    for: favoriteItem,
+                    status: updatedDraft.status,
+                    currentChapter: updatedDraft.currentChapter,
+                    totalChapters: updatedDraft.totalChapters,
+                    modelContext: modelContext
+                )
+            }
+        }
         .task(id: malId) {
             await viewModel.load()
         }
+    }
+
+    private func incrementReadingProgress(
+        for item: MyListCollectionItem,
+        manga: MangaDetailDTO
+    ) {
+        let totalChapters = normalizedTotalChapters(for: manga)
+        let nextChapter = min(
+            (item.currentChapter ?? 0) + 1,
+            totalChapters ?? Int.max
+        )
+        let nextStatus: MangaReadingStatus
+        if let totalChapters, nextChapter >= totalChapters {
+            nextStatus = .completed
+        } else {
+            nextStatus = .reading
+        }
+
+        viewModel.updateReadingProgress(
+            for: item,
+            status: nextStatus,
+            currentChapter: nextChapter,
+            totalChapters: totalChapters,
+            modelContext: modelContext
+        )
+    }
+
+    private func decrementReadingProgress(
+        for item: MyListCollectionItem,
+        manga: MangaDetailDTO
+    ) {
+        let totalChapters = normalizedTotalChapters(for: manga)
+        let nextChapter = max((item.currentChapter ?? 0) - 1, 0)
+        let nextStatus: MangaReadingStatus = nextChapter > 0 ? .reading : .planned
+
+        viewModel.updateReadingProgress(
+            for: item,
+            status: nextStatus,
+            currentChapter: nextChapter,
+            totalChapters: totalChapters,
+            modelContext: modelContext
+        )
+    }
+
+    private func normalizedTotalChapters(for manga: MangaDetailDTO) -> Int? {
+        guard let chapters = manga.chapters, chapters > 0 else { return nil }
+        return chapters
     }
 }
 

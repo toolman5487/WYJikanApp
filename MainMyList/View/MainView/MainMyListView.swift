@@ -146,7 +146,11 @@ struct MainMyListView: View {
                 genreNamesRawValue: item.genreNamesRawValue,
                 type: item.type,
                 year: item.year,
-                addedAt: item.addedAt
+                addedAt: item.addedAt,
+                mangaReadingStatusRawValue: item.mangaReadingStatusRawValue,
+                currentChapter: item.currentChapter,
+                totalChaptersSnapshot: item.totalChaptersSnapshot,
+                progressUpdatedAt: item.progressUpdatedAt
             )
         }
     }

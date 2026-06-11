@@ -25,6 +25,8 @@ struct AnimeDetailView: View {
     @EnvironmentObject private var favoriteStatusStore: FavoriteStatusStore
     @Environment(\.modelContext) private var modelContext
     @State private var imagePreviewSession: ImagePreviewSession?
+    @State private var isShowingCharacterList = false
+    @State private var isShowingRecommendationList = false
     private let detailService: any AnimeDetailServicing
 
     // MARK: - Lifecycle
@@ -76,6 +78,24 @@ struct AnimeDetailView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
+        .navigationDestination(isPresented: $isShowingCharacterList) {
+            if let anime = currentAnime {
+                AnimeDetailCharactersListView(
+                    animeTitle: viewModel.displayTitle(for: anime),
+                    roles: viewModel.allCharacterRoles,
+                    viewModel: viewModel
+                )
+            }
+        }
+        .navigationDestination(isPresented: $isShowingRecommendationList) {
+            if let anime = currentAnime {
+                AnimeDetailRecommendationsListView(
+                    animeTitle: viewModel.displayTitle(for: anime),
+                    recommendations: viewModel.allRecommendations,
+                    viewModel: viewModel
+                )
+            }
+        }
         .toolbar {
             DetailNavigationToolbar(
                 isFavorite: isFavorite,
@@ -117,6 +137,15 @@ struct AnimeDetailView: View {
 
     private var isFavorite: Bool {
         favoriteStatusStore.isFavorite(malId: malId, mediaKind: .anime)
+    }
+
+    private var currentAnime: AnimeDetailDTO? {
+        switch viewModel.screenState {
+        case let .loaded(anime), let .refreshing(anime):
+            return anime
+        case .idle, .loading, .error:
+            return nil
+        }
     }
 
     private func detailScroll<Content: View>(@ViewBuilder content: () -> Content) -> some View {
@@ -170,7 +199,8 @@ struct AnimeDetailView: View {
         case .characters:
             AnimeDetailCharactersSectionView(
                 viewModel: viewModel,
-                animeTitle: viewModel.displayTitle(for: anime)
+                animeTitle: viewModel.displayTitle(for: anime),
+                isShowingCharacterList: $isShowingCharacterList
             )
         case .staff:
             AnimeDetailStaffSectionView(viewModel: viewModel, anime: anime)
@@ -184,7 +214,8 @@ struct AnimeDetailView: View {
         case .recommendations:
             AnimeDetailRecommendationsSectionView(
                 viewModel: viewModel,
-                animeTitle: viewModel.displayTitle(for: anime)
+                animeTitle: viewModel.displayTitle(for: anime),
+                isShowingRecommendationList: $isShowingRecommendationList
             )
         }
     }
