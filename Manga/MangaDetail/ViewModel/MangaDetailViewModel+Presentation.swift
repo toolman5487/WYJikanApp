@@ -225,6 +225,31 @@ extension MangaDetailViewModel {
         recommendationItems.filter { $0.entry != nil }
     }
 
+    var canShowFullRecommendationList: Bool {
+        allRecommendations.count > previewRecommendations.count
+    }
+
+    func recommendationRows(for context: DetailRecommendationDisplayContext) -> [DetailRecommendationRow] {
+        let recommendations = switch context {
+        case .preview:
+            previewRecommendations
+        case .list:
+            allRecommendations
+        }
+
+        return recommendations.compactMap { recommendation in
+            guard let malId = recommendation.entry?.malId else { return nil }
+            return DetailRecommendationRow(
+                id: malId,
+                malId: malId,
+                title: recommendationTitle(recommendation),
+                imageURL: recommendationImageURL(recommendation),
+                summary: recommendationSummary(for: recommendation),
+                context: context
+            )
+        }
+    }
+
     func characterName(_ character: AnimeCharacterEntryDTO) -> String {
         preferredDisplayName(
             kanjiName: character.nameKanji,
@@ -273,19 +298,26 @@ extension MangaDetailViewModel {
         return URL(string: urlString)
     }
 
-    func recommendationSummaryText(_ recommendation: MangaRecommendationDTO) -> String {
-        if let content = recommendation.content?
+    private func recommendationSummary(for recommendation: MangaRecommendationDTO) -> DetailRecommendationSummary {
+        if let content = normalizedRecommendationContent(recommendation) {
+            return .reason(content)
+        }
+
+        if let votes = recommendation.votes, votes > 0 {
+            return .votes(formatted: "\(formatNumber(votes)) 人推薦")
+        }
+
+        return .fallback
+    }
+
+    private func normalizedRecommendationContent(_ recommendation: MangaRecommendationDTO) -> String? {
+        guard let content = recommendation.content?
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .replacingOccurrences(of: "\n", with: " "),
-           !content.isEmpty {
-            return String(content.prefix(52))
+              !content.isEmpty else {
+            return nil
         }
-
-        if let votes = recommendation.votes {
-            return "\(formatNumber(votes)) 人推薦"
-        }
-
-        return "相似作品推薦"
+        return content
     }
 
     func imagePreviewItems(for manga: MangaDetailDTO) -> [ImagePreviewItem] {

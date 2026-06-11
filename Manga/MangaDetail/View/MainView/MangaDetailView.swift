@@ -196,8 +196,7 @@ struct MangaDetailView: View {
             if let manga = currentManga {
                 MangaDetailRecommendationsListView(
                     mangaTitle: viewModel.displayTitle(for: manga),
-                    recommendations: viewModel.allRecommendations,
-                    viewModel: viewModel
+                    rows: viewModel.recommendationRows(for: .list)
                 )
             }
         }

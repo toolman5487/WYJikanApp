@@ -91,8 +91,7 @@ struct AnimeDetailView: View {
             if let anime = currentAnime {
                 AnimeDetailRecommendationsListView(
                     animeTitle: viewModel.displayTitle(for: anime),
-                    recommendations: viewModel.allRecommendations,
-                    viewModel: viewModel
+                    rows: viewModel.recommendationRows(for: .list)
                 )
             }
         }

@@ -117,53 +117,83 @@ struct AnimeDetailCharacterCardView: View {
 }
 
 struct AnimeDetailRecommendationCardView: View {
-    let title: String
-    let summary: String
-    let imageURL: URL?
-    let cardWidth: CGFloat
-    let cardHeight: CGFloat
-    let cornerRadius: CGFloat
-    let textMinHeight: CGFloat
+    @Environment(\.animeDetailRecommendationsListMetrics) private var listMetrics
+
+    let row: DetailRecommendationRow
+
+    private let previewCardWidth: CGFloat = 160
+    private let previewCardHeight: CGFloat = 240
+    private let previewCornerRadius: CGFloat = 16
+    private let previewTextMinHeight: CGFloat = 44
 
     var body: some View {
+        switch row.context {
+        case .preview:
+            previewCard
+        case .list:
+            listCard
+        }
+    }
+
+    private var previewCard: some View {
         VStack(alignment: .leading, spacing: 12) {
             posterView
-                .frame(width: cardWidth, height: cardHeight)
-                .clipShape(
-                    RoundedRectangle(
-                        cornerRadius: cornerRadius,
-                        style: .continuous
-                    )
-                )
+                .frame(width: previewCardWidth, height: previewCardHeight)
+                .clipShape(posterShape(cornerRadius: previewCornerRadius))
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(title)
+                Text(row.title)
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(ThemeColor.textPrimary)
                     .lineLimit(1)
 
-                Text(summary)
-                    .font(.caption2)
-                    .foregroundStyle(ThemeColor.textSecondary)
-                    .lineLimit(1)
+                switch row.summary.displayText(for: .preview) {
+                case let summaryText?:
+                    Text(summaryText)
+                        .font(.caption2)
+                        .foregroundStyle(ThemeColor.textSecondary)
+                        .lineLimit(1)
+                case nil:
+                    EmptyView()
+                }
             }
             .frame(
-                minWidth: cardWidth,
-                maxWidth: cardWidth,
-                minHeight: textMinHeight,
+                minWidth: previewCardWidth,
+                maxWidth: previewCardWidth,
+                minHeight: previewTextMinHeight,
                 alignment: .topLeading
             )
         }
-        .frame(width: cardWidth, alignment: .leading)
+        .frame(width: previewCardWidth, alignment: .leading)
+    }
+
+    private var listCard: some View {
+        VStack(alignment: .leading, spacing: AnimeDetailRecommendationsListMetrics.titleSpacing) {
+            posterView
+                .frame(width: listMetrics.cardWidth, height: listMetrics.posterHeight)
+                .clipShape(posterShape(cornerRadius: previewCornerRadius))
+
+            Text(row.title)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(ThemeColor.textPrimary)
+                .lineLimit(1)
+                .truncationMode(.tail)
+                .frame(width: listMetrics.cardWidth, alignment: .leading)
+        }
+        .frame(width: listMetrics.cardWidth, alignment: .topLeading)
+    }
+
+    private func posterShape(cornerRadius: CGFloat) -> RoundedRectangle {
+        RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
     }
 
     @ViewBuilder
     private var posterView: some View {
-        if let imageURL {
+        if let imageURL = row.imageURL {
             RemotePosterImageView(url: imageURL)
         } else {
             RoundedRectangle(
-                cornerRadius: cornerRadius,
+                cornerRadius: previewCornerRadius,
                 style: .continuous
             )
                 .fill(Color(.systemGray5))

@@ -23,26 +23,16 @@ struct AnimeDetailRecommendationsSectionView: View {
         } content: {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(alignment: .top, spacing: 12) {
-                    ForEach(viewModel.previewRecommendations) { recommendation in
-                        if let entry = recommendation.entry {
-                            NavigationLink {
-                                AnimeDetailView(malId: entry.malId)
-                            } label: {
-                                AnimeDetailRecommendationCardView(
-                                    title: viewModel.recommendationTitle(recommendation),
-                                    summary: viewModel.recommendationSummaryText(recommendation),
-                                    imageURL: viewModel.recommendationImageURL(recommendation),
-                                    cardWidth: 160,
-                                    cardHeight: 240,
-                                    cornerRadius: 16,
-                                    textMinHeight: 44
-                                )
-                            }
-                            .buttonStyle(.plain)
+                    ForEach(viewModel.recommendationRows(for: .preview)) { row in
+                        NavigationLink {
+                            AnimeDetailView(malId: row.malId)
+                        } label: {
+                            AnimeDetailRecommendationCardView(row: row)
                         }
+                        .buttonStyle(.plain)
                     }
 
-                    if canShowRecommendationList {
+                    if viewModel.canShowFullRecommendationList {
                         EndBounceHintView(
                             axis: .horizontal,
                             title: "更多推薦",
@@ -58,7 +48,7 @@ struct AnimeDetailRecommendationsSectionView: View {
             }
             .onEndBounce(
                 axis: .horizontal,
-                isEnabled: canShowRecommendationList,
+                isEnabled: viewModel.canShowFullRecommendationList,
                 progress: $recommendationListBounceProgress
             ) {
                 isShowingRecommendationList = true
@@ -66,97 +56,30 @@ struct AnimeDetailRecommendationsSectionView: View {
         }
     }
 
-    private var canShowRecommendationList: Bool {
-        viewModel.allRecommendations.count > viewModel.previewRecommendations.count
-    }
-
     private var recommendationListDestination: some View {
         AnimeDetailRecommendationsListView(
             animeTitle: animeTitle,
-            recommendations: viewModel.allRecommendations,
-            viewModel: viewModel
+            rows: viewModel.recommendationRows(for: .list)
         )
     }
 }
 
 struct AnimeDetailRecommendationsListView: View {
     let animeTitle: String
-    let recommendations: [AnimeRecommendationDTO]
-    let viewModel: AnimeDetailViewModel
-
-    private let columns = [
-        GridItem(
-            .adaptive(
-                minimum: 160,
-                maximum: 160
-            ),
-            spacing: 16,
-            alignment: .top
-        )
-    ]
+    let rows: [DetailRecommendationRow]
 
     var body: some View {
-        ScrollView {
-            LazyVGrid(columns: columns, alignment: .leading, spacing: 20) {
-                ForEach(recommendations) { recommendation in
-                    if let entry = recommendation.entry {
-                        NavigationLink {
-                            AnimeDetailView(malId: entry.malId)
-                        } label: {
-                            VStack(alignment: .leading, spacing: 12) {
-                                recommendationPoster(recommendation)
-                                    .frame(width: 160, height: 240)
-                                    .clipShape(
-                                        RoundedRectangle(
-                                            cornerRadius: 16,
-                                            style: .continuous
-                                        )
-                                    )
-
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text(viewModel.recommendationTitle(recommendation))
-                                        .font(.subheadline.weight(.semibold))
-                                        .foregroundStyle(ThemeColor.textPrimary)
-                                        .lineLimit(1)
-
-                                    Text(viewModel.recommendationSummaryText(recommendation))
-                                        .font(.caption)
-                                        .foregroundStyle(ThemeColor.textSecondary)
-                                        .lineLimit(3)
-                                }
-                                .frame(
-                                    minWidth: 160,
-                                    maxWidth: 160,
-                                    minHeight: 72,
-                                    alignment: .topLeading
-                                )
-                            }
-                            .frame(width: 160, alignment: .leading)
-                        }
-                        .buttonStyle(.plain)
-                    }
+        AnimeDetailRecommendationsListLayout {
+            ForEach(rows) { row in
+                NavigationLink {
+                    AnimeDetailView(malId: row.malId)
+                } label: {
+                    AnimeDetailRecommendationCardView(row: row)
                 }
+                .buttonStyle(.plain)
             }
-            .padding()
         }
         .navigationTitle("\(animeTitle) 推薦")
         .navigationBarTitleDisplayMode(.inline)
-    }
-
-    @ViewBuilder
-    private func recommendationPoster(_ recommendation: AnimeRecommendationDTO) -> some View {
-        if let imageURL = viewModel.recommendationImageURL(recommendation) {
-            RemotePosterImageView(url: imageURL)
-        } else {
-            RoundedRectangle(
-                cornerRadius: 16,
-                style: .continuous
-            )
-                .fill(Color(.systemGray5))
-                .overlay {
-                    Image(systemName: "photo")
-                        .foregroundStyle(ThemeColor.textTertiary)
-                }
-        }
     }
 }
