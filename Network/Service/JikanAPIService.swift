@@ -69,6 +69,43 @@ nonisolated enum JikanAPICachePolicy: Sendable {
     case reloadIgnoringCache(ttl: TimeInterval)
 }
 
+// MARK: - JikanCacheDuration
+
+nonisolated enum JikanCacheDuration {
+    static let search: TimeInterval = 45
+    static let paging: TimeInterval = 120
+    static let feed: TimeInterval = 300
+    static let detail: TimeInterval = 600
+    static let genreList: TimeInterval = 86_400
+}
+
+nonisolated extension JikanAPICachePolicy {
+    static func resolved(forceRefresh: Bool, ttl: TimeInterval) -> JikanAPICachePolicy {
+        forceRefresh ? .reloadIgnoringCache(ttl: ttl) : .cacheFirst(ttl: ttl)
+    }
+
+    static func search(forceRefresh: Bool = false) -> JikanAPICachePolicy {
+        resolved(forceRefresh: forceRefresh, ttl: JikanCacheDuration.search)
+    }
+
+    static func paging(page: Int, forceRefresh: Bool = false) -> JikanAPICachePolicy {
+        let ttl = page == 1 ? JikanCacheDuration.feed : JikanCacheDuration.paging
+        return resolved(forceRefresh: forceRefresh, ttl: ttl)
+    }
+
+    static func feed(forceRefresh: Bool = false) -> JikanAPICachePolicy {
+        resolved(forceRefresh: forceRefresh, ttl: JikanCacheDuration.feed)
+    }
+
+    static func detail(forceRefresh: Bool = false) -> JikanAPICachePolicy {
+        resolved(forceRefresh: forceRefresh, ttl: JikanCacheDuration.detail)
+    }
+
+    static func genreList(forceRefresh: Bool = false) -> JikanAPICachePolicy {
+        resolved(forceRefresh: forceRefresh, ttl: JikanCacheDuration.genreList)
+    }
+}
+
 // MARK: - JikanAPIResponseState
 
 nonisolated enum JikanAPIResponseState: Sendable {

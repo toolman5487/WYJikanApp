@@ -45,8 +45,6 @@ protocol FavoriteRepository: AnyObject {
 }
 
 final class SwiftDataFavoriteRepository: FavoriteRepository {
-    static let shared = SwiftDataFavoriteRepository()
-
     var favoriteSnapshotPublisher: AnyPublisher<FavoriteSnapshot, Never> {
         snapshotSubject
             .removeDuplicates()
@@ -64,7 +62,7 @@ final class SwiftDataFavoriteRepository: FavoriteRepository {
 
     private var modelContext: ModelContext?
 
-    private init() {}
+    init() {}
 
     func connect(modelContext: ModelContext) {
         self.modelContext = modelContext
@@ -186,127 +184,6 @@ final class SwiftDataFavoriteRepository: FavoriteRepository {
         var descriptor = FetchDescriptor<MyListCollectionItem>(
             predicate: #Predicate<MyListCollectionItem> {
                 $0.malId == malId && $0.mediaKindRawValue == mediaKindRawValue
-            }
-        )
-        descriptor.fetchLimit = 1
-        return try modelContext.fetch(descriptor).first
-    }
-}
-
-// MARK: - Broadcast Reminder
-
-protocol AnimeBroadcastReminderRepository: AnyObject {
-    func connect(modelContext: ModelContext)
-
-    var snapshotPublisher: AnyPublisher<AnimeBroadcastReminderSnapshotSet, Never> { get }
-
-    func reload() throws
-
-    func subscribe(snapshot: AnimeBroadcastReminderSnapshot) throws
-
-    func unsubscribe(malId: Int) throws
-}
-
-final class SwiftDataAnimeBroadcastReminderRepository: AnimeBroadcastReminderRepository {
-    static let shared = SwiftDataAnimeBroadcastReminderRepository()
-
-    var snapshotPublisher: AnyPublisher<AnimeBroadcastReminderSnapshotSet, Never> {
-        snapshotSubject
-            .removeDuplicates()
-            .eraseToAnyPublisher()
-    }
-
-    private let snapshotSubject = CurrentValueSubject<AnimeBroadcastReminderSnapshotSet, Never>(
-        AnimeBroadcastReminderSnapshotSet(subscriptions: [])
-    )
-
-    private var modelContext: ModelContext?
-
-    private init() {}
-
-    func connect(modelContext: ModelContext) {
-        self.modelContext = modelContext
-    }
-
-    func reload() throws {
-        let modelContext = try requireModelContext()
-        snapshotSubject.send(try makeSnapshotSet(from: modelContext))
-    }
-
-    func subscribe(snapshot: AnimeBroadcastReminderSnapshot) throws {
-        let modelContext = try requireModelContext()
-
-        if let existing = try fetchSubscription(malId: snapshot.malId, modelContext: modelContext) {
-            existing.title = snapshot.title
-            existing.broadcastDay = snapshot.broadcastDay
-            existing.broadcastTime = snapshot.broadcastTime
-            existing.broadcastTimezone = snapshot.broadcastTimezone
-            existing.broadcastString = snapshot.broadcastString
-        } else {
-            modelContext.insert(
-                AnimeBroadcastReminderSubscription(
-                    malId: snapshot.malId,
-                    title: snapshot.title,
-                    broadcastDay: snapshot.broadcastDay,
-                    broadcastTime: snapshot.broadcastTime,
-                    broadcastTimezone: snapshot.broadcastTimezone,
-                    broadcastString: snapshot.broadcastString,
-                    subscribedAt: Date()
-                )
-            )
-        }
-
-        try modelContext.save()
-        try publish(from: modelContext)
-    }
-
-    func unsubscribe(malId: Int) throws {
-        let modelContext = try requireModelContext()
-
-        guard let existing = try fetchSubscription(malId: malId, modelContext: modelContext) else {
-            return
-        }
-
-        modelContext.delete(existing)
-
-        do {
-            try modelContext.save()
-            try publish(from: modelContext)
-        } catch {
-            modelContext.rollback()
-            throw error
-        }
-    }
-
-    private func requireModelContext() throws -> ModelContext {
-        guard let modelContext else {
-            throw RepositoryConnectionError.notConnected
-        }
-        return modelContext
-    }
-
-    private func publish(from modelContext: ModelContext) throws {
-        snapshotSubject.send(try makeSnapshotSet(from: modelContext))
-    }
-
-    private func makeSnapshotSet(from modelContext: ModelContext) throws -> AnimeBroadcastReminderSnapshotSet {
-        let subscriptions = try modelContext.fetch(
-            FetchDescriptor<AnimeBroadcastReminderSubscription>(
-                sortBy: [SortDescriptor(\.subscribedAt, order: .reverse)]
-            )
-        )
-        return AnimeBroadcastReminderSnapshotSet(
-            subscriptions: subscriptions.map(AnimeBroadcastReminderSnapshot.init(subscription:))
-        )
-    }
-
-    private func fetchSubscription(
-        malId: Int,
-        modelContext: ModelContext
-    ) throws -> AnimeBroadcastReminderSubscription? {
-        var descriptor = FetchDescriptor<AnimeBroadcastReminderSubscription>(
-            predicate: #Predicate<AnimeBroadcastReminderSubscription> {
-                $0.malId == malId
             }
         )
         descriptor.fetchLimit = 1

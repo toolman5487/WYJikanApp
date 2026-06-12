@@ -167,6 +167,6 @@ nonisolated final class HomeWatchService: HomeWatchServicing {
     }
 
     private func cachePolicy(forceRefresh: Bool, ttl: TimeInterval) -> JikanAPICachePolicy {
-        forceRefresh ? .reloadIgnoringCache(ttl: ttl) : .cacheFirst(ttl: ttl)
+        .resolved(forceRefresh: forceRefresh, ttl: ttl)
     }
 }

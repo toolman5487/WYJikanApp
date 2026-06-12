@@ -279,6 +279,7 @@
 		16E201022FAA210000000002 /* FavoriteRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E201012FAA210000000001 /* FavoriteRepository.swift */; };
 		16E201052FAA210000000005 /* FavoriteStatusStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E201042FAA210000000004 /* FavoriteStatusStore.swift */; };
 		16E201072FB8000000000007 /* MyListStatisticsSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E201062FB8000000000006 /* MyListStatisticsSectionView.swift */; };
+		16E201082FAA220000000008 /* AnimeBroadcastReminderRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E201072FAA220000000007 /* AnimeBroadcastReminderRepository.swift */; };
 		16E700022FE1000000000002 /* AppUserFacingError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E700012FE1000000000001 /* AppUserFacingError.swift */; };
 		16E700042FE1000000000004 /* FeatureLoadFailure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E700032FE1000000000003 /* FeatureLoadFailure.swift */; };
 		16E700062FE1000000000006 /* ErrorMessageKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E700052FE1000000000005 /* ErrorMessageKind.swift */; };
@@ -627,6 +628,7 @@
 		16E201012FAA210000000001 /* FavoriteRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteRepository.swift; sourceTree = "<group>"; };
 		16E201042FAA210000000004 /* FavoriteStatusStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteStatusStore.swift; sourceTree = "<group>"; };
 		16E201062FB8000000000006 /* MyListStatisticsSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListStatisticsSectionView.swift; sourceTree = "<group>"; };
+		16E201072FAA220000000007 /* AnimeBroadcastReminderRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeBroadcastReminderRepository.swift; sourceTree = "<group>"; };
 		16E700012FE1000000000001 /* AppUserFacingError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUserFacingError.swift; sourceTree = "<group>"; };
 		16E700032FE1000000000003 /* FeatureLoadFailure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureLoadFailure.swift; sourceTree = "<group>"; };
 		16E700052FE1000000000005 /* ErrorMessageKind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorMessageKind.swift; sourceTree = "<group>"; };
@@ -2618,6 +2620,7 @@
 			isa = PBXGroup;
 			children = (
 				16E201012FAA210000000001 /* FavoriteRepository.swift */,
+				16E201072FAA220000000007 /* AnimeBroadcastReminderRepository.swift */,
 			);
 			path = Repository;
 			sourceTree = "<group>";
@@ -3163,6 +3166,7 @@
 				16E200032FAA200000000003 /* MyListCollectionItem.swift in Sources */,
 				16E200042FAA200000000004 /* MainMyListViewModel.swift in Sources */,
 				16E201022FAA210000000002 /* FavoriteRepository.swift in Sources */,
+				16E201082FAA220000000008 /* AnimeBroadcastReminderRepository.swift in Sources */,
 				16E201052FAA210000000005 /* FavoriteStatusStore.swift in Sources */,
 				16E200072FAA200000000007 /* MyListSummaryTile.swift in Sources */,
 				16E201072FB8000000000007 /* MyListStatisticsSectionView.swift in Sources */,

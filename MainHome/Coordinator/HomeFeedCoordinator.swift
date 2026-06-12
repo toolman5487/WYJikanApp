@@ -172,3 +172,66 @@ final class HomeFeedCoordinator {
         await viewModel.refresh()
     }
 }
+
+// MARK: - HomeFeedSectionLoader
+
+@MainActor
+final class HomeFeedSectionLoader {
+    enum State {
+        case idle
+        case loading(Task<Void, Never>)
+
+        fileprivate var isLoading: Bool {
+            if case .loading = self { return true }
+            return false
+        }
+    }
+
+    private(set) var state: State = .idle
+    private nonisolated(unsafe) var activeTask: Task<Void, Never>?
+
+    var isLoading: Bool { state.isLoading }
+
+    var task: Task<Void, Never>? { activeTask }
+
+    func loadIfNeeded(isContentEmpty: Bool, load: () -> Void) {
+        guard isContentEmpty, !isLoading else { return }
+        load()
+    }
+
+    func refresh(hasContent: Bool, performLoad: @escaping (Bool, Bool) async -> Void) async {
+        if let task = activeTask {
+            await task.value
+            return
+        }
+
+        let task = beginLoad {
+            await performLoad(true, !hasContent)
+        }
+        await task.value
+    }
+
+    func load(performLoad: @escaping (Bool, Bool) async -> Void) {
+        guard !isLoading else { return }
+        _ = beginLoad {
+            await performLoad(false, true)
+        }
+    }
+
+    @discardableResult
+    func beginLoad(operation: @escaping () async -> Void) -> Task<Void, Never> {
+        let task = Task { await operation() }
+        activeTask = task
+        state = .loading(task)
+        return task
+    }
+
+    func markIdle() {
+        activeTask = nil
+        state = .idle
+    }
+
+    nonisolated func cancel() {
+        activeTask?.cancel()
+    }
+}

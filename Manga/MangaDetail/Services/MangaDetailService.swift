@@ -25,28 +25,28 @@ nonisolated final class MangaDetailService: MangaDetailServicing {
     func fetchMangaDetail(malId: Int) async throws -> MangaDetailResponse {
         try await apiService.fetch(
             endpoint: APIConfig.Manga.detail(id: malId),
-            cachePolicy: .cacheFirst(ttl: 600)
+            cachePolicy: .detail()
         )
     }
 
     func fetchMangaPictures(malId: Int) async throws -> MangaPicturesResponse {
         try await apiService.fetch(
             endpoint: APIConfig.Manga.pictures(id: malId),
-            cachePolicy: .cacheFirst(ttl: 600)
+            cachePolicy: .detail()
         )
     }
 
     func fetchMangaCharacters(malId: Int) async throws -> MangaCharactersResponse {
         try await apiService.fetch(
             endpoint: APIConfig.Manga.characters(id: malId),
-            cachePolicy: .cacheFirst(ttl: 600)
+            cachePolicy: .detail()
         )
     }
 
     func fetchMangaRecommendations(malId: Int) async throws -> MangaRecommendationsResponse {
         try await apiService.fetch(
             endpoint: APIConfig.Manga.recommendations(id: malId),
-            cachePolicy: .cacheFirst(ttl: 600)
+            cachePolicy: .detail()
         )
     }
 }

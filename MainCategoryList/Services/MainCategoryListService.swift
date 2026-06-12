@@ -63,12 +63,7 @@ nonisolated final class MainCategoryListService: MainCategoryListServicing {
                 page = requestPage
             }
 
-            switch page {
-            case 1:
-                return .cacheFirst(ttl: 300)
-            default:
-                return .cacheFirst(ttl: 120)
-            }
+            return .paging(page: page)
         }
     }
 
@@ -88,14 +83,14 @@ nonisolated final class MainCategoryListService: MainCategoryListServicing {
     func fetchAnimeGenres() async throws -> AnimeGenreListResponse {
         try await apiService.fetch(
             endpoint: APIConfig.Genres.anime,
-            cachePolicy: .cacheFirst(ttl: 86_400)
+            cachePolicy: .genreList()
         )
     }
 
     func fetchMangaGenres() async throws -> MangaGenreListResponse {
         try await apiService.fetch(
             endpoint: APIConfig.Genres.manga,
-            cachePolicy: .cacheFirst(ttl: 86_400)
+            cachePolicy: .genreList()
         )
     }
 

@@ -35,42 +35,19 @@ enum HomeTrendingAnimeScreenState: Equatable {
 
 @MainActor
 final class HomeTrendingAnimeViewModel: ObservableObject {
-    private enum LoadState {
-        case idle
-        case loading(Task<Void, Never>)
-
-        nonisolated var task: Task<Void, Never>? {
-            switch self {
-            case .idle:
-                return nil
-            case .loading(let task):
-                return task
-            }
-        }
-
-        nonisolated var isLoading: Bool {
-            switch self {
-            case .idle:
-                return false
-            case .loading:
-                return true
-            }
-        }
-    }
-
     private static let maxCards = 10
 
     @Published private(set) var screenState: HomeTrendingAnimeScreenState = .loading
 
     private let service: MainHomeServicing
-    private var loadState: LoadState = .idle
+    private let sectionLoader = HomeFeedSectionLoader()
 
     init(service: MainHomeServicing) {
         self.service = service
     }
 
     deinit {
-        loadState.task?.cancel()
+        sectionLoader.cancel()
     }
 
     var items: [HomeTrendingAnimeCardItem] {
@@ -78,29 +55,27 @@ final class HomeTrendingAnimeViewModel: ObservableObject {
     }
 
     func loadIfNeeded() {
-        guard items.isEmpty, !loadState.isLoading else { return }
-        load()
+        sectionLoader.loadIfNeeded(isContentEmpty: items.isEmpty) {
+            load()
+        }
     }
 
     func refresh() async {
-        if let task = loadState.task {
-            await task.value
-            return
+        await sectionLoader.refresh(hasContent: screenState.hasContent) { [weak self] forceRefresh, showsLoadingState in
+            await self?.performLoad(forceRefresh: forceRefresh, showsLoadingState: showsLoadingState)
         }
-
-        let task = startLoad(forceRefresh: true, showsLoadingState: !screenState.hasContent)
-        await task.value
     }
 
     func load() {
-        guard !loadState.isLoading else { return }
-        _ = startLoad(forceRefresh: false, showsLoadingState: true)
+        sectionLoader.load { [weak self] forceRefresh, showsLoadingState in
+            await self?.performLoad(forceRefresh: forceRefresh, showsLoadingState: showsLoadingState)
+        }
     }
 
     private func performLoad(forceRefresh: Bool, showsLoadingState: Bool) async {
         let previousState = screenState
         defer {
-            loadState = .idle
+            sectionLoader.markIdle()
         }
 
         if showsLoadingState {
@@ -140,15 +115,6 @@ final class HomeTrendingAnimeViewModel: ObservableObject {
                 screenState = .error(FeatureLoadFailure(error))
             }
         }
-    }
-
-    private func startLoad(forceRefresh: Bool, showsLoadingState: Bool) -> Task<Void, Never> {
-        let task = Task { [weak self] in
-            guard let self else { return }
-            await self.performLoad(forceRefresh: forceRefresh, showsLoadingState: showsLoadingState)
-        }
-        loadState = .loading(task)
-        return task
     }
 
     private static func displayTitle(japanese: String?, english: String?, fallback: String?) -> String {

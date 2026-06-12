@@ -53,14 +53,14 @@ nonisolated final class MainHomeService: MainHomeServicing {
     func fetchHeroBanner(forceRefresh: Bool) async throws -> HeroBannerResponse {
         try await apiService.fetch(
             endpoint: APIConfig.Seasons.now(),
-            cachePolicy: cachePolicy(forceRefresh: forceRefresh, ttl: 300)
+            cachePolicy: .feed(forceRefresh: forceRefresh)
         )
     }
 
     func fetchTopAnime(limit: Int, forceRefresh: Bool) async throws -> HomeTrendingAnimeResponse {
         try await apiService.fetch(
             endpoint: APIConfig.Top.anime,
-            cachePolicy: cachePolicy(forceRefresh: forceRefresh, ttl: 300),
+            cachePolicy: .feed(forceRefresh: forceRefresh),
             queryItems: [
                 URLQueryItem(name: "limit", value: String(limit))
             ]
@@ -70,7 +70,7 @@ nonisolated final class MainHomeService: MainHomeServicing {
     func fetchTopManga(limit: Int, forceRefresh: Bool) async throws -> HomeTrendingMangaResponse {
         try await apiService.fetch(
             endpoint: APIConfig.Top.manga,
-            cachePolicy: cachePolicy(forceRefresh: forceRefresh, ttl: 300),
+            cachePolicy: .feed(forceRefresh: forceRefresh),
             queryItems: [
                 URLQueryItem(name: "limit", value: String(limit))
             ]
@@ -80,7 +80,7 @@ nonisolated final class MainHomeService: MainHomeServicing {
     func fetchTodayAnime(limit: Int, forceRefresh: Bool) async throws -> HomeTodayAnimeResponse {
         try await apiService.fetch(
             endpoint: APIConfig.Schedules.day(HomeScheduleDay.current().apiValue),
-            cachePolicy: cachePolicy(forceRefresh: forceRefresh, ttl: 300),
+            cachePolicy: .feed(forceRefresh: forceRefresh),
             queryItems: [
                 URLQueryItem(name: "filter", value: "tv"),
                 URLQueryItem(name: "limit", value: String(limit)),
@@ -92,7 +92,7 @@ nonisolated final class MainHomeService: MainHomeServicing {
     func fetchRecommendedAnime(limit: Int, forceRefresh: Bool) async throws -> HomeRecommendedAnimeResponse {
         try await apiService.fetch(
             endpoint: APIConfig.Recommendations.anime,
-            cachePolicy: cachePolicy(forceRefresh: forceRefresh, ttl: 300),
+            cachePolicy: .feed(forceRefresh: forceRefresh),
             queryItems: [
                 URLQueryItem(name: "limit", value: String(limit))
             ]
@@ -102,12 +102,8 @@ nonisolated final class MainHomeService: MainHomeServicing {
     func fetchAnimeDetail(malId: Int, forceRefresh: Bool) async throws -> AnimeDetailResponse {
         try await apiService.fetch(
             endpoint: APIConfig.Anime.detail(id: malId),
-            cachePolicy: cachePolicy(forceRefresh: forceRefresh, ttl: 600)
+            cachePolicy: .detail(forceRefresh: forceRefresh)
         )
-    }
-
-    private func cachePolicy(forceRefresh: Bool, ttl: TimeInterval) -> JikanAPICachePolicy {
-        forceRefresh ? .remoteOnly : .cacheFirst(ttl: ttl)
     }
 
 }

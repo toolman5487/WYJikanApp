@@ -57,7 +57,7 @@ nonisolated enum JikanImageURLResolver {
     }
 
     private static func variants(from images: AnimeImagesDTO?) -> JikanImageVariants {
-        JikanImageVariants(
+        makeVariants(
             jpgImageUrl: images?.jpg?.imageUrl,
             jpgSmallImageUrl: images?.jpg?.smallImageUrl,
             jpgLargeImageUrl: images?.jpg?.largeImageUrl,
@@ -68,7 +68,7 @@ nonisolated enum JikanImageURLResolver {
     }
 
     private static func variants(from images: AnimeListImagesDTO?) -> JikanImageVariants {
-        JikanImageVariants(
+        makeVariants(
             jpgImageUrl: images?.jpg?.imageUrl,
             jpgSmallImageUrl: images?.jpg?.smallImageUrl,
             jpgLargeImageUrl: images?.jpg?.largeImageUrl,
@@ -79,7 +79,7 @@ nonisolated enum JikanImageURLResolver {
     }
 
     private static func variants(from images: MangaListImagesDTO?) -> JikanImageVariants {
-        JikanImageVariants(
+        makeVariants(
             jpgImageUrl: images?.jpg?.imageUrl,
             jpgSmallImageUrl: images?.jpg?.smallImageUrl,
             jpgLargeImageUrl: images?.jpg?.largeImageUrl,
@@ -90,7 +90,7 @@ nonisolated enum JikanImageURLResolver {
     }
 
     private static func variants(from images: AnimeCategoryImagesDTO?) -> JikanImageVariants {
-        JikanImageVariants(
+        makeVariants(
             jpgImageUrl: images?.jpg?.imageUrl,
             jpgSmallImageUrl: images?.jpg?.smallImageUrl,
             jpgLargeImageUrl: images?.jpg?.largeImageUrl,
@@ -101,13 +101,31 @@ nonisolated enum JikanImageURLResolver {
     }
 
     private static func variants(from images: MangaCategoryImagesDTO?) -> JikanImageVariants {
-        JikanImageVariants(
+        makeVariants(
             jpgImageUrl: images?.jpg?.imageUrl,
             jpgSmallImageUrl: images?.jpg?.smallImageUrl,
             jpgLargeImageUrl: images?.jpg?.largeImageUrl,
             webpImageUrl: images?.webp?.imageUrl,
             webpSmallImageUrl: images?.webp?.smallImageUrl,
             webpLargeImageUrl: images?.webp?.largeImageUrl
+        )
+    }
+
+    private static func makeVariants(
+        jpgImageUrl: String?,
+        jpgSmallImageUrl: String?,
+        jpgLargeImageUrl: String?,
+        webpImageUrl: String?,
+        webpSmallImageUrl: String?,
+        webpLargeImageUrl: String?
+    ) -> JikanImageVariants {
+        JikanImageVariants(
+            jpgImageUrl: jpgImageUrl,
+            jpgSmallImageUrl: jpgSmallImageUrl,
+            jpgLargeImageUrl: jpgLargeImageUrl,
+            webpImageUrl: webpImageUrl,
+            webpSmallImageUrl: webpSmallImageUrl,
+            webpLargeImageUrl: webpLargeImageUrl
         )
     }
 

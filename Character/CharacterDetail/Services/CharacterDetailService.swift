@@ -22,7 +22,7 @@ nonisolated final class CharacterDetailService: CharacterDetailServicing {
     func fetchCharacterDetail(malId: Int) async throws -> CharacterDetailResponse {
         try await apiService.fetch(
             endpoint: APIConfig.Characters.full(id: malId),
-            cachePolicy: .cacheFirst(ttl: 600)
+            cachePolicy: .detail()
         )
     }
 }

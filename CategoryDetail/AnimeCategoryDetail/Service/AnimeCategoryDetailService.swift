@@ -81,12 +81,7 @@ nonisolated final class AnimeCategoryDetailService: AnimeCategoryDetailServicing
         private var cachePolicy: JikanAPICachePolicy {
             switch self {
             case .page(_, let page, _, _):
-                switch page {
-                case 1:
-                    return .cacheFirst(ttl: 300)
-                default:
-                    return .cacheFirst(ttl: 120)
-                }
+                return .paging(page: page)
             }
         }
     }

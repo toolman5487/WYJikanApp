@@ -35,29 +35,6 @@ enum HomeRecommendedAnimeScreenState: Equatable {
 
 @MainActor
 final class HomeRecommendedAnimeViewModel: ObservableObject {
-    private enum LoadState {
-        case idle
-        case loading(Task<Void, Never>)
-
-        nonisolated var task: Task<Void, Never>? {
-            switch self {
-            case .idle:
-                return nil
-            case .loading(let task):
-                return task
-            }
-        }
-
-        nonisolated var isLoading: Bool {
-            switch self {
-            case .idle:
-                return false
-            case .loading:
-                return true
-            }
-        }
-    }
-
     private static let initialVisibleCards = 9
     private static let loadMoreStep = 9
     private static let maxCards = 30
@@ -72,7 +49,7 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
 
     private let service: MainHomeServicing
     private let animeDetailService: AnimeDetailServicing
-    private var loadState: LoadState = .idle
+    private let sectionLoader = HomeFeedSectionLoader()
     private var titleEnrichmentTask: Task<Void, Never>?
 
     init(service: MainHomeServicing, animeDetailService: AnimeDetailServicing) {
@@ -81,7 +58,7 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
     }
 
     deinit {
-        loadState.task?.cancel()
+        sectionLoader.cancel()
         titleEnrichmentTask?.cancel()
     }
 
@@ -98,23 +75,21 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
     }
 
     func loadIfNeeded() {
-        guard allItems.isEmpty, !loadState.isLoading else { return }
-        load()
+        sectionLoader.loadIfNeeded(isContentEmpty: allItems.isEmpty) {
+            load()
+        }
     }
 
     func refresh() async {
-        if let task = loadState.task {
-            await task.value
-            return
+        await sectionLoader.refresh(hasContent: screenState.hasContent) { [weak self] forceRefresh, showsLoadingState in
+            await self?.performLoad(forceRefresh: forceRefresh, showsLoadingState: showsLoadingState)
         }
-
-        let task = startLoad(forceRefresh: true, showsLoadingState: !screenState.hasContent)
-        await task.value
     }
 
     func load() {
-        guard !loadState.isLoading else { return }
-        _ = startLoad(forceRefresh: false, showsLoadingState: true)
+        sectionLoader.load { [weak self] forceRefresh, showsLoadingState in
+            await self?.performLoad(forceRefresh: forceRefresh, showsLoadingState: showsLoadingState)
+        }
     }
 
     func loadMore() {
@@ -129,7 +104,7 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
         let previousVisibleCount = visibleCount
         titleEnrichmentTask?.cancel()
         defer {
-            loadState = .idle
+            sectionLoader.markIdle()
         }
 
         if showsLoadingState {
@@ -217,15 +192,6 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
                 startTitleEnrichmentIfNeeded()
             }
         }
-    }
-
-    private func startLoad(forceRefresh: Bool, showsLoadingState: Bool) -> Task<Void, Never> {
-        let task = Task { [weak self] in
-            guard let self else { return }
-            await self.performLoad(forceRefresh: forceRefresh, showsLoadingState: showsLoadingState)
-        }
-        loadState = .loading(task)
-        return task
     }
 
     private func resolvedVisibleCount(

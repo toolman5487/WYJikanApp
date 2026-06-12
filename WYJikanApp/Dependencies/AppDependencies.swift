@@ -39,26 +39,31 @@ struct AppDependencies {
         broadcastReminderRepository.connect(modelContext: modelContext)
     }
 
-    static let live = AppDependencies(
-        mainHomeService: MainHomeService(),
-        homeWatchService: HomeWatchService(),
-        mainCategoryListService: MainCategoryListService(),
-        mainSearchService: MainSearchService(),
-        mainNewsService: MainNewsService(),
-        animeDetailService: AnimeDetailService(),
-        mangaDetailService: MangaDetailService(),
-        animeReviewService: AnimeReviewService(),
-        mangaReviewService: MangaReviewService(),
-        peopleDetailService: PeopleDetailService(),
-        characterDetailService: CharacterDetailService(),
-        animeCategoryDetailService: AnimeCategoryDetailService(),
-        mangaCategoryDetailService: MangaCategoryDetailService(),
-        homeTodayAnimeScheduleListService: HomeTodayAnimeScheduleListService(),
-        homeTrendingAnimeListService: HomeTrendingAnimeListService(),
-        homeTrendingMangaListService: HomeTrendingMangaListService(),
-        favoriteRepository: SwiftDataFavoriteRepository.shared,
-        broadcastReminderRepository: SwiftDataAnimeBroadcastReminderRepository.shared
-    )
+    static let live: AppDependencies = {
+        let favoriteRepository = SwiftDataFavoriteRepository()
+        let broadcastReminderRepository = SwiftDataAnimeBroadcastReminderRepository()
+
+        return AppDependencies(
+            mainHomeService: MainHomeService(),
+            homeWatchService: HomeWatchService(),
+            mainCategoryListService: MainCategoryListService(),
+            mainSearchService: MainSearchService(),
+            mainNewsService: MainNewsService(),
+            animeDetailService: AnimeDetailService(),
+            mangaDetailService: MangaDetailService(),
+            animeReviewService: AnimeReviewService(),
+            mangaReviewService: MangaReviewService(),
+            peopleDetailService: PeopleDetailService(),
+            characterDetailService: CharacterDetailService(),
+            animeCategoryDetailService: AnimeCategoryDetailService(),
+            mangaCategoryDetailService: MangaCategoryDetailService(),
+            homeTodayAnimeScheduleListService: HomeTodayAnimeScheduleListService(),
+            homeTrendingAnimeListService: HomeTrendingAnimeListService(),
+            homeTrendingMangaListService: HomeTrendingMangaListService(),
+            favoriteRepository: favoriteRepository,
+            broadcastReminderRepository: broadcastReminderRepository
+        )
+    }()
 
     // MARK: - Tab Factories
 

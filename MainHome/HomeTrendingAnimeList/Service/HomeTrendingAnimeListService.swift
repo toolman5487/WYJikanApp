@@ -21,7 +21,7 @@ nonisolated final class HomeTrendingAnimeListService: HomeTrendingAnimeListServi
     func fetchPage(page: Int, limit: Int) async throws -> HomeTrendingAnimeListResponse {
         try await apiService.fetch(
             endpoint: APIConfig.Top.anime,
-            cachePolicy: .cacheFirst(ttl: 300),
+            cachePolicy: .paging(page: page),
             queryItems: [
                 URLQueryItem(name: "page", value: String(page)),
                 URLQueryItem(name: "limit", value: String(limit))
