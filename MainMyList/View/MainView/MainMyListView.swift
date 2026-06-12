@@ -59,7 +59,7 @@ struct MainMyListView: View {
         .onAppear {
             viewModel.refreshPresentation(from: items)
         }
-        .onChange(of: itemRevisions) { _, _ in
+        .onChange(of: MyListItemsFingerprint(items: items)) { _, _ in
             viewModel.refreshPresentation(from: items)
         }
     }
@@ -137,27 +137,6 @@ struct MainMyListView: View {
     }
 
     // MARK: - Private Methods
-
-    private var itemRevisions: [MyListItemRevision] {
-        items.map { item in
-            MyListItemRevision(
-                id: item.persistentModelID,
-                malId: item.malId,
-                mediaKindRawValue: item.mediaKindRawValue,
-                title: item.title,
-                subtitle: item.subtitle,
-                imageURLString: item.imageURLString,
-                genreNamesRawValue: item.genreNamesRawValue,
-                type: item.type,
-                year: item.year,
-                addedAt: item.addedAt,
-                mangaReadingStatusRawValue: item.mangaReadingStatusRawValue,
-                currentChapter: item.currentChapter,
-                totalChaptersSnapshot: item.totalChaptersSnapshot,
-                progressUpdatedAt: item.progressUpdatedAt
-            )
-        }
-    }
 
     private func contentState(for presentation: MyListPresentation) -> ContentState {
         presentation.filteredItems.isEmpty ? .empty : .populated

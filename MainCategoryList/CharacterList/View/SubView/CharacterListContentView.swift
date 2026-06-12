@@ -40,7 +40,7 @@ struct CharacterListContentView: View {
                 )
                 .padding(.vertical, 24)
 
-            case .content(let rows, let inlineError, let footer):
+            case .content(let rows, let inlineError, _):
                 LazyVStack(alignment: .leading, spacing: 12) {
                     ForEach(rows) { row in
                         NavigationLink {
@@ -53,17 +53,9 @@ struct CharacterListContentView: View {
                 }
 
                 if let failure = inlineError {
-                    ErrorMessageView(state: ErrorMessageView.State(failure: failure))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 8)
-                }
-
-                switch footer {
-                case .hidden:
-                    EmptyView()
-
-                case .loadMore, .loadingMore:
-                    EmptyView()
+                    LoadMoreErrorFooterView(failure: failure) {
+                        viewModel.loadMore()
+                    }
                 }
             }
         }

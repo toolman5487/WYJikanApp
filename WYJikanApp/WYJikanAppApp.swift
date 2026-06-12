@@ -130,19 +130,15 @@ private struct AppLaunchFailureView: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            Image(systemName: "exclamationmark.triangle.fill")
-                .font(.system(size: 44, weight: .semibold))
-                .foregroundStyle(ThemeColor.sakura)
-
             Text("App 暫時無法啟動")
                 .font(.system(.title2, design: .rounded).weight(.bold))
                 .foregroundStyle(ThemeColor.textPrimary)
 
-            Text(message)
-                .font(.body)
-                .foregroundStyle(ThemeColor.textSecondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 24)
+            ErrorMessageView(
+                state: ErrorMessageView.State(
+                    failure: FeatureLoadFailure(message: message)
+                )
+            )
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(24)

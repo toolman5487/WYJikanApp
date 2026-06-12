@@ -26,6 +26,7 @@ final class MainMyListViewModel: ObservableObject {
 
     private let favoriteRepository: any FavoriteRepository
     private var cachedItems: [MyListCollectionItem] = []
+    private var lastItemsFingerprint: MyListItemsFingerprint?
 
     // MARK: - Lifecycle
 
@@ -37,6 +38,9 @@ final class MainMyListViewModel: ObservableObject {
     // MARK: - Public Methods
 
     func refreshPresentation(from items: [MyListCollectionItem]) {
+        let fingerprint = MyListItemsFingerprint(items: items)
+        guard fingerprint != lastItemsFingerprint else { return }
+        lastItemsFingerprint = fingerprint
         cachedItems = items
         rebuildPresentationFromCachedItems()
     }

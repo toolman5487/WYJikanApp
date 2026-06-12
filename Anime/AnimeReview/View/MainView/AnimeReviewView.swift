@@ -51,8 +51,15 @@ private struct AnimeReviewBodyView: View {
         Group {
             switch viewModel.screenState {
             case let .error(failure):
-                ErrorMessageView(state: ErrorMessageView.State(failure: failure), height: 200)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                ErrorMessageRetryCardView(
+                    state: ErrorMessageView.State(failure: failure),
+                    title: "評論暫時載入失敗",
+                    retryTitle: "重新載入"
+                ) {
+                    Task { await viewModel.load() }
+                }
+                .padding(16)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             case .loading:
                 AnimeReviewListSkeletonView()
             case .empty:

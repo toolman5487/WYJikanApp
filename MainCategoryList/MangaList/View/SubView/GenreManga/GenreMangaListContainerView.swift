@@ -45,13 +45,14 @@ struct GenreMangaListContainerView: View {
                 )
                 .padding(.vertical, 8)
 
-            case .content(let sections, let inlineError, let loadMoreState):
+            case .content(let sections, let inlineError):
                 LazyVStack(alignment: .leading, spacing: 0, pinnedViews: [.sectionHeaders]) {
                     if let failure = inlineError {
-                        ErrorMessageView(state: ErrorMessageView.State(failure: failure))
-                            .frame(maxWidth: .infinity)
-                            .padding(.horizontal, 8)
-                            .padding(.bottom, 8)
+                        LoadMoreErrorFooterView(failure: failure) {
+                            viewModel.loadMoreSections()
+                        }
+                        .padding(.horizontal, 8)
+                        .padding(.bottom, 8)
                     }
 
                     ForEach(sections) { section in
@@ -66,14 +67,6 @@ struct GenreMangaListContainerView: View {
                         } header: {
                             GenreMangaSectionHeaderView(section: section)
                         }
-                    }
-
-                    switch loadMoreState {
-                    case .hidden:
-                        EmptyView()
-
-                    case .available, .loading:
-                        EmptyView()
                     }
                 }
             }

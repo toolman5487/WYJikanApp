@@ -22,17 +22,11 @@ final class GenreAnimeViewModel: ObservableObject {
         case error(FeatureLoadFailure)
     }
 
-    enum LoadMoreState: Equatable {
-        case hidden
-        case available
-        case loading
-    }
-
     enum ScreenState {
         case loading
         case error(FeatureLoadFailure)
         case empty
-        case content(sections: [AnimeGenreSection], inlineError: FeatureLoadFailure?, loadMoreState: LoadMoreState)
+        case content(sections: [AnimeGenreSection], inlineError: FeatureLoadFailure?)
     }
 
     // MARK: - Constants
@@ -50,6 +44,12 @@ final class GenreAnimeViewModel: ObservableObject {
 
     // MARK: - Derived State
 
+    var canPullLoadMore: Bool {
+        guard canLoadMore, !isLoadingMore else { return false }
+        if case .error = loadState { return false }
+        return true
+    }
+
     var screenState: ScreenState {
         switch loadState {
         case .loadingInitial where genreSections.isEmpty:
@@ -63,8 +63,7 @@ final class GenreAnimeViewModel: ObservableObject {
 
             return .content(
                 sections: genreSections,
-                inlineError: inlineErrorMessage,
-                loadMoreState: footerLoadMoreState
+                inlineError: inlineErrorMessage
             )
         }
     }
@@ -154,13 +153,6 @@ private extension GenreAnimeViewModel {
         return failure
     }
 
-    var footerLoadMoreState: LoadMoreState {
-        if !canLoadMore {
-            return .hidden
-        }
-
-        return loadState == .loadingMore ? .loading : .available
-    }
 }
 
 extension GenreAnimeViewModel {

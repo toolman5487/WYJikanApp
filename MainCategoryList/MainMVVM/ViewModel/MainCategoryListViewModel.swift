@@ -72,17 +72,15 @@ final class MainCategoryListViewModel: ObservableObject {
     var canLoadMoreSelectedKind: Bool {
         switch selectedKind {
         case .anime:
-            return animeListViewModel.genreAnimeViewModel.canLoadMore &&
-                !animeListViewModel.genreAnimeViewModel.isLoadingMore
+            return animeListViewModel.genreAnimeViewModel.canPullLoadMore
         case .manga:
-            return mangaListViewModel.genreMangaViewModel.canLoadMore &&
-                !mangaListViewModel.genreMangaViewModel.isLoadingMore
+            return mangaListViewModel.genreMangaViewModel.canPullLoadMore
         case .people:
             return peopleListViewModel.hasNextPage &&
-                peopleListViewModel.paginationState != .loadingMore
+                peopleListViewModel.paginationState == .idle
         case .character:
             return characterListViewModel.hasNextPage &&
-                characterListViewModel.paginationState != .loadingMore
+                characterListViewModel.paginationState == .idle
         }
     }
 

@@ -85,7 +85,5 @@ struct MyListItemRowView: View {
                     .frame(height: 4)
             }
         }
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("閱讀進度，\(item.readingProgressSummary())")
     }
 }

@@ -59,7 +59,6 @@ struct MangaReadingProgressSectionView: View {
             .buttonStyle(.plain)
             .disabled((item.currentChapter ?? 0) == 0)
             .opacity((item.currentChapter ?? 0) == 0 ? 0.42 : 1)
-            .accessibilityLabel("減少一話")
 
             Button {
                 onEdit(item)
@@ -74,7 +73,6 @@ struct MangaReadingProgressSectionView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
             }
             .buttonStyle(.plain)
-            .accessibilityLabel("輸入閱讀進度，\(chapterButtonText(for: item))")
 
             Button {
                 onIncrement(item)
@@ -89,7 +87,6 @@ struct MangaReadingProgressSectionView: View {
             .buttonStyle(.plain)
             .disabled(isAtLastChapter(item))
             .opacity(isAtLastChapter(item) ? 0.42 : 1)
-            .accessibilityLabel("增加一話")
         }
     }
 

@@ -82,18 +82,12 @@ struct HeroBannerView: View {
     private func bannerErrorView(failure: FeatureLoadFailure, buttonTitle: String) -> some View {
         ZStack {
             BannerSkeletonView()
-            VStack(spacing: 12) {
-                ErrorMessageView(state: ErrorMessageView.State(failure: failure), height: nil)
-                Button(buttonTitle) {
-                    viewModel.retry()
-                }
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(ThemeColor.textPrimary)
-                .padding(.vertical, 12)
-                .padding(.horizontal, 16)
-                .background(ThemeColor.sakura)
-                .clipShape(Capsule())
-            }
+            ErrorMessageRetryCardView(
+                state: ErrorMessageView.State(failure: failure),
+                retryTitle: buttonTitle,
+                onRetry: { viewModel.retry() },
+                minHeight: 0
+            )
             .padding(24)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -109,12 +103,8 @@ struct HeroBannerView: View {
                 Button(buttonTitle) {
                     viewModel.retry()
                 }
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(ThemeColor.textPrimary)
-                .padding(.vertical, 12)
-                .padding(.horizontal, 16)
-                .background(ThemeColor.sakura)
-                .clipShape(Capsule())
+                .buttonStyle(.borderedProminent)
+                .tint(ThemeColor.sakura)
             }
             .padding(24)
         }

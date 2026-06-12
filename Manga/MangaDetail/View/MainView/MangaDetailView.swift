@@ -204,8 +204,15 @@ private struct MangaDetailBodyView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
             case let .error(failure):
-                ErrorMessageView(state: ErrorMessageView.State(failure: failure), height: 200)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                ErrorMessageRetryCardView(
+                    state: ErrorMessageView.State(failure: failure),
+                    title: "作品資料暫時載入失敗",
+                    retryTitle: "重新載入"
+                ) {
+                    Task { await viewModel.load(forceRefresh: true) }
+                }
+                .padding(16)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             case .idle, .loading:
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: 20) {
