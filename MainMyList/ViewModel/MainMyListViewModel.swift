@@ -8,8 +8,12 @@
 import Combine
 import Foundation
 import OSLog
+
 @MainActor
 final class MainMyListViewModel: ObservableObject {
+
+    // MARK: - Published State
+
     @Published private(set) var presentation: MyListPresentation
     @Published var selectedFilter: MyListFilter = .all {
         didSet {
@@ -18,18 +22,51 @@ final class MainMyListViewModel: ObservableObject {
         }
     }
 
+    // MARK: - Dependencies
+
     private let favoriteRepository: any FavoriteRepository
     private var cachedItems: [MyListCollectionItem] = []
+
+    // MARK: - Lifecycle
 
     init(favoriteRepository: any FavoriteRepository) {
         self.favoriteRepository = favoriteRepository
         self.presentation = Self.emptyPresentation(selectedFilter: .all)
     }
 
+    // MARK: - Public Methods
+
     func refreshPresentation(from items: [MyListCollectionItem]) {
         cachedItems = items
         rebuildPresentationFromCachedItems()
     }
+
+    func remove(_ item: MyListCollectionItem) {
+        do {
+            try favoriteRepository.remove(item)
+        } catch {
+            AppLogger.persistence.error("MyList delete failed: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    func emptyTitle(for filter: MyListFilter) -> String {
+        filter == .all ? "還沒有收藏" : "還沒有收藏\(filter.title)"
+    }
+
+    func emptyState(for items: [MyListCollectionItem]) -> MyListEmptyState {
+        let title = emptyTitle(for: selectedFilter)
+        let message = "\(title)\n在作品詳情頁點右上角的愛心，就會加入收藏。"
+
+        guard let selectedMediaKind = selectedFilter.mediaKind else {
+            return MyListEmptyState(kind: .emptyCollection, message: message)
+        }
+
+        let hasOtherMedia = items.contains { $0.mediaKind != selectedMediaKind }
+        let kind: ErrorMessageKind = hasOtherMedia ? .filteredEmpty : .emptyCollection
+        return MyListEmptyState(kind: kind, message: message)
+    }
+
+    // MARK: - Presentation
 
     private func rebuildPresentationFromCachedItems() {
         presentation = makePresentation(
@@ -160,27 +197,6 @@ final class MainMyListViewModel: ObservableObject {
         )
     }
 
-    func remove(_ item: MyListCollectionItem) {
-        do {
-            try favoriteRepository.remove(item)
-        } catch {
-            AppLogger.persistence.error("MyList delete failed: \(error.localizedDescription, privacy: .public)")
-        }
-    }
-
-    func emptyTitle(for filter: MyListFilter) -> String {
-        filter == .all ? "還沒有收藏" : "還沒有收藏\(filter.title)"
-    }
-
-    private func weeklyAddedSummary(count: Int, filterTitle: String?) -> String {
-        switch filterTitle {
-        case .some(let title):
-            return "最近 7 天新增 \(count) 筆\(title)收藏"
-        case .none:
-            return "最近 7 天新增 \(count) 筆收藏"
-        }
-    }
-
     private static func emptyPresentation(selectedFilter: MyListFilter) -> MyListPresentation {
         let emptyAllAnalysis = MyListGenreAnalysis(
             scope: .all,
@@ -254,6 +270,8 @@ final class MainMyListViewModel: ObservableObject {
             summaryTile: summaryTile
         )
     }
+
+    // MARK: - Analysis
 
     private func makeGenreAnalysis(
         from items: [MyListCollectionItem],
@@ -332,5 +350,16 @@ final class MainMyListViewModel: ObservableObject {
             formatSlices: Array(formatSlices.prefix(6)),
             missingTypeItemCount: missingTypeItemCount
         )
+    }
+
+    // MARK: - Private Methods
+
+    private func weeklyAddedSummary(count: Int, filterTitle: String?) -> String {
+        switch filterTitle {
+        case .some(let title):
+            return "最近 7 天新增 \(count) 筆\(title)收藏"
+        case .none:
+            return "最近 7 天新增 \(count) 筆收藏"
+        }
     }
 }

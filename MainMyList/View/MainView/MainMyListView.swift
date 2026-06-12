@@ -103,7 +103,7 @@ struct MainMyListView: View {
     private func contentView(presentation: MyListPresentation) -> some View {
         switch contentState(for: presentation) {
         case .empty:
-            MyListEmptyStateView(title: viewModel.emptyTitle(for: viewModel.selectedFilter))
+            MyListEmptyStateView(emptyState: viewModel.emptyState(for: items))
 
         case .populated:
             LazyVStack(spacing: 12) {

@@ -49,7 +49,7 @@ struct MyListGenreCollectionsDetailView: View {
                     }
                 } else {
                     ErrorMessageView(
-                        state: .emptyCollection(viewModel.emptyStateMessage),
+                        state: .filteredEmpty(viewModel.emptyStateMessage),
                         height: 160
                     )
                 }

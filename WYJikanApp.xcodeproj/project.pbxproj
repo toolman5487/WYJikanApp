@@ -283,6 +283,7 @@
 		16E200072FAA200000000007 /* MyListSummaryTile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E200082FAA200000000008 /* MyListSummaryTile.swift */; };
 		16E200092FAA200000000009 /* MyListItemRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E2000A2FAA20000000000A /* MyListItemRowView.swift */; };
 		16E2000B2FAA20000000000B /* MyListEmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E2000C2FAA20000000000C /* MyListEmptyStateView.swift */; };
+		16E200102FAA200000000010 /* MyListEmptyState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E200112FAA200000000011 /* MyListEmptyState.swift */; };
 		16E2000D2FAA20000000000D /* MyListCollectionStatusBadgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E2000E2FAA20000000000E /* MyListCollectionStatusBadgeView.swift */; };
 		16E201022FAA210000000002 /* FavoriteRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E201012FAA210000000001 /* FavoriteRepository.swift */; };
 		16E201052FAA210000000005 /* FavoriteStatusStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E201042FAA210000000004 /* FavoriteStatusStore.swift */; };
@@ -638,6 +639,7 @@
 		16E200082FAA200000000008 /* MyListSummaryTile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListSummaryTile.swift; sourceTree = "<group>"; };
 		16E2000A2FAA20000000000A /* MyListItemRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListItemRowView.swift; sourceTree = "<group>"; };
 		16E2000C2FAA20000000000C /* MyListEmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListEmptyStateView.swift; sourceTree = "<group>"; };
+		16E200112FAA200000000011 /* MyListEmptyState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListEmptyState.swift; sourceTree = "<group>"; };
 		16E2000E2FAA20000000000E /* MyListCollectionStatusBadgeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListCollectionStatusBadgeView.swift; sourceTree = "<group>"; };
 		16E201012FAA210000000001 /* FavoriteRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteRepository.swift; sourceTree = "<group>"; };
 		16E201042FAA210000000004 /* FavoriteStatusStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteStatusStore.swift; sourceTree = "<group>"; };
@@ -2608,6 +2610,7 @@
 			isa = PBXGroup;
 			children = (
 				16E200012FAA200000000001 /* MyListCollectionItem.swift */,
+				16E200112FAA200000000011 /* MyListEmptyState.swift */,
 				15ACFCA72FD9127B00B38F89 /* MyListFilter.swift */,
 				15ACFCA82FD9127B00B38F89 /* MyListFormatAnalysis.swift */,
 				15ACFCA92FD9127B00B38F89 /* MyListFormatDisplay.swift */,
@@ -3188,6 +3191,7 @@
 				16E200072FAA200000000007 /* MyListSummaryTile.swift in Sources */,
 				16E201072FB8000000000007 /* MyListStatisticsSectionView.swift in Sources */,
 				16E200092FAA200000000009 /* MyListItemRowView.swift in Sources */,
+				16E200102FAA200000000010 /* MyListEmptyState.swift in Sources */,
 				16E2000B2FAA20000000000B /* MyListEmptyStateView.swift in Sources */,
 				16E2000D2FAA20000000000D /* MyListCollectionStatusBadgeView.swift in Sources */,
 				15FA4A122F97D00000EC4C09 /* MyListHeaderSkeletonView.swift in Sources */,

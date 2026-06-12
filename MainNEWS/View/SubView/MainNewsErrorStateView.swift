@@ -6,20 +6,20 @@
 import SwiftUI
 
 struct MainNewsErrorStateView: View {
-    let message: String
+
+    // MARK: - Properties
+
+    let failure: FeatureLoadFailure
     let onRetry: () -> Void
 
-    var body: some View {
-        VStack(spacing: 16) {
-            ErrorMessageView(state: .network(message))
+    // MARK: - Body
 
-            Button("重新載入", action: onRetry)
-                .buttonStyle(.borderedProminent)
-                .tint(ThemeColor.sakura)
-        }
-        .frame(maxWidth: .infinity, minHeight: 220, alignment: .center)
-        .padding(24)
-        .background(Color(.secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+    var body: some View {
+        ErrorMessageRetryCardView(
+            state: ErrorMessageView.State(failure: failure),
+            title: "新聞暫時讀不到",
+            retryTitle: "重新載入",
+            onRetry: onRetry
+        )
     }
 }

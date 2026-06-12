@@ -28,7 +28,10 @@ struct MyListStatisticsSectionView: View {
                 MyListStatisticsCardContainer(
                     title: "收藏總覽"
                 ) {
-                    emptyOverviewIllustration
+                    ErrorMessageView(
+                        state: .emptyCollection("尚無收藏統計"),
+                        height: 120
+                    )
                 }
 
             case .populated:
@@ -46,26 +49,4 @@ struct MyListStatisticsSectionView: View {
         }
     }
 
-    private var emptyOverviewIllustration: some View {
-        HStack {
-            Spacer()
-
-            Image(systemName: "tray.fill")
-                .font(.system(size: 44, weight: .regular))
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [
-                            ThemeColor.textSecondary.opacity(0.52),
-                            ThemeColor.textSecondary.opacity(0.24)
-                        ],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                )
-                .frame(height: 120)
-                .accessibilityLabel("尚無收藏統計")
-
-            Spacer()
-        }
-    }
 }
