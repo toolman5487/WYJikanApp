@@ -86,7 +86,14 @@ struct HomeWatchListView: View {
                 .transition(.opacity.combined(with: .move(edge: .bottom)))
 
         case .empty:
-            HomeWatchListEmptyStateView()
+            FeatureEmptyStateCardView(
+                emptyState: .emptyCollection(
+                    title: "目前沒有可顯示的影音資料",
+                    message: "稍後重新整理，或切換其他分類查看。"
+                ),
+                minHeight: 0,
+                alignment: .leading
+            )
                 .transition(.opacity.combined(with: .move(edge: .bottom)))
 
         case .error(let failure):

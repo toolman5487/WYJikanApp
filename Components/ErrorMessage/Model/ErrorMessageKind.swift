@@ -15,6 +15,7 @@ nonisolated enum ErrorMessageLoadContext: Sendable {
 nonisolated enum ErrorMessageKind: Equatable, Sendable {
     case network
     case serverError
+    case rateLimited
     case timeout
     case noSearchResults
     case emptyCollection
@@ -40,6 +41,8 @@ nonisolated enum ErrorMessageKind: Equatable, Sendable {
 
         if let jikanError = error as? JikanAPIError {
             switch jikanError {
+            case .serverError(let statusCode) where statusCode == 429:
+                return .rateLimited
             case .serverError:
                 return .serverError
             case .networkError(let underlyingError):
@@ -67,7 +70,11 @@ nonisolated enum ErrorMessageKind: Equatable, Sendable {
             return .timeout
         }
 
-        if message.contains("伺服器") || message.contains("請求太頻繁") {
+        if message.contains("請求太頻繁") {
+            return .rateLimited
+        }
+
+        if message.contains("伺服器") {
             return .serverError
         }
 

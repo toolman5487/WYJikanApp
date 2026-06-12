@@ -91,7 +91,12 @@ struct MainNewsView: View {
             MainNewsLoadingView()
                 .transition(.opacity)
         case .empty:
-            MainNewsEmptyStateView(filterTitle: viewModel.selectedFilter.title)
+            FeatureEmptyStateCardView(
+                emptyState: .emptyCollection(
+                    title: "目前沒有新聞",
+                    message: "\(viewModel.selectedFilter.title) 暫時沒有可顯示的動漫新聞。"
+                )
+            )
                 .transition(.opacity)
         case .error(let failure):
             MainNewsErrorStateView(failure: failure) {

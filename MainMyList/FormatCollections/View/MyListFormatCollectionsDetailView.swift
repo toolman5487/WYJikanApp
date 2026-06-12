@@ -48,9 +48,12 @@ struct MyListFormatCollectionsDetailView: View {
                         }
                     }
                 } else {
-                    ErrorMessageView(
-                        state: .filteredEmpty(viewModel.emptyStateMessage),
-                        height: 160
+                    FeatureEmptyStateCardView(
+                        emptyState: .filteredEmpty(
+                            title: "沒有符合條件的收藏",
+                            message: viewModel.emptyStateMessage
+                        ),
+                        minHeight: 160
                     )
                 }
             }

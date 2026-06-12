@@ -14,6 +14,7 @@ struct ErrorMessageView: View {
     enum State: Equatable {
         case network(String)
         case serverError(String)
+        case rateLimited(String)
         case timeout(String)
         case noSearchResults(String)
         case emptyCollection(String)
@@ -79,6 +80,8 @@ extension ErrorMessageView.State {
             self = .network(message)
         case .serverError:
             self = .serverError(message)
+        case .rateLimited:
+            self = .rateLimited(message)
         case .timeout:
             self = .timeout(message)
         case .noSearchResults:
@@ -110,6 +113,7 @@ private extension ErrorMessageView.State {
         switch self {
         case .network(let text),
              .serverError(let text),
+             .rateLimited(let text),
              .timeout(let text),
              .noSearchResults(let text),
              .emptyCollection(let text),
@@ -127,11 +131,13 @@ private extension ErrorMessageView.State {
         case .network:
             "wifi.exclamationmark"
         case .serverError:
-            "server.rack"
+            "exclamationmark.icloud"
+        case .rateLimited:
+            "hourglass"
         case .timeout:
             "clock.badge.exclamationmark"
         case .noSearchResults:
-            "magnifyingglass"
+            "doc.text.magnifyingglass"
         case .emptyCollection:
             "tray.fill"
         case .filteredEmpty:
@@ -139,9 +145,9 @@ private extension ErrorMessageView.State {
         case .notFound:
             "doc.questionmark"
         case .loadMoreFailed:
-            "arrow.down.circle"
+            "arrow.clockwise.circle"
         case .unavailable:
-            "square.3.layers.3d.down.right.slash"
+            "exclamationmark.triangle"
         case .permissionDenied:
             "lock.fill"
         }
@@ -151,12 +157,12 @@ private extension ErrorMessageView.State {
         switch self {
         case .network:
             Color.red
-        case .serverError, .timeout:
+        case .serverError, .rateLimited, .timeout:
             Color.orange
-        case .noSearchResults, .unavailable, .loadMoreFailed:
-            Color.yellow
-        case .emptyCollection, .filteredEmpty, .notFound:
-            ThemeColor.textTertiary
+        case .unavailable, .loadMoreFailed:
+            Color.orange
+        case .emptyCollection, .filteredEmpty, .noSearchResults, .notFound:
+            ThemeColor.sakura
         case .permissionDenied:
             ThemeColor.sakura
         }
@@ -171,6 +177,10 @@ private extension ErrorMessageView.State {
 
 #Preview("伺服器錯誤") {
     ErrorMessageView(state: .serverError("伺服器暫時無法回應，請稍後再試。"), height: 200)
+}
+
+#Preview("請求頻繁") {
+    ErrorMessageView(state: .rateLimited("請求太頻繁，請稍候再試。"), height: 200)
 }
 
 #Preview("連線逾時") {

@@ -61,7 +61,10 @@ struct HomeTrendingAnimeView: View {
                             .frame(width: cardSize.width)
 
                     case .empty:
-                        ErrorMessageView(state: .emptyCollection("尚無資料，稍後嘗試"), height: cardSize.height)
+                        FeatureEmptyStateInlineView(
+                            emptyState: .emptyCollection(message: "尚無熱門動畫，稍後再試"),
+                            height: cardSize.height
+                        )
                             .frame(width: cardSize.width)
 
                     case .content:

@@ -28,8 +28,8 @@ struct MyListStatisticsSectionView: View {
                 MyListStatisticsCardContainer(
                     title: "收藏總覽"
                 ) {
-                    ErrorMessageView(
-                        state: .emptyCollection("尚無收藏統計"),
+                    FeatureEmptyStateInlineView(
+                        emptyState: .emptyCollection(message: "尚無收藏統計"),
                         height: 120
                     )
                 }

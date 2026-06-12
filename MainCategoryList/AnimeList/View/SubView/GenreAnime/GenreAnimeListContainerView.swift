@@ -36,12 +36,14 @@ struct GenreAnimeListContainerView: View {
                 .padding(.vertical, 8)
 
             case .empty:
-                ErrorMessageView(
-                    state: .emptyCollection("目前沒有分類資料"),
-                    height: 180
+                FeatureEmptyStateCardView(
+                    emptyState: .emptyCollection(
+                        title: "目前沒有分類資料",
+                        message: "稍後再回來看看，或重新整理頁面。"
+                    ),
+                    minHeight: 180
                 )
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 24)
+                .padding(.vertical, 8)
 
             case .content(let sections, let inlineError, let loadMoreState):
                 LazyVStack(alignment: .leading, spacing: 0, pinnedViews: [.sectionHeaders]) {

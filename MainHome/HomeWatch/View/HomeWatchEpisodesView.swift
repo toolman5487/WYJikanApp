@@ -58,7 +58,10 @@ struct HomeWatchEpisodesView: View {
                             .frame(width: cardSize.width)
 
                     case .empty:
-                        ErrorMessageView(state: .emptyCollection("尚無集數資料"), height: cardSize.height)
+                        FeatureEmptyStateInlineView(
+                            emptyState: .emptyCollection(message: "尚無可顯示的集數"),
+                            height: cardSize.height
+                        )
                             .frame(width: cardSize.width)
 
                     case .content:

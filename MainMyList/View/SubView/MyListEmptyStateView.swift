@@ -16,16 +16,11 @@ struct MyListEmptyStateView: View {
     // MARK: - Body
 
     var body: some View {
-        ErrorMessageView(
-            state: ErrorMessageView.State(
-                kind: emptyState.kind,
-                message: emptyState.message
-            )
+        FeatureEmptyStateCardView(
+            emptyState: emptyState,
+            minHeight: 0,
+            alignment: .center
         )
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 44)
-            .padding(.horizontal, 20)
-            .background(Color(.secondarySystemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .padding(.vertical, 20)
     }
 }

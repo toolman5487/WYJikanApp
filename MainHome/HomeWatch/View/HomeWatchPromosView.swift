@@ -56,7 +56,10 @@ struct HomeWatchPromosView: View {
                             .frame(width: cardSize.width)
 
                     case .empty:
-                        ErrorMessageView(state: .emptyCollection("尚無預告資料"), height: cardSize.height)
+                        FeatureEmptyStateInlineView(
+                            emptyState: .emptyCollection(message: "尚無可顯示的預告"),
+                            height: cardSize.height
+                        )
                             .frame(width: cardSize.width)
 
                     case .content:

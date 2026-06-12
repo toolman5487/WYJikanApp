@@ -52,7 +52,13 @@ private struct AnimeDetailEpisodesListBodyView: View {
                 ProgressView()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             case .empty:
-                ErrorMessageView(state: .emptyCollection("目前沒有可顯示的集數資料"), height: 200)
+                FeatureEmptyStateCardView(
+                    emptyState: .emptyCollection(
+                        title: "尚無集數資料",
+                        message: "這部作品目前沒有可顯示的集數資訊。"
+                    ),
+                    minHeight: 200
+                )
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             case .error(let failure):
                 ErrorMessageView(state: ErrorMessageView.State(failure: failure), height: 200)

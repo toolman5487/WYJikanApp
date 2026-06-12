@@ -101,7 +101,12 @@ private struct HomeTrendingAnimeListBodyView: View {
                 .transition(.opacity.combined(with: .move(edge: .bottom)))
 
         case .empty:
-            HomeTrendingAnimeListEmptyStateView()
+            FeatureEmptyStateCardView(
+                emptyState: .emptyCollection(
+                    title: "目前還沒有熱門動畫資料",
+                    message: "稍後再回來看看，榜單更新後就會顯示在這裡。"
+                )
+            )
                 .transition(.opacity.combined(with: .move(edge: .bottom)))
 
         case .error(let failure):

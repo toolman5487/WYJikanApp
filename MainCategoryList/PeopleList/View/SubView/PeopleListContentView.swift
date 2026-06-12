@@ -31,12 +31,14 @@ struct PeopleListContentView: View {
                 }
 
             case .empty:
-                ErrorMessageView(
-                    state: .emptyCollection("目前沒有聲優資料"),
-                    height: 180
+                FeatureEmptyStateCardView(
+                    emptyState: .emptyCollection(
+                        title: "目前沒有聲優資料",
+                        message: "稍後再回來看看。"
+                    ),
+                    minHeight: 180
                 )
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 48)
+                .padding(.vertical, 24)
 
             case .content(let rows, let inlineError, let footer):
                 LazyVStack(alignment: .leading, spacing: 12) {

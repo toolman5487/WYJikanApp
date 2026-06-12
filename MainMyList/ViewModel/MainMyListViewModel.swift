@@ -55,15 +55,17 @@ final class MainMyListViewModel: ObservableObject {
 
     func emptyState(for items: [MyListCollectionItem]) -> MyListEmptyState {
         let title = emptyTitle(for: selectedFilter)
-        let message = "\(title)\n在作品詳情頁點右上角的愛心，就會加入收藏。"
+        let message = "在作品詳情頁點右上角的愛心，就會加入收藏。"
 
         guard let selectedMediaKind = selectedFilter.mediaKind else {
-            return MyListEmptyState(kind: .emptyCollection, message: message)
+            return .emptyCollection(title: title, message: message)
         }
 
         let hasOtherMedia = items.contains { $0.mediaKind != selectedMediaKind }
-        let kind: ErrorMessageKind = hasOtherMedia ? .filteredEmpty : .emptyCollection
-        return MyListEmptyState(kind: kind, message: message)
+        if hasOtherMedia {
+            return .filteredEmpty(title: title, message: message)
+        }
+        return .emptyCollection(title: title, message: message)
     }
 
     // MARK: - Presentation

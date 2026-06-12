@@ -35,27 +35,6 @@ struct HomeWatchListLoadingView: View {
     }
 }
 
-struct HomeWatchListEmptyStateView: View {
-
-    // MARK: - Body
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("目前沒有可顯示的影音資料")
-                .font(.headline)
-                .foregroundStyle(ThemeColor.textPrimary)
-
-            Text("稍後重新整理，或切換其他分類查看。")
-                .font(.subheadline)
-                .foregroundStyle(ThemeColor.textSecondary)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(16)
-        .background(Color(.secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-    }
-}
-
 struct HomeWatchListErrorStateView: View {
 
     // MARK: - Properties

@@ -36,8 +36,8 @@ struct MyListFormatDistributionChartCardView: View {
             subtitle: distributionSubtitle
         ) {
             if statistics.formatAnalysis.formatSlices.isEmpty {
-                ErrorMessageView(
-                    state: .emptyCollection(emptyStateMessage),
+                FeatureEmptyStateInlineView(
+                    emptyState: .emptyCollection(message: emptyStateMessage),
                     height: 120
                 )
             } else {

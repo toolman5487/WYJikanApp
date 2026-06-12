@@ -61,7 +61,10 @@ struct HomeTodayAnimeView: View {
                             .frame(width: cardSize.width)
 
                     case .empty:
-                        ErrorMessageView(state: .emptyCollection("尚無資料"), height: cardSize.height)
+                        FeatureEmptyStateInlineView(
+                            emptyState: .emptyCollection(message: "今天沒有可顯示的動畫"),
+                            height: cardSize.height
+                        )
                             .frame(width: cardSize.width)
 
                     case .content:

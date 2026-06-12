@@ -23,11 +23,13 @@ struct MainSearchResultsContentView<FilterHeader: View>: View {
             case .emptyPrompt:
                 VStack(spacing: 0) {
                     filterHeader()
-                    ContentUnavailableView {
-                        Label("開始搜尋", systemImage: "magnifyingglass")
-                    } description: {
-                        Text("選擇類型，輸入上方搜尋列關鍵字。")
-                    }
+                    FeatureEmptyStateCardView(
+                        emptyState: .noSearchResults(
+                            title: "開始搜尋",
+                            message: "選擇類型，輸入上方搜尋列關鍵字。"
+                        ),
+                        minHeight: 200
+                    )
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             case .loading:
@@ -48,9 +50,12 @@ struct MainSearchResultsContentView<FilterHeader: View>: View {
             case .emptyResults(let query):
                 VStack(spacing: 0) {
                     filterHeader()
-                    ErrorMessageView(
-                        state: .noSearchResults("沒有符合「\(query)」的結果，請換個關鍵字試試。"),
-                        height: 200
+                    FeatureEmptyStateCardView(
+                        emptyState: .noSearchResults(
+                            title: "找不到結果",
+                            message: "沒有符合「\(query)」的結果，請換個關鍵字試試。"
+                        ),
+                        minHeight: 200
                     )
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }

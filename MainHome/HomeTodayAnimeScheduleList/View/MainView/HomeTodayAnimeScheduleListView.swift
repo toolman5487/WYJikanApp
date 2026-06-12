@@ -87,7 +87,12 @@ private struct HomeTodayAnimeScheduleListBodyView: View {
                 .transition(.opacity.combined(with: .move(edge: .bottom)))
 
         case .empty:
-            HomeTodayAnimeScheduleListEmptyStateView()
+            FeatureEmptyStateCardView(
+                emptyState: .emptyCollection(
+                    title: "這天目前沒有可顯示的 TV 動畫",
+                    message: "可以切換其他星期，或稍後再回來看看。"
+                )
+            )
                 .transition(.opacity.combined(with: .move(edge: .bottom)))
 
         case .error(let failure):

@@ -154,20 +154,11 @@ private struct HomeTrendingMangaListBodyView: View {
     }
 
     private var emptyStateCard: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text(emptyStateTitle)
-                .font(.title3.weight(.bold))
-                .foregroundStyle(ThemeColor.textPrimary)
-
-            Text(emptyStateSubtitle)
-                .font(.body)
-                .foregroundStyle(ThemeColor.textSecondary)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-        .frame(maxWidth: .infinity, minHeight: 220, alignment: .center)
-        .padding(24)
-        .background(Color(.secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        FeatureEmptyStateCardView(
+            emptyState: viewModel.selectedFormat == .all
+                ? .emptyCollection(title: emptyStateTitle, message: emptyStateSubtitle)
+                : .filteredEmpty(title: emptyStateTitle, message: emptyStateSubtitle)
+        )
     }
 
     private var canLoadMore: Bool {

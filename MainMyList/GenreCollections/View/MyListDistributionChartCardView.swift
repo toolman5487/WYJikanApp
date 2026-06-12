@@ -22,8 +22,8 @@ struct MyListDistributionChartCardView: View {
             subtitle: distributionSubtitle
         ) {
             if statistics.selectedAnalysis.genreSlices.isEmpty {
-                ErrorMessageView(
-                    state: .emptyCollection(emptyStateMessage),
+                FeatureEmptyStateInlineView(
+                    emptyState: .emptyCollection(message: emptyStateMessage),
                     height: 120
                 )
             } else {

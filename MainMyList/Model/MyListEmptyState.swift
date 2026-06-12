@@ -7,7 +7,4 @@
 
 import Foundation
 
-struct MyListEmptyState: Equatable {
-    let kind: ErrorMessageKind
-    let message: String
-}
+typealias MyListEmptyState = FeatureEmptyState

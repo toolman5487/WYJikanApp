@@ -103,7 +103,9 @@ struct HeroBannerView: View {
         ZStack {
             BannerSkeletonView()
             VStack(spacing: 12) {
-                ErrorMessageView(state: .emptyCollection(message), height: nil)
+                FeatureEmptyStateInlineView(
+                    emptyState: .emptyCollection(message: message)
+                )
                 Button(buttonTitle) {
                     viewModel.retry()
                 }

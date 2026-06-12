@@ -56,7 +56,14 @@ private struct MangaReviewBodyView: View {
             case .loading:
                 MangaReviewListSkeletonView()
             case .empty:
-                AnimeReviewEmptyStateView()
+                FeatureEmptyStateCardView(
+                    emptyState: .emptyCollection(
+                        title: "尚無評論",
+                        message: "目前還沒有人留下評價。"
+                    ),
+                    minHeight: 0
+                )
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             case .content:
                 MangaReviewListView(viewModel: viewModel)
             }

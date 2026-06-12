@@ -106,7 +106,12 @@ private struct MangaCategoryDetailBodyView: View {
             MangaCategoryDetailLoadingView()
 
         case .empty:
-            MangaCategoryDetailEmptyStateView()
+            FeatureEmptyStateCardView(
+                emptyState: .emptyCollection(
+                    title: "這個分類目前還沒有作品",
+                    message: "可以先回到首頁看看其他分類，或稍後再回來探索。"
+                )
+            )
 
         case let .error(failure):
             MangaCategoryDetailErrorStateView(failure: failure) {

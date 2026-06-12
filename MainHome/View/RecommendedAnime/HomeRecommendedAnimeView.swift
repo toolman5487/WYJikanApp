@@ -63,7 +63,10 @@ struct HomeRecommendedAnimeView: View {
                         .padding(.horizontal, 16)
 
                 case .empty:
-                    ErrorMessageView(state: .emptyCollection("尚無推薦資料"), height: 240)
+                    FeatureEmptyStateInlineView(
+                        emptyState: .emptyCollection(message: "尚無推薦作品，稍後再試"),
+                        height: 240
+                    )
                         .padding(.horizontal, 16)
 
                 case .content:
