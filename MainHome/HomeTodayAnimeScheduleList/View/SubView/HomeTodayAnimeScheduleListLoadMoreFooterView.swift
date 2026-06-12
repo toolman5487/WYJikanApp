@@ -2,39 +2,28 @@
 //  HomeTodayAnimeScheduleListLoadMoreFooterView.swift
 //  WYJikanApp
 //
-//  Created by Codex on 2026/5/5.
+//  Created by Willy Hsu on 2026/5/6.
 //
 
 import SwiftUI
 
 struct HomeTodayAnimeScheduleListLoadMoreFooterView: View {
 
-    // MARK: - Properties
-
     let state: HomeTodayAnimeScheduleListViewModel.LoadMoreState
+    var progress: CGFloat = 0
     let onLoadMore: () -> Void
     let onRetry: () -> Void
 
-    // MARK: - Body
-
-    @ViewBuilder
     var body: some View {
-        switch state {
-        case .hidden:
-            EmptyView()
-
-        case .available:
-            Button("載入更多", action: onLoadMore)
-                .buttonStyle(.borderedProminent)
-                .tint(ThemeColor.sakura)
-                .frame(maxWidth: .infinity, alignment: .center)
-
-        case .loading:
-            ProgressView()
-                .frame(maxWidth: .infinity, minHeight: 44)
-
-        case .error(let failure):
-            LoadMoreErrorFooterView(failure: failure, onRetry: onRetry)
-        }
+        PaginationLoadMoreFooterView(
+            state: state,
+            availablePresentation: .endBounceHint(
+                title: "載入更多作品",
+                subtitle: "繼續往下拉展開更多",
+                progress: progress
+            ),
+            onAvailableTap: onLoadMore,
+            onRetry: onRetry
+        )
     }
 }

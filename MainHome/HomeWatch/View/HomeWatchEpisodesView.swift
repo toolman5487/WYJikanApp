@@ -153,7 +153,7 @@ private struct HomeWatchEpisodeCardView: View {
                 chip(text: item.episodeText)
 
                 if !item.badgeTexts.isEmpty {
-                    HStack(spacing: 6) {
+                    HStack(spacing: 8) {
                         ForEach(item.badgeTexts.prefix(2), id: \.self) { badge in
                             chip(text: badge)
                         }

@@ -98,7 +98,7 @@ struct MyListFormatDistributionChartCardView: View {
     }
 
     private var legendView: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 8) {
             ForEach(Array(statistics.formatAnalysis.formatSlices.enumerated()), id: \.element.id) { index, slice in
                 HStack(spacing: 8) {
                     ZStack {

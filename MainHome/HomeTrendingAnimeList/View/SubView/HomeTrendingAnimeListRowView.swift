@@ -73,7 +73,7 @@ struct HomeTrendingAnimeListRowView: View {
             if let imageURL = item.imageURL {
                 RemotePosterImageView(
                     url: imageURL,
-                    fixedSize: CGSize(width: 82, height: 120)
+                    fixedSize: CGSize(width: 84, height: 120)
                 )
             } else {
                 Color(.secondarySystemFill)
@@ -84,7 +84,7 @@ struct HomeTrendingAnimeListRowView: View {
                     }
             }
         }
-        .frame(width: 82, height: 120)
+        .frame(width: 84, height: 120)
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 

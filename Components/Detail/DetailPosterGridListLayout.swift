@@ -76,3 +76,53 @@ struct DetailPosterGridListLayout<Content: View>: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
+
+// MARK: - Picture Grid
+
+enum DetailPictureGridMetrics {
+    static let rowSpacing: CGFloat = 12
+
+    static var flexibleColumns: [GridItem] {
+        Array(
+            repeating: GridItem(.flexible(), spacing: DetailPosterGridListMetrics.columnSpacing),
+            count: DetailPosterGridListMetrics.columnCount
+        )
+    }
+
+    static func fixedColumns(containerWidth: CGFloat) -> [GridItem] {
+        DetailPosterGridListMetrics.make(containerWidth: containerWidth).gridColumns
+    }
+}
+
+struct DetailPictureGridLayout<Content: View>: View {
+    var embedInScrollView: Bool = false
+    @ViewBuilder let content: () -> Content
+
+    var body: some View {
+        if embedInScrollView {
+            GeometryReader { geometry in
+                ScrollView {
+                    grid(containerWidth: geometry.size.width)
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else {
+            grid(containerWidth: nil)
+        }
+    }
+
+    @ViewBuilder
+    private func grid(containerWidth: CGFloat?) -> some View {
+        let columns = containerWidth.map(DetailPictureGridMetrics.fixedColumns)
+            ?? DetailPictureGridMetrics.flexibleColumns
+
+        LazyVGrid(
+            columns: columns,
+            alignment: .center,
+            spacing: DetailPictureGridMetrics.rowSpacing
+        ) {
+            content()
+        }
+        .padding(embedInScrollView ? DetailPosterGridListMetrics.horizontalPadding : 0)
+    }
+}

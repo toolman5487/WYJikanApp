@@ -107,7 +107,7 @@ struct HomeWatchListRowView: View {
     }
 
     private var thumbnailSize: CGSize {
-        CGSize(width: 82, height: 120)
+        CGSize(width: 84, height: 120)
     }
 
     private var actionText: String {

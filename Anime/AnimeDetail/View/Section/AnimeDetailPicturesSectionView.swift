@@ -38,17 +38,9 @@ struct AnimeDetailPicturesSectionView: View {
         }
     }
 
-    private var gridColumns: [GridItem] {
-        [
-            GridItem(.flexible(), spacing: 12),
-            GridItem(.flexible(), spacing: 12),
-            GridItem(.flexible(), spacing: 12)
-        ]
-    }
-
     @ViewBuilder
     private func pictureGrid(items: [AnimeDetailPictureItem]) -> some View {
-        LazyVGrid(columns: gridColumns, alignment: .center, spacing: 12) {
+        DetailPictureGridLayout {
             ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
                 DetailPictureGridItemView(url: item.url) {
                     onTapImage?(index)
@@ -62,24 +54,13 @@ struct AnimeDetailPicturesListView: View {
     let viewModel: AnimeDetailViewModel
     let onTapImage: ((Int) -> Void)?
 
-    private var gridColumns: [GridItem] {
-        [
-            GridItem(.flexible(), spacing: 12),
-            GridItem(.flexible(), spacing: 12),
-            GridItem(.flexible(), spacing: 12)
-        ]
-    }
-
     var body: some View {
-        ScrollView {
-            LazyVGrid(columns: gridColumns, alignment: .center, spacing: 12) {
-                ForEach(Array(viewModel.pictureItems.enumerated()), id: \.element.id) { index, item in
-                    DetailPictureGridItemView(url: item.url) {
-                        onTapImage?(index)
-                    }
+        DetailPictureGridLayout(embedInScrollView: true) {
+            ForEach(Array(viewModel.pictureItems.enumerated()), id: \.element.id) { index, item in
+                DetailPictureGridItemView(url: item.url) {
+                    onTapImage?(index)
                 }
             }
-            .padding()
         }
         .navigationTitle("劇照")
         .navigationBarTitleDisplayMode(.inline)

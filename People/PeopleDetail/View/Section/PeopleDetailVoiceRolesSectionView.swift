@@ -95,7 +95,7 @@ struct PeopleDetailVoiceRolesListView: View {
                         } label: {
                             HStack(alignment: .top, spacing: 16) {
                                 voiceRoleImage(character)
-                                    .frame(width: 82, height: 104)
+                                    .frame(width: 84, height: 104)
                                     .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
 
                                 VStack(alignment: .leading, spacing: 8) {
@@ -137,7 +137,7 @@ struct PeopleDetailVoiceRolesListView: View {
         if let imageURL = viewModel.imageURL(from: character.images) {
             RemotePosterImageView(
                 url: imageURL,
-                fixedSize: CGSize(width: 82, height: 104)
+                fixedSize: CGSize(width: 84, height: 104)
             )
         } else {
             RoundedRectangle(cornerRadius: 16, style: .continuous)

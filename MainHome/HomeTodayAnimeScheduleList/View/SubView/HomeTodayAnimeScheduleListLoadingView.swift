@@ -26,7 +26,7 @@ struct HomeTodayAnimeScheduleListLoadingView: View {
                             VStack(alignment: .leading, spacing: 12) {
                                 SkeletonBar(width: 160, height: 16, cornerRadius: 8)
                                 SkeletonBar(width: 120, height: 16, cornerRadius: 8)
-                                SkeletonBar(width: 190, height: 12, cornerRadius: 8)
+                                SkeletonBar(width: 192, height: 12, cornerRadius: 8)
                             }
 
                             Spacer()

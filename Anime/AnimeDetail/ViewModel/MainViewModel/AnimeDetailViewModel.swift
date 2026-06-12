@@ -102,8 +102,9 @@ final class AnimeDetailViewModel: ObservableObject {
 
     private func loadSupplementaryContent(resetOnFailure: Bool) async {
         await loadCharacters(resetOnFailure: resetOnFailure)
-        await loadPictures(resetOnFailure: resetOnFailure)
-        await loadRecommendations(resetOnFailure: resetOnFailure)
+        async let pictures: Void = loadPictures(resetOnFailure: resetOnFailure)
+        async let recommendations: Void = loadRecommendations(resetOnFailure: resetOnFailure)
+        _ = await (pictures, recommendations)
     }
 
     func reloadCharacters() async {

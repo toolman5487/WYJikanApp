@@ -26,7 +26,7 @@ struct HomeTrendingAnimeListLoadingView: View {
 
                             VStack(alignment: .leading, spacing: 12) {
                                 SkeletonBar(width: 164, height: 16, cornerRadius: 8)
-                                SkeletonBar(width: 122, height: 16, cornerRadius: 8)
+                                SkeletonBar(width: 120, height: 16, cornerRadius: 8)
                                 SkeletonBar(width: 196, height: 12, cornerRadius: 8)
                                 SkeletonBar(width: 176, height: 12, cornerRadius: 8)
                             }

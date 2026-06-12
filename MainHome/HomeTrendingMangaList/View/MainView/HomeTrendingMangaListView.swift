@@ -94,16 +94,20 @@ private struct HomeTrendingMangaListBodyView: View {
     private var stateContentView: some View {
         switch viewModel.screenState {
         case .loading:
-            MangaCategoryDetailLoadingView()
+            RankedMediaListLoadingView()
 
         case .empty:
             VStack(alignment: .leading, spacing: 16) {
                 emptyStateCard
 
-                MangaCategoryDetailLoadMoreFooterView(
+                PaginationLoadMoreFooterView(
                     state: viewModel.loadMoreState,
-                    progress: loadMoreBounceProgress,
-                    onLoadMore: {
+                    availablePresentation: .endBounceHint(
+                        title: "載入更多作品",
+                        subtitle: "繼續往下拉展開更多",
+                        progress: loadMoreBounceProgress
+                    ),
+                    onAvailableTap: {
                         Task { await viewModel.loadMore() }
                     },
                     onRetry: {

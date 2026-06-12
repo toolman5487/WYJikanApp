@@ -2,14 +2,12 @@
 //  MangaCategoryDetailGridSectionView.swift
 //  WYJikanApp
 //
-//  Created by Codex on 2026/5/2.
+//  Created by Codex on 2025/5/2.
 //
 
 import SwiftUI
 
 struct MangaCategoryDetailGridSectionView: View {
-
-    // MARK: - Properties
 
     let items: [MangaCategoryItemDTO]
     let favoriteIDs: Set<Int>
@@ -19,31 +17,28 @@ struct MangaCategoryDetailGridSectionView: View {
     let onLoadMore: () -> Void
     let onRetryLoadMore: () -> Void
 
-    // MARK: - Body
-
     var body: some View {
-        LazyVStack(alignment: .leading, spacing: 12) {
-            ForEach(items) { item in
-                NavigationLink {
-                    MangaDetailView(malId: item.id)
-                } label: {
-                    MangaCategoryDetailGridCardView(
-                        item: item,
-                        isFavorite: favoriteIDs.contains(item.id)
-                    )
-                }
-                .buttonStyle(.plain)
-                .onAppear {
-                    onItemAppear(item)
-                }
+        PaginatedItemListSection(
+            items: items,
+            loadMoreState: loadMoreState,
+            loadMoreProgress: loadMoreProgress,
+            loadMoreAvailableTitle: "載入更多作品",
+            loadMoreAvailableSubtitle: "繼續往下拉展開更多",
+            onLoadMoreTap: onLoadMore,
+            onRetryLoadMore: onRetryLoadMore
+        ) { item in
+            NavigationLink {
+                MangaDetailView(malId: item.id)
+            } label: {
+                MangaCategoryDetailGridCardView(
+                    item: item,
+                    isFavorite: favoriteIDs.contains(item.id)
+                )
             }
-
-            MangaCategoryDetailLoadMoreFooterView(
-                state: loadMoreState,
-                progress: loadMoreProgress,
-                onLoadMore: onLoadMore,
-                onRetry: onRetryLoadMore
-            )
+            .buttonStyle(.plain)
+            .onAppear {
+                onItemAppear(item)
+            }
         }
     }
 }

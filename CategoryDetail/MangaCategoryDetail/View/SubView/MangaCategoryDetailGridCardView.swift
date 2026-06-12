@@ -68,7 +68,7 @@ struct MangaCategoryDetailGridCardView: View {
             if let posterURL = item.posterURL {
                 RemotePosterImageView(
                     url: posterURL,
-                    fixedSize: CGSize(width: 82, height: 120)
+                    fixedSize: CGSize(width: 84, height: 120)
                 )
             } else {
                 Color(.secondarySystemFill)
@@ -79,7 +79,7 @@ struct MangaCategoryDetailGridCardView: View {
                     }
             }
         }
-        .frame(width: 82, height: 120)
+        .frame(width: 84, height: 120)
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 

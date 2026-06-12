@@ -14,18 +14,18 @@ struct MainNewsLoadingView: View {
                         .fill(Color(.systemGray5))
                         .frame(width: 96, height: 72)
 
-                    VStack(alignment: .leading, spacing: 10) {
+                    VStack(alignment: .leading, spacing: 8) {
                         HStack(spacing: 8) {
-                            SkeletonBar(width: nil, height: 12, cornerRadius: 6)
+                            SkeletonBar(width: nil, height: 12, cornerRadius: 8)
                                 .frame(maxWidth: index.isMultiple(of: 2) ? 104 : 132, alignment: .leading)
-                            SkeletonBar(width: 56, height: 12, cornerRadius: 6)
+                            SkeletonBar(width: 56, height: 12, cornerRadius: 8)
                         }
 
                         SkeletonBar(width: nil, height: 16, cornerRadius: 8)
                             .frame(maxWidth: 188, alignment: .leading)
                         SkeletonBar(width: nil, height: 16, cornerRadius: 8)
                             .frame(maxWidth: 232, alignment: .leading)
-                        SkeletonBar(width: nil, height: 12, cornerRadius: 6)
+                        SkeletonBar(width: nil, height: 12, cornerRadius: 8)
                             .frame(maxWidth: 164, alignment: .leading)
                     }
 

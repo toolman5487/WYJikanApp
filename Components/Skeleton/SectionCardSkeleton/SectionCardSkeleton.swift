@@ -19,7 +19,7 @@ struct SectionCardSkeleton: View {
     }
 
     private var sectionHeight: CGFloat {
-        let verticalSpacing: CGFloat = 10
+        let verticalSpacing: CGFloat = 8
         let rowHeight: CGFloat = 20
         let contentPadding: CGFloat = 24
         return CGFloat(rowCount) * rowHeight + CGFloat(max(0, rowCount - 1)) * verticalSpacing + contentPadding

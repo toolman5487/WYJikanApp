@@ -18,12 +18,7 @@ final class AnimeDetailEpisodesListViewModel: ObservableObject {
         case error(FeatureLoadFailure)
     }
 
-    enum LoadMoreState: Equatable {
-        case hidden
-        case available
-        case loading
-        case error(FeatureLoadFailure)
-    }
+    typealias LoadMoreState = PaginationFooterState
 
     @Published private(set) var screenState: ScreenState = .loading
     @Published private(set) var loadMoreState: LoadMoreState = .hidden

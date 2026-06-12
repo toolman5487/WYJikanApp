@@ -68,8 +68,8 @@ struct MyListItemRowView: View {
     }
 
     private var mangaReadingProgressView: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack(spacing: 6) {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 8) {
                 Image(systemName: item.mangaReadingStatus.systemImageName)
                     .font(.caption.weight(.semibold))
                 Text(item.readingProgressSummary())

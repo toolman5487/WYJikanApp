@@ -325,9 +325,4 @@ enum MainSearchScreenState: Equatable {
     case content([MainSearchResultRow])
 }
 
-enum MainSearchLoadMoreState: Equatable {
-    case hidden
-    case available
-    case loading
-    case error(FeatureLoadFailure)
-}
+typealias MainSearchLoadMoreState = PaginationFooterState

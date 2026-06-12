@@ -22,7 +22,17 @@ struct MangaReviewListView: View {
                     MangaReviewRowView(viewModel: viewModel, entry: entry)
                 }
 
-                loadMoreFooterView
+                PaginationLoadMoreFooterView(
+                    state: viewModel.loadMoreState,
+                    availablePresentation: .endBounceHint(
+                        title: "載入更多評論",
+                        subtitle: "繼續往下拉展開更多",
+                        progress: loadMoreBounceProgress
+                    ),
+                    onRetry: {
+                        Task { await viewModel.loadMore() }
+                    }
+                )
             }
             .padding()
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -38,43 +48,7 @@ struct MangaReviewListView: View {
         }
     }
 
-    @ViewBuilder
-    private var loadMoreFooterView: some View {
-        switch viewModel.loadMoreState {
-        case .hidden:
-            EmptyView()
-        case .available:
-            EndBounceHintView(
-                axis: .vertical,
-                title: "載入更多評論",
-                subtitle: "繼續往下拉展開更多",
-                progress: loadMoreBounceProgress
-            )
-        case .loading:
-            ProgressView()
-                .frame(maxWidth: .infinity, minHeight: 116)
-        case .error(let failure):
-            VStack(alignment: .leading, spacing: 12) {
-                ErrorMessageView(state: ErrorMessageView.State(failure: failure))
-
-                Button {
-                    Task { await viewModel.loadMore() }
-                } label: {
-                    Label("重試載入更多", systemImage: "arrow.trianglehead.counterclockwise")
-                }
-                .buttonStyle(.borderedProminent)
-                .tint(ThemeColor.sakura)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-        }
-    }
-
     private var canLoadMore: Bool {
-        switch viewModel.loadMoreState {
-        case .available:
-            return true
-        case .hidden, .loading, .error:
-            return false
-        }
+        viewModel.loadMoreState == .available
     }
 }

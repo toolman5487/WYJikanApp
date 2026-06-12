@@ -12,33 +12,21 @@ struct AnimeDetailEpisodesLoadMoreFooterView: View {
     let onLoadMore: () async -> Void
     let onRetry: () async -> Void
 
-    @ViewBuilder
     var body: some View {
-        switch state {
-        case .hidden:
-            EmptyView()
-        case .available:
-            Button("載入更多集數", action: loadMore)
-                .buttonStyle(.borderedProminent)
-                .tint(ThemeColor.sakura)
-                .frame(maxWidth: .infinity, minHeight: 44, alignment: .center)
-        case .loading:
-            ProgressView()
-                .frame(maxWidth: .infinity, minHeight: 44)
-        case .error(let failure):
-            LoadMoreErrorFooterView(failure: failure, onRetry: retry)
-        }
-    }
-
-    private func loadMore() {
-        Task {
-            await onLoadMore()
-        }
-    }
-
-    private func retry() {
-        Task {
-            await onRetry()
-        }
+        PaginationLoadMoreFooterView(
+            state: state,
+            availablePresentation: .prominentButton(title: "載入更多集數"),
+            loadingMinHeight: 44,
+            onAvailableTap: {
+                Task {
+                    await onLoadMore()
+                }
+            },
+            onRetry: {
+                Task {
+                    await onRetry()
+                }
+            }
+        )
     }
 }

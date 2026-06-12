@@ -26,12 +26,7 @@ final class MangaReviewViewModel: ObservableObject {
         }
     }
 
-    enum LoadMoreState: Equatable {
-        case hidden
-        case available
-        case loading
-        case error(FeatureLoadFailure)
-    }
+    typealias LoadMoreState = PaginationFooterState
 
     private enum LoadingPhase {
         case idle

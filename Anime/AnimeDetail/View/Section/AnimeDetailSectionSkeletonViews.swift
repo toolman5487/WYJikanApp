@@ -50,7 +50,7 @@ struct AnimeDetailEpisodesEntrySectionSkeletonView: View {
             HStack(alignment: .center, spacing: 16) {
                 VStack(alignment: .leading, spacing: 8) {
                     SkeletonBar(width: 136, height: 20, cornerRadius: 8)
-                    SkeletonBar(width: 220, height: 14, cornerRadius: 7)
+                    SkeletonBar(width: 220, height: 16, cornerRadius: 8)
                 }
 
                 Spacer(minLength: 0)
@@ -146,16 +146,16 @@ struct AnimeDetailHorizontalCardSectionSkeletonView: View {
 
                 Spacer(minLength: 0)
 
-                SkeletonBar(width: actionWidth, height: 18, cornerRadius: 8)
+                SkeletonBar(width: actionWidth, height: 16, cornerRadius: 8)
             }
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(alignment: .top, spacing: 12) {
                     ForEach(0..<3, id: \.self) { _ in
-                        VStack(alignment: .leading, spacing: 10) {
+                        VStack(alignment: .leading, spacing: 8) {
                             SkeletonBar(width: 160, height: 240, cornerRadius: 16)
                             SkeletonBar(width: 136, height: 16, cornerRadius: 8)
-                            SkeletonBar(width: 104, height: 14, cornerRadius: 7)
+                            SkeletonBar(width: 104, height: 16, cornerRadius: 8)
                         }
                         .frame(width: 160, alignment: .leading)
                     }

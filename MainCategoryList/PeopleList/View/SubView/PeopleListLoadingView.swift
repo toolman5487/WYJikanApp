@@ -22,11 +22,11 @@ struct PeopleListLoadingView: View {
                     VStack(alignment: .leading, spacing: 8) {
                         RoundedRectangle(cornerRadius: 8)
                             .fill(Color(.secondarySystemBackground))
-                            .frame(height: 18)
+                            .frame(height: 16)
 
                         RoundedRectangle(cornerRadius: 8)
                             .fill(Color(.secondarySystemBackground))
-                            .frame(width: 96, height: 14)
+                            .frame(width: 96, height: 16)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }

@@ -17,7 +17,7 @@ struct HomeWatchListLoadingView: View {
                 HStack(spacing: 12) {
                     RoundedRectangle(cornerRadius: 12, style: .continuous)
                         .fill(Color(.systemGray5))
-                        .frame(width: 82, height: 120)
+                        .frame(width: 84, height: 120)
 
                     VStack(alignment: .leading, spacing: 12) {
                         SkeletonBar(width: 184, height: 16, cornerRadius: 8)
@@ -37,35 +37,21 @@ struct HomeWatchListLoadingView: View {
 
 struct HomeWatchListLoadMoreFooterView: View {
 
-    // MARK: - Properties
-
     let state: HomeWatchListViewModel.LoadMoreState
     var progress: CGFloat = 0
     let onLoadMore: () -> Void
     let onRetry: () -> Void
 
-    // MARK: - Body
-
-    @ViewBuilder
     var body: some View {
-        switch state {
-        case .hidden:
-            EmptyView()
-
-        case .available:
-            EndBounceHintView(
-                axis: .vertical,
+        PaginationLoadMoreFooterView(
+            state: state,
+            availablePresentation: .endBounceHint(
                 title: "載入更多影音",
                 subtitle: "繼續往下拉展開更多",
                 progress: progress
-            )
-
-        case .loading:
-            ProgressView()
-                .frame(maxWidth: .infinity, minHeight: 116)
-
-        case .error(let failure):
-            LoadMoreErrorFooterView(failure: failure, onRetry: onRetry)
-        }
+            ),
+            onAvailableTap: onLoadMore,
+            onRetry: onRetry
+        )
     }
 }

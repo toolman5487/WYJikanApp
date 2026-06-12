@@ -55,8 +55,8 @@ struct MainNewsHeaderView: View {
             .font(.caption.weight(.semibold))
             .foregroundStyle(ThemeColor.textPrimary)
             .lineLimit(1)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 6)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 8)
             .background(ThemeColor.sakura.opacity(0.32))
             .clipShape(Capsule())
     }
