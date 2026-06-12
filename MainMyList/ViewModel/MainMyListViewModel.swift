@@ -26,24 +26,17 @@ final class MainMyListViewModel: ObservableObject {
 
     private let favoriteRepository: any FavoriteRepository
     private var cachedItems: [MyListCollectionItem] = []
-    private var lastItemsFingerprint: MyListItemsFingerprint?
+    private var myListCancellable: AnyCancellable?
 
     // MARK: - Lifecycle
 
     init(favoriteRepository: any FavoriteRepository) {
         self.favoriteRepository = favoriteRepository
         self.presentation = Self.emptyPresentation(selectedFilter: .all)
+        connectToRepository()
     }
 
     // MARK: - Public Methods
-
-    func refreshPresentation(from items: [MyListCollectionItem]) {
-        let fingerprint = MyListItemsFingerprint(items: items)
-        guard fingerprint != lastItemsFingerprint else { return }
-        lastItemsFingerprint = fingerprint
-        cachedItems = items
-        rebuildPresentationFromCachedItems()
-    }
 
     func remove(_ item: MyListCollectionItem) {
         do {
@@ -57,7 +50,7 @@ final class MainMyListViewModel: ObservableObject {
         filter == .all ? "還沒有收藏" : "還沒有收藏\(filter.title)"
     }
 
-    func emptyState(for items: [MyListCollectionItem]) -> MyListEmptyState {
+    func emptyState() -> MyListEmptyState {
         let title = emptyTitle(for: selectedFilter)
         let message = "在作品詳情頁點右上角的愛心，就會加入收藏。"
 
@@ -65,11 +58,35 @@ final class MainMyListViewModel: ObservableObject {
             return .emptyCollection(title: title, message: message)
         }
 
-        let hasOtherMedia = items.contains { $0.mediaKind != selectedMediaKind }
+        let hasOtherMedia = cachedItems.contains { $0.mediaKind != selectedMediaKind }
         if hasOtherMedia {
             return .filteredEmpty(title: title, message: message)
         }
         return .emptyCollection(title: title, message: message)
+    }
+
+    // MARK: - Repository
+
+    private func connectToRepository() {
+        guard myListCancellable == nil else { return }
+
+        myListCancellable = favoriteRepository.myListPublisher
+            .sink { [weak self] items in
+                self?.applyItems(items)
+            }
+
+        do {
+            try favoriteRepository.reloadFavorites()
+        } catch {
+            AppLogger.persistence.error(
+                "MyList reload failed: \(error.localizedDescription, privacy: .public)"
+            )
+        }
+    }
+
+    private func applyItems(_ items: [MyListCollectionItem]) {
+        cachedItems = items
+        rebuildPresentationFromCachedItems()
     }
 
     // MARK: - Presentation

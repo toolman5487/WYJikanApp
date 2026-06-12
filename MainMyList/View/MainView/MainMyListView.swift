@@ -18,8 +18,6 @@ struct MainMyListView: View {
 
     // MARK: - Properties
 
-    @Query(sort: \MyListCollectionItem.addedAt, order: .reverse)
-    private var items: [MyListCollectionItem]
     @StateObject private var viewModel: MainMyListViewModel
 
     @State private var genreCollectionsRoute: MyListGenreCollectionsRoute?
@@ -55,12 +53,6 @@ struct MainMyListView: View {
             .navigationDestination(item: $formatCollectionsRoute) { route in
                 MyListFormatCollectionsDetailView(route: route)
             }
-        }
-        .onAppear {
-            viewModel.refreshPresentation(from: items)
-        }
-        .onChange(of: MyListItemsFingerprint(items: items)) { _, _ in
-            viewModel.refreshPresentation(from: items)
         }
     }
 
@@ -103,7 +95,7 @@ struct MainMyListView: View {
     private func contentView(presentation: MyListPresentation) -> some View {
         switch contentState(for: presentation) {
         case .empty:
-            MyListEmptyStateView(emptyState: viewModel.emptyState(for: items))
+            MyListEmptyStateView(emptyState: viewModel.emptyState())
 
         case .populated:
             LazyVStack(spacing: 12) {

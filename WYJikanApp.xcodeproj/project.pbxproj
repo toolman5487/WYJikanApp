@@ -109,7 +109,6 @@
 		15ACFCBC2FD9127B00B38F89 /* MyListFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15ACFCA72FD9127B00B38F89 /* MyListFilter.swift */; };
 		15ACFCBE2FD9127B00B38F89 /* MyListGenreSlice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15ACFCAE2FD9127B00B38F89 /* MyListGenreSlice.swift */; };
 		15ACFCBF2FD9127B00B38F89 /* MyListStatisticsScope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15ACFCB32FD9127B00B38F89 /* MyListStatisticsScope.swift */; };
-		15ACFCC02FD9127B00B38F89 /* MyListItemRevision.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15ACFCAF2FD9127B00B38F89 /* MyListItemRevision.swift */; };
 		15ACFCC12FD9127B00B38F89 /* MyListStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15ACFCB22FD9127B00B38F89 /* MyListStatistics.swift */; };
 		15ACFCC22FD9127B00B38F89 /* MyListFormatAnalysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15ACFCA82FD9127B00B38F89 /* MyListFormatAnalysis.swift */; };
 		15ACFD012FD916DC00B38F89 /* MyListFormatDistributionChartCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15ACFCF22FD916DC00B38F89 /* MyListFormatDistributionChartCardView.swift */; };
@@ -455,7 +454,6 @@
 		15ACFCAA2FD9127B00B38F89 /* MyListFormatSlice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListFormatSlice.swift; sourceTree = "<group>"; };
 		15ACFCAB2FD9127B00B38F89 /* MyListGenreAnalysis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListGenreAnalysis.swift; sourceTree = "<group>"; };
 		15ACFCAE2FD9127B00B38F89 /* MyListGenreSlice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListGenreSlice.swift; sourceTree = "<group>"; };
-		15ACFCAF2FD9127B00B38F89 /* MyListItemRevision.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListItemRevision.swift; sourceTree = "<group>"; };
 		15ACFCB02FD9127B00B38F89 /* MyListMediaKind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListMediaKind.swift; sourceTree = "<group>"; };
 		15ACFCB12FD9127B00B38F89 /* MyListPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListPresentation.swift; sourceTree = "<group>"; };
 		15ACFCB22FD9127B00B38F89 /* MyListStatistics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListStatistics.swift; sourceTree = "<group>"; };
@@ -2599,7 +2597,6 @@
 				15ACFCAA2FD9127B00B38F89 /* MyListFormatSlice.swift */,
 				15ACFCAB2FD9127B00B38F89 /* MyListGenreAnalysis.swift */,
 				15ACFCAE2FD9127B00B38F89 /* MyListGenreSlice.swift */,
-				15ACFCAF2FD9127B00B38F89 /* MyListItemRevision.swift */,
 				15ACFCB02FD9127B00B38F89 /* MyListMediaKind.swift */,
 				15ACFCB12FD9127B00B38F89 /* MyListPresentation.swift */,
 				15ACFCB22FD9127B00B38F89 /* MyListStatistics.swift */,
@@ -3286,7 +3283,6 @@
 				15ACFCBC2FD9127B00B38F89 /* MyListFilter.swift in Sources */,
 				15ACFCBE2FD9127B00B38F89 /* MyListGenreSlice.swift in Sources */,
 				15ACFCBF2FD9127B00B38F89 /* MyListStatisticsScope.swift in Sources */,
-				15ACFCC02FD9127B00B38F89 /* MyListItemRevision.swift in Sources */,
 				15ACFCC12FD9127B00B38F89 /* MyListStatistics.swift in Sources */,
 				15ACFCC22FD9127B00B38F89 /* MyListFormatAnalysis.swift in Sources */,
 				1574ECAB2F7CB30F00E37AE8 /* MangaDetailService.swift in Sources */,

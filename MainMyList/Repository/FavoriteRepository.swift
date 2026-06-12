@@ -29,6 +29,7 @@ protocol FavoriteRepository: AnyObject {
     func connect(modelContext: ModelContext)
 
     var favoriteSnapshotPublisher: AnyPublisher<FavoriteSnapshot, Never> { get }
+    var myListPublisher: AnyPublisher<[MyListCollectionItem], Never> { get }
 
     func reloadFavorites() throws
 
@@ -52,9 +53,14 @@ final class SwiftDataFavoriteRepository: FavoriteRepository {
             .eraseToAnyPublisher()
     }
 
+    var myListPublisher: AnyPublisher<[MyListCollectionItem], Never> {
+        myListSubject.eraseToAnyPublisher()
+    }
+
     private let snapshotSubject = CurrentValueSubject<FavoriteSnapshot, Never>(
         FavoriteSnapshot(animeIDs: [], mangaIDs: [])
     )
+    private let myListSubject = CurrentValueSubject<[MyListCollectionItem], Never>([])
 
     private var modelContext: ModelContext?
 
@@ -66,7 +72,7 @@ final class SwiftDataFavoriteRepository: FavoriteRepository {
 
     func reloadFavorites() throws {
         let modelContext = try requireModelContext()
-        snapshotSubject.send(try makeSnapshot(from: modelContext))
+        try publish(from: modelContext)
     }
 
     func toggleFavorite(
@@ -85,7 +91,7 @@ final class SwiftDataFavoriteRepository: FavoriteRepository {
 
             do {
                 try modelContext.save()
-                try publishFavorites(from: modelContext)
+                try publish(from: modelContext)
                 return false
             } catch {
                 modelContext.rollback()
@@ -101,7 +107,7 @@ final class SwiftDataFavoriteRepository: FavoriteRepository {
 
         do {
             try modelContext.save()
-            try publishFavorites(from: modelContext)
+            try publish(from: modelContext)
             return true
         } catch {
             modelContext.rollback()
@@ -115,7 +121,7 @@ final class SwiftDataFavoriteRepository: FavoriteRepository {
 
         do {
             try modelContext.save()
-            try publishFavorites(from: modelContext)
+            try publish(from: modelContext)
         } catch {
             modelContext.rollback()
             throw error
@@ -127,6 +133,7 @@ final class SwiftDataFavoriteRepository: FavoriteRepository {
 
         do {
             try modelContext.save()
+            try publish(from: modelContext)
         } catch {
             modelContext.rollback()
             throw error
@@ -140,16 +147,21 @@ final class SwiftDataFavoriteRepository: FavoriteRepository {
         return modelContext
     }
 
-    private func publishFavorites(from modelContext: ModelContext) throws {
-        snapshotSubject.send(try makeSnapshot(from: modelContext))
+    private func publish(from modelContext: ModelContext) throws {
+        let items = try fetchAllItems(from: modelContext)
+        myListSubject.send(items)
+        snapshotSubject.send(makeSnapshot(from: items))
     }
 
-    private func makeSnapshot(from modelContext: ModelContext) throws -> FavoriteSnapshot {
-        let items = try modelContext.fetch(
+    private func fetchAllItems(from modelContext: ModelContext) throws -> [MyListCollectionItem] {
+        try modelContext.fetch(
             FetchDescriptor<MyListCollectionItem>(
                 sortBy: [SortDescriptor(\.addedAt, order: .reverse)]
             )
         )
+    }
+
+    private func makeSnapshot(from items: [MyListCollectionItem]) -> FavoriteSnapshot {
         var animeIDs: Set<Int> = []
         var mangaIDs: Set<Int> = []
 
