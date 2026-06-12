@@ -109,17 +109,7 @@ nonisolated struct PeopleListRow: Identifiable, Hashable, Sendable {
     }
 
     private static func posterURL(from images: AnimeImagesDTO?) -> URL? {
-        let webp = images?.webp
-        let jpg = images?.jpg
-        let candidates: [String?] = [
-            webp?.largeImageUrl,
-            jpg?.largeImageUrl,
-            webp?.imageUrl,
-            jpg?.imageUrl,
-            jpg?.smallImageUrl,
-            webp?.smallImageUrl
-        ]
-        return candidates.compactMap { $0 }.first.flatMap { URL(string: $0) }
+        JikanImageURLResolver.url(from: images, tier: .card)
     }
 
     private static func normalizedSortTitle(from title: String) -> String {

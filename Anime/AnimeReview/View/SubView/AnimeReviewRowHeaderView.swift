@@ -41,7 +41,10 @@ struct AnimeReviewRowHeaderView: View {
     @ViewBuilder
     private var reviewAvatar: some View {
         if let url = viewModel.userAvatarURL(for: entry) {
-            RemotePosterImageView(url: url)
+            RemotePosterImageView(
+                url: url,
+                fixedSize: CGSize(width: 44, height: 44)
+            )
         } else {
             ZStack {
                 Color(.systemGray5)

@@ -37,18 +37,7 @@ struct HomeTrendingAnimeListLoadMoreFooterView: View {
                 .frame(maxWidth: .infinity, minHeight: 116)
 
         case .error(let failure):
-            VStack(alignment: .leading, spacing: 12) {
-                ErrorMessageView(state: ErrorMessageView.State(failure: failure))
-
-                Button {
-                    onRetry()
-                } label: {
-                    Label("重試載入更多", systemImage: "arrow.trianglehead.counterclockwise")
-                }
-                .buttonStyle(.borderedProminent)
-                .tint(ThemeColor.sakura)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
+            LoadMoreErrorFooterView(failure: failure, onRetry: onRetry)
         }
     }
 }

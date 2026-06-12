@@ -113,12 +113,8 @@ final class HomeTrendingAnimeViewModel: ObservableObject {
                 forceRefresh: forceRefresh
             )
             let mapped: [HomeTrendingAnimeCardItem] = response.data.compactMap { dto -> HomeTrendingAnimeCardItem? in
-                guard let urlString =
-                    dto.images?.webp?.imageUrl ??
-                    dto.images?.jpg?.imageUrl ??
-                    dto.images?.webp?.largeImageUrl ??
-                    dto.images?.jpg?.largeImageUrl,
-                    let url = URL(string: urlString) else { return nil }
+                guard let url = JikanImageURLResolver.url(from: dto.images, tier: .card)
+                else { return nil }
 
                 return HomeTrendingAnimeCardItem(
                     id: dto.malId,

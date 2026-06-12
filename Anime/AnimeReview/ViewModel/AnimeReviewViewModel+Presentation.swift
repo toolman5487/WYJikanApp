@@ -12,19 +12,7 @@ extension AnimeReviewViewModel {
     // MARK: - Presentation
 
     func userAvatarURL(for entry: AnimeReviewEntryDTO) -> URL? {
-        let candidates: [String?] = [
-            entry.user?.images?.webp?.imageUrl,
-            entry.user?.images?.jpg?.imageUrl,
-            entry.user?.images?.webp?.smallImageUrl,
-            entry.user?.images?.jpg?.smallImageUrl
-        ]
-        for candidate in candidates {
-            guard let raw = candidate?.trimmingCharacters(in: .whitespacesAndNewlines), !raw.isEmpty,
-                  let url = URL(string: raw)
-            else { continue }
-            return url
-        }
-        return nil
+        JikanImageURLResolver.url(from: entry.user?.images, tier: .thumbnail)
     }
 
     func username(for entry: AnimeReviewEntryDTO) -> String {

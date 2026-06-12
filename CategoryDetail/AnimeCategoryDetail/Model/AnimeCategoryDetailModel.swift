@@ -133,20 +133,7 @@ nonisolated extension AnimeCategoryItemDTO {
     }
 
     var posterURL: URL? {
-        let candidates = [
-            images?.webp?.largeImageUrl,
-            images?.jpg?.largeImageUrl,
-            images?.webp?.imageUrl,
-            images?.jpg?.imageUrl,
-            images?.webp?.smallImageUrl,
-            images?.jpg?.smallImageUrl
-        ]
-        for raw in candidates {
-            if let raw, let url = URL(string: raw) {
-                return url
-            }
-        }
-        return nil
+        JikanImageURLResolver.url(from: images, tier: .poster)
     }
 
     var synopsisPreview: String? {

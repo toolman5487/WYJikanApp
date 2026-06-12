@@ -76,19 +76,11 @@ struct RemotePosterImageView: View {
     }
 
     private var imageOptions: SDWebImageOptions {
-        guard !usesWebPImage else {
-            return [.retryFailed]
-        }
-
-        return [
-            .retryFailed,
-            .scaleDownLargeImages
-        ]
+        [.retryFailed, .scaleDownLargeImages]
     }
 
     private var imageContext: [SDWebImageContextOption: Any]? {
-        guard !usesWebPImage else { return nil }
-        guard let fixedSize else { return nil }
+        guard let fixedSize, !usesWebPImage else { return nil }
 
         return [
             .imageThumbnailPixelSize: CGSize(

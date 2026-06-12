@@ -166,12 +166,7 @@ final class HeroBannerViewModel: ObservableObject {
             let response = try await service.fetchHeroBanner(forceRefresh: forceRefresh)
             var seenMalIds = Set<Int>()
             let mapped: [BannerItem] = response.data.compactMap { dto in
-                guard let urlString =
-                    dto.images?.webp?.largeImageUrl ??
-                    dto.images?.jpg?.largeImageUrl ??
-                    dto.images?.webp?.imageUrl ??
-                    dto.images?.jpg?.imageUrl,
-                    let url = URL(string: urlString)
+                guard let url = JikanImageURLResolver.url(from: dto.images, tier: .full)
                 else { return nil }
 
                 guard seenMalIds.insert(dto.malId).inserted else { return nil }

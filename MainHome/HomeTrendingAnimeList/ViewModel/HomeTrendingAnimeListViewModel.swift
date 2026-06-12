@@ -313,14 +313,7 @@ final class HomeTrendingAnimeListViewModel: ObservableObject {
     }
 
     private static func posterURL(from dto: HomeTrendingAnimeListDTO) -> URL? {
-        let raw =
-            dto.images?.webp?.largeImageUrl ??
-            dto.images?.jpg?.largeImageUrl ??
-            dto.images?.webp?.imageUrl ??
-            dto.images?.jpg?.imageUrl
-
-        guard let raw else { return nil }
-        return URL(string: raw)
+        JikanImageURLResolver.url(from: dto.images, tier: .poster)
     }
 
     private static func typeDisplayText(_ raw: String?) -> String? {

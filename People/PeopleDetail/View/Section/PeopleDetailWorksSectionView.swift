@@ -269,7 +269,10 @@ struct PeopleDetailWorkCardView: View {
     @ViewBuilder
     private var posterView: some View {
         if let imageURL {
-            RemotePosterImageView(url: imageURL)
+            RemotePosterImageView(
+                url: imageURL,
+                fixedSize: CGSize(width: cardWidth, height: cardHeight)
+            )
         } else {
             RoundedRectangle(
                 cornerRadius: cornerRadius,

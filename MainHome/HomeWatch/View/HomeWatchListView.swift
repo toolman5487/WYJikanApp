@@ -97,9 +97,16 @@ struct HomeWatchListView: View {
                 .transition(.opacity.combined(with: .move(edge: .bottom)))
 
         case .error(let failure):
-            HomeWatchListErrorStateView(failure: failure) {
-                Task { await viewModel.reload() }
-            }
+            ErrorMessageRetryCardView(
+                state: ErrorMessageView.State(failure: failure),
+                title: "影音資料載入失敗",
+                retryTitle: "重新整理",
+                onRetry: {
+                    Task { await viewModel.reload() }
+                },
+                minHeight: 0,
+                alignment: .leading
+            )
             .transition(.opacity.combined(with: .move(edge: .bottom)))
 
         case .content(let items):

@@ -36,9 +36,6 @@ nonisolated struct HomeTrendingMangaDTO: Codable, Identifiable, Hashable, Sendab
 
     var id: Int { malId }
     var imgUrl: String? {
-        images?.jpg?.largeImageUrl ??
-        images?.webp?.largeImageUrl ??
-        images?.jpg?.imageUrl ??
-        images?.webp?.imageUrl
+        JikanImageURLResolver.urlString(from: images, tier: .card)
     }
 }

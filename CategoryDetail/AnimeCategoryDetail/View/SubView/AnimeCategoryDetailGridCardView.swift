@@ -66,7 +66,10 @@ struct AnimeCategoryDetailGridCardView: View {
     private var posterView: some View {
         Group {
             if let posterURL = item.posterURL {
-                RemotePosterImageView(url: posterURL)
+                RemotePosterImageView(
+                    url: posterURL,
+                    fixedSize: CGSize(width: 82, height: 120)
+                )
             } else {
                 Color(.secondarySystemFill)
                     .overlay {

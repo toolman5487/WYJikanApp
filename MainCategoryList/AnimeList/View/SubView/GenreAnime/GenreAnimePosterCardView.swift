@@ -26,7 +26,10 @@ struct GenreAnimePosterCardView: View {
             PosterCardView(rank: item.rank) {
                 Group {
                     if let posterURL = item.posterURL {
-                        RemotePosterImageView(url: posterURL)
+                        RemotePosterImageView(
+                            url: posterURL,
+                            fixedSize: CGSize(width: cardWidth, height: cardHeight)
+                        )
                     } else {
                         Color(.secondarySystemFill)
                             .overlay {

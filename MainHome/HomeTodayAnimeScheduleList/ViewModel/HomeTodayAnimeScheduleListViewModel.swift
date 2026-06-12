@@ -282,13 +282,7 @@ final class HomeTodayAnimeScheduleListViewModel: ObservableObject {
     }
 
     private static func posterURL(from dto: HomeTodayAnimeDTO) -> URL? {
-        let raw =
-            dto.images?.jpg?.largeImageUrl ??
-            dto.images?.webp?.largeImageUrl ??
-            dto.images?.jpg?.imageUrl ??
-            dto.images?.webp?.imageUrl
-        guard let raw else { return nil }
-        return URL(string: raw)
+        JikanImageURLResolver.url(from: dto.images, tier: .poster)
     }
 
     private static func typeDisplayText(_ raw: String?) -> String? {

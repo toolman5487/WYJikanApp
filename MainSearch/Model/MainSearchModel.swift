@@ -196,19 +196,7 @@ nonisolated struct MainSearchResultRow: Identifiable, Hashable, Sendable {
     // MARK: Shared Mapping
 
     static func posterURL(from images: AnimeImagesDTO?) -> URL? {
-        let webp = images?.webp
-        let jpg = images?.jpg
-        let candidates: [String?] = [
-            webp?.largeImageUrl,
-            jpg?.largeImageUrl,
-            webp?.imageUrl,
-            jpg?.imageUrl,
-            jpg?.smallImageUrl,
-            webp?.smallImageUrl
-        ]
-        let urlString = candidates.compactMap { $0 }.first
-        guard let urlString else { return nil }
-        return URL(string: urlString)
+        JikanImageURLResolver.url(from: images, tier: .card)
     }
 
     // MARK: Factory Methods

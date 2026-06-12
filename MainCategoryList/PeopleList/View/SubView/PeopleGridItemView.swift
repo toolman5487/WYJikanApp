@@ -55,7 +55,8 @@ struct PeopleGridItemView: View {
         if let imageURL = row.imageURL {
             RemotePosterImageView(
                 url: imageURL,
-                contentMode: .fill
+                contentMode: .fill,
+                fixedSize: CGSize(width: 72, height: 96)
             )
         } else {
             Color(.secondarySystemBackground)

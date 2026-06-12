@@ -71,7 +71,10 @@ struct HomeTrendingAnimeListRowView: View {
     private var posterView: some View {
         Group {
             if let imageURL = item.imageURL {
-                RemotePosterImageView(url: imageURL)
+                RemotePosterImageView(
+                    url: imageURL,
+                    fixedSize: CGSize(width: 82, height: 120)
+                )
             } else {
                 Color(.secondarySystemFill)
                     .overlay {

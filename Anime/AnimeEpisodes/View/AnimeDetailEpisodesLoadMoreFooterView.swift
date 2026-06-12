@@ -26,14 +26,7 @@ struct AnimeDetailEpisodesLoadMoreFooterView: View {
             ProgressView()
                 .frame(maxWidth: .infinity, minHeight: 44)
         case .error(let failure):
-            VStack(alignment: .leading, spacing: 12) {
-                ErrorMessageView(state: ErrorMessageView.State(failure: failure))
-
-                Button("重試載入更多", action: retry)
-                    .buttonStyle(.borderedProminent)
-                    .tint(ThemeColor.sakura)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
+            LoadMoreErrorFooterView(failure: failure, onRetry: retry)
         }
     }
 

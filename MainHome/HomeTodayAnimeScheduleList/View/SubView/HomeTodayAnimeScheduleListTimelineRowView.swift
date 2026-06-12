@@ -68,7 +68,10 @@ struct HomeTodayAnimeScheduleListTimelineRowView: View {
     private var posterView: some View {
         Group {
             if let imageURL = item.imageURL {
-                RemotePosterImageView(url: imageURL)
+                RemotePosterImageView(
+                    url: imageURL,
+                    fixedSize: CGSize(width: 76, height: 112)
+                )
             } else {
                 Color(.secondarySystemFill)
                     .overlay {

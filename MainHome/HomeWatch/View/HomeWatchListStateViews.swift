@@ -35,27 +35,6 @@ struct HomeWatchListLoadingView: View {
     }
 }
 
-struct HomeWatchListErrorStateView: View {
-
-    // MARK: - Properties
-
-    let failure: FeatureLoadFailure
-    let onRetry: () -> Void
-
-    // MARK: - Body
-
-    var body: some View {
-        ErrorMessageRetryCardView(
-            state: ErrorMessageView.State(failure: failure),
-            title: "影音資料載入失敗",
-            retryTitle: "重新整理",
-            onRetry: onRetry,
-            minHeight: 0,
-            alignment: .leading
-        )
-    }
-}
-
 struct HomeWatchListLoadMoreFooterView: View {
 
     // MARK: - Properties
@@ -86,18 +65,7 @@ struct HomeWatchListLoadMoreFooterView: View {
                 .frame(maxWidth: .infinity, minHeight: 116)
 
         case .error(let failure):
-            VStack(alignment: .leading, spacing: 12) {
-                ErrorMessageView(state: ErrorMessageView.State(failure: failure))
-
-                Button {
-                    onRetry()
-                } label: {
-                    Label("重試載入更多", systemImage: "arrow.trianglehead.counterclockwise")
-                }
-                .buttonStyle(.borderedProminent)
-                .tint(ThemeColor.sakura)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
+            LoadMoreErrorFooterView(failure: failure, onRetry: onRetry)
         }
     }
 }

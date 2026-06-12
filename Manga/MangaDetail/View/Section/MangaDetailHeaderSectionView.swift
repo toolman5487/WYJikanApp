@@ -50,7 +50,10 @@ struct MangaDetailHeaderSectionView: View {
     @ViewBuilder
     private var posterView: some View {
         if let url = viewModel.posterURL(for: manga) {
-            RemotePosterImageView(url: url)
+            RemotePosterImageView(
+                url: url,
+                fixedSize: CGSize(width: 132, height: 196)
+            )
                 .aspectRatio(2.0 / 3.0, contentMode: .fit)
                 .frame(width: 132, height: 196)
                 .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))

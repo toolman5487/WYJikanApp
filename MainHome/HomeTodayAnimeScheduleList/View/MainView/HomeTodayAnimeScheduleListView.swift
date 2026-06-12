@@ -96,7 +96,11 @@ private struct HomeTodayAnimeScheduleListBodyView: View {
                 .transition(.opacity.combined(with: .move(edge: .bottom)))
 
         case .error(let failure):
-            HomeTodayAnimeScheduleListErrorStateView(failure: failure) {
+            ErrorMessageRetryCardView(
+                state: ErrorMessageView.State(failure: failure),
+                title: "播出表暫時讀不到",
+                retryTitle: "重新載入"
+            ) {
                 Task { await viewModel.reload() }
             }
             .transition(.opacity.combined(with: .move(edge: .bottom)))
@@ -113,18 +117,16 @@ private struct HomeTodayAnimeScheduleListBodyView: View {
         return LazyVStack(alignment: .leading, spacing: 0, pinnedViews: [.sectionHeaders]) {
             ForEach(sections) { section in
                 Section {
-                    VStack(spacing: 12) {
-                        ForEach(section.items) { item in
-                            HomeTodayAnimeScheduleListTimelineRowView(
-                                item: item,
-                                isFavorite: favoriteIDs.contains(item.id)
-                            ) {
-                                router.push(.animeDetail(malId: item.id))
-                            }
-                            .onAppear {
-                                Task {
-                                    await viewModel.loadMoreIfNeeded(currentItem: item)
-                                }
+                    ForEach(section.items) { item in
+                        HomeTodayAnimeScheduleListTimelineRowView(
+                            item: item,
+                            isFavorite: favoriteIDs.contains(item.id)
+                        ) {
+                            router.push(.animeDetail(malId: item.id))
+                        }
+                        .onAppear {
+                            Task {
+                                await viewModel.loadMoreIfNeeded(currentItem: item)
                             }
                         }
                     }

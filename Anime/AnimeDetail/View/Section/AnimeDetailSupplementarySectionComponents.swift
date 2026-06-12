@@ -101,7 +101,10 @@ struct AnimeDetailCharacterCardView: View {
     @ViewBuilder
     private var portraitView: some View {
         if let imageURL {
-            RemotePosterImageView(url: imageURL)
+            RemotePosterImageView(
+                url: imageURL,
+                fixedSize: CGSize(width: cardWidth, height: cardHeight)
+            )
         } else {
             RoundedRectangle(
                 cornerRadius: cornerRadius,
@@ -190,7 +193,13 @@ struct AnimeDetailRecommendationCardView: View {
     @ViewBuilder
     private var posterView: some View {
         if let imageURL = row.imageURL {
-            RemotePosterImageView(url: imageURL)
+            RemotePosterImageView(
+                url: imageURL,
+                fixedSize: CGSize(
+                    width: row.context == .preview ? previewCardWidth : listMetrics.cardWidth,
+                    height: row.context == .preview ? previewCardHeight : listMetrics.posterHeight
+                )
+            )
         } else {
             RoundedRectangle(
                 cornerRadius: previewCornerRadius,

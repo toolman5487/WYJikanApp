@@ -18,6 +18,50 @@ struct AnimeDetailPicturesSectionView: View {
         self.onTapImage = onTapImage
     }
 
+    var body: some View {
+        if viewModel.canShowFullPictureList {
+            AnimeDetailLinkedSection(
+                title: "劇照",
+                actionTitle: "查看全部"
+            ) {
+                AnimeDetailPicturesListView(
+                    viewModel: viewModel,
+                    onTapImage: onTapImage
+                )
+            } content: {
+                pictureGrid(items: viewModel.previewPictureItems)
+            }
+        } else {
+            AnimeDetailSectionCard("劇照") {
+                pictureGrid(items: viewModel.pictureItems)
+            }
+        }
+    }
+
+    private var gridColumns: [GridItem] {
+        [
+            GridItem(.flexible(), spacing: 12),
+            GridItem(.flexible(), spacing: 12),
+            GridItem(.flexible(), spacing: 12)
+        ]
+    }
+
+    @ViewBuilder
+    private func pictureGrid(items: [AnimeDetailPictureItem]) -> some View {
+        LazyVGrid(columns: gridColumns, alignment: .center, spacing: 12) {
+            ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
+                DetailPictureGridItemView(url: item.url) {
+                    onTapImage?(index)
+                }
+            }
+        }
+    }
+}
+
+struct AnimeDetailPicturesListView: View {
+    let viewModel: AnimeDetailViewModel
+    let onTapImage: ((Int) -> Void)?
+
     private var gridColumns: [GridItem] {
         [
             GridItem(.flexible(), spacing: 12),
@@ -27,7 +71,7 @@ struct AnimeDetailPicturesSectionView: View {
     }
 
     var body: some View {
-        AnimeDetailSectionCard("劇照") {
+        ScrollView {
             LazyVGrid(columns: gridColumns, alignment: .center, spacing: 12) {
                 ForEach(Array(viewModel.pictureItems.enumerated()), id: \.element.id) { index, item in
                     DetailPictureGridItemView(url: item.url) {
@@ -35,7 +79,10 @@ struct AnimeDetailPicturesSectionView: View {
                     }
                 }
             }
+            .padding()
         }
+        .navigationTitle("劇照")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 

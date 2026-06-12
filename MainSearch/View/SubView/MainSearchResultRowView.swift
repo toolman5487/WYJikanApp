@@ -36,7 +36,10 @@ struct MainSearchResultRowView: View {
     @ViewBuilder
     private var poster: some View {
         if let url = row.imageURL {
-            RemotePosterImageView(url: url)
+            RemotePosterImageView(
+                url: url,
+                fixedSize: CGSize(width: 48, height: 64)
+            )
         } else {
             Color(.systemGray5)
                 .overlay {

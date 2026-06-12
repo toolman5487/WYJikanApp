@@ -135,7 +135,10 @@ struct AnimeDetailCharactersListView: View {
     @ViewBuilder
     private func characterImage(_ character: AnimeCharacterEntryDTO) -> some View {
         if let imageURL = viewModel.characterImageURL(character) {
-            RemotePosterImageView(url: imageURL)
+            RemotePosterImageView(
+                url: imageURL,
+                fixedSize: CGSize(width: 82, height: 104)
+            )
         } else {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .fill(Color(.systemGray5))

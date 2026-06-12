@@ -240,15 +240,7 @@ extension PeopleDetailViewModel {
     }
 
     func imageURL(from images: AnimeImagesDTO?) -> URL? {
-        let candidates: [String?] = [
-            images?.webp?.largeImageUrl,
-            images?.jpg?.largeImageUrl,
-            images?.webp?.imageUrl,
-            images?.jpg?.imageUrl,
-            images?.jpg?.smallImageUrl,
-            images?.webp?.smallImageUrl
-        ]
-        return candidates.compactMap(nonEmpty).first.flatMap { URL(string: $0) }
+        JikanImageURLResolver.url(from: images, tier: .full)
     }
 
     func workTitle(_ work: PeopleRelatedWorkDTO) -> String {

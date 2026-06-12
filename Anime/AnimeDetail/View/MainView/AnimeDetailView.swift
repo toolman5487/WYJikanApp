@@ -238,26 +238,62 @@ private struct AnimeDetailBodyView: View {
         case .synopsis:
             AnimeDetailSynopsisSectionView(viewModel: viewModel, anime: anime)
         case .characters:
-            AnimeDetailCharactersSectionView(
-                viewModel: viewModel,
-                animeTitle: viewModel.displayTitle(for: anime),
-                isShowingCharacterList: $isShowingCharacterList
-            )
+            if viewModel.isLoadingCharacters {
+                AnimeDetailCharactersSectionSkeletonView()
+            } else if let failure = viewModel.charactersFailure {
+                DetailSupplementarySectionErrorView(
+                    title: "角色與聲優",
+                    failure: failure,
+                    retryTitle: "重試"
+                ) {
+                    Task { await viewModel.reloadCharacters() }
+                }
+            } else {
+                AnimeDetailCharactersSectionView(
+                    viewModel: viewModel,
+                    animeTitle: viewModel.displayTitle(for: anime),
+                    isShowingCharacterList: $isShowingCharacterList
+                )
+            }
         case .staff:
             AnimeDetailStaffSectionView(viewModel: viewModel, anime: anime)
         case .pictures:
-            AnimeDetailPicturesSectionView(
-                viewModel: viewModel,
-                onTapImage: { index in
-                    showImagePreview(for: anime, selectedPictureIndex: index)
+            if viewModel.isLoadingPictures {
+                AnimeDetailPicturesSectionSkeletonView()
+            } else if let failure = viewModel.picturesFailure {
+                DetailSupplementarySectionErrorView(
+                    title: "劇照",
+                    failure: failure,
+                    retryTitle: "重試"
+                ) {
+                    Task { await viewModel.reloadPictures() }
                 }
-            )
+            } else {
+                AnimeDetailPicturesSectionView(
+                    viewModel: viewModel,
+                    onTapImage: { index in
+                        showImagePreview(for: anime, selectedPictureIndex: index)
+                    }
+                )
+            }
         case .recommendations:
-            AnimeDetailRecommendationsSectionView(
-                viewModel: viewModel,
-                animeTitle: viewModel.displayTitle(for: anime),
-                isShowingRecommendationList: $isShowingRecommendationList
-            )
+            if viewModel.isLoadingRecommendations {
+                AnimeDetailRecommendationsSectionSkeletonView()
+            } else if let failure = viewModel.recommendationsFailure {
+                DetailSupplementarySectionErrorView(
+                    title: "你可能也喜歡",
+                    failure: failure,
+                    retryTitle: "重試"
+                ) {
+                    Task { await viewModel.reloadRecommendations() }
+                }
+            } else {
+                AnimeDetailRecommendationsSectionView(
+                    viewModel: viewModel,
+                    animeTitle: viewModel.displayTitle(for: anime),
+                    isShowingRecommendationList: $isShowingRecommendationList
+                )
+            }
         }
     }
 

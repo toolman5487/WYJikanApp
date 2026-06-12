@@ -50,7 +50,10 @@ struct MyListItemRowView: View {
     @ViewBuilder
     private var posterView: some View {
         if let url = item.imageURL {
-            RemotePosterImageView(url: url)
+            RemotePosterImageView(
+                url: url,
+                fixedSize: CGSize(width: 56, height: 84)
+            )
                 .frame(width: 56, height: 84)
                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         } else {

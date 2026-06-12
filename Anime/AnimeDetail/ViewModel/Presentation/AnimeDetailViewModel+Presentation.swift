@@ -53,13 +53,7 @@ extension AnimeDetailViewModel {
     }
 
     func posterURL(for anime: AnimeDetailDTO) -> URL? {
-        let urlString =
-            anime.images?.webp?.largeImageUrl ??
-            anime.images?.jpg?.largeImageUrl ??
-            anime.images?.webp?.imageUrl ??
-            anime.images?.jpg?.imageUrl
-        guard let urlString else { return nil }
-        return URL(string: urlString)
+        JikanImageURLResolver.url(from: anime.images, tier: .poster)
     }
 
     func malWorkPageURL(for anime: AnimeDetailDTO) -> URL? {
@@ -127,10 +121,10 @@ extension AnimeDetailViewModel {
                 hasEpisodes: hasEpisodes(for: anime),
                 hasTrailer: hasTrailer(for: anime),
                 hasSynopsis: hasSynopsis(for: anime),
-                hasCharacters: hasCharacters,
+                hasCharacters: showsCharactersSection,
                 hasStaffOrThemes: hasStaffInfo(for: anime) || hasThemes(for: anime),
-                hasPictures: hasPictures,
-                hasRecommendations: hasRecommendations
+                hasPictures: showsPicturesSection,
+                hasRecommendations: showsRecommendationsSection
             )
         )
     }
@@ -425,12 +419,34 @@ extension AnimeDetailViewModel {
         !pictureItems.isEmpty
     }
 
+    private static let previewPictureLimit = 9
+
+    var previewPictureItems: [AnimeDetailPictureItem] {
+        Array(pictureItems.prefix(Self.previewPictureLimit))
+    }
+
+    var canShowFullPictureList: Bool {
+        pictureItems.count > previewPictureItems.count
+    }
+
     var hasCharacters: Bool {
         !allCharacterRoles.isEmpty
     }
 
+    var showsCharactersSection: Bool {
+        hasCharacters || isLoadingCharacters || charactersFailure != nil
+    }
+
+    var showsPicturesSection: Bool {
+        hasPictures || isLoadingPictures || picturesFailure != nil
+    }
+
     var hasRecommendations: Bool {
         !allRecommendations.isEmpty
+    }
+
+    var showsRecommendationsSection: Bool {
+        hasRecommendations || isLoadingRecommendations || recommendationsFailure != nil
     }
 
     var previewCharacterRoles: [AnimeCharacterRoleDTO] {
@@ -487,13 +503,7 @@ extension AnimeDetailViewModel {
     }
 
     func characterImageURL(_ character: AnimeCharacterEntryDTO) -> URL? {
-        let urlString =
-            character.images?.webp?.largeImageUrl ??
-            character.images?.jpg?.largeImageUrl ??
-            character.images?.webp?.imageUrl ??
-            character.images?.jpg?.imageUrl
-        guard let urlString else { return nil }
-        return URL(string: urlString)
+        JikanImageURLResolver.url(from: character.images, tier: .card)
     }
 
     func characterRoleText(_ role: AnimeCharacterRoleDTO) -> String {
@@ -587,13 +597,7 @@ extension AnimeDetailViewModel {
     }
 
     func recommendationImageURL(_ recommendation: AnimeRecommendationDTO) -> URL? {
-        let urlString =
-            recommendation.entry?.images?.webp?.largeImageUrl ??
-            recommendation.entry?.images?.jpg?.largeImageUrl ??
-            recommendation.entry?.images?.webp?.imageUrl ??
-            recommendation.entry?.images?.jpg?.imageUrl
-        guard let urlString else { return nil }
-        return URL(string: urlString)
+        JikanImageURLResolver.url(from: recommendation.entry?.images, tier: .card)
     }
 
     private func recommendationSummary(for recommendation: AnimeRecommendationDTO) -> DetailRecommendationSummary {

@@ -135,7 +135,10 @@ struct PeopleDetailVoiceRolesListView: View {
     @ViewBuilder
     private func voiceRoleImage(_ character: PeopleRelatedCharacterDTO) -> some View {
         if let imageURL = viewModel.imageURL(from: character.images) {
-            RemotePosterImageView(url: imageURL)
+            RemotePosterImageView(
+                url: imageURL,
+                fixedSize: CGSize(width: 82, height: 104)
+            )
         } else {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .fill(Color(.systemGray5))
@@ -197,7 +200,10 @@ struct PeopleDetailVoiceRoleCardView: View {
     @ViewBuilder
     private var posterView: some View {
         if let imageURL {
-            RemotePosterImageView(url: imageURL)
+            RemotePosterImageView(
+                url: imageURL,
+                fixedSize: CGSize(width: cardWidth, height: cardHeight)
+            )
         } else {
             RoundedRectangle(
                 cornerRadius: cornerRadius,

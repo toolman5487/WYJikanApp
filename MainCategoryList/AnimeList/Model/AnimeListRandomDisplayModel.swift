@@ -18,18 +18,7 @@ extension AnimeListRandomDTO {
     }
 
     var posterURL: URL? {
-        let candidates = [
-            images?.webp?.largeImageUrl,
-            images?.jpg?.largeImageUrl,
-            images?.webp?.imageUrl,
-            images?.jpg?.imageUrl,
-            images?.webp?.smallImageUrl,
-            images?.jpg?.smallImageUrl
-        ]
-        for s in candidates {
-            if let s, let url = URL(string: s) { return url }
-        }
-        return nil
+        JikanImageURLResolver.url(from: images, tier: .poster)
     }
 
     var synopsisPreview: String? {

@@ -47,13 +47,7 @@ extension MangaDetailViewModel {
     }
 
     func posterURL(for manga: MangaDetailDTO) -> URL? {
-        let urlString =
-            manga.images?.webp?.largeImageUrl ??
-            manga.images?.jpg?.largeImageUrl ??
-            manga.images?.webp?.imageUrl ??
-            manga.images?.jpg?.imageUrl
-        guard let urlString else { return nil }
-        return URL(string: urlString)
+        JikanImageURLResolver.url(from: manga.images, tier: .poster)
     }
 
     func malWorkPageURL(for manga: MangaDetailDTO) -> URL? {
@@ -127,11 +121,11 @@ extension MangaDetailViewModel {
         MangaDetailSectionBuilder().sections(
             for: MangaDetailSectionAvailability(
                 hasSynopsis: hasSynopsis(for: manga),
-                hasCharacters: hasCharacters,
+                hasCharacters: showsCharactersSection,
                 hasPublicationInfo: hasPublicationInfo(for: manga),
                 hasThemes: hasThemes(for: manga),
-                hasPictures: hasPictures,
-                hasRecommendations: hasRecommendations
+                hasPictures: showsPicturesSection,
+                hasRecommendations: showsRecommendationsSection
             )
         )
     }
@@ -200,12 +194,34 @@ extension MangaDetailViewModel {
         !pictureItems.isEmpty
     }
 
+    private static let previewPictureLimit = 9
+
+    var previewPictureItems: [MangaDetailPictureItem] {
+        Array(pictureItems.prefix(Self.previewPictureLimit))
+    }
+
+    var canShowFullPictureList: Bool {
+        pictureItems.count > previewPictureItems.count
+    }
+
     var hasCharacters: Bool {
         !allCharacterRoles.isEmpty
     }
 
+    var showsCharactersSection: Bool {
+        hasCharacters || isLoadingCharacters || charactersFailure != nil
+    }
+
+    var showsPicturesSection: Bool {
+        hasPictures || isLoadingPictures || picturesFailure != nil
+    }
+
     var hasRecommendations: Bool {
         !allRecommendations.isEmpty
+    }
+
+    var showsRecommendationsSection: Bool {
+        hasRecommendations || isLoadingRecommendations || recommendationsFailure != nil
     }
 
     var previewCharacterRoles: [MangaCharacterRoleDTO] {
@@ -258,13 +274,7 @@ extension MangaDetailViewModel {
     }
 
     func characterImageURL(_ character: AnimeCharacterEntryDTO) -> URL? {
-        let urlString =
-            character.images?.webp?.largeImageUrl ??
-            character.images?.jpg?.largeImageUrl ??
-            character.images?.webp?.imageUrl ??
-            character.images?.jpg?.imageUrl
-        guard let urlString else { return nil }
-        return URL(string: urlString)
+        JikanImageURLResolver.url(from: character.images, tier: .card)
     }
 
     func characterRoleText(_ role: MangaCharacterRoleDTO) -> String {
@@ -288,13 +298,7 @@ extension MangaDetailViewModel {
     }
 
     func recommendationImageURL(_ recommendation: MangaRecommendationDTO) -> URL? {
-        let urlString =
-            recommendation.entry?.images?.webp?.largeImageUrl ??
-            recommendation.entry?.images?.jpg?.largeImageUrl ??
-            recommendation.entry?.images?.webp?.imageUrl ??
-            recommendation.entry?.images?.jpg?.imageUrl
-        guard let urlString else { return nil }
-        return URL(string: urlString)
+        JikanImageURLResolver.url(from: recommendation.entry?.images, tier: .card)
     }
 
     private func recommendationSummary(for recommendation: MangaRecommendationDTO) -> DetailRecommendationSummary {

@@ -41,7 +41,10 @@ struct PeopleDetailHeaderSectionView: View {
     @ViewBuilder
     private var posterView: some View {
         if let url = viewModel.posterURL(for: person) {
-            RemotePosterImageView(url: url)
+            RemotePosterImageView(
+                url: url,
+                fixedSize: CGSize(width: 132, height: 196)
+            )
                 .aspectRatio(2.0 / 3.0, contentMode: .fill)
                 .frame(width: 132, height: 196)
                 .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))

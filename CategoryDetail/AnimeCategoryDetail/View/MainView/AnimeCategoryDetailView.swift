@@ -114,7 +114,11 @@ private struct AnimeCategoryDetailBodyView: View {
             )
 
         case let .error(failure):
-            AnimeCategoryDetailErrorStateView(failure: failure) {
+            ErrorMessageRetryCardView(
+                state: ErrorMessageView.State(failure: failure),
+                title: "這個分類暫時打不開",
+                retryTitle: "重新載入"
+            ) {
                 Task { await viewModel.reload() }
             }
 

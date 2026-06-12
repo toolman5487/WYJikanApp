@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import SDWebImageSwiftUI
 
 struct HeroBannerImageView: View {
 
@@ -14,39 +13,20 @@ struct HeroBannerImageView: View {
 
     let url: URL
 
-    @State private var didFail = false
-
     // MARK: - Body
 
     var body: some View {
-        WebImage(url: url) { image in
-            image
-                .resizable()
-                .scaledToFill()
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-        } placeholder: {
-            Color(.systemBackground)
-                .overlay(ProgressView())
-        }
-        .onFailure { _ in
-            Task { @MainActor in
-                didFail = true
-            }
-        }
-        .overlay {
-            if didFail {
-                Color(.systemBackground)
-                    .overlay(Image(systemName: "photo").imageScale(.large))
-            }
-        }
-        .onChange(of: url) { _, _ in
-            Task { @MainActor in
-                didFail = false
-            }
+        GeometryReader { proxy in
+            RemotePosterImageView(
+                url: url,
+                contentMode: .fill,
+                fixedSize: proxy.size
+            )
         }
     }
 }
 
 #Preview {
     HeroBannerImageView(url: URL(string: "https://example.com/image.jpg")!)
+        .frame(height: 220)
 }

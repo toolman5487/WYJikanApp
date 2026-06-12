@@ -92,26 +92,62 @@ private struct MangaDetailBodyView: View {
         case .synopsis:
             MangaDetailSynopsisSectionView(viewModel: viewModel, manga: manga)
         case .characters:
-            MangaDetailCharactersSectionView(
-                viewModel: viewModel,
-                mangaTitle: viewModel.displayTitle(for: manga),
-                isShowingCharacterList: $isShowingCharacterList
-            )
+            if viewModel.isLoadingCharacters {
+                MangaDetailCharactersSectionSkeletonView()
+            } else if let failure = viewModel.charactersFailure {
+                DetailSupplementarySectionErrorView(
+                    title: "角色",
+                    failure: failure,
+                    retryTitle: "重試"
+                ) {
+                    Task { await viewModel.reloadCharacters() }
+                }
+            } else {
+                MangaDetailCharactersSectionView(
+                    viewModel: viewModel,
+                    mangaTitle: viewModel.displayTitle(for: manga),
+                    isShowingCharacterList: $isShowingCharacterList
+                )
+            }
         case .publication:
             MangaDetailPublicationSectionView(viewModel: viewModel, manga: manga)
         case .pictures:
-            MangaDetailPicturesSectionView(
-                viewModel: viewModel,
-                onTapImage: { index in
-                    showImagePreview(for: manga, selectedPictureIndex: index)
+            if viewModel.isLoadingPictures {
+                AnimeDetailPicturesSectionSkeletonView()
+            } else if let failure = viewModel.picturesFailure {
+                DetailSupplementarySectionErrorView(
+                    title: "圖片",
+                    failure: failure,
+                    retryTitle: "重試"
+                ) {
+                    Task { await viewModel.reloadPictures() }
                 }
-            )
+            } else {
+                MangaDetailPicturesSectionView(
+                    viewModel: viewModel,
+                    onTapImage: { index in
+                        showImagePreview(for: manga, selectedPictureIndex: index)
+                    }
+                )
+            }
         case .recommendations:
-            MangaDetailRecommendationsSectionView(
-                viewModel: viewModel,
-                mangaTitle: viewModel.displayTitle(for: manga),
-                isShowingRecommendationList: $isShowingRecommendationList
-            )
+            if viewModel.isLoadingRecommendations {
+                MangaDetailRecommendationsSectionSkeletonView()
+            } else if let failure = viewModel.recommendationsFailure {
+                DetailSupplementarySectionErrorView(
+                    title: "你可能也喜歡",
+                    failure: failure,
+                    retryTitle: "重試"
+                ) {
+                    Task { await viewModel.reloadRecommendations() }
+                }
+            } else {
+                MangaDetailRecommendationsSectionView(
+                    viewModel: viewModel,
+                    mangaTitle: viewModel.displayTitle(for: manga),
+                    isShowingRecommendationList: $isShowingRecommendationList
+                )
+            }
         }
     }
 

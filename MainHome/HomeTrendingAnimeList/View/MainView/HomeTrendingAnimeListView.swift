@@ -110,7 +110,11 @@ private struct HomeTrendingAnimeListBodyView: View {
                 .transition(.opacity.combined(with: .move(edge: .bottom)))
 
         case .error(let failure):
-            HomeTrendingAnimeListErrorStateView(failure: failure) {
+            ErrorMessageRetryCardView(
+                state: ErrorMessageView.State(failure: failure),
+                title: "熱門榜單暫時讀不到",
+                retryTitle: "重新載入"
+            ) {
                 Task { await viewModel.reload() }
             }
             .transition(.opacity.combined(with: .move(edge: .bottom)))
@@ -127,15 +131,13 @@ private struct HomeTrendingAnimeListBodyView: View {
         return LazyVStack(alignment: .leading, spacing: 8, pinnedViews: [.sectionHeaders]) {
             ForEach(sections) { section in
                 Section {
-                    VStack(spacing: 12) {
-                        ForEach(section.items) { item in
-                            HomeTrendingAnimeListRowView(
-                                item: item,
-                                sort: viewModel.selectedSort,
-                                isFavorite: favoriteIDs.contains(item.id)
-                            ) {
-                                router.push(.animeDetail(malId: item.id))
-                            }
+                    ForEach(section.items) { item in
+                        HomeTrendingAnimeListRowView(
+                            item: item,
+                            sort: viewModel.selectedSort,
+                            isFavorite: favoriteIDs.contains(item.id)
+                        ) {
+                            router.push(.animeDetail(malId: item.id))
                         }
                     }
                 } header: {

@@ -30,20 +30,6 @@ nonisolated enum AnimeDetailPictureMapping {
     }
 
     private static func bestURL(from images: AnimeImagesDTO) -> URL? {
-        let candidates: [String?] = [
-            images.webp?.largeImageUrl,
-            images.jpg?.largeImageUrl,
-            images.webp?.imageUrl,
-            images.jpg?.imageUrl,
-            images.webp?.smallImageUrl,
-            images.jpg?.smallImageUrl
-        ]
-        for candidate in candidates {
-            guard let raw = candidate?.trimmingCharacters(in: .whitespacesAndNewlines), !raw.isEmpty,
-                  let url = URL(string: raw)
-            else { continue }
-            return url
-        }
-        return nil
+        JikanImageURLResolver.url(from: images, tier: .full)
     }
 }

@@ -61,8 +61,10 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
     private static let initialVisibleCards = 9
     private static let loadMoreStep = 9
     private static let maxCards = 30
-    private static let titleEnrichmentDelayNanoseconds: UInt64 = 350_000_000
+    private static let titleEnrichmentDelayNanoseconds: UInt64 = 500_000_000
+    private static let titleCacheLimit = 100
     private static var titleCache: [Int: String] = [:]
+    private static var titleCacheOrder: [Int] = []
 
     @Published private(set) var screenState: HomeRecommendedAnimeScreenState = .loading
     @Published private(set) var visibleCount: Int = 9
@@ -113,7 +115,10 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
     }
 
     func loadMore() {
+        let previousCount = visibleCount
         visibleCount = min(visibleCount + Self.loadMoreStep, allItems.count)
+        guard visibleCount > previousCount else { return }
+        startTitleEnrichmentIfNeeded()
     }
 
     private func performLoad(forceRefresh: Bool, showsLoadingState: Bool) async {
@@ -138,18 +143,15 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
                 guard dto.entry.count >= 2 else { return nil }
                 let source = dto.entry[0]
                 let recommended = dto.entry[1]
-                guard let urlString =
-                    recommended.images?.webp?.largeImageUrl ??
-                    recommended.images?.jpg?.largeImageUrl ??
-                    recommended.images?.webp?.imageUrl ??
-                    recommended.images?.jpg?.imageUrl,
-                    let url = URL(string: urlString)
-                else { return nil }
+                guard let url = JikanImageURLResolver.url(
+                    from: recommended.images,
+                    tier: .card
+                ) else { return nil }
 
                 return HomeRecommendedAnimeCardItem(
                     id: dto.id,
                     sourceTitle: source.title?.trimmingCharacters(in: .whitespacesAndNewlines).nonEmpty ?? "原作",
-                    recommendedTitle: Self.titleCache[recommended.malId] ??
+                    recommendedTitle: Self.cachedTitle(for: recommended.malId) ??
                         recommended.title?.trimmingCharacters(in: .whitespacesAndNewlines).nonEmpty ??
                         "推薦作品",
                     username: dto.user?.username?.trimmingCharacters(in: .whitespacesAndNewlines).nonEmpty,
@@ -182,8 +184,8 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
 
     private func startTitleEnrichmentIfNeeded() {
         titleEnrichmentTask?.cancel()
-        let uncachedIDs = allItems.compactMap { item in
-            Self.titleCache[item.detailMalId] == nil ? item.detailMalId : nil
+        let uncachedIDs = displayedItems.compactMap { item in
+            Self.cachedTitle(for: item.detailMalId) == nil ? item.detailMalId : nil
         }
         guard !uncachedIDs.isEmpty else { return }
 
@@ -202,7 +204,7 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
                         english: anime.titleEnglish,
                         fallback: anime.title
                     )
-                    Self.titleCache[id] = title
+                    Self.storeTitle(title, for: id)
                     self.replaceRecommendedTitle(for: id, with: title)
                     try? await Task.sleep(nanoseconds: Self.titleEnrichmentDelayNanoseconds)
                 } catch {
@@ -250,6 +252,19 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
         screenState = updatedItems.isEmpty ? .empty : .content(updatedItems)
     }
 
+    private static func cachedTitle(for malId: Int) -> String? {
+        titleCache[malId]
+    }
+
+    private static func storeTitle(_ title: String, for malId: Int) {
+        titleCache[malId] = title
+        titleCacheOrder.removeAll { $0 == malId }
+        titleCacheOrder.append(malId)
+        while titleCacheOrder.count > titleCacheLimit {
+            let removed = titleCacheOrder.removeFirst()
+            titleCache.removeValue(forKey: removed)
+        }
+    }
 
     private nonisolated static func preferredTitle(japanese: String?, english: String?, fallback: String?) -> String {
         if let japanese, !japanese.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {

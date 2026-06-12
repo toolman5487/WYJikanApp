@@ -333,14 +333,7 @@ nonisolated enum HomeWatchPresentationBuilder {
     }
 
     private static func posterURL(from images: AnimeImagesDTO?) -> URL? {
-        [
-            images?.webp?.largeImageUrl,
-            images?.jpg?.largeImageUrl,
-            images?.webp?.imageUrl,
-            images?.jpg?.imageUrl
-        ]
-        .compactMap(url(from:))
-        .first
+        JikanImageURLResolver.url(from: images, tier: .poster)
     }
 
     private static func url(from value: String?) -> URL? {

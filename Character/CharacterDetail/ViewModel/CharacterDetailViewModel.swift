@@ -74,6 +74,10 @@ final class CharacterDetailViewModel: ObservableObject {
 }
 
 extension CharacterDetailViewModel {
+
+    private static let previewWorkLimit = 6
+    private static let previewVoiceActorLimit = 8
+
     enum Section: Identifiable {
         case header
         case info
@@ -187,16 +191,36 @@ extension CharacterDetailViewModel {
         (character.voices ?? []).filter { $0.person != nil }
     }
 
+    func previewAnimeRoles(for character: CharacterDetailDTO) -> [CharacterAnimeRoleDTO] {
+        Array(animeRoles(for: character).prefix(Self.previewWorkLimit))
+    }
+
+    func canShowFullAnimeRoleList(for character: CharacterDetailDTO) -> Bool {
+        animeRoles(for: character).count > previewAnimeRoles(for: character).count
+    }
+
+    func previewMangaRoles(for character: CharacterDetailDTO) -> [CharacterMangaRoleDTO] {
+        Array(mangaRoles(for: character).prefix(Self.previewWorkLimit))
+    }
+
+    func canShowFullMangaRoleList(for character: CharacterDetailDTO) -> Bool {
+        mangaRoles(for: character).count > previewMangaRoles(for: character).count
+    }
+
+    func previewVoiceActors(for character: CharacterDetailDTO) -> [CharacterVoiceActorDTO] {
+        Array(voiceActors(for: character).prefix(Self.previewVoiceActorLimit))
+    }
+
+    func canShowFullVoiceActorList(for character: CharacterDetailDTO) -> Bool {
+        voiceActors(for: character).count > previewVoiceActors(for: character).count
+    }
+
+    func thumbnailImageURL(from images: AnimeImagesDTO?) -> URL? {
+        JikanImageURLResolver.url(from: images, tier: .card)
+    }
+
     func imageURL(from images: AnimeImagesDTO?) -> URL? {
-        let candidates: [String?] = [
-            images?.webp?.largeImageUrl,
-            images?.jpg?.largeImageUrl,
-            images?.webp?.imageUrl,
-            images?.jpg?.imageUrl,
-            images?.jpg?.smallImageUrl,
-            images?.webp?.smallImageUrl
-        ]
-        return candidates.compactMap(nonEmpty).first.flatMap { URL(string: $0) }
+        JikanImageURLResolver.url(from: images, tier: .full)
     }
 
     func workTitle(_ work: CharacterRelatedWorkDTO) -> String {

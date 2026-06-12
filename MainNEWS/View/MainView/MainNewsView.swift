@@ -99,7 +99,11 @@ struct MainNewsView: View {
             )
                 .transition(.opacity)
         case .error(let failure):
-            MainNewsErrorStateView(failure: failure) {
+            ErrorMessageRetryCardView(
+                state: ErrorMessageView.State(failure: failure),
+                title: "新聞暫時讀不到",
+                retryTitle: "重新載入"
+            ) {
                 startReload()
             }
             .transition(.opacity)
