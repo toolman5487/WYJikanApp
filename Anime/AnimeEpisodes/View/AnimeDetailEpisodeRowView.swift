@@ -107,7 +107,7 @@ struct AnimeDetailEpisodeRowView: View, Equatable {
 
         case .error(let failure, let content):
             VStack(alignment: .leading, spacing: 16) {
-                errorBanner(message: failure.message)
+                ErrorMessageView(state: ErrorMessageView.State(failure: failure))
                 detailContent(content)
             }
         }
@@ -169,26 +169,6 @@ struct AnimeDetailEpisodeRowView: View, Equatable {
                     .clipShape(Capsule())
             }
         }
-    }
-
-    private func errorBanner(message: String) -> some View {
-        HStack(alignment: .top, spacing: 8) {
-            Image(systemName: "exclamationmark.triangle.fill")
-                .foregroundStyle(ThemeColor.sakura)
-
-            Text(message)
-                .font(.footnote)
-                .foregroundStyle(ThemeColor.textSecondary)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-        .padding(12)
-        .background(ThemeColor.sakura.opacity(0.12))
-        .clipShape(
-            RoundedRectangle(
-                cornerRadius: 12,
-                style: .continuous
-            )
-        )
     }
 
     private func externalLinks(_ links: [AnimeDetailEpisodeExternalLink]) -> some View {

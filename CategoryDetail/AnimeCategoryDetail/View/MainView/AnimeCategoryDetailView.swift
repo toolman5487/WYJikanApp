@@ -109,7 +109,7 @@ private struct AnimeCategoryDetailBodyView: View {
             AnimeCategoryDetailEmptyStateView()
 
         case let .error(failure):
-            AnimeCategoryDetailErrorStateView(message: failure.message) {
+            AnimeCategoryDetailErrorStateView(failure: failure) {
                 Task { await viewModel.reload() }
             }
 

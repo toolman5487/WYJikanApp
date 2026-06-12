@@ -55,9 +55,7 @@ struct AnimeReviewListView: View {
                 .frame(maxWidth: .infinity, minHeight: 116)
         case .error(let failure):
             VStack(alignment: .leading, spacing: 12) {
-                Text(failure.message)
-                    .font(.footnote)
-                    .foregroundStyle(ThemeColor.textSecondary)
+                ErrorMessageView(state: ErrorMessageView.State(failure: failure))
 
                 Button {
                     Task { await viewModel.loadMore() }

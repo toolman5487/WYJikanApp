@@ -38,9 +38,7 @@ struct MangaCategoryDetailLoadMoreFooterView: View {
 
         case let .error(failure):
             VStack(alignment: .leading, spacing: 12) {
-                Text(failure.message)
-                    .font(.footnote)
-                    .foregroundStyle(ThemeColor.textSecondary)
+                ErrorMessageView(state: ErrorMessageView.State(failure: failure))
 
                 Button {
                     onRetry()

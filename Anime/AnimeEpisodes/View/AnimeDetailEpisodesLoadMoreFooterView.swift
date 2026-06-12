@@ -27,9 +27,7 @@ struct AnimeDetailEpisodesLoadMoreFooterView: View {
                 .frame(maxWidth: .infinity, minHeight: 44)
         case .error(let failure):
             VStack(alignment: .leading, spacing: 12) {
-                Text(failure.message)
-                    .font(.footnote)
-                    .foregroundStyle(ThemeColor.textSecondary)
+                ErrorMessageView(state: ErrorMessageView.State(failure: failure))
 
                 Button("重試載入更多", action: retry)
                     .buttonStyle(.borderedProminent)

@@ -160,7 +160,7 @@ final class AnimeDetailEpisodesListViewModel: ObservableObject {
                 "Anime episodes load-more failed: \(error.localizedDescription, privacy: .public)"
             )
             isLoadingMore = false
-            loadMoreState = .error(FeatureLoadFailure(message: "載入更多集數失敗"))
+            loadMoreState = .error(FeatureLoadFailure.loadMore(message: "載入更多集數失敗"))
         }
     }
 

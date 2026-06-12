@@ -108,7 +108,7 @@ final class AnimeReviewViewModel: ObservableObject {
         } catch is CancellationError {
             return
         } catch {
-            loadMoreState = .error(FeatureLoadFailure(message: "載入更多失敗"))
+            loadMoreState = .error(FeatureLoadFailure.loadMore())
         }
     }
 }
