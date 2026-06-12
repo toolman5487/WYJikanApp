@@ -29,7 +29,7 @@ final class HomeTrendingAnimeListViewModel: ObservableObject {
     private var pagination = PaginatedListState<HomeTrendingAnimeListItem>()
     private var cancellables: Set<AnyCancellable> = []
 
-    init(service: HomeTrendingAnimeListServicing = HomeTrendingAnimeListService()) {
+    init(service: HomeTrendingAnimeListServicing) {
         self.service = service
         bindSelectedSort()
     }

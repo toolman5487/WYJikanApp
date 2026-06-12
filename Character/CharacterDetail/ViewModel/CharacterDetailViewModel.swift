@@ -46,7 +46,7 @@ final class CharacterDetailViewModel: ObservableObject {
     private let service: CharacterDetailServicing
     private var loadState: LoadState = .idle
 
-    init(malId: Int, service: CharacterDetailServicing = CharacterDetailService()) {
+    init(malId: Int, service: CharacterDetailServicing) {
         self.malId = malId
         self.service = service
     }

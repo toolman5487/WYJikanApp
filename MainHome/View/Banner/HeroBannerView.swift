@@ -108,6 +108,6 @@ struct HeroBannerView: View {
 }
 
 #Preview {
-    HeroBannerView(viewModel: HeroBannerViewModel())
+    HeroBannerView(viewModel: HeroBannerViewModel(service: AppDependencies.live.mainHomeService))
         .environmentObject(MainHomeRouter())
 }

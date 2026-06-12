@@ -8,18 +8,13 @@
 import Foundation
 import Combine
 import OSLog
-import SwiftData
-
 @MainActor
 final class FavoriteStatusStore: ObservableObject {
     @Published private(set) var animeFavoriteIDs: Set<Int> = []
     @Published private(set) var mangaFavoriteIDs: Set<Int> = []
     private var snapshotCancellable: AnyCancellable?
 
-    func connect(
-        to favoriteRepository: any FavoriteRepository,
-        modelContext: ModelContext
-    ) {
+    func connect(to favoriteRepository: any FavoriteRepository) {
         guard snapshotCancellable == nil else { return }
 
         snapshotCancellable = favoriteRepository.favoriteSnapshotPublisher
@@ -32,7 +27,7 @@ final class FavoriteStatusStore: ObservableObject {
             }
 
         do {
-            try favoriteRepository.reloadFavorites(from: modelContext)
+            try favoriteRepository.reloadFavorites()
         } catch {
             AppLogger.persistence.error(
                 "Favorite snapshot reload failed: \(error.localizedDescription, privacy: .public)"
@@ -78,10 +73,7 @@ final class AnimeBroadcastReminderStatusStore: ObservableObject {
 
     private var snapshotCancellable: AnyCancellable?
 
-    func connect(
-        to repository: any AnimeBroadcastReminderRepository,
-        modelContext: ModelContext
-    ) {
+    func connect(to repository: any AnimeBroadcastReminderRepository) {
         guard snapshotCancellable == nil else { return }
 
         snapshotCancellable = repository.snapshotPublisher
@@ -92,7 +84,7 @@ final class AnimeBroadcastReminderStatusStore: ObservableObject {
             }
 
         do {
-            try repository.reload(from: modelContext)
+            try repository.reload()
         } catch {
             AppLogger.persistence.error(
                 "Broadcast reminder snapshot reload failed: \(error.localizedDescription, privacy: .public)"

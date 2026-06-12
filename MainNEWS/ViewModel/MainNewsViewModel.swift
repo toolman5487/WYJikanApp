@@ -19,7 +19,7 @@ final class MainNewsViewModel: ObservableObject {
     private var requestGeneration = 0
 
     init(
-        service: MainNewsServicing = MainNewsService(),
+        service: MainNewsServicing,
         presentationBuilder: MainNewsPresentationBuilder = MainNewsPresentationBuilder()
     ) {
         self.service = service

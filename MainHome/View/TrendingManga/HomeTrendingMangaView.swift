@@ -123,7 +123,7 @@ struct HomeTrendingMangaView: View {
 }
 
 #Preview {
-    HomeTrendingMangaView(viewModel: HomeTrendingMangaViewModel())
+    HomeTrendingMangaView(viewModel: HomeTrendingMangaViewModel(service: AppDependencies.live.mainHomeService))
         .environmentObject(FavoriteStatusStore())
         .environmentObject(MainHomeRouter())
 }

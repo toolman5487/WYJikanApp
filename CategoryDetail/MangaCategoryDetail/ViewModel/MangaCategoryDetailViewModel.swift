@@ -43,7 +43,7 @@ final class MangaCategoryDetailViewModel: ObservableObject {
 
     init(
         genre: MangaListGenreDTO,
-        service: MangaCategoryDetailServicing = MangaCategoryDetailService()
+        service: MangaCategoryDetailServicing
     ) {
         self.genre = genre
         self.service = service

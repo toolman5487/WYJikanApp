@@ -32,7 +32,7 @@ final class MainSearchViewModel: ObservableObject {
     private var loadMoreTask: Task<Void, Never>?
 
     init(
-        service: MainSearchServicing = MainSearchService(),
+        service: MainSearchServicing,
         initialKind: MainSearchKind = .anime,
         initialQuery: String = "",
         initialSortOption: MainSearchSortOption = .default,

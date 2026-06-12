@@ -57,7 +57,7 @@ final class MangaReviewViewModel: ObservableObject {
     private var loadingPhase: LoadingPhase = .idle
     private var hasNextPage = false
 
-    init(malId: Int, service: MangaReviewServicing = MangaReviewService()) {
+    init(malId: Int, service: MangaReviewServicing) {
         self.malId = malId
         self.service = service
     }

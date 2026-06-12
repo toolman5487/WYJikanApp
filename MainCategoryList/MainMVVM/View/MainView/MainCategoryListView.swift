@@ -8,10 +8,17 @@
 import SwiftUI
 
 struct MainCategoryListView: View {
-    
+
     // MARK: - Properties
-    
-    @StateObject private var viewModel = MainCategoryListViewModel()
+
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @StateObject private var viewModel: MainCategoryListViewModel
+
+    // MARK: - Lifecycle
+
+    init(dependencies: AppDependencies) {
+        _viewModel = StateObject(wrappedValue: dependencies.makeMainCategoryListViewModel())
+    }
     @State private var loadMoreBounceProgress: CGFloat = 0
     
     private let topAnchorId = "MainCategoryListTopAnchor"
@@ -23,7 +30,9 @@ struct MainCategoryListView: View {
             scrollView
                 .toolbar(.hidden, for: .navigationBar)
                 .task {
-                    viewModel.loadSelectedKindIfNeeded()
+                    viewModel.prepareSelectedKind(
+                        isPadScreen: horizontalSizeClass == .regular
+                    )
                 }
                 .onDisappear {
                     viewModel.stopLoading()
@@ -175,5 +184,5 @@ struct MainCategoryListView: View {
 // MARK: - Preview
 
 #Preview {
-    MainCategoryListView()
+    MainCategoryListView(dependencies: .live)
 }

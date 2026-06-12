@@ -8,6 +8,23 @@
 import SwiftUI
 
 struct PeopleDetailView: View {
+    let malId: Int
+
+    var body: some View {
+        PeopleDetailConfiguredView(malId: malId)
+    }
+}
+
+private struct PeopleDetailConfiguredView: View {
+    @Environment(\.appDependencies) private var dependencies
+    let malId: Int
+
+    var body: some View {
+        PeopleDetailBodyView(malId: malId, dependencies: dependencies)
+    }
+}
+
+private struct PeopleDetailBodyView: View {
 
     // MARK: - Properties
 
@@ -16,9 +33,9 @@ struct PeopleDetailView: View {
 
     // MARK: - Lifecycle
 
-    init(malId: Int, service: PeopleDetailServicing = PeopleDetailService()) {
+    init(malId: Int, dependencies: AppDependencies) {
         self.malId = malId
-        _viewModel = StateObject(wrappedValue: PeopleDetailViewModel(malId: malId, service: service))
+        _viewModel = StateObject(wrappedValue: dependencies.makePeopleDetailViewModel(malId: malId))
     }
 
     // MARK: - Body

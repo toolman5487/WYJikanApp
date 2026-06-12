@@ -99,7 +99,7 @@ struct RandomHeroSectionView: View {
 
 #Preview {
     RandomHeroSectionView(
-        viewModel: RandomHeroViewModel(),
+        viewModel: RandomHeroViewModel(service: AppDependencies.live.mainCategoryListService),
         favoriteIDs: []
     )
 }

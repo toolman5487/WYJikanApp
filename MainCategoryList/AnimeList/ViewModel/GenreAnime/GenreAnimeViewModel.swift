@@ -41,12 +41,6 @@ final class GenreAnimeViewModel: ObservableObject {
     private static let maxRetryCount = 2
     private static let retryBackoff: Duration = .milliseconds(800)
     private static let genreErrorMessage = "目前無法載入分類資料，請稍後再試"
-    private static let batchConfiguration = MainCategoryGenreBatchConfiguration(
-        initialBatchSize: 5,
-        loadMoreBatchSize: 5,
-        initialItemRequestDelay: .milliseconds(1200),
-        requestInterval: .seconds(1)
-    )
 
     // MARK: - Published State
 
@@ -78,7 +72,7 @@ final class GenreAnimeViewModel: ObservableObject {
     // MARK: - Dependencies
 
     private let service: MainCategoryListServicing
-    private let batchLoader: MainCategoryGenreBatchLoader<AnimeListGenreDTO, AnimeListRandomDTO>
+    private var batchLoader: MainCategoryGenreBatchLoader<AnimeListGenreDTO, AnimeListRandomDTO>
 
     // MARK: - Loading State
 
@@ -87,12 +81,20 @@ final class GenreAnimeViewModel: ObservableObject {
 
     // MARK: - Lifecycle
 
-    init(service: MainCategoryListServicing = MainCategoryListService()) {
+    init(
+        service: MainCategoryListServicing,
+        batchConfiguration: MainCategoryGenreBatchConfiguration = .standard
+    ) {
         self.service = service
-        self.batchLoader = MainCategoryGenreBatchLoader(configuration: Self.batchConfiguration)
+        self.batchLoader = MainCategoryGenreBatchLoader(configuration: batchConfiguration)
     }
 
     // MARK: - Public Methods
+
+    func configureBatchIfNeeded(_ configuration: MainCategoryGenreBatchConfiguration) {
+        guard canReplaceBatchConfiguration else { return }
+        batchLoader = MainCategoryGenreBatchLoader(configuration: configuration)
+    }
 
     func loadIfNeeded() {
         switch loadState {
@@ -138,6 +140,15 @@ final class GenreAnimeViewModel: ObservableObject {
 // MARK: - Screen State
 
 private extension GenreAnimeViewModel {
+    var canReplaceBatchConfiguration: Bool {
+        switch loadState {
+        case .idle where genreSections.isEmpty:
+            return true
+        case .idle, .loadingInitial, .loadingMore, .paused, .loaded, .error:
+            return false
+        }
+    }
+
     var inlineErrorMessage: String? {
         guard case .error(let message) = loadState else { return nil }
         return message

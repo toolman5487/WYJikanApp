@@ -41,7 +41,7 @@ final class HomeTodayAnimeScheduleListViewModel: ObservableObject {
 
     init(
         initialDay: HomeScheduleDay = .current(),
-        service: HomeTodayAnimeScheduleListServicing = HomeTodayAnimeScheduleListService()
+        service: HomeTodayAnimeScheduleListServicing
     ) {
         self.selectedDay = initialDay
         self.service = service

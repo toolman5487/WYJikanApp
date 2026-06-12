@@ -8,8 +8,6 @@
 import Combine
 import Foundation
 import OSLog
-import SwiftData
-
 @MainActor
 final class MainMyListViewModel: ObservableObject {
     @Published private(set) var presentation: MyListPresentation
@@ -23,7 +21,7 @@ final class MainMyListViewModel: ObservableObject {
     private let favoriteRepository: any FavoriteRepository
     private var cachedItems: [MyListCollectionItem] = []
 
-    init(favoriteRepository: any FavoriteRepository = SwiftDataFavoriteRepository.shared) {
+    init(favoriteRepository: any FavoriteRepository) {
         self.favoriteRepository = favoriteRepository
         self.presentation = Self.emptyPresentation(selectedFilter: .all)
     }
@@ -162,9 +160,9 @@ final class MainMyListViewModel: ObservableObject {
         )
     }
 
-    func remove(_ item: MyListCollectionItem, from modelContext: ModelContext) {
+    func remove(_ item: MyListCollectionItem) {
         do {
-            try favoriteRepository.remove(item, from: modelContext)
+            try favoriteRepository.remove(item)
         } catch {
             AppLogger.persistence.error("MyList delete failed: \(error.localizedDescription, privacy: .public)")
         }

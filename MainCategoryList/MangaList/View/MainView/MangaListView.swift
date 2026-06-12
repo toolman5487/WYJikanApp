@@ -55,7 +55,7 @@ private struct MainView: View {
 #Preview {
     NavigationStack {
         ScrollView {
-            MangaListView(viewModel: MangaListViewModel())
+            MangaListView(viewModel: AppDependencies.live.makeMainCategoryListViewModel().mangaListViewModel)
                 .environmentObject(FavoriteStatusStore())
                 .padding(.horizontal)
         }

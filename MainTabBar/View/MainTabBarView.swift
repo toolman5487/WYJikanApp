@@ -6,12 +6,31 @@
 import SwiftUI
 
 struct MainTabBarView: View {
+    @Environment(\.appDependencies) private var dependencies
+
+    var body: some View {
+        MainTabBarConfiguredView(dependencies: dependencies)
+    }
+}
+
+private struct MainTabBarConfiguredView: View {
 
     // MARK: - Properties
 
+    let dependencies: AppDependencies
+
     @EnvironmentObject private var viewModel: MainTabBarViewModel
     @EnvironmentObject private var favoriteStatusStore: FavoriteStatusStore
-    @StateObject private var mainSearchViewModel = MainSearchViewModel()
+    @StateObject private var mainSearchViewModel: MainSearchViewModel
+
+    // MARK: - Lifecycle
+
+    init(dependencies: AppDependencies) {
+        self.dependencies = dependencies
+        _mainSearchViewModel = StateObject(
+            wrappedValue: dependencies.makeMainSearchViewModel()
+        )
+    }
 
     // MARK: - Body
 
@@ -19,26 +38,26 @@ struct MainTabBarView: View {
         TabView(selection: $viewModel.selectedTab) {
             TabSection("主頁") {
                 Tab(value: AppTab.home) {
-                    MainHomeView()
+                    MainHomeView(dependencies: dependencies)
                 } label: {
                     Image(systemName: viewModel.selectedTab == .home ? "square.grid.3x3.fill" : "square.grid.3x3")
                 }
 
                 Tab(value: AppTab.categorylist) {
-                    MainCategoryListView()
+                    MainCategoryListView(dependencies: dependencies)
                 } label: {
                     Image(systemName: viewModel.selectedTab == .categorylist ? "film.stack.fill" : "film.stack")
                 }
 
                 Tab(value: AppTab.news) {
-                    MainNewsView()
+                    MainNewsView(dependencies: dependencies)
                 } label: {
                     Image(systemName: "antenna.radiowaves.left.and.right")
                         .symbolVariant(viewModel.selectedTab == .news ? .fill : .none)
                 }
 
                 Tab(value: AppTab.myList) {
-                    MainMyListView()
+                    MainMyListView(dependencies: dependencies)
                 } label: {
                     Image(systemName: viewModel.selectedTab == .myList ? "heart.fill" : "heart")
                 }
@@ -79,7 +98,7 @@ struct MainTabBarView: View {
 
 #Preview {
     MainTabBarView()
-        .environmentObject(MainTabBarViewModel.shared)
+        .environmentObject(MainTabBarViewModel())
         .environmentObject(FavoriteStatusStore())
         .environmentObject(MainHomeRouter.shared)
 }

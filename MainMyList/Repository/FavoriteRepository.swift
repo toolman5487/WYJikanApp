@@ -9,27 +9,38 @@ import Foundation
 import Combine
 import SwiftData
 
+enum RepositoryConnectionError: LocalizedError {
+    case notConnected
+
+    var errorDescription: String? {
+        switch self {
+        case .notConnected:
+            return "資料庫尚未連線，請重新啟動 App。"
+        }
+    }
+}
+
 struct FavoriteSnapshot: Equatable, Sendable {
     let animeIDs: Set<Int>
     let mangaIDs: Set<Int>
 }
 
 protocol FavoriteRepository: AnyObject {
+    func connect(modelContext: ModelContext)
+
     var favoriteSnapshotPublisher: AnyPublisher<FavoriteSnapshot, Never> { get }
 
-    func reloadFavorites(from modelContext: ModelContext) throws
+    func reloadFavorites() throws
 
     func toggleFavorite(
         malId: Int,
         mediaKind: MyListMediaKind,
-        modelContext: ModelContext,
         makeItem: (() -> MyListCollectionItem)?
     ) throws -> Bool
 
-    func remove(
-        _ item: MyListCollectionItem,
-        from modelContext: ModelContext
-    ) throws
+    func remove(_ item: MyListCollectionItem) throws
+
+    func saveChanges() throws
 }
 
 final class SwiftDataFavoriteRepository: FavoriteRepository {
@@ -45,18 +56,26 @@ final class SwiftDataFavoriteRepository: FavoriteRepository {
         FavoriteSnapshot(animeIDs: [], mangaIDs: [])
     )
 
+    private var modelContext: ModelContext?
+
     private init() {}
 
-    func reloadFavorites(from modelContext: ModelContext) throws {
+    func connect(modelContext: ModelContext) {
+        self.modelContext = modelContext
+    }
+
+    func reloadFavorites() throws {
+        let modelContext = try requireModelContext()
         snapshotSubject.send(try makeSnapshot(from: modelContext))
     }
 
     func toggleFavorite(
         malId: Int,
         mediaKind: MyListMediaKind,
-        modelContext: ModelContext,
         makeItem: (() -> MyListCollectionItem)? = nil
     ) throws -> Bool {
+        let modelContext = try requireModelContext()
+
         if let existing = try fetchFavoriteItem(
             malId: malId,
             mediaKind: mediaKind,
@@ -90,10 +109,8 @@ final class SwiftDataFavoriteRepository: FavoriteRepository {
         }
     }
 
-    func remove(
-        _ item: MyListCollectionItem,
-        from modelContext: ModelContext
-    ) throws {
+    func remove(_ item: MyListCollectionItem) throws {
+        let modelContext = try requireModelContext()
         modelContext.delete(item)
 
         do {
@@ -103,6 +120,24 @@ final class SwiftDataFavoriteRepository: FavoriteRepository {
             modelContext.rollback()
             throw error
         }
+    }
+
+    func saveChanges() throws {
+        let modelContext = try requireModelContext()
+
+        do {
+            try modelContext.save()
+        } catch {
+            modelContext.rollback()
+            throw error
+        }
+    }
+
+    private func requireModelContext() throws -> ModelContext {
+        guard let modelContext else {
+            throw RepositoryConnectionError.notConnected
+        }
+        return modelContext
     }
 
     private func publishFavorites(from modelContext: ModelContext) throws {
@@ -149,19 +184,15 @@ final class SwiftDataFavoriteRepository: FavoriteRepository {
 // MARK: - Broadcast Reminder
 
 protocol AnimeBroadcastReminderRepository: AnyObject {
+    func connect(modelContext: ModelContext)
+
     var snapshotPublisher: AnyPublisher<AnimeBroadcastReminderSnapshotSet, Never> { get }
 
-    func reload(from modelContext: ModelContext) throws
+    func reload() throws
 
-    func subscribe(
-        snapshot: AnimeBroadcastReminderSnapshot,
-        modelContext: ModelContext
-    ) throws
+    func subscribe(snapshot: AnimeBroadcastReminderSnapshot) throws
 
-    func unsubscribe(
-        malId: Int,
-        modelContext: ModelContext
-    ) throws
+    func unsubscribe(malId: Int) throws
 }
 
 final class SwiftDataAnimeBroadcastReminderRepository: AnimeBroadcastReminderRepository {
@@ -177,16 +208,22 @@ final class SwiftDataAnimeBroadcastReminderRepository: AnimeBroadcastReminderRep
         AnimeBroadcastReminderSnapshotSet(subscriptions: [])
     )
 
+    private var modelContext: ModelContext?
+
     private init() {}
 
-    func reload(from modelContext: ModelContext) throws {
+    func connect(modelContext: ModelContext) {
+        self.modelContext = modelContext
+    }
+
+    func reload() throws {
+        let modelContext = try requireModelContext()
         snapshotSubject.send(try makeSnapshotSet(from: modelContext))
     }
 
-    func subscribe(
-        snapshot: AnimeBroadcastReminderSnapshot,
-        modelContext: ModelContext
-    ) throws {
+    func subscribe(snapshot: AnimeBroadcastReminderSnapshot) throws {
+        let modelContext = try requireModelContext()
+
         if let existing = try fetchSubscription(malId: snapshot.malId, modelContext: modelContext) {
             existing.title = snapshot.title
             existing.broadcastDay = snapshot.broadcastDay
@@ -211,10 +248,9 @@ final class SwiftDataAnimeBroadcastReminderRepository: AnimeBroadcastReminderRep
         try publish(from: modelContext)
     }
 
-    func unsubscribe(
-        malId: Int,
-        modelContext: ModelContext
-    ) throws {
+    func unsubscribe(malId: Int) throws {
+        let modelContext = try requireModelContext()
+
         guard let existing = try fetchSubscription(malId: malId, modelContext: modelContext) else {
             return
         }
@@ -228,6 +264,13 @@ final class SwiftDataAnimeBroadcastReminderRepository: AnimeBroadcastReminderRep
             modelContext.rollback()
             throw error
         }
+    }
+
+    private func requireModelContext() throws -> ModelContext {
+        guard let modelContext else {
+            throw RepositoryConnectionError.notConnected
+        }
+        return modelContext
     }
 
     private func publish(from modelContext: ModelContext) throws {

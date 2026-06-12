@@ -30,7 +30,7 @@ final class HomeWatchListViewModel: ObservableObject {
 
     init(
         initialFeed: HomeWatchFeedKind = .latestEpisodes,
-        service: HomeWatchServicing = HomeWatchService()
+        service: HomeWatchServicing
     ) {
         self.selectedFeed = initialFeed
         self.service = service

@@ -18,12 +18,16 @@ struct MainMyListView: View {
 
     // MARK: - Properties
 
-    @Environment(\.modelContext) private var modelContext
     @Query(sort: \MyListCollectionItem.addedAt, order: .reverse)
     private var items: [MyListCollectionItem]
-    @StateObject private var viewModel = MainMyListViewModel()
+    @StateObject private var viewModel: MainMyListViewModel
+
     @State private var genreCollectionsRoute: MyListGenreCollectionsRoute?
     @State private var formatCollectionsRoute: MyListFormatCollectionsRoute?
+
+    init(dependencies: AppDependencies) {
+        _viewModel = StateObject(wrappedValue: dependencies.makeMainMyListViewModel())
+    }
 
     // MARK: - Body
 
@@ -112,7 +116,7 @@ struct MainMyListView: View {
                     .buttonStyle(.plain)
                     .contextMenu {
                         Button(role: .destructive) {
-                            viewModel.remove(item, from: modelContext)
+                            viewModel.remove(item)
                         } label: {
                             Label("移除收藏", systemImage: "heart.slash")
                         }
@@ -183,5 +187,5 @@ struct MainMyListView: View {
 }
 
 #Preview {
-    MainMyListView()
+    MainMyListView(dependencies: .live)
 }

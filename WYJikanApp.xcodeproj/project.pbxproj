@@ -1196,8 +1196,8 @@
 			isa = PBXGroup;
 			children = (
 				15A2955E2F8631B50056071F /* Model */,
-				15A2955D2F8631AD0056071F /* ViewModel */,
 				15A295542F86301C0056071F /* View */,
+				15A2955D2F8631AD0056071F /* ViewModel */,
 			);
 			path = MainMVVM;
 			sourceTree = "<group>";
@@ -1360,8 +1360,8 @@
 		15A2955D2F8631AD0056071F /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
-				15A2955F2F8631D60056071F /* MainCategoryListViewModel.swift */,
 				16F6A0032FC200000000003 /* MainCategoryGenreBatchLoader.swift */,
+				15A2955F2F8631D60056071F /* MainCategoryListViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";

@@ -40,7 +40,7 @@ final class HomeWatchPromosViewModel: ObservableObject {
     private let service: HomeWatchServicing
     private var loadState: LoadState = .idle
 
-    init(service: HomeWatchServicing = HomeWatchService()) {
+    init(service: HomeWatchServicing) {
         self.service = service
     }
 

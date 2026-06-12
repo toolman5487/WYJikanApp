@@ -15,8 +15,8 @@ struct MainNewsView: View {
 
     // MARK: - Lifecycle
 
-    init(viewModel: MainNewsViewModel = MainNewsViewModel()) {
-        _viewModel = StateObject(wrappedValue: viewModel)
+    init(dependencies: AppDependencies) {
+        _viewModel = StateObject(wrappedValue: dependencies.makeMainNewsViewModel())
     }
 
     // MARK: - Body
@@ -122,5 +122,5 @@ struct MainNewsView: View {
 }
 
 #Preview {
-    MainNewsView()
+    MainNewsView(dependencies: .live)
 }

@@ -9,43 +9,49 @@ import SwiftUI
 import SwiftData
 
 struct MangaDetailView: View {
+    let malId: Int
+
+    var body: some View {
+        MangaDetailConfiguredView(malId: malId)
+    }
+}
+
+private struct MangaDetailConfiguredView: View {
+    @Environment(\.appDependencies) private var dependencies
+    let malId: Int
+
+    var body: some View {
+        MangaDetailBodyView(malId: malId, dependencies: dependencies)
+    }
+}
+
+private struct MangaDetailBodyView: View {
     private struct ImagePreviewSession: Identifiable {
         let id = UUID()
         let items: [ImagePreviewItem]
         var selectedIndex: Int
     }
-    
+
     // MARK: - Properties
-    
+
     let malId: Int
-    
+
     @StateObject private var viewModel: MangaDetailViewModel
     @EnvironmentObject private var favoriteStatusStore: FavoriteStatusStore
-    @Environment(\.modelContext) private var modelContext
     @Query(sort: \MyListCollectionItem.addedAt, order: .reverse)
     private var collectionItems: [MyListCollectionItem]
     @State private var imagePreviewSession: ImagePreviewSession?
     @State private var progressEditorDraft: MangaReadingProgressEditorDraft?
     @State private var isShowingCharacterList = false
     @State private var isShowingRecommendationList = false
-    
+
     // MARK: - Initialization
-    
-    init(
-        malId: Int,
-        service: MangaDetailServicing = MangaDetailService(),
-        favoriteRepository: any FavoriteRepository = SwiftDataFavoriteRepository.shared
-    ) {
+
+    init(malId: Int, dependencies: AppDependencies) {
         self.malId = malId
-        _viewModel = StateObject(
-            wrappedValue: MangaDetailViewModel(
-                malId: malId,
-                service: service,
-                favoriteRepository: favoriteRepository
-            )
-        )
+        _viewModel = StateObject(wrappedValue: dependencies.makeMangaDetailViewModel(malId: malId))
     }
-    
+
     @ViewBuilder
     private func sectionView(_ section: MangaDetailViewModel.Section, viewModel: MangaDetailViewModel, manga: MangaDetailDTO) -> some View {
         switch section {
@@ -63,15 +69,15 @@ struct MangaDetailView: View {
                         item: favoriteItem,
                         manga: manga,
                         onIncrement: { item in
-                            incrementReadingProgress(for: item, manga: manga)
+                            viewModel.incrementReadingProgress(for: item, manga: manga)
                         },
                         onDecrement: { item in
-                            decrementReadingProgress(for: item, manga: manga)
+                            viewModel.decrementReadingProgress(for: item, manga: manga)
                         },
                         onEdit: { item in
-                            progressEditorDraft = MangaReadingProgressEditorDraft(
-                                item: item,
-                                totalChapters: normalizedTotalChapters(for: manga)
+                            progressEditorDraft = viewModel.readingProgressEditorDraft(
+                                for: item,
+                                manga: manga
                             )
                         }
                     )
@@ -126,7 +132,7 @@ struct MangaDetailView: View {
         )
         imagePreviewSession = ImagePreviewSession(items: items, selectedIndex: selectedIndex)
     }
-    
+
     private var isFavorite: Bool {
         favoriteStatusStore.isFavorite(malId: malId, mediaKind: .manga)
     }
@@ -145,9 +151,9 @@ struct MangaDetailView: View {
             return nil
         }
     }
-    
+
     // MARK: - Body
-    
+
     var body: some View {
         Group {
             switch viewModel.screenState {
@@ -208,10 +214,7 @@ struct MangaDetailView: View {
                 reviewState: viewModel.reviewNavigationState(),
                 isRefreshing: viewModel.isRefreshing,
                 onFavoriteTap: {
-                    viewModel.toggleFavorite(
-                        isFavorite: isFavorite,
-                        modelContext: modelContext
-                    )
+                    viewModel.toggleFavorite(isFavorite: isFavorite)
                 },
                 onRefreshTap: {
                     Task {
@@ -244,61 +247,13 @@ struct MangaDetailView: View {
                     for: favoriteItem,
                     status: updatedDraft.status,
                     currentChapter: updatedDraft.currentChapter,
-                    totalChapters: updatedDraft.totalChapters,
-                    modelContext: modelContext
+                    totalChapters: updatedDraft.totalChapters
                 )
             }
         }
         .task(id: malId) {
             await viewModel.load()
         }
-    }
-
-    private func incrementReadingProgress(
-        for item: MyListCollectionItem,
-        manga: MangaDetailDTO
-    ) {
-        let totalChapters = normalizedTotalChapters(for: manga)
-        let nextChapter = min(
-            (item.currentChapter ?? 0) + 1,
-            totalChapters ?? Int.max
-        )
-        let nextStatus: MangaReadingStatus
-        if let totalChapters, nextChapter >= totalChapters {
-            nextStatus = .completed
-        } else {
-            nextStatus = .reading
-        }
-
-        viewModel.updateReadingProgress(
-            for: item,
-            status: nextStatus,
-            currentChapter: nextChapter,
-            totalChapters: totalChapters,
-            modelContext: modelContext
-        )
-    }
-
-    private func decrementReadingProgress(
-        for item: MyListCollectionItem,
-        manga: MangaDetailDTO
-    ) {
-        let totalChapters = normalizedTotalChapters(for: manga)
-        let nextChapter = max((item.currentChapter ?? 0) - 1, 0)
-        let nextStatus: MangaReadingStatus = nextChapter > 0 ? .reading : .planned
-
-        viewModel.updateReadingProgress(
-            for: item,
-            status: nextStatus,
-            currentChapter: nextChapter,
-            totalChapters: totalChapters,
-            modelContext: modelContext
-        )
-    }
-
-    private func normalizedTotalChapters(for manga: MangaDetailDTO) -> Int? {
-        guard let chapters = manga.chapters, chapters > 0 else { return nil }
-        return chapters
     }
 }
 

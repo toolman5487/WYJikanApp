@@ -5,10 +5,26 @@
 //  Created by Willy Hsu on 2026/3/27.
 //
 
-import SwiftData
 import SwiftUI
 
 struct AnimeDetailView: View {
+    let malId: Int
+
+    var body: some View {
+        AnimeDetailConfiguredView(malId: malId)
+    }
+}
+
+private struct AnimeDetailConfiguredView: View {
+    @Environment(\.appDependencies) private var dependencies
+    let malId: Int
+
+    var body: some View {
+        AnimeDetailBodyView(malId: malId, dependencies: dependencies)
+    }
+}
+
+private struct AnimeDetailBodyView: View {
 
     // MARK: - Types
 
@@ -25,32 +41,16 @@ struct AnimeDetailView: View {
     @EnvironmentObject private var favoriteStatusStore: FavoriteStatusStore
     @EnvironmentObject private var broadcastReminderStatusStore: AnimeBroadcastReminderStatusStore
     @EnvironmentObject private var todayAnimeNotificationScheduler: HomeTodayAnimeNotificationScheduler
-    @Environment(\.modelContext) private var modelContext
     @State private var imagePreviewSession: ImagePreviewSession?
     @State private var isShowingCharacterList = false
     @State private var isShowingRecommendationList = false
     @State private var broadcastReminderAlertMessage: String?
-    private let detailService: any AnimeDetailServicing
-    private let broadcastReminderRepository: any AnimeBroadcastReminderRepository
 
     // MARK: - Lifecycle
 
-    init(
-        malId: Int,
-        service: AnimeDetailServicing = AnimeDetailService(),
-        favoriteRepository: any FavoriteRepository = SwiftDataFavoriteRepository.shared,
-        broadcastReminderRepository: any AnimeBroadcastReminderRepository = SwiftDataAnimeBroadcastReminderRepository.shared
-    ) {
+    init(malId: Int, dependencies: AppDependencies) {
         self.malId = malId
-        self.detailService = service
-        self.broadcastReminderRepository = broadcastReminderRepository
-        _viewModel = StateObject(
-            wrappedValue: AnimeDetailViewModel(
-                malId: malId,
-                service: service,
-                favoriteRepository: favoriteRepository
-            )
-        )
+        _viewModel = StateObject(wrappedValue: dependencies.makeAnimeDetailViewModel(malId: malId))
     }
 
     // MARK: - Body
@@ -110,10 +110,7 @@ struct AnimeDetailView: View {
                 reviewState: viewModel.reviewNavigationState(),
                 isRefreshing: viewModel.isRefreshing,
                 onFavoriteTap: {
-                    viewModel.toggleFavorite(
-                        isFavorite: isFavorite,
-                        modelContext: modelContext
-                    )
+                    viewModel.toggleFavorite(isFavorite: isFavorite)
                 },
                 onBroadcastReminderTap: {
                     Task {
@@ -123,7 +120,11 @@ struct AnimeDetailView: View {
                 onRefreshTap: {
                     Task {
                         await viewModel.load(forceRefresh: true)
-                        await syncBroadcastReminderIfNeeded()
+                        await viewModel.syncBroadcastReminderIfNeeded(
+                            isSubscribed: broadcastReminderStatusStore.isSubscribed(malId: malId),
+                            subscribedCount: broadcastReminderStatusStore.subscriptions.count,
+                            notificationScheduler: todayAnimeNotificationScheduler
+                        )
                     }
                 },
                 reviewDestination: { title in
@@ -159,7 +160,11 @@ struct AnimeDetailView: View {
         }
         .task(id: malId) {
             await viewModel.load()
-            await syncBroadcastReminderIfNeeded()
+            await viewModel.syncBroadcastReminderIfNeeded(
+                isSubscribed: broadcastReminderStatusStore.isSubscribed(malId: malId),
+                subscribedCount: broadcastReminderStatusStore.subscriptions.count,
+                notificationScheduler: todayAnimeNotificationScheduler
+            )
         }
     }
 
@@ -224,8 +229,7 @@ struct AnimeDetailView: View {
         case .episodes:
             AnimeDetailEpisodesEntrySectionView(
                 viewModel: viewModel,
-                anime: anime,
-                service: detailService
+                anime: anime
             )
         case .score:
             AnimeDetailScoreSectionView(viewModel: viewModel, anime: anime)
@@ -264,26 +268,11 @@ struct AnimeDetailView: View {
         imagePreviewSession = ImagePreviewSession(items: items, selectedIndex: selectedIndex)
     }
 
-    private func syncBroadcastReminderIfNeeded() async {
-        guard let anime = viewModel.detail else { return }
-
-        await AnimeBroadcastReminderReconciler.reconcile(
-            anime: anime,
-            isSubscribed: broadcastReminderStatusStore.isSubscribed(malId: malId),
-            subscribedCount: broadcastReminderStatusStore.subscriptions.count,
-            repository: broadcastReminderRepository,
-            scheduler: todayAnimeNotificationScheduler,
-            modelContext: modelContext
-        )
-    }
-
     private func toggleBroadcastReminder() async {
         if let error = await viewModel.toggleBroadcastReminder(
             isSubscribed: broadcastReminderStatusStore.isSubscribed(malId: malId),
             subscribedCount: broadcastReminderStatusStore.subscriptions.count,
-            reminderRepository: broadcastReminderRepository,
-            notificationScheduler: todayAnimeNotificationScheduler,
-            modelContext: modelContext
+            notificationScheduler: todayAnimeNotificationScheduler
         ) {
             broadcastReminderAlertMessage = error.localizedDescription
         }

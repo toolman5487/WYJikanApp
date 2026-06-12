@@ -8,8 +8,6 @@
 import Combine
 import Foundation
 import OSLog
-import SwiftData
-
 @MainActor
 final class AnimeDetailViewModel: ObservableObject {
     enum ScreenState {
@@ -28,15 +26,18 @@ final class AnimeDetailViewModel: ObservableObject {
     private let malId: Int
     private let service: AnimeDetailServicing
     private let favoriteRepository: any FavoriteRepository
+    private let broadcastReminderRepository: any AnimeBroadcastReminderRepository
 
     init(
         malId: Int,
-        service: AnimeDetailServicing = AnimeDetailService(),
-        favoriteRepository: any FavoriteRepository = SwiftDataFavoriteRepository.shared
+        service: AnimeDetailServicing,
+        favoriteRepository: any FavoriteRepository,
+        broadcastReminderRepository: any AnimeBroadcastReminderRepository
     ) {
         self.malId = malId
         self.service = service
         self.favoriteRepository = favoriteRepository
+        self.broadcastReminderRepository = broadcastReminderRepository
     }
 
     var detail: AnimeDetailDTO? {
@@ -145,28 +146,85 @@ final class AnimeDetailViewModel: ObservableObject {
         detail != nil
     }
 
-    func toggleFavorite(
-        isFavorite: Bool,
-        modelContext: ModelContext
-    ) {
+    func toggleFavorite(isFavorite: Bool) {
         do {
             if isFavorite {
                 _ = try favoriteRepository.toggleFavorite(
                     malId: malId,
                     mediaKind: .anime,
-                    modelContext: modelContext,
                     makeItem: nil
                 )
             } else if let detail {
                 _ = try favoriteRepository.toggleFavorite(
                     malId: malId,
                     mediaKind: .anime,
-                    modelContext: modelContext,
                     makeItem: { self.favoriteItem(for: detail) }
                 )
             }
         } catch {
             AppLogger.persistence.error("Anime favorite update failed: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    // MARK: - Broadcast Reminder
+
+    func syncBroadcastReminderIfNeeded(
+        isSubscribed: Bool,
+        subscribedCount: Int,
+        notificationScheduler: HomeTodayAnimeNotificationScheduler
+    ) async {
+        guard let detail else { return }
+
+        await AnimeBroadcastReminderReconciler.reconcile(
+            anime: detail,
+            isSubscribed: isSubscribed,
+            subscribedCount: subscribedCount,
+            repository: broadcastReminderRepository,
+            scheduler: notificationScheduler
+        )
+    }
+
+    func toggleBroadcastReminder(
+        isSubscribed: Bool,
+        subscribedCount: Int,
+        notificationScheduler: HomeTodayAnimeNotificationScheduler
+    ) async -> AnimeDetailBroadcastReminderError? {
+        guard let detail else {
+            return .detailUnavailable
+        }
+
+        do {
+            if isSubscribed {
+                await AnimeBroadcastReminderReconciler.unsubscribe(
+                    malId: detail.id,
+                    remainingSubscriptionCount: subscribedCount - 1,
+                    repository: broadcastReminderRepository,
+                    scheduler: notificationScheduler
+                )
+                return nil
+            }
+
+            guard let snapshot = AnimeBroadcastReminderSnapshot(
+                anime: detail,
+                title: displayTitle(for: detail)
+            ) else {
+                return .broadcastUnavailable
+            }
+
+            do {
+                try await notificationScheduler.ensureAuthorizationForSubscription()
+            } catch BaseUserNotificationError.permissionDenied {
+                return .permissionDenied
+            }
+
+            try broadcastReminderRepository.subscribe(snapshot: snapshot)
+            await notificationScheduler.refreshScheduledNotificationsImmediately()
+            return nil
+        } catch {
+            AppLogger.persistence.error(
+                "Anime broadcast reminder update failed: \(error.localizedDescription, privacy: .public)"
+            )
+            return .broadcastUnavailable
         }
     }
 }

@@ -66,7 +66,7 @@ final class HomeTodayAnimeViewModel: ObservableObject {
     private let service: MainHomeServicing
     private var loadState: LoadState = .idle
 
-    init(service: MainHomeServicing = MainHomeService()) {
+    init(service: MainHomeServicing) {
         self.service = service
     }
 

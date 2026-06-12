@@ -101,7 +101,7 @@ final class RandomHeroViewModel: ObservableObject {
     // MARK: - Lifecycle
 
     init(
-        service: MainCategoryListServicing = MainCategoryListService(),
+        service: MainCategoryListServicing,
         storage: UserDefaults = .standard
     ) {
         self.service = service

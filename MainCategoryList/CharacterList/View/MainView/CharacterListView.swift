@@ -27,7 +27,7 @@ struct CharacterListView: View {
 
 #Preview {
     ScrollView {
-        CharacterListView(viewModel: CharacterListViewModel())
+        CharacterListView(viewModel: CharacterListViewModel(service: AppDependencies.live.mainCategoryListService))
             .padding(.horizontal)
     }
 }

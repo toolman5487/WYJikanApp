@@ -5,7 +5,6 @@
 
 import Foundation
 import OSLog
-import SwiftData
 
 enum AnimeBroadcastReminderReconciler {
     @MainActor
@@ -14,8 +13,7 @@ enum AnimeBroadcastReminderReconciler {
         isSubscribed: Bool,
         subscribedCount: Int,
         repository: any AnimeBroadcastReminderRepository,
-        scheduler: HomeTodayAnimeNotificationScheduler,
-        modelContext: ModelContext
+        scheduler: HomeTodayAnimeNotificationScheduler
     ) async {
         guard isSubscribed else { return }
         guard !AnimeBroadcastReminderScheduling.isCurrentlyAiring(anime) else { return }
@@ -24,8 +22,7 @@ enum AnimeBroadcastReminderReconciler {
             malId: anime.id,
             remainingSubscriptionCount: subscribedCount - 1,
             repository: repository,
-            scheduler: scheduler,
-            modelContext: modelContext
+            scheduler: scheduler
         )
     }
 
@@ -34,8 +31,7 @@ enum AnimeBroadcastReminderReconciler {
         subscriptions: [AnimeBroadcastReminderSnapshot],
         service: AnimeDetailServicing,
         repository: any AnimeBroadcastReminderRepository,
-        scheduler: HomeTodayAnimeNotificationScheduler,
-        modelContext: ModelContext
+        scheduler: HomeTodayAnimeNotificationScheduler
     ) async {
         guard !subscriptions.isEmpty else { return }
 
@@ -48,7 +44,7 @@ enum AnimeBroadcastReminderReconciler {
                     continue
                 }
 
-                try repository.unsubscribe(malId: subscription.malId, modelContext: modelContext)
+                try repository.unsubscribe(malId: subscription.malId)
                 await scheduler.removeReminders(forAnimeID: subscription.malId)
                 remainingCount -= 1
 
@@ -76,11 +72,10 @@ enum AnimeBroadcastReminderReconciler {
         malId: Int,
         remainingSubscriptionCount: Int,
         repository: any AnimeBroadcastReminderRepository,
-        scheduler: HomeTodayAnimeNotificationScheduler,
-        modelContext: ModelContext
+        scheduler: HomeTodayAnimeNotificationScheduler
     ) async {
         do {
-            try repository.unsubscribe(malId: malId, modelContext: modelContext)
+            try repository.unsubscribe(malId: malId)
             await scheduler.removeReminders(forAnimeID: malId)
 
             if remainingSubscriptionCount <= 0 {

@@ -8,6 +8,20 @@
 import SwiftUI
 
 struct HomeTodayAnimeScheduleListView: View {
+    var body: some View {
+        HomeTodayAnimeScheduleListConfiguredView()
+    }
+}
+
+private struct HomeTodayAnimeScheduleListConfiguredView: View {
+    @Environment(\.appDependencies) private var dependencies
+
+    var body: some View {
+        HomeTodayAnimeScheduleListBodyView(dependencies: dependencies)
+    }
+}
+
+private struct HomeTodayAnimeScheduleListBodyView: View {
 
     // MARK: - Properties
 
@@ -17,8 +31,10 @@ struct HomeTodayAnimeScheduleListView: View {
 
     // MARK: - Lifecycle
 
-    init(viewModel: HomeTodayAnimeScheduleListViewModel = HomeTodayAnimeScheduleListViewModel()) {
-        _viewModel = StateObject(wrappedValue: viewModel)
+    init(dependencies: AppDependencies) {
+        _viewModel = StateObject(
+            wrappedValue: dependencies.makeHomeTodayAnimeScheduleListViewModel()
+        )
     }
 
     // MARK: - Body

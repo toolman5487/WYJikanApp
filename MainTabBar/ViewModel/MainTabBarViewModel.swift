@@ -25,8 +25,6 @@ final class MainTabBarViewModel: ObservableObject {
 
     // MARK: - Properties
 
-    static let shared = MainTabBarViewModel()
-
     @Published var selectedTab: AppTab = .home
     @Published private(set) var lastSeenMyListFavoriteCount: Int
 

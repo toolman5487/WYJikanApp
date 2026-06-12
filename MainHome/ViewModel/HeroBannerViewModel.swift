@@ -70,7 +70,7 @@ final class HeroBannerViewModel: ObservableObject {
     private var autoScrollTask: Task<Void, Never>?
 
     init(
-        service: MainHomeServicing = MainHomeService(),
+        service: MainHomeServicing,
         emptyStateMessage: String = "目前沒有本季焦點作品"
     ) {
         self.service = service

@@ -123,7 +123,7 @@ struct HomeTrendingAnimeView: View {
 }
 
 #Preview {
-    HomeTrendingAnimeView(viewModel: HomeTrendingAnimeViewModel())
+    HomeTrendingAnimeView(viewModel: HomeTrendingAnimeViewModel(service: AppDependencies.live.mainHomeService))
         .environmentObject(FavoriteStatusStore())
         .environmentObject(MainHomeRouter())
 }

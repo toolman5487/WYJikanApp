@@ -18,14 +18,18 @@ final class AnimeListViewModel: ObservableObject {
     // MARK: - Lifecycle
 
     init(
-        randomHeroViewModel: RandomHeroViewModel = RandomHeroViewModel(),
-        genreAnimeViewModel: GenreAnimeViewModel = GenreAnimeViewModel()
+        randomHeroViewModel: RandomHeroViewModel,
+        genreAnimeViewModel: GenreAnimeViewModel
     ) {
         self.randomHeroViewModel = randomHeroViewModel
         self.genreAnimeViewModel = genreAnimeViewModel
     }
 
     // MARK: - Public Methods
+
+    func configureGenreBatchIfNeeded(_ configuration: MainCategoryGenreBatchConfiguration) {
+        genreAnimeViewModel.configureBatchIfNeeded(configuration)
+    }
 
     func loadIfNeeded() {
         genreAnimeViewModel.loadIfNeeded()

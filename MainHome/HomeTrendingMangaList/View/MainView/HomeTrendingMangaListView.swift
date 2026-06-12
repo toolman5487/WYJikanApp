@@ -8,6 +8,20 @@
 import SwiftUI
 
 struct HomeTrendingMangaListView: View {
+    var body: some View {
+        HomeTrendingMangaListConfiguredView()
+    }
+}
+
+private struct HomeTrendingMangaListConfiguredView: View {
+    @Environment(\.appDependencies) private var dependencies
+
+    var body: some View {
+        HomeTrendingMangaListBodyView(dependencies: dependencies)
+    }
+}
+
+private struct HomeTrendingMangaListBodyView: View {
 
     // MARK: - Properties
 
@@ -17,8 +31,10 @@ struct HomeTrendingMangaListView: View {
 
     // MARK: - Lifecycle
 
-    init(viewModel: HomeTrendingMangaListViewModel = HomeTrendingMangaListViewModel()) {
-        _viewModel = StateObject(wrappedValue: viewModel)
+    init(dependencies: AppDependencies) {
+        _viewModel = StateObject(
+            wrappedValue: dependencies.makeHomeTrendingMangaListViewModel()
+        )
     }
 
     // MARK: - Body

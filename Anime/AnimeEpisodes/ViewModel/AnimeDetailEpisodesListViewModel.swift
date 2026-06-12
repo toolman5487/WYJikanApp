@@ -43,7 +43,7 @@ final class AnimeDetailEpisodesListViewModel: ObservableObject {
 
     init(
         malId: Int,
-        service: any AnimeDetailServicing = AnimeDetailService(),
+        service: any AnimeDetailServicing,
         rowPresenter: AnimeDetailEpisodeRowPresenter = AnimeDetailEpisodeRowPresenter()
     ) {
         self.malId = malId

@@ -8,6 +8,23 @@
 import SwiftUI
 
 struct AnimeCategoryDetailView: View {
+    let genre: AnimeListGenreDTO
+
+    var body: some View {
+        AnimeCategoryDetailConfiguredView(genre: genre)
+    }
+}
+
+private struct AnimeCategoryDetailConfiguredView: View {
+    @Environment(\.appDependencies) private var dependencies
+    let genre: AnimeListGenreDTO
+
+    var body: some View {
+        AnimeCategoryDetailBodyView(genre: genre, dependencies: dependencies)
+    }
+}
+
+private struct AnimeCategoryDetailBodyView: View {
 
     // MARK: - Properties
 
@@ -17,12 +34,9 @@ struct AnimeCategoryDetailView: View {
 
     // MARK: - Initialization
 
-    init(
-        genre: AnimeListGenreDTO,
-        service: AnimeCategoryDetailServicing = AnimeCategoryDetailService()
-    ) {
+    init(genre: AnimeListGenreDTO, dependencies: AppDependencies) {
         _viewModel = StateObject(
-            wrappedValue: AnimeCategoryDetailViewModel(genre: genre, service: service)
+            wrappedValue: dependencies.makeAnimeCategoryDetailViewModel(genre: genre)
         )
     }
 

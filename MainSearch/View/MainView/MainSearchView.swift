@@ -85,7 +85,7 @@ struct MainSearchView: View {
 
 #Preview {
     struct MainSearchPreview: View {
-        @StateObject private var viewModel = MainSearchViewModel()
+        @StateObject private var viewModel = AppDependencies.live.makeMainSearchViewModel()
 
         var body: some View {
             MainSearchView(viewModel: viewModel)

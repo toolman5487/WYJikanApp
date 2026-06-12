@@ -12,20 +12,36 @@ struct AnimeDetailEpisodesListView: View {
     let malId: Int
     let animeTitle: String
 
+    var body: some View {
+        AnimeDetailEpisodesListConfiguredView(malId: malId, animeTitle: animeTitle)
+    }
+}
+
+private struct AnimeDetailEpisodesListConfiguredView: View {
+    @Environment(\.appDependencies) private var dependencies
+    let malId: Int
+    let animeTitle: String
+
+    var body: some View {
+        AnimeDetailEpisodesListBodyView(
+            malId: malId,
+            animeTitle: animeTitle,
+            dependencies: dependencies
+        )
+    }
+}
+
+private struct AnimeDetailEpisodesListBodyView: View {
+    let malId: Int
+    let animeTitle: String
+
     @StateObject private var viewModel: AnimeDetailEpisodesListViewModel
 
-    init(
-        malId: Int,
-        animeTitle: String,
-        service: any AnimeDetailServicing = AnimeDetailService()
-    ) {
+    init(malId: Int, animeTitle: String, dependencies: AppDependencies) {
         self.malId = malId
         self.animeTitle = animeTitle
         _viewModel = StateObject(
-            wrappedValue: AnimeDetailEpisodesListViewModel(
-                malId: malId,
-                service: service
-            )
+            wrappedValue: dependencies.makeAnimeDetailEpisodesListViewModel(malId: malId)
         )
     }
 

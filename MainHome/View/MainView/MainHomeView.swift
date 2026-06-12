@@ -21,6 +21,7 @@ struct MainHomeView: View {
     @StateObject private var recommendedAnimeViewModel: HomeRecommendedAnimeViewModel
     @State private var feedCoordinator: HomeFeedCoordinator?
     @State private var loadMoreBounceProgress: CGFloat = 0
+    private let dependencies: AppDependencies
     private let watchService: any HomeWatchServicing
 
     enum HomeSection: Identifiable {
@@ -65,10 +66,10 @@ struct MainHomeView: View {
 
     // MARK: - Lifecycle
 
-    init(
-        service: MainHomeServicing = MainHomeService(),
-        watchService: HomeWatchServicing = HomeWatchService()
-    ) {
+    init(dependencies: AppDependencies) {
+        let service = dependencies.mainHomeService
+        let watchService = dependencies.homeWatchService
+        self.dependencies = dependencies
         self.watchService = watchService
         _heroBannerViewModel = StateObject(wrappedValue: HeroBannerViewModel(service: service))
         _watchPromosViewModel = StateObject(wrappedValue: HomeWatchPromosViewModel(service: watchService))
@@ -135,10 +136,7 @@ struct MainHomeView: View {
                 switch route {
                 case .watch(let feed):
                     HomeWatchListView(
-                        viewModel: HomeWatchListViewModel(
-                            initialFeed: feed,
-                            service: watchService
-                        )
+                        viewModel: dependencies.makeHomeWatchListViewModel(initialFeed: feed)
                     )
                 case .webPage(let page):
                     BaseWebView(page: page)
@@ -274,6 +272,6 @@ struct MainHomeView: View {
 }
 
 #Preview {
-    MainHomeView()
+    MainHomeView(dependencies: .live)
         .environmentObject(MainHomeRouter.shared)
 }

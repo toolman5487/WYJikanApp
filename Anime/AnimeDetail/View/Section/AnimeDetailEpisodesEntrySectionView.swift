@@ -11,14 +11,12 @@ import SwiftUI
 struct AnimeDetailEpisodesEntrySectionView: View {
     let viewModel: AnimeDetailViewModel
     let anime: AnimeDetailDTO
-    let service: any AnimeDetailServicing
 
     var body: some View {
         NavigationLink {
             AnimeDetailEpisodesListView(
                 malId: anime.malId,
-                animeTitle: viewModel.displayTitle(for: anime),
-                service: service
+                animeTitle: viewModel.displayTitle(for: anime)
             )
         } label: {
             AnimeDetailSectionCard("集數") {

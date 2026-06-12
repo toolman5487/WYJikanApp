@@ -180,6 +180,6 @@ private struct HomeWatchPromoCardView: View {
 }
 
 #Preview {
-    HomeWatchPromosView(viewModel: HomeWatchPromosViewModel())
+    HomeWatchPromosView(viewModel: HomeWatchPromosViewModel(service: AppDependencies.live.homeWatchService))
         .environmentObject(MainHomeRouter())
 }

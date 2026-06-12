@@ -135,7 +135,7 @@ private struct HomeTodayAnimeCardView: View {
 }
 
 #Preview {
-    HomeTodayAnimeView(viewModel: HomeTodayAnimeViewModel())
+    HomeTodayAnimeView(viewModel: HomeTodayAnimeViewModel(service: AppDependencies.live.mainHomeService))
         .environmentObject(FavoriteStatusStore())
         .environmentObject(MainHomeRouter())
 }

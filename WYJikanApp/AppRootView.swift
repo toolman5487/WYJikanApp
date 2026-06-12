@@ -5,40 +5,37 @@
 //  Created by Codex on 2026/5/13.
 //
 
-import SwiftData
 import SwiftUI
 
 struct AppRootView: View {
-    @Environment(\.modelContext) private var modelContext
     @EnvironmentObject private var broadcastReminderStatusStore: AnimeBroadcastReminderStatusStore
-    @EnvironmentObject private var todayAnimeNotificationScheduler: HomeTodayAnimeNotificationScheduler
+    @EnvironmentObject private var bootstrapViewModel: AppBootstrapViewModel
 
     var body: some View {
         MainTabBarView()
         .preferredColorScheme(.dark)
         .dynamicTypeSize(.medium)
         .task {
-            await bootstrap()
+            await bootstrapViewModel.bootstrap(
+                subscriptions: broadcastReminderStatusStore.subscriptions
+            )
         }
-    }
-
-    private func bootstrap() async {
-        await AnimeBroadcastReminderReconciler.reconcileAll(
-            subscriptions: broadcastReminderStatusStore.subscriptions,
-            service: AnimeDetailService(),
-            repository: SwiftDataAnimeBroadcastReminderRepository.shared,
-            scheduler: todayAnimeNotificationScheduler,
-            modelContext: modelContext
-        )
-        await todayAnimeNotificationScheduler.refreshScheduledNotificationIfNeeded()
     }
 }
 
 #Preview {
     AppRootView()
+        .environment(\.appDependencies, .live)
         .environmentObject(FavoriteStatusStore())
         .environmentObject(AnimeBroadcastReminderStatusStore())
         .environmentObject(HomeTodayAnimeNotificationScheduler())
-        .environmentObject(MainTabBarViewModel.shared)
+        .environmentObject(
+            AppBootstrapViewModel(
+                animeDetailService: AppDependencies.live.animeDetailService,
+                broadcastReminderRepository: AppDependencies.live.broadcastReminderRepository,
+                notificationScheduler: HomeTodayAnimeNotificationScheduler()
+            )
+        )
+        .environmentObject(MainTabBarViewModel())
         .environmentObject(MainHomeRouter.shared)
 }

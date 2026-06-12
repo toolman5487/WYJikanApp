@@ -27,7 +27,7 @@ struct PeopleListView: View {
 
 #Preview {
     ScrollView {
-        PeopleListView(viewModel: PeopleListViewModel())
+        PeopleListView(viewModel: PeopleListViewModel(service: AppDependencies.live.mainCategoryListService))
             .padding(.horizontal)
     }
 }

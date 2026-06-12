@@ -12,6 +12,12 @@ final class AppNotificationDelegate: NSObject, UIApplicationDelegate, UNUserNoti
     @MainActor
     static var onNotificationOpened: (@MainActor (UNNotificationResponse) async -> Void)?
 
+    @MainActor
+    static var onRouteToHomeTab: (@MainActor () -> Void)?
+
+    @MainActor
+    static var onNavigateToMainHomeRoutes: (@MainActor ([MainHomeRoute]) -> Void)?
+
     private enum NotificationUserInfoKey {
         static let route = "route"
         static let animeID = "animeID"
@@ -58,7 +64,7 @@ final class AppNotificationDelegate: NSObject, UIApplicationDelegate, UNUserNoti
 
     @MainActor
     private func routeToTodayAnimeSchedule(using userInfo: [AnyHashable: Any]) {
-        MainTabBarViewModel.shared.selectedTab = .home
+        Self.onRouteToHomeTab?()
 
         let routes: [MainHomeRoute]
         if let animeID = userInfo[NotificationUserInfoKey.animeID] as? Int {
@@ -70,6 +76,6 @@ final class AppNotificationDelegate: NSObject, UIApplicationDelegate, UNUserNoti
             routes = [.todayAnimeSchedule]
         }
 
-        MainHomeRouter.shared.replacePath(with: routes)
+        Self.onNavigateToMainHomeRoutes?(routes)
     }
 }

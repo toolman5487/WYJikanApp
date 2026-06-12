@@ -41,7 +41,7 @@ final class CharacterListViewModel: ObservableObject {
     private var loadTask: Task<Void, Never>?
     private var sourceRows: [CharacterListRow] = []
 
-    init(service: MainCategoryListServicing = MainCategoryListService()) {
+    init(service: MainCategoryListServicing) {
         self.service = service
     }
 

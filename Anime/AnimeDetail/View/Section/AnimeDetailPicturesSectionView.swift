@@ -68,6 +68,6 @@ struct DetailPictureGridItemView: View {
 }
 
 #Preview {
-    AnimeDetailPicturesSectionView(viewModel: AnimeDetailViewModel(malId: 1))
+    AnimeDetailPicturesSectionView(viewModel: AppDependencies.live.makeAnimeDetailViewModel(malId: 1))
         .padding()
 }

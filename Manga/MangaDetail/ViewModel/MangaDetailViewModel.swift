@@ -8,8 +8,6 @@
 import Combine
 import Foundation
 import OSLog
-import SwiftData
-
 @MainActor
 final class MangaDetailViewModel: ObservableObject {
     enum ScreenState {
@@ -31,8 +29,8 @@ final class MangaDetailViewModel: ObservableObject {
 
     init(
         malId: Int,
-        service: MangaDetailServicing = MangaDetailService(),
-        favoriteRepository: any FavoriteRepository = SwiftDataFavoriteRepository.shared
+        service: MangaDetailServicing,
+        favoriteRepository: any FavoriteRepository
     ) {
         self.malId = malId
         self.service = service
@@ -144,23 +142,18 @@ final class MangaDetailViewModel: ObservableObject {
         detail != nil
     }
 
-    func toggleFavorite(
-        isFavorite: Bool,
-        modelContext: ModelContext
-    ) {
+    func toggleFavorite(isFavorite: Bool) {
         do {
             if isFavorite {
                 _ = try favoriteRepository.toggleFavorite(
                     malId: malId,
                     mediaKind: .manga,
-                    modelContext: modelContext,
                     makeItem: nil
                 )
             } else if let detail {
                 _ = try favoriteRepository.toggleFavorite(
                     malId: malId,
                     mediaKind: .manga,
-                    modelContext: modelContext,
                     makeItem: { self.favoriteItem(for: detail) }
                 )
             }
@@ -173,8 +166,7 @@ final class MangaDetailViewModel: ObservableObject {
         for item: MyListCollectionItem,
         status: MangaReadingStatus,
         currentChapter: Int?,
-        totalChapters: Int?,
-        modelContext: ModelContext
+        totalChapters: Int?
     ) {
         item.updateMangaReadingProgress(
             status: status,
@@ -183,10 +175,64 @@ final class MangaDetailViewModel: ObservableObject {
         )
 
         do {
-            try modelContext.save()
+            try favoriteRepository.saveChanges()
         } catch {
-            modelContext.rollback()
             AppLogger.persistence.error("Manga reading progress update failed: \(error.localizedDescription, privacy: .public)")
         }
+    }
+
+    func readingProgressEditorDraft(
+        for item: MyListCollectionItem,
+        manga: MangaDetailDTO
+    ) -> MangaReadingProgressEditorDraft {
+        MangaReadingProgressEditorDraft(
+            item: item,
+            totalChapters: totalChapters(for: manga)
+        )
+    }
+
+    func incrementReadingProgress(
+        for item: MyListCollectionItem,
+        manga: MangaDetailDTO
+    ) {
+        let resolvedTotalChapters = totalChapters(for: manga)
+        let nextChapter = min(
+            (item.currentChapter ?? 0) + 1,
+            resolvedTotalChapters ?? Int.max
+        )
+        let nextStatus: MangaReadingStatus
+        if let resolvedTotalChapters, nextChapter >= resolvedTotalChapters {
+            nextStatus = .completed
+        } else {
+            nextStatus = .reading
+        }
+
+        updateReadingProgress(
+            for: item,
+            status: nextStatus,
+            currentChapter: nextChapter,
+            totalChapters: resolvedTotalChapters
+        )
+    }
+
+    func decrementReadingProgress(
+        for item: MyListCollectionItem,
+        manga: MangaDetailDTO
+    ) {
+        let resolvedTotalChapters = totalChapters(for: manga)
+        let nextChapter = max((item.currentChapter ?? 0) - 1, 0)
+        let nextStatus: MangaReadingStatus = nextChapter > 0 ? .reading : .planned
+
+        updateReadingProgress(
+            for: item,
+            status: nextStatus,
+            currentChapter: nextChapter,
+            totalChapters: resolvedTotalChapters
+        )
+    }
+
+    private func totalChapters(for manga: MangaDetailDTO) -> Int? {
+        guard let chapters = manga.chapters, chapters > 0 else { return nil }
+        return chapters
     }
 }

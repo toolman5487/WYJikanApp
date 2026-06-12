@@ -19,7 +19,7 @@ struct HomeWatchListView: View {
 
     // MARK: - Lifecycle
 
-    init(viewModel: HomeWatchListViewModel = HomeWatchListViewModel()) {
+    init(viewModel: HomeWatchListViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
 
@@ -163,7 +163,9 @@ struct HomeWatchListView: View {
 }
 
 #Preview {
-    HomeWatchListView()
-        .environmentObject(FavoriteStatusStore())
-        .environmentObject(MainHomeRouter())
+    HomeWatchListView(
+        viewModel: AppDependencies.live.makeHomeWatchListViewModel(initialFeed: .latestPromos)
+    )
+    .environmentObject(FavoriteStatusStore())
+    .environmentObject(MainHomeRouter())
 }

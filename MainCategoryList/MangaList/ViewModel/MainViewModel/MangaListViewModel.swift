@@ -14,11 +14,15 @@ final class MangaListViewModel: ObservableObject {
     let genreMangaViewModel: GenreMangaViewModel
 
     init(
-        randomHeroViewModel: RandomMangaViewModel = RandomMangaViewModel(),
-        genreMangaViewModel: GenreMangaViewModel = GenreMangaViewModel()
+        randomHeroViewModel: RandomMangaViewModel,
+        genreMangaViewModel: GenreMangaViewModel
     ) {
         self.randomHeroViewModel = randomHeroViewModel
         self.genreMangaViewModel = genreMangaViewModel
+    }
+
+    func configureGenreBatchIfNeeded(_ configuration: MainCategoryGenreBatchConfiguration) {
+        genreMangaViewModel.configureBatchIfNeeded(configuration)
     }
 
     func loadIfNeeded() {

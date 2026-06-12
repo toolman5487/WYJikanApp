@@ -22,10 +22,12 @@ struct WYJikanAppApp: App {
     // MARK: - Properties
 
     @UIApplicationDelegateAdaptor(AppNotificationDelegate.self) private var appDelegate
+    private let appDependencies = AppDependencies.live
     private let startupState: StartupState
     @StateObject private var favoriteStatusStore: FavoriteStatusStore
     @StateObject private var broadcastReminderStatusStore: AnimeBroadcastReminderStatusStore
     @StateObject private var todayAnimeNotificationScheduler: HomeTodayAnimeNotificationScheduler
+    @StateObject private var appBootstrapViewModel: AppBootstrapViewModel
     @StateObject private var mainTabBarViewModel: MainTabBarViewModel
     @StateObject private var mainHomeRouter: MainHomeRouter
 
@@ -37,6 +39,9 @@ struct WYJikanAppApp: App {
         let todayAnimeNotificationScheduler = HomeTodayAnimeNotificationScheduler(
             subscriptionProvider: { broadcastReminderStatusStore.subscriptions }
         )
+        let dependencies = AppDependencies.live
+        let mainTabBarViewModel = MainTabBarViewModel()
+        let mainHomeRouter = MainHomeRouter.shared
 
         do {
             let sharedModelContainer = try ModelContainer(
@@ -44,14 +49,9 @@ struct WYJikanAppApp: App {
                 AnimeBroadcastReminderSubscription.self
             )
             let modelContext = ModelContext(sharedModelContainer)
-            favoriteStatusStore.connect(
-                to: SwiftDataFavoriteRepository.shared,
-                modelContext: modelContext
-            )
-            broadcastReminderStatusStore.connect(
-                to: SwiftDataAnimeBroadcastReminderRepository.shared,
-                modelContext: modelContext
-            )
+            dependencies.connectRepositories(modelContext: modelContext)
+            favoriteStatusStore.connect(to: dependencies.favoriteRepository)
+            broadcastReminderStatusStore.connect(to: dependencies.broadcastReminderRepository)
             startupState = .ready(sharedModelContainer)
         } catch {
             AppLogger.persistence.error(
@@ -65,12 +65,25 @@ struct WYJikanAppApp: App {
         _favoriteStatusStore = StateObject(wrappedValue: favoriteStatusStore)
         _broadcastReminderStatusStore = StateObject(wrappedValue: broadcastReminderStatusStore)
         _todayAnimeNotificationScheduler = StateObject(wrappedValue: todayAnimeNotificationScheduler)
-        _mainTabBarViewModel = StateObject(wrappedValue: MainTabBarViewModel.shared)
-        _mainHomeRouter = StateObject(wrappedValue: MainHomeRouter.shared)
+        _appBootstrapViewModel = StateObject(
+            wrappedValue: AppBootstrapViewModel(
+                animeDetailService: dependencies.animeDetailService,
+                broadcastReminderRepository: dependencies.broadcastReminderRepository,
+                notificationScheduler: todayAnimeNotificationScheduler
+            )
+        )
+        _mainTabBarViewModel = StateObject(wrappedValue: mainTabBarViewModel)
+        _mainHomeRouter = StateObject(wrappedValue: mainHomeRouter)
 
         MainActor.assumeIsolated {
             AppNotificationDelegate.onNotificationOpened = { response in
                 await todayAnimeNotificationScheduler.clearNotificationsForOpenedResponse(response)
+            }
+            AppNotificationDelegate.onRouteToHomeTab = {
+                mainTabBarViewModel.selectedTab = .home
+            }
+            AppNotificationDelegate.onNavigateToMainHomeRoutes = { routes in
+                mainHomeRouter.replacePath(with: routes)
             }
         }
     }
@@ -90,9 +103,11 @@ struct WYJikanAppApp: App {
         switch startupState {
         case .ready(let modelContainer):
             AppRootView()
+                .environment(\.appDependencies, appDependencies)
                 .environmentObject(favoriteStatusStore)
                 .environmentObject(broadcastReminderStatusStore)
                 .environmentObject(todayAnimeNotificationScheduler)
+                .environmentObject(appBootstrapViewModel)
                 .environmentObject(mainTabBarViewModel)
                 .environmentObject(mainHomeRouter)
                 .modelContainer(modelContainer)

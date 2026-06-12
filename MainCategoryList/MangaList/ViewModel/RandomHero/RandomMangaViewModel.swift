@@ -87,7 +87,7 @@ final class RandomMangaViewModel: ObservableObject {
     private var cooldownCancellable: AnyCancellable?
 
     init(
-        service: MainCategoryListServicing = MainCategoryListService(),
+        service: MainCategoryListServicing,
         storage: UserDefaults = .standard
     ) {
         self.service = service

@@ -180,7 +180,7 @@ private struct HomeWatchEpisodeCardView: View {
 }
 
 #Preview {
-    HomeWatchEpisodesView(viewModel: HomeWatchEpisodesViewModel())
+    HomeWatchEpisodesView(viewModel: HomeWatchEpisodesViewModel(service: AppDependencies.live.homeWatchService))
         .environmentObject(FavoriteStatusStore())
         .environmentObject(MainHomeRouter())
 }

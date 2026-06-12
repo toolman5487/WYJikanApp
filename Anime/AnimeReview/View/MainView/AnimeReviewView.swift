@@ -8,16 +8,43 @@
 import SwiftUI
 
 struct AnimeReviewView: View {
+    let malId: Int
+    let animeTitle: String?
 
+    init(malId: Int, animeTitle: String? = nil) {
+        self.malId = malId
+        self.animeTitle = animeTitle
+    }
+
+    var body: some View {
+        AnimeReviewConfiguredView(malId: malId, animeTitle: animeTitle)
+    }
+}
+
+private struct AnimeReviewConfiguredView: View {
+    @Environment(\.appDependencies) private var dependencies
+    let malId: Int
+    let animeTitle: String?
+
+    var body: some View {
+        AnimeReviewBodyView(
+            malId: malId,
+            animeTitle: animeTitle,
+            dependencies: dependencies
+        )
+    }
+}
+
+private struct AnimeReviewBodyView: View {
     let malId: Int
     let animeTitle: String?
 
     @StateObject private var viewModel: AnimeReviewViewModel
 
-    init(malId: Int, animeTitle: String? = nil, service: AnimeReviewServicing = AnimeReviewService()) {
+    init(malId: Int, animeTitle: String?, dependencies: AppDependencies) {
         self.malId = malId
         self.animeTitle = animeTitle
-        _viewModel = StateObject(wrappedValue: AnimeReviewViewModel(malId: malId, service: service))
+        _viewModel = StateObject(wrappedValue: dependencies.makeAnimeReviewViewModel(malId: malId))
     }
 
     var body: some View {
@@ -40,8 +67,6 @@ struct AnimeReviewView: View {
             await viewModel.load()
         }
     }
-
-    // MARK: - Private
 
     private var navigationTitleText: String {
         let trimmed = animeTitle?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""

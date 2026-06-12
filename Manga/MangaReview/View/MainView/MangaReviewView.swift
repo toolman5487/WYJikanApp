@@ -8,16 +8,43 @@
 import SwiftUI
 
 struct MangaReviewView: View {
+    let malId: Int
+    let mangaTitle: String?
 
+    init(malId: Int, mangaTitle: String? = nil) {
+        self.malId = malId
+        self.mangaTitle = mangaTitle
+    }
+
+    var body: some View {
+        MangaReviewConfiguredView(malId: malId, mangaTitle: mangaTitle)
+    }
+}
+
+private struct MangaReviewConfiguredView: View {
+    @Environment(\.appDependencies) private var dependencies
+    let malId: Int
+    let mangaTitle: String?
+
+    var body: some View {
+        MangaReviewBodyView(
+            malId: malId,
+            mangaTitle: mangaTitle,
+            dependencies: dependencies
+        )
+    }
+}
+
+private struct MangaReviewBodyView: View {
     let malId: Int
     let mangaTitle: String?
 
     @StateObject private var viewModel: MangaReviewViewModel
 
-    init(malId: Int, mangaTitle: String? = nil, service: MangaReviewServicing = MangaReviewService()) {
+    init(malId: Int, mangaTitle: String?, dependencies: AppDependencies) {
         self.malId = malId
         self.mangaTitle = mangaTitle
-        _viewModel = StateObject(wrappedValue: MangaReviewViewModel(malId: malId, service: service))
+        _viewModel = StateObject(wrappedValue: dependencies.makeMangaReviewViewModel(malId: malId))
     }
 
     var body: some View {
@@ -40,8 +67,6 @@ struct MangaReviewView: View {
             await viewModel.load()
         }
     }
-
-    // MARK: - Private
 
     private var navigationTitleText: String {
         let trimmed = mangaTitle?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""

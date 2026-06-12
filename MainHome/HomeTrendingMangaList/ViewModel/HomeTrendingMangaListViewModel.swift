@@ -30,7 +30,7 @@ final class HomeTrendingMangaListViewModel: ObservableObject {
     private var pagination = PaginatedListState<MangaCategoryItemDTO>()
     private var cancellables: Set<AnyCancellable> = []
 
-    init(service: HomeTrendingMangaListServicing = HomeTrendingMangaListService()) {
+    init(service: HomeTrendingMangaListServicing) {
         self.service = service
         bindPresentation()
     }

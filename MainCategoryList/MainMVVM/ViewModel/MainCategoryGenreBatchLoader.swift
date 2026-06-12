@@ -7,6 +7,8 @@
 
 import Foundation
 
+// MARK: - MainCategoryGenreBatchPhase
+
 enum MainCategoryGenreBatchPhase: Equatable, Sendable {
     case initial
     case loadMore
@@ -21,12 +23,32 @@ enum MainCategoryGenreBatchPhase: Equatable, Sendable {
     }
 }
 
+// MARK: - MainCategoryGenreBatchConfiguration
+
 struct MainCategoryGenreBatchConfiguration: Sendable {
     let initialBatchSize: Int
     let loadMoreBatchSize: Int
     let initialItemRequestDelay: Duration
     let requestInterval: Duration
+
+    static let standard = MainCategoryGenreBatchConfiguration(
+        initialBatchSize: 3,
+        loadMoreBatchSize: 5,
+        initialItemRequestDelay: .milliseconds(1200),
+        requestInterval: .seconds(1)
+    )
+
+    static func platformAdaptive(initialBatchSize: Int) -> Self {
+        MainCategoryGenreBatchConfiguration(
+            initialBatchSize: initialBatchSize,
+            loadMoreBatchSize: 5,
+            initialItemRequestDelay: .milliseconds(1200),
+            requestInterval: .seconds(1)
+        )
+    }
 }
+
+// MARK: - MainCategoryGenreBatchResult
 
 enum MainCategoryGenreBatchResult: Equatable, Sendable {
     case empty
@@ -34,8 +56,13 @@ enum MainCategoryGenreBatchResult: Equatable, Sendable {
     case finished(canLoadMore: Bool)
 }
 
+// MARK: - MainCategoryGenreBatchLoader
+
 @MainActor
 final class MainCategoryGenreBatchLoader<Genre: Identifiable, Item> where Genre.ID == Int {
+
+    // MARK: - Types
+
     typealias BatchStartHandler = (MainCategoryGenreBatchPhase, [Genre]) -> Void
     typealias PhaseChangeHandler = (MainCategoryGenreBatchPhase) -> Void
     typealias ItemFetcher = (Genre) async -> [Item]
@@ -49,6 +76,8 @@ final class MainCategoryGenreBatchLoader<Genre: Identifiable, Item> where Genre.
         var shouldApplyInitialDelay: Bool
     }
 
+    // MARK: - Properties
+
     private let configuration: MainCategoryGenreBatchConfiguration
     private var loadedGenreCount = 0
     private var pendingBatch: PendingBatch?
@@ -56,6 +85,8 @@ final class MainCategoryGenreBatchLoader<Genre: Identifiable, Item> where Genre.
     var hasPendingBatch: Bool {
         pendingBatch != nil
     }
+
+    // MARK: - Lifecycle
 
     init(configuration: MainCategoryGenreBatchConfiguration) {
         self.configuration = configuration
@@ -65,6 +96,8 @@ final class MainCategoryGenreBatchLoader<Genre: Identifiable, Item> where Genre.
         loadedGenreCount = 0
         pendingBatch = nil
     }
+
+    // MARK: - Public Methods
 
     func startBatch(
         _ phase: MainCategoryGenreBatchPhase,
@@ -99,9 +132,10 @@ final class MainCategoryGenreBatchLoader<Genre: Identifiable, Item> where Genre.
         onPhaseChange(batch.phase)
 
         if batch.shouldApplyInitialDelay {
-            try? await Task.sleep(for: configuration.initialItemRequestDelay)
-            guard !Task.isCancelled else {
-                pendingBatch = batch
+            guard await sleepUnlessCancelled(
+                for: configuration.initialItemRequestDelay,
+                batch: &batch
+            ) else {
                 return .cancelled
             }
             batch.shouldApplyInitialDelay = false
@@ -121,9 +155,10 @@ final class MainCategoryGenreBatchLoader<Genre: Identifiable, Item> where Genre.
             pendingBatch = batch
 
             if batch.nextGenreIndex < batch.endIndex {
-                try? await Task.sleep(for: configuration.requestInterval)
-                guard !Task.isCancelled else {
-                    pendingBatch = batch
+                guard await sleepUnlessCancelled(
+                    for: configuration.requestInterval,
+                    batch: &batch
+                ) else {
                     return .cancelled
                 }
             }
@@ -133,6 +168,8 @@ final class MainCategoryGenreBatchLoader<Genre: Identifiable, Item> where Genre.
         pendingBatch = nil
         return .finished(canLoadMore: loadedGenreCount < genres.count)
     }
+
+    // MARK: - Private Methods
 
     private func makePendingBatch(
         for phase: MainCategoryGenreBatchPhase,
@@ -152,5 +189,17 @@ final class MainCategoryGenreBatchLoader<Genre: Identifiable, Item> where Genre.
             nextGenreIndex: startIndex,
             shouldApplyInitialDelay: true
         )
+    }
+
+    private func sleepUnlessCancelled(
+        for duration: Duration,
+        batch: inout PendingBatch
+    ) async -> Bool {
+        try? await Task.sleep(for: duration)
+        guard !Task.isCancelled else {
+            pendingBatch = batch
+            return false
+        }
+        return true
     }
 }

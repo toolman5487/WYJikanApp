@@ -8,6 +8,23 @@
 import SwiftUI
 
 struct CharacterDetailView: View {
+    let malId: Int
+
+    var body: some View {
+        CharacterDetailConfiguredView(malId: malId)
+    }
+}
+
+private struct CharacterDetailConfiguredView: View {
+    @Environment(\.appDependencies) private var dependencies
+    let malId: Int
+
+    var body: some View {
+        CharacterDetailBodyView(malId: malId, dependencies: dependencies)
+    }
+}
+
+private struct CharacterDetailBodyView: View {
 
     // MARK: - Properties
 
@@ -16,9 +33,9 @@ struct CharacterDetailView: View {
 
     // MARK: - Lifecycle
 
-    init(malId: Int, service: CharacterDetailServicing = CharacterDetailService()) {
+    init(malId: Int, dependencies: AppDependencies) {
         self.malId = malId
-        _viewModel = StateObject(wrappedValue: CharacterDetailViewModel(malId: malId, service: service))
+        _viewModel = StateObject(wrappedValue: dependencies.makeCharacterDetailViewModel(malId: malId))
     }
 
     // MARK: - Body

@@ -71,7 +71,7 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
     private var loadState: LoadState = .idle
     private var titleEnrichmentTask: Task<Void, Never>?
 
-    init(service: MainHomeServicing = MainHomeService()) {
+    init(service: MainHomeServicing) {
         self.service = service
     }
 
