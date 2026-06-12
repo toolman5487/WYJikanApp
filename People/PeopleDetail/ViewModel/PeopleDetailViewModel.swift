@@ -74,6 +74,10 @@ final class PeopleDetailViewModel: ObservableObject {
 }
 
 extension PeopleDetailViewModel {
+
+    private static let previewVoiceRoleLimit = 8
+    private static let previewWorkLimit = 6
+
     enum Section: Identifiable {
         case header
         case info
@@ -199,12 +203,40 @@ extension PeopleDetailViewModel {
         (person.voices ?? []).filter { $0.character != nil || $0.anime != nil }
     }
 
+    func voiceRolesWithCharacter(for person: PeopleDetailDTO) -> [PeopleVoiceRoleDTO] {
+        voiceRoles(for: person).filter { $0.character != nil }
+    }
+
+    func previewVoiceRoles(for person: PeopleDetailDTO) -> [PeopleVoiceRoleDTO] {
+        Array(voiceRolesWithCharacter(for: person).prefix(Self.previewVoiceRoleLimit))
+    }
+
+    func canShowFullVoiceRoleList(for person: PeopleDetailDTO) -> Bool {
+        voiceRolesWithCharacter(for: person).count > previewVoiceRoles(for: person).count
+    }
+
     func animeStaffPositions(for person: PeopleDetailDTO) -> [PeopleAnimeStaffPositionDTO] {
         (person.anime ?? []).filter { $0.anime != nil }
     }
 
+    func previewAnimeStaffPositions(for person: PeopleDetailDTO) -> [PeopleAnimeStaffPositionDTO] {
+        Array(animeStaffPositions(for: person).prefix(Self.previewWorkLimit))
+    }
+
+    func canShowFullAnimeStaffList(for person: PeopleDetailDTO) -> Bool {
+        animeStaffPositions(for: person).count > previewAnimeStaffPositions(for: person).count
+    }
+
     func mangaStaffPositions(for person: PeopleDetailDTO) -> [PeopleMangaStaffPositionDTO] {
         (person.manga ?? []).filter { $0.manga != nil }
+    }
+
+    func previewMangaStaffPositions(for person: PeopleDetailDTO) -> [PeopleMangaStaffPositionDTO] {
+        Array(mangaStaffPositions(for: person).prefix(Self.previewWorkLimit))
+    }
+
+    func canShowFullMangaStaffList(for person: PeopleDetailDTO) -> Bool {
+        mangaStaffPositions(for: person).count > previewMangaStaffPositions(for: person).count
     }
 
     func imageURL(from images: AnimeImagesDTO?) -> URL? {

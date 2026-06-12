@@ -1,13 +1,13 @@
 //
-//  AnimeDetailRecommendationsListLayout.swift
+//  DetailPosterGridListLayout.swift
 //  WYJikanApp
 //
-//  Created by Willy Hsu on 2026/6/11.
+//  Created by Willy Hsu on 2026/6/12.
 //
 
 import SwiftUI
 
-struct AnimeDetailRecommendationsListMetrics: Equatable {
+struct DetailPosterGridListMetrics: Equatable {
     static let columnCount = 3
     static let horizontalPadding: CGFloat = 16
     static let columnSpacing: CGFloat = 12
@@ -40,23 +40,23 @@ struct AnimeDetailRecommendationsListMetrics: Equatable {
     static let fallback = make(containerWidth: 390)
 }
 
-private struct AnimeDetailRecommendationsListMetricsKey: EnvironmentKey {
-    static let defaultValue = AnimeDetailRecommendationsListMetrics.fallback
+private struct DetailPosterGridListMetricsKey: EnvironmentKey {
+    static let defaultValue = DetailPosterGridListMetrics.fallback
 }
 
 extension EnvironmentValues {
-    var animeDetailRecommendationsListMetrics: AnimeDetailRecommendationsListMetrics {
-        get { self[AnimeDetailRecommendationsListMetricsKey.self] }
-        set { self[AnimeDetailRecommendationsListMetricsKey.self] = newValue }
+    var detailPosterGridListMetrics: DetailPosterGridListMetrics {
+        get { self[DetailPosterGridListMetricsKey.self] }
+        set { self[DetailPosterGridListMetricsKey.self] = newValue }
     }
 }
 
-struct AnimeDetailRecommendationsListLayout<Content: View>: View {
+struct DetailPosterGridListLayout<Content: View>: View {
     @ViewBuilder let content: () -> Content
 
     var body: some View {
         GeometryReader { geometry in
-            let metrics = AnimeDetailRecommendationsListMetrics.make(
+            let metrics = DetailPosterGridListMetrics.make(
                 containerWidth: geometry.size.width
             )
 
@@ -64,14 +64,14 @@ struct AnimeDetailRecommendationsListLayout<Content: View>: View {
                 LazyVGrid(
                     columns: metrics.gridColumns,
                     alignment: .leading,
-                    spacing: AnimeDetailRecommendationsListMetrics.rowSpacing
+                    spacing: DetailPosterGridListMetrics.rowSpacing
                 ) {
                     content()
                 }
-                .padding(.horizontal, AnimeDetailRecommendationsListMetrics.horizontalPadding)
-                .padding(.vertical, AnimeDetailRecommendationsListMetrics.horizontalPadding)
+                .padding(.horizontal, DetailPosterGridListMetrics.horizontalPadding)
+                .padding(.vertical, DetailPosterGridListMetrics.horizontalPadding)
             }
-            .environment(\.animeDetailRecommendationsListMetrics, metrics)
+            .environment(\.detailPosterGridListMetrics, metrics)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }

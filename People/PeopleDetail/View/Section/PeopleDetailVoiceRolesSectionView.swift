@@ -10,34 +10,144 @@ import SwiftUI
 struct PeopleDetailVoiceRolesSectionView: View {
     let viewModel: PeopleDetailViewModel
     let person: PeopleDetailDTO
+    let personName: String
+    @Binding var isShowingVoiceRoleList: Bool
+    @State private var voiceRoleListBounceProgress: CGFloat = 0
 
     var body: some View {
-        let roles = viewModel.voiceRoles(for: person)
-        PeopleDetailHorizontalSection(title: "配音角色") {
-            ForEach(roles) { role in
-                if let character = role.character {
-                    NavigationLink {
-                        CharacterDetailView(malId: character.malId)
-                    } label: {
-                        PeopleDetailVoiceRoleCardView(
-                            characterName: viewModel.characterName(character),
-                            workTitle: role.anime.map(viewModel.workTitle) ?? "-",
-                            role: viewModel.roleText(role.role),
-                            imageURL: viewModel.imageURL(from: character.images),
-                            cardWidth: 160,
-                            cardHeight: 240,
-                            cornerRadius: 16,
-                            textMinHeight: 60
+        AnimeDetailLinkedSection(
+            title: "配音角色",
+            actionTitle: "查看全部"
+        ) {
+            voiceRoleListDestination
+        } content: {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(alignment: .top, spacing: 12) {
+                    ForEach(viewModel.previewVoiceRoles(for: person)) { role in
+                        if let character = role.character {
+                            NavigationLink {
+                                CharacterDetailView(malId: character.malId)
+                            } label: {
+                                PeopleDetailVoiceRoleCardView(
+                                    characterName: viewModel.characterName(character),
+                                    workTitle: role.anime.map(viewModel.workTitle) ?? "-",
+                                    role: viewModel.roleText(role.role),
+                                    imageURL: viewModel.imageURL(from: character.images),
+                                    cardWidth: 160,
+                                    cardHeight: 240,
+                                    cornerRadius: 16,
+                                    textMinHeight: 60
+                                )
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+
+                    if canShowVoiceRoleList {
+                        EndBounceHintView(
+                            axis: .horizontal,
+                            title: "完整配音",
+                            subtitle: "繼續向右滑查看全部",
+                            progress: voiceRoleListBounceProgress,
+                            width: 160,
+                            height: 240,
+                            cornerRadius: 16
                         )
                     }
-                    .buttonStyle(.plain)
+                }
+                .padding(.vertical, 4)
+            }
+            .onEndBounce(
+                axis: .horizontal,
+                isEnabled: canShowVoiceRoleList,
+                progress: $voiceRoleListBounceProgress
+            ) {
+                isShowingVoiceRoleList = true
+            }
+        }
+    }
+
+    private var canShowVoiceRoleList: Bool {
+        viewModel.canShowFullVoiceRoleList(for: person)
+    }
+
+    private var voiceRoleListDestination: some View {
+        PeopleDetailVoiceRolesListView(
+            personName: personName,
+            roles: viewModel.voiceRolesWithCharacter(for: person),
+            viewModel: viewModel
+        )
+    }
+}
+
+struct PeopleDetailVoiceRolesListView: View {
+    let personName: String
+    let roles: [PeopleVoiceRoleDTO]
+    let viewModel: PeopleDetailViewModel
+
+    var body: some View {
+        ScrollView {
+            LazyVStack(alignment: .leading, spacing: 16) {
+                ForEach(roles) { role in
+                    if let character = role.character {
+                        NavigationLink {
+                            CharacterDetailView(malId: character.malId)
+                        } label: {
+                            HStack(alignment: .top, spacing: 16) {
+                                voiceRoleImage(character)
+                                    .frame(width: 82, height: 104)
+                                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text(viewModel.characterName(character))
+                                        .font(.headline)
+                                        .foregroundStyle(ThemeColor.textPrimary)
+                                        .lineLimit(2)
+                                        .multilineTextAlignment(.leading)
+
+                                    Text(role.anime.map(viewModel.workTitle) ?? "-")
+                                        .font(.caption)
+                                        .foregroundStyle(ThemeColor.textSecondary)
+                                        .lineLimit(2)
+
+                                    Text(viewModel.roleText(role.role))
+                                        .font(.caption.weight(.semibold))
+                                        .foregroundStyle(ThemeColor.sakura)
+                                        .lineLimit(1)
+                                }
+
+                                Spacer(minLength: 0)
+                            }
+                            .padding(16)
+                            .background(Color(.secondarySystemBackground))
+                            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        }
+                        .buttonStyle(.plain)
+                    }
                 }
             }
+            .padding()
+        }
+        .navigationTitle("\(personName) 配音角色")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    @ViewBuilder
+    private func voiceRoleImage(_ character: PeopleRelatedCharacterDTO) -> some View {
+        if let imageURL = viewModel.imageURL(from: character.images) {
+            RemotePosterImageView(url: imageURL)
+        } else {
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(Color(.systemGray5))
+                .overlay {
+                    Image(systemName: "person.crop.rectangle")
+                        .foregroundStyle(ThemeColor.textTertiary)
+                }
         }
     }
 }
 
-private struct PeopleDetailVoiceRoleCardView: View {
+struct PeopleDetailVoiceRoleCardView: View {
     let characterName: String
     let workTitle: String
     let role: String

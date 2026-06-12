@@ -30,6 +30,9 @@ private struct PeopleDetailBodyView: View {
 
     let malId: Int
     @StateObject private var viewModel: PeopleDetailViewModel
+    @State private var isShowingVoiceRoleList = false
+    @State private var isShowingAnimeStaffList = false
+    @State private var isShowingMangaStaffList = false
 
     // MARK: - Lifecycle
 
@@ -63,6 +66,33 @@ private struct PeopleDetailBodyView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
+        .navigationDestination(isPresented: $isShowingVoiceRoleList) {
+            if let person = currentPerson {
+                PeopleDetailVoiceRolesListView(
+                    personName: viewModel.displayName(for: person),
+                    roles: viewModel.voiceRolesWithCharacter(for: person),
+                    viewModel: viewModel
+                )
+            }
+        }
+        .navigationDestination(isPresented: $isShowingAnimeStaffList) {
+            if let person = currentPerson {
+                PeopleDetailAnimeStaffListView(
+                    personName: viewModel.displayName(for: person),
+                    positions: viewModel.animeStaffPositions(for: person),
+                    viewModel: viewModel
+                )
+            }
+        }
+        .navigationDestination(isPresented: $isShowingMangaStaffList) {
+            if let person = currentPerson {
+                PeopleDetailMangaStaffListView(
+                    personName: viewModel.displayName(for: person),
+                    positions: viewModel.mangaStaffPositions(for: person),
+                    viewModel: viewModel
+                )
+            }
+        }
         .toolbar {
             DetailExternalActionsToolbar(
                 shareState: viewModel.shareNavigationState(),
@@ -75,6 +105,13 @@ private struct PeopleDetailBodyView: View {
     }
 
     // MARK: - Private Methods
+
+    private var currentPerson: PeopleDetailDTO? {
+        if case .loaded(let person) = viewModel.screenState {
+            return person
+        }
+        return nil
+    }
 
     private func detailScroll<Content: View>(@ViewBuilder content: () -> Content) -> some View {
         ScrollView {
@@ -96,11 +133,26 @@ private struct PeopleDetailBodyView: View {
         case .about:
             PeopleDetailAboutSectionView(viewModel: viewModel, person: person)
         case .voices:
-            PeopleDetailVoiceRolesSectionView(viewModel: viewModel, person: person)
+            PeopleDetailVoiceRolesSectionView(
+                viewModel: viewModel,
+                person: person,
+                personName: viewModel.displayName(for: person),
+                isShowingVoiceRoleList: $isShowingVoiceRoleList
+            )
         case .anime:
-            PeopleDetailAnimeStaffSectionView(viewModel: viewModel, person: person)
+            PeopleDetailAnimeStaffSectionView(
+                viewModel: viewModel,
+                person: person,
+                personName: viewModel.displayName(for: person),
+                isShowingAnimeStaffList: $isShowingAnimeStaffList
+            )
         case .manga:
-            PeopleDetailMangaStaffSectionView(viewModel: viewModel, person: person)
+            PeopleDetailMangaStaffSectionView(
+                viewModel: viewModel,
+                person: person,
+                personName: viewModel.displayName(for: person),
+                isShowingMangaStaffList: $isShowingMangaStaffList
+            )
         }
     }
 }

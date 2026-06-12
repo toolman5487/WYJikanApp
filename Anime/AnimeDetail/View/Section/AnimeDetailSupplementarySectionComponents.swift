@@ -117,7 +117,7 @@ struct AnimeDetailCharacterCardView: View {
 }
 
 struct AnimeDetailRecommendationCardView: View {
-    @Environment(\.animeDetailRecommendationsListMetrics) private var listMetrics
+    @Environment(\.detailPosterGridListMetrics) private var listMetrics
 
     let row: DetailRecommendationRow
 
@@ -168,7 +168,7 @@ struct AnimeDetailRecommendationCardView: View {
     }
 
     private var listCard: some View {
-        VStack(alignment: .leading, spacing: AnimeDetailRecommendationsListMetrics.titleSpacing) {
+        VStack(alignment: .leading, spacing: DetailPosterGridListMetrics.titleSpacing) {
             posterView
                 .frame(width: listMetrics.cardWidth, height: listMetrics.posterHeight)
                 .clipShape(posterShape(cornerRadius: previewCornerRadius))

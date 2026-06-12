@@ -12,7 +12,7 @@ struct MangaDetailRecommendationsListView: View {
     let rows: [DetailRecommendationRow]
 
     var body: some View {
-        AnimeDetailRecommendationsListLayout {
+        DetailPosterGridListLayout {
             ForEach(rows) { row in
                 NavigationLink {
                     MangaDetailView(malId: row.malId)
