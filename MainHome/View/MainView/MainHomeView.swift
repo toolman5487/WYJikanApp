@@ -19,6 +19,7 @@ struct MainHomeView: View {
     @StateObject private var trendingMangaViewModel: HomeTrendingMangaViewModel
     @StateObject private var trendingAnimeViewModel: HomeTrendingAnimeViewModel
     @StateObject private var recommendedAnimeViewModel: HomeRecommendedAnimeViewModel
+    @State private var feedCoordinator: HomeFeedCoordinator?
     @State private var loadMoreBounceProgress: CGFloat = 0
     private let watchService: any HomeWatchServicing
 
@@ -84,8 +85,11 @@ struct MainHomeView: View {
         NavigationStack(path: $router.path) {
             ScrollView {
                 LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
-                    HeroBannerView(viewModel: heroBannerViewModel)
-                        .ignoresSafeArea(edges: .top)
+                    HeroBannerView(
+                        viewModel: heroBannerViewModel,
+                        autoLoadOnAppear: false
+                    )
+                    .ignoresSafeArea(edges: .top)
 
                     ForEach(sections) { section in
                         Section {
@@ -115,8 +119,16 @@ struct MainHomeView: View {
             ) {
                 recommendedAnimeViewModel.loadMore()
             }
+            .onAppear {
+                if feedCoordinator == nil {
+                    feedCoordinator = makeFeedCoordinator()
+                }
+            }
             .refreshable {
                 await refreshAllContent()
+            }
+            .task {
+                await feedCoordinator?.loadInitial()
             }
             .toolbarBackground(.hidden, for: .navigationBar)
             .navigationDestination(for: MainHomeRoute.self) { route in
@@ -149,37 +161,53 @@ struct MainHomeView: View {
 
     @ViewBuilder
     private func sectionView(_ section: HomeSection) -> some View {
-        switch section {
-        case .watchPromos:
-            HomeWatchPromosView(
-                viewModel: watchPromosViewModel,
-                showsHeader: false
-            )
-        case .todayAnime:
-            HomeTodayAnimeView(
-                viewModel: todayAnimeViewModel,
-                showsHeader: false
-            )
-        case .watchEpisodes:
-            HomeWatchEpisodesView(
-                viewModel: watchEpisodesViewModel,
-                showsHeader: false
-            )
-        case .trendingAnime:
-            HomeTrendingAnimeView(
-                viewModel: trendingAnimeViewModel,
-                showsHeader: false
-            )
-        case .trendingManga:
-            HomeTrendingMangaView(
-                viewModel: trendingMangaViewModel,
-                showsHeader: false
-            )
-        case .recommendedAnime:
-            HomeRecommendedAnimeView(
-                viewModel: recommendedAnimeViewModel,
-                showsHeader: false
-            )
+        Group {
+            switch section {
+            case .watchPromos:
+                HomeWatchPromosView(
+                    viewModel: watchPromosViewModel,
+                    showsHeader: false,
+                    autoLoadOnAppear: false
+                )
+            case .todayAnime:
+                HomeTodayAnimeView(
+                    viewModel: todayAnimeViewModel,
+                    showsHeader: false,
+                    autoLoadOnAppear: false
+                )
+            case .watchEpisodes:
+                HomeWatchEpisodesView(
+                    viewModel: watchEpisodesViewModel,
+                    showsHeader: false,
+                    autoLoadOnAppear: false
+                )
+            case .trendingAnime:
+                HomeTrendingAnimeView(
+                    viewModel: trendingAnimeViewModel,
+                    showsHeader: false,
+                    autoLoadOnAppear: false
+                )
+            case .trendingManga:
+                HomeTrendingMangaView(
+                    viewModel: trendingMangaViewModel,
+                    showsHeader: false,
+                    autoLoadOnAppear: false
+                )
+            case .recommendedAnime:
+                HomeRecommendedAnimeView(
+                    viewModel: recommendedAnimeViewModel,
+                    showsHeader: false,
+                    autoLoadOnAppear: false
+                )
+            }
+        }
+        .task {
+            if feedCoordinator == nil {
+                feedCoordinator = makeFeedCoordinator()
+            }
+            guard let feedSection = homeFeedSection(for: section),
+                  let coordinator = feedCoordinator else { return }
+            await coordinator.loadSectionIfNeeded(feedSection)
         }
     }
 
@@ -206,24 +234,42 @@ struct MainHomeView: View {
         }
     }
 
-    private func refreshAllContent() async {
-        async let heroBannerRefresh = heroBannerViewModel.refresh()
-        async let watchPromosRefresh = watchPromosViewModel.refresh()
-        async let todayAnimeRefresh = todayAnimeViewModel.refresh()
-        async let watchEpisodesRefresh = watchEpisodesViewModel.refresh()
-        async let trendingAnimeRefresh = trendingAnimeViewModel.refresh()
-        async let trendingMangaRefresh = trendingMangaViewModel.refresh()
-        async let recommendedAnimeRefresh = recommendedAnimeViewModel.refresh()
-
-        _ = await (
-            heroBannerRefresh,
-            watchPromosRefresh,
-            todayAnimeRefresh,
-            watchEpisodesRefresh,
-            trendingAnimeRefresh,
-            trendingMangaRefresh,
-            recommendedAnimeRefresh
+    private func makeFeedCoordinator() -> HomeFeedCoordinator {
+        HomeFeedCoordinator(
+            viewModels: HomeFeedViewModels(
+                heroBanner: heroBannerViewModel,
+                todayAnime: todayAnimeViewModel,
+                trendingAnime: trendingAnimeViewModel,
+                trendingManga: trendingMangaViewModel,
+                watchPromos: watchPromosViewModel,
+                watchEpisodes: watchEpisodesViewModel,
+                recommendedAnime: recommendedAnimeViewModel
+            )
         )
+    }
+
+    private func homeFeedSection(for section: HomeSection) -> HomeFeedSection? {
+        switch section {
+        case .watchPromos:
+            return .watchPromos
+        case .todayAnime:
+            return .todayAnime
+        case .watchEpisodes:
+            return .watchEpisodes
+        case .trendingAnime:
+            return .trendingAnime
+        case .trendingManga:
+            return .trendingManga
+        case .recommendedAnime:
+            return .recommendedAnime
+        }
+    }
+
+    private func refreshAllContent() async {
+        if feedCoordinator == nil {
+            feedCoordinator = makeFeedCoordinator()
+        }
+        await feedCoordinator?.refreshAll()
     }
 }
 

@@ -16,6 +16,7 @@ struct HomeRecommendedAnimeView: View {
     @ObservedObject private var viewModel: HomeRecommendedAnimeViewModel
 
     let showsHeader: Bool
+    let autoLoadOnAppear: Bool
 
     private var columns: [GridItem] {
         [
@@ -29,10 +30,12 @@ struct HomeRecommendedAnimeView: View {
 
     init(
         viewModel: HomeRecommendedAnimeViewModel,
-        showsHeader: Bool = true
+        showsHeader: Bool = true,
+        autoLoadOnAppear: Bool = true
     ) {
         self.viewModel = viewModel
         self.showsHeader = showsHeader
+        self.autoLoadOnAppear = autoLoadOnAppear
     }
 
     // MARK: - Body
@@ -79,7 +82,9 @@ struct HomeRecommendedAnimeView: View {
             }
         }
         .onAppear {
-            viewModel.loadIfNeeded()
+            if autoLoadOnAppear {
+                viewModel.loadIfNeeded()
+            }
         }
     }
 }

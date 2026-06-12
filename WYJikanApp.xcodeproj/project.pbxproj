@@ -163,6 +163,7 @@
 		15B3C7772FDA91E10021D377 /* DetailNavigationToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15B3C7792FDA91E10021D377 /* DetailNavigationToolbar.swift */; };
 		15B3C7782FDA91E10021D377 /* DetailToolbarPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15B3C77A2FDA91E10021D377 /* DetailToolbarPresentation.swift */; };
 		15B3C77B2FDA91E10021D378 /* AnimeBroadcastReminderReconciler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15B3C77C2FDA91E10021D378 /* AnimeBroadcastReminderReconciler.swift */; };
+		15B3C77D2FDA91E10021D379 /* HomeFeedCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15B3C77E2FDA91E10021D379 /* HomeFeedCoordinator.swift */; };
 		15B80E602F8E100100DDB201 /* MainSearchResultsContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15B80E642F8E100100DDB201 /* MainSearchResultsContentView.swift */; };
 		15B80E612F8E100200DDB201 /* MainSearchListSkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15B80E652F8E100200DDB201 /* MainSearchListSkeletonView.swift */; };
 		15B80E622F8E100300DDB201 /* MainSearchResultRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15B80E662F8E100300DDB201 /* MainSearchResultRowView.swift */; };
@@ -512,6 +513,8 @@
 		15B3C76D2FDA91E10021D375 /* DetailCopySuccessIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailCopySuccessIndicator.swift; sourceTree = "<group>"; };
 		15B3C7792FDA91E10021D377 /* DetailNavigationToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailNavigationToolbar.swift; sourceTree = "<group>"; };
 		15B3C77A2FDA91E10021D377 /* DetailToolbarPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailToolbarPresentation.swift; sourceTree = "<group>"; };
+		15B3C77C2FDA91E10021D378 /* AnimeBroadcastReminderReconciler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeBroadcastReminderReconciler.swift; sourceTree = "<group>"; };
+		15B3C77E2FDA91E10021D379 /* HomeFeedCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeFeedCoordinator.swift; sourceTree = "<group>"; };
 		15B80E642F8E100100DDB201 /* MainSearchResultsContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSearchResultsContentView.swift; sourceTree = "<group>"; };
 		15B80E652F8E100200DDB201 /* MainSearchListSkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSearchListSkeletonView.swift; sourceTree = "<group>"; };
 		15B80E662F8E100300DDB201 /* MainSearchResultRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSearchResultRowView.swift; sourceTree = "<group>"; };
@@ -655,7 +658,6 @@
 		16F200252FAB400000000025 /* HomeTodayAnimeNotificationConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeNotificationConfig.swift; sourceTree = "<group>"; };
 		16F200292FAB400000000029 /* HomeTodayAnimeBroadcastReminder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeBroadcastReminder.swift; sourceTree = "<group>"; };
 		16F2002B2FAB40000000002B /* HomeTodayAnimeBroadcastReminderFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeBroadcastReminderFactory.swift; sourceTree = "<group>"; };
-		15B3C77C2FDA91E10021D378 /* AnimeBroadcastReminderReconciler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeBroadcastReminderReconciler.swift; sourceTree = "<group>"; };
 		16F2002D2FAB40000000002D /* HomeTodayAnimeNotificationRequestFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeNotificationRequestFactory.swift; sourceTree = "<group>"; };
 		16F2002F2FAB40000000002F /* HomeTodayAnimeNotificationExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTodayAnimeNotificationExtensions.swift; sourceTree = "<group>"; };
 		16F200342FAB400000000034 /* BaseUserNotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseUserNotificationManager.swift; sourceTree = "<group>"; };
@@ -1774,6 +1776,14 @@
 			path = Detail;
 			sourceTree = "<group>";
 		};
+		15B3C77F2FDA91E10021D379 /* Coordinator */ = {
+			isa = PBXGroup;
+			children = (
+				15B3C77E2FDA91E10021D379 /* HomeFeedCoordinator.swift */,
+			);
+			path = Coordinator;
+			sourceTree = "<group>";
+		};
 		15B80E682F8E100500DDB201 /* MainView */ = {
 			isa = PBXGroup;
 			children = (
@@ -2143,6 +2153,7 @@
 		15FCF8832F73C25A0054153E /* MainHome */ = {
 			isa = PBXGroup;
 			children = (
+				15B3C77F2FDA91E10021D379 /* Coordinator */,
 				16F200052FAB400000000005 /* HomeTodayAnimeScheduleList */,
 				16F300192FAB500000000019 /* HomeTrendingAnimeList */,
 				1504E4F72FAB8A51009EB340 /* HomeTrendingMangaList */,
@@ -3030,6 +3041,7 @@
 				16F2000C2FAB40000000000C /* HomeTodayAnimeScheduleListService.swift in Sources */,
 				16F200242FAB400000000024 /* HomeTodayAnimeNotificationScheduler.swift in Sources */,
 				15B3C77B2FDA91E10021D378 /* AnimeBroadcastReminderReconciler.swift in Sources */,
+				15B3C77D2FDA91E10021D379 /* HomeFeedCoordinator.swift in Sources */,
 				16F200262FAB400000000026 /* HomeTodayAnimeNotificationConfig.swift in Sources */,
 				16F2002A2FAB40000000002A /* HomeTodayAnimeBroadcastReminder.swift in Sources */,
 				16F2002C2FAB40000000002C /* HomeTodayAnimeBroadcastReminderFactory.swift in Sources */,

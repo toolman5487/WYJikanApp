@@ -17,6 +17,7 @@ struct HomeTrendingAnimeView: View {
     @State private var endBounceProgress: CGFloat = 0
 
     let showsHeader: Bool
+    let autoLoadOnAppear: Bool
 
     private let cardSize = MainHomePosterCardMetrics.size
 
@@ -24,10 +25,12 @@ struct HomeTrendingAnimeView: View {
 
     init(
         viewModel: HomeTrendingAnimeViewModel,
-        showsHeader: Bool = true
+        showsHeader: Bool = true,
+        autoLoadOnAppear: Bool = true
     ) {
         self.viewModel = viewModel
         self.showsHeader = showsHeader
+        self.autoLoadOnAppear = autoLoadOnAppear
     }
 
     // MARK: - Body
@@ -112,7 +115,9 @@ struct HomeTrendingAnimeView: View {
             }
         }
         .onAppear {
-            viewModel.loadIfNeeded()
+            if autoLoadOnAppear {
+                viewModel.loadIfNeeded()
+            }
         }
     }
 }

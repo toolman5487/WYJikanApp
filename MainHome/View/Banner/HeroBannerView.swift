@@ -14,12 +14,18 @@ struct HeroBannerView: View {
     @ObservedObject private var viewModel: HeroBannerViewModel
     @EnvironmentObject private var router: MainHomeRouter
 
+    let autoLoadOnAppear: Bool
+
     private static let heroAspectRatio: CGFloat = 2.0 / 3.0
 
     // MARK: - Lifecycle
 
-    init(viewModel: HeroBannerViewModel) {
+    init(
+        viewModel: HeroBannerViewModel,
+        autoLoadOnAppear: Bool = true
+    ) {
         self.viewModel = viewModel
+        self.autoLoadOnAppear = autoLoadOnAppear
     }
 
     // MARK: - Body
@@ -32,7 +38,9 @@ struct HeroBannerView: View {
         .aspectRatio(Self.heroAspectRatio, contentMode: .fit)
         .frame(maxWidth: .infinity)
         .onAppear {
-            viewModel.loadIfNeeded()
+            if autoLoadOnAppear {
+                viewModel.loadIfNeeded()
+            }
             viewModel.resumeAutoScrollIfNeeded()
         }
         .onDisappear {
