@@ -56,7 +56,7 @@ struct HeroBannerView: View {
         case .loading:
             BannerSkeletonView()
         case .error(let failure):
-            bannerMessageView(message: failure.message, buttonTitle: "重試")
+            bannerErrorView(failure: failure, buttonTitle: "重試")
         case .empty:
             bannerMessageView(message: viewModel.emptyStateMessage, buttonTitle: "重新整理")
         case .content:
@@ -79,11 +79,31 @@ struct HeroBannerView: View {
         }
     }
 
+    private func bannerErrorView(failure: FeatureLoadFailure, buttonTitle: String) -> some View {
+        ZStack {
+            BannerSkeletonView()
+            VStack(spacing: 12) {
+                ErrorMessageView(state: ErrorMessageView.State(failure: failure), height: nil)
+                Button(buttonTitle) {
+                    viewModel.retry()
+                }
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(ThemeColor.textPrimary)
+                .padding(.vertical, 12)
+                .padding(.horizontal, 16)
+                .background(ThemeColor.sakura)
+                .clipShape(Capsule())
+            }
+            .padding(24)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
     private func bannerMessageView(message: String, buttonTitle: String) -> some View {
         ZStack {
             BannerSkeletonView()
             VStack(spacing: 12) {
-                ErrorMessageView(state: .network(message), height: nil)
+                ErrorMessageView(state: .emptyCollection(message), height: nil)
                 Button(buttonTitle) {
                     viewModel.retry()
                 }

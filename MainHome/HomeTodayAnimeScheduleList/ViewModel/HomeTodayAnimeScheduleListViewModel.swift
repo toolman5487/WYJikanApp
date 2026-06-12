@@ -166,7 +166,7 @@ final class HomeTodayAnimeScheduleListViewModel: ObservableObject {
             }
             return
         } catch {
-            guard pagination.failLoadMore(FeatureLoadFailure(message: "載入更多失敗"), generation: generation) else { return }
+            guard pagination.failLoadMore(FeatureLoadFailure.loadMore(), generation: generation) else { return }
             loadMoreState = pagination.footerState
         }
     }

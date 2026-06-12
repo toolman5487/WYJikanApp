@@ -90,7 +90,7 @@ struct HomeWatchListView: View {
                 .transition(.opacity.combined(with: .move(edge: .bottom)))
 
         case .error(let failure):
-            HomeWatchListErrorStateView(message: failure.message) {
+            HomeWatchListErrorStateView(failure: failure) {
                 Task { await viewModel.reload() }
             }
             .transition(.opacity.combined(with: .move(edge: .bottom)))

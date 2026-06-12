@@ -57,7 +57,7 @@ struct HomeTodayAnimeView: View {
                         }
 
                     case .error(let failure):
-                        ErrorMessageView(state: .network(failure.message), height: cardSize.height)
+                        ErrorMessageView(state: ErrorMessageView.State(failure: failure), height: cardSize.height)
                             .frame(width: cardSize.width)
 
                     case .empty:

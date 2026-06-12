@@ -113,7 +113,13 @@ private struct HomeTrendingMangaListBodyView: View {
             }
 
         case .error(let failure):
-            errorStateCard(message: failure.message)
+            ErrorMessageRetryCardView(
+                state: ErrorMessageView.State(failure: failure),
+                title: "熱門漫畫榜單暫時讀不到",
+                retryTitle: "重新載入"
+            ) {
+                Task { await viewModel.reload() }
+            }
 
         case .content(let items):
             MangaCategoryDetailGridSectionView(
@@ -157,28 +163,6 @@ private struct HomeTrendingMangaListBodyView: View {
                 .font(.body)
                 .foregroundStyle(ThemeColor.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
-        }
-        .frame(maxWidth: .infinity, minHeight: 220, alignment: .center)
-        .padding(24)
-        .background(Color(.secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-    }
-
-    private func errorStateCard(message: String) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("熱門漫畫榜單暫時讀不到")
-                .font(.title3.weight(.bold))
-                .foregroundStyle(ThemeColor.textPrimary)
-
-            Text(message)
-                .font(.body)
-                .foregroundStyle(ThemeColor.textSecondary)
-
-            Button("重新載入") {
-                Task { await viewModel.reload() }
-            }
-            .buttonStyle(.borderedProminent)
-            .tint(ThemeColor.sakura)
         }
         .frame(maxWidth: .infinity, minHeight: 220, alignment: .center)
         .padding(24)

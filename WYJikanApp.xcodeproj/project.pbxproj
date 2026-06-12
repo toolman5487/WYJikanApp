@@ -193,8 +193,6 @@
 		15FC4F3E2F73E7620054153E /* HeroBannerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F3D2F73E7620054153E /* HeroBannerViewModel.swift */; };
 		15FC4F412F73EB7B0054153E /* MainHomeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F402F73EB7B0054153E /* MainHomeService.swift */; };
 		15FC4F452F74C7CF0054153E /* ErrorMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F442F74C7CF0054153E /* ErrorMessageView.swift */; };
-		16E700022FE1000000000002 /* AppUserFacingError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E700012FE1000000000001 /* AppUserFacingError.swift */; };
-		16E700042FE1000000000004 /* FeatureLoadFailure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E700032FE1000000000003 /* FeatureLoadFailure.swift */; };
 		15FC4F472F74DF4D0054153E /* HeroBannerImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F462F74DF4D0054153E /* HeroBannerImageView.swift */; };
 		15FC4F4B2F74E52B0054153E /* BannerSkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F4A2F74E52B0054153E /* BannerSkeletonView.swift */; };
 		15FC4F4F2F74E6440054153E /* ShimmerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FC4F4E2F74E6440054153E /* ShimmerView.swift */; };
@@ -289,6 +287,10 @@
 		16E201022FAA210000000002 /* FavoriteRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E201012FAA210000000001 /* FavoriteRepository.swift */; };
 		16E201052FAA210000000005 /* FavoriteStatusStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E201042FAA210000000004 /* FavoriteStatusStore.swift */; };
 		16E201072FB8000000000007 /* MyListStatisticsSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E201062FB8000000000006 /* MyListStatisticsSectionView.swift */; };
+		16E700022FE1000000000002 /* AppUserFacingError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E700012FE1000000000001 /* AppUserFacingError.swift */; };
+		16E700042FE1000000000004 /* FeatureLoadFailure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E700032FE1000000000003 /* FeatureLoadFailure.swift */; };
+		16E700062FE1000000000006 /* ErrorMessageKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E700052FE1000000000005 /* ErrorMessageKind.swift */; };
+		16E700082FE1000000000008 /* ErrorMessageRetryCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E700072FE1000000000007 /* ErrorMessageRetryCardView.swift */; };
 		16F100042FAB300000000004 /* HomeRecommendedAnimeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F100032FAB300000000003 /* HomeRecommendedAnimeModel.swift */; };
 		16F100052FAB300000000005 /* HomeRecommendedAnimeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F100022FAB300000000002 /* HomeRecommendedAnimeViewModel.swift */; };
 		16F100062FAB300000000006 /* HomeRecommendedAnimeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F100012FAB300000000001 /* HomeRecommendedAnimeView.swift */; };
@@ -546,8 +548,6 @@
 		15FC4F3D2F73E7620054153E /* HeroBannerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroBannerViewModel.swift; sourceTree = "<group>"; };
 		15FC4F402F73EB7B0054153E /* MainHomeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainHomeService.swift; sourceTree = "<group>"; };
 		15FC4F442F74C7CF0054153E /* ErrorMessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorMessageView.swift; sourceTree = "<group>"; };
-		16E700012FE1000000000001 /* AppUserFacingError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUserFacingError.swift; sourceTree = "<group>"; };
-		16E700032FE1000000000003 /* FeatureLoadFailure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureLoadFailure.swift; sourceTree = "<group>"; };
 		15FC4F462F74DF4D0054153E /* HeroBannerImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeroBannerImageView.swift; sourceTree = "<group>"; };
 		15FC4F4A2F74E52B0054153E /* BannerSkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BannerSkeletonView.swift; sourceTree = "<group>"; };
 		15FC4F4E2F74E6440054153E /* ShimmerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShimmerView.swift; sourceTree = "<group>"; };
@@ -642,6 +642,10 @@
 		16E201012FAA210000000001 /* FavoriteRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteRepository.swift; sourceTree = "<group>"; };
 		16E201042FAA210000000004 /* FavoriteStatusStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteStatusStore.swift; sourceTree = "<group>"; };
 		16E201062FB8000000000006 /* MyListStatisticsSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListStatisticsSectionView.swift; sourceTree = "<group>"; };
+		16E700012FE1000000000001 /* AppUserFacingError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUserFacingError.swift; sourceTree = "<group>"; };
+		16E700032FE1000000000003 /* FeatureLoadFailure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureLoadFailure.swift; sourceTree = "<group>"; };
+		16E700052FE1000000000005 /* ErrorMessageKind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorMessageKind.swift; sourceTree = "<group>"; };
+		16E700072FE1000000000007 /* ErrorMessageRetryCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorMessageRetryCardView.swift; sourceTree = "<group>"; };
 		16F100012FAB300000000001 /* HomeRecommendedAnimeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeRecommendedAnimeView.swift; sourceTree = "<group>"; };
 		16F100022FAB300000000002 /* HomeRecommendedAnimeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeRecommendedAnimeViewModel.swift; sourceTree = "<group>"; };
 		16F100032FAB300000000003 /* HomeRecommendedAnimeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeRecommendedAnimeModel.swift; sourceTree = "<group>"; };
@@ -2046,24 +2050,16 @@
 		15FC4F422F74C79F0054153E /* ErrorMessage */ = {
 			isa = PBXGroup;
 			children = (
-				16E700052FE1000000000005 /* Model */,
+				16E700092FE1000000000009 /* Model */,
 				15FC4F432F74C7B40054153E /* View */,
 			);
 			path = ErrorMessage;
 			sourceTree = "<group>";
 		};
-		16E700052FE1000000000005 /* Model */ = {
-			isa = PBXGroup;
-			children = (
-				16E700012FE1000000000001 /* AppUserFacingError.swift */,
-				16E700032FE1000000000003 /* FeatureLoadFailure.swift */,
-			);
-			path = Model;
-			sourceTree = "<group>";
-		};
 		15FC4F432F74C7B40054153E /* View */ = {
 			isa = PBXGroup;
 			children = (
+				16E700072FE1000000000007 /* ErrorMessageRetryCardView.swift */,
 				15FC4F442F74C7CF0054153E /* ErrorMessageView.swift */,
 			);
 			path = View;
@@ -2652,6 +2648,16 @@
 			path = Store;
 			sourceTree = "<group>";
 		};
+		16E700092FE1000000000009 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				16E700012FE1000000000001 /* AppUserFacingError.swift */,
+				16E700052FE1000000000005 /* ErrorMessageKind.swift */,
+				16E700032FE1000000000003 /* FeatureLoadFailure.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
 		16F100072FAB300000000007 /* RecommendedAnime */ = {
 			isa = PBXGroup;
 			children = (
@@ -3129,8 +3135,10 @@
 				15FC4F412F73EB7B0054153E /* MainHomeService.swift in Sources */,
 				15AC996B2F879D8B008EAAEE /* GenreAnimeSectionView.swift in Sources */,
 				16E700022FE1000000000002 /* AppUserFacingError.swift in Sources */,
+				16E700062FE1000000000006 /* ErrorMessageKind.swift in Sources */,
 				16E700042FE1000000000004 /* FeatureLoadFailure.swift in Sources */,
 				15FC4F452F74C7CF0054153E /* ErrorMessageView.swift in Sources */,
+				16E700082FE1000000000008 /* ErrorMessageRetryCardView.swift in Sources */,
 				159667F42F8659AD0033410A /* PosterTextGradientOverlayView.swift in Sources */,
 				159667F52F8659AD0033410A /* RemotePosterImageView.swift in Sources */,
 				16D100032FAA100000000003 /* ImagePreviewViewer.swift in Sources */,

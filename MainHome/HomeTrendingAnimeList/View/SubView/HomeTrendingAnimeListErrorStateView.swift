@@ -11,28 +11,17 @@ struct HomeTrendingAnimeListErrorStateView: View {
 
     // MARK: - Properties
 
-    let message: String
+    let failure: FeatureLoadFailure
     let onRetry: () -> Void
 
     // MARK: - Body
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("熱門榜單暫時讀不到")
-                .font(.title3.weight(.bold))
-                .foregroundStyle(ThemeColor.textPrimary)
-
-            Text(message)
-                .font(.body)
-                .foregroundStyle(ThemeColor.textSecondary)
-
-            Button("重新載入", action: onRetry)
-                .buttonStyle(.borderedProminent)
-                .tint(ThemeColor.sakura)
-        }
-        .frame(maxWidth: .infinity, minHeight: 220, alignment: .center)
-        .padding(24)
-        .background(Color(.secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        ErrorMessageRetryCardView(
+            state: ErrorMessageView.State(failure: failure),
+            title: "熱門榜單暫時讀不到",
+            retryTitle: "重新載入",
+            onRetry: onRetry
+        )
     }
 }
