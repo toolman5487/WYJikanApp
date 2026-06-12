@@ -7,6 +7,9 @@ import Foundation
 import OSLog
 
 enum AnimeBroadcastReminderReconciler {
+    private static let bootstrapDeferNanoseconds: UInt64 = 2_000_000_000
+    private static let reconcileRequestIntervalNanoseconds: UInt64 = 1_000_000_000
+
     @MainActor
     static func reconcile(
         anime: AnimeDetailDTO,
@@ -35,9 +38,17 @@ enum AnimeBroadcastReminderReconciler {
     ) async {
         guard !subscriptions.isEmpty else { return }
 
+        try? await Task.sleep(nanoseconds: bootstrapDeferNanoseconds)
+        if Task.isCancelled { return }
+
         var remainingCount = subscriptions.count
 
-        for subscription in subscriptions {
+        for (index, subscription) in subscriptions.enumerated() {
+            if index > 0 {
+                try? await Task.sleep(nanoseconds: reconcileRequestIntervalNanoseconds)
+                if Task.isCancelled { return }
+            }
+
             do {
                 let response = try await service.fetchAnimeDetail(malId: subscription.malId)
                 guard !AnimeBroadcastReminderScheduling.isCurrentlyAiring(response.data) else {

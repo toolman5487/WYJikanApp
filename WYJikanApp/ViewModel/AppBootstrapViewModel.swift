@@ -29,12 +29,14 @@ final class AppBootstrapViewModel: ObservableObject {
     // MARK: - Public Methods
 
     func bootstrap(subscriptions: [AnimeBroadcastReminderSnapshot]) async {
-        await AnimeBroadcastReminderReconciler.reconcileAll(
-            subscriptions: subscriptions,
-            service: animeDetailService,
-            repository: broadcastReminderRepository,
-            scheduler: notificationScheduler
-        )
-        await notificationScheduler.refreshScheduledNotificationIfNeeded()
+        await Task(priority: .utility) {
+            await AnimeBroadcastReminderReconciler.reconcileAll(
+                subscriptions: subscriptions,
+                service: animeDetailService,
+                repository: broadcastReminderRepository,
+                scheduler: notificationScheduler
+            )
+            await notificationScheduler.refreshScheduledNotificationIfNeeded()
+        }.value
     }
 }

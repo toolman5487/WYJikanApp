@@ -28,10 +28,12 @@ final class MangaDetailViewModel: ObservableObject {
     @Published private(set) var charactersFailure: FeatureLoadFailure?
     @Published private(set) var picturesFailure: FeatureLoadFailure?
     @Published private(set) var recommendationsFailure: FeatureLoadFailure?
+    @Published private(set) var favoriteCollectionItem: MyListCollectionItem?
 
     private let malId: Int
     private let service: MangaDetailServicing
     private let favoriteRepository: any FavoriteRepository
+    private var myListCancellable: AnyCancellable?
 
     init(
         malId: Int,
@@ -41,6 +43,7 @@ final class MangaDetailViewModel: ObservableObject {
         self.malId = malId
         self.service = service
         self.favoriteRepository = favoriteRepository
+        connectToMyList()
     }
 
     var detail: MangaDetailDTO? {
@@ -189,6 +192,18 @@ final class MangaDetailViewModel: ObservableObject {
 
     var isFavoriteActionEnabled: Bool {
         detail != nil
+    }
+
+    // MARK: - MyList
+
+    private func connectToMyList() {
+        myListCancellable = favoriteRepository.myListPublisher
+            .sink { [weak self] items in
+                guard let self else { return }
+                favoriteCollectionItem = items.first { item in
+                    item.malId == malId && item.mediaKind == .manga
+                }
+            }
     }
 
     func toggleFavorite(isFavorite: Bool) {

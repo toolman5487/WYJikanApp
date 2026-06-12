@@ -61,7 +61,8 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
     private static let initialVisibleCards = 9
     private static let loadMoreStep = 9
     private static let maxCards = 30
-    private static let titleEnrichmentDelayNanoseconds: UInt64 = 500_000_000
+    private static let maxTitleEnrichmentsPerPass = 3
+    private static let titleEnrichmentDelayNanoseconds: UInt64 = 1_000_000_000
     private static let titleCacheLimit = 100
     private static var titleCache: [Int: String] = [:]
     private static var titleCacheOrder: [Int] = []
@@ -70,11 +71,13 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
     @Published private(set) var visibleCount: Int = 9
 
     private let service: MainHomeServicing
+    private let animeDetailService: AnimeDetailServicing
     private var loadState: LoadState = .idle
     private var titleEnrichmentTask: Task<Void, Never>?
 
-    init(service: MainHomeServicing) {
+    init(service: MainHomeServicing, animeDetailService: AnimeDetailServicing) {
         self.service = service
+        self.animeDetailService = animeDetailService
     }
 
     deinit {
@@ -187,17 +190,15 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
         let uncachedIDs = displayedItems.compactMap { item in
             Self.cachedTitle(for: item.detailMalId) == nil ? item.detailMalId : nil
         }
-        guard !uncachedIDs.isEmpty else { return }
+        let idsToFetch = Array(uncachedIDs.prefix(Self.maxTitleEnrichmentsPerPass))
+        guard !idsToFetch.isEmpty else { return }
 
         titleEnrichmentTask = Task { [weak self] in
             guard let self else { return }
-            for id in uncachedIDs {
+            for id in idsToFetch {
                 if Task.isCancelled { return }
                 do {
-                    let response = try await self.service.fetchAnimeDetail(
-                        malId: id,
-                        forceRefresh: false
-                    )
+                    let response = try await self.animeDetailService.fetchAnimeDetail(malId: id)
                     let anime = response.data
                     let title = Self.preferredTitle(
                         japanese: anime.titleJapanese,
@@ -210,6 +211,10 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
                 } catch {
                     continue
                 }
+            }
+
+            if !Task.isCancelled {
+                startTitleEnrichmentIfNeeded()
             }
         }
     }

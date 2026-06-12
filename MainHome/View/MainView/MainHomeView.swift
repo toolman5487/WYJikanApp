@@ -77,7 +77,12 @@ struct MainHomeView: View {
         _watchEpisodesViewModel = StateObject(wrappedValue: HomeWatchEpisodesViewModel(service: watchService))
         _trendingAnimeViewModel = StateObject(wrappedValue: HomeTrendingAnimeViewModel(service: service))
         _trendingMangaViewModel = StateObject(wrappedValue: HomeTrendingMangaViewModel(service: service))
-        _recommendedAnimeViewModel = StateObject(wrappedValue: HomeRecommendedAnimeViewModel(service: service))
+        _recommendedAnimeViewModel = StateObject(
+            wrappedValue: HomeRecommendedAnimeViewModel(
+                service: service,
+                animeDetailService: dependencies.animeDetailService
+            )
+        )
     }
 
     // MARK: - Body

@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import SwiftData
 
 struct MangaDetailView: View {
     let malId: Int
@@ -38,8 +37,6 @@ private struct MangaDetailBodyView: View {
 
     @StateObject private var viewModel: MangaDetailViewModel
     @EnvironmentObject private var favoriteStatusStore: FavoriteStatusStore
-    @Query(sort: \MyListCollectionItem.addedAt, order: .reverse)
-    private var collectionItems: [MyListCollectionItem]
     @State private var imagePreviewSession: ImagePreviewSession?
     @State private var progressEditorDraft: MangaReadingProgressEditorDraft?
     @State private var isShowingCharacterList = false
@@ -64,7 +61,7 @@ private struct MangaDetailBodyView: View {
                         showImagePreview(for: manga, selectedImageURL: viewModel.posterURL(for: manga))
                     }
                 )
-                if let favoriteItem {
+                if let favoriteItem = viewModel.favoriteCollectionItem {
                     MangaReadingProgressSectionView(
                         item: favoriteItem,
                         manga: manga,
@@ -173,12 +170,6 @@ private struct MangaDetailBodyView: View {
         favoriteStatusStore.isFavorite(malId: malId, mediaKind: .manga)
     }
 
-    private var favoriteItem: MyListCollectionItem? {
-        collectionItems.first { item in
-            item.malId == malId && item.mediaKind == .manga
-        }
-    }
-
     private var currentManga: MangaDetailDTO? {
         switch viewModel.screenState {
         case let .loaded(manga), let .refreshing(manga):
@@ -285,7 +276,7 @@ private struct MangaDetailBodyView: View {
         }
         .sheet(item: $progressEditorDraft) { draft in
             MangaReadingProgressEditorView(draft: draft) { updatedDraft in
-                guard let favoriteItem else { return }
+                guard let favoriteItem = viewModel.favoriteCollectionItem else { return }
                 viewModel.updateReadingProgress(
                     for: favoriteItem,
                     status: updatedDraft.status,
