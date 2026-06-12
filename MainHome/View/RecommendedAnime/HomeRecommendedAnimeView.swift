@@ -58,8 +58,8 @@ struct HomeRecommendedAnimeView: View {
                     }
                     .padding(.horizontal, 16)
 
-                case .error(let errorMessage):
-                    ErrorMessageView(state: .network(errorMessage), height: 240)
+                case .error(let failure):
+                    ErrorMessageView(state: .network(failure.message), height: 240)
                         .padding(.horizontal, 16)
 
                 case .empty:

@@ -21,8 +21,8 @@ struct PeopleListContentView: View {
             case .loading:
                 PeopleListLoadingView()
 
-            case .error(let message):
-                ErrorMessageView(state: .network(message), height: 180)
+            case .error(let failure):
+                ErrorMessageView(state: .network(failure.message), height: 180)
 
             case .empty:
                 Text("目前沒有聲優資料")

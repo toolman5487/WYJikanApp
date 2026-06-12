@@ -11,7 +11,7 @@ nonisolated enum PaginationFooterState: Equatable, Sendable {
     case hidden
     case available
     case loading
-    case error(message: String)
+    case error(FeatureLoadFailure)
 }
 
 nonisolated struct PaginatedPage<Item: Sendable>: Sendable {
@@ -96,11 +96,11 @@ nonisolated struct PaginatedListState<Item: Identifiable & Sendable>: Sendable w
         return true
     }
 
-    mutating func failLoadMore(message: String, generation: Int) -> Bool {
+    mutating func failLoadMore(_ failure: FeatureLoadFailure, generation: Int) -> Bool {
         guard isCurrent(generation) else { return false }
 
         isLoadingMore = false
-        footerState = .error(message: message)
+        footerState = .error(failure)
 
         return true
     }
@@ -121,8 +121,8 @@ nonisolated struct PaginatedListState<Item: Identifiable & Sendable>: Sendable w
             return .loading
         }
 
-        if case .error(let message) = footerState {
-            return .error(message: message)
+        if case .error(let failure) = footerState {
+            return .error(failure)
         }
 
         return hasNextPage ? .available : .hidden

@@ -53,8 +53,8 @@ struct HomeWatchEpisodesView: View {
                                 .frame(width: cardSize.width, height: cardSize.height)
                         }
 
-                    case .error(let errorMessage):
-                        ErrorMessageView(state: .network(errorMessage), height: cardSize.height)
+                    case .error(let failure):
+                        ErrorMessageView(state: .network(failure.message), height: cardSize.height)
                             .frame(width: cardSize.width)
 
                     case .empty:

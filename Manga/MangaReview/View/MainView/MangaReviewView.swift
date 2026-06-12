@@ -50,8 +50,8 @@ private struct MangaReviewBodyView: View {
     var body: some View {
         Group {
             switch viewModel.screenState {
-            case let .error(message):
-                ErrorMessageView(state: .network(message), height: 200)
+            case let .error(failure):
+                ErrorMessageView(state: .network(failure.message), height: 200)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             case .loading:
                 MangaReviewListSkeletonView()

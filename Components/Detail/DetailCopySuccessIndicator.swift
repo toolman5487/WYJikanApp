@@ -12,7 +12,7 @@ struct DetailCopySuccessIndicator: View {
         Image(systemName: "doc.on.doc.fill")
             .font(.title3.weight(.semibold))
             .foregroundStyle(ThemeColor.sakura)
-            .padding(10)
+            .padding(8)
             .background(.ultraThinMaterial, in: Circle())
             .shadow(color: .black.opacity(0.12), radius: 8, y: 2)
     }

@@ -87,7 +87,7 @@ final class MainNewsViewModel: ObservableObject {
             if let existingContent, forceRefresh {
                 screenState = .content(existingContent)
             } else {
-                screenState = .error(message: error.userFacingMessage)
+                screenState = .error(FeatureLoadFailure(error))
             }
         }
     }

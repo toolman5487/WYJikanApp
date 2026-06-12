@@ -21,8 +21,8 @@ struct CharacterListContentView: View {
             case .loading:
                 CharacterListLoadingView()
 
-            case .error(let message):
-                ErrorMessageView(state: .network(message), height: 180)
+            case .error(let failure):
+                ErrorMessageView(state: .network(failure.message), height: 180)
 
             case .empty:
                 Text("目前沒有角色資料")

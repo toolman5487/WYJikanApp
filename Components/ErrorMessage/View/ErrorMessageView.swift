@@ -7,42 +7,10 @@
 
 import SwiftUI
 
-nonisolated protocol AppUserFacingError: Error {
-    nonisolated var userMessage: String { get }
-}
-
-extension Error {
-    nonisolated var userFacingMessage: String {
-        if let error = self as? any AppUserFacingError {
-            return error.userMessage
-        }
-
-        if let urlError = self as? URLError {
-            return urlError.userMessage
-        }
-
-        return "目前無法載入資料，請稍後再試。"
-    }
-}
-
-private extension URLError {
-    nonisolated var userMessage: String {
-        switch code {
-        case .notConnectedToInternet, .networkConnectionLost:
-            return "網路連線不穩，請確認連線後再試。"
-        case .timedOut:
-            return "連線逾時，請稍後再試。"
-        case .cannotFindHost, .cannotConnectToHost, .dnsLookupFailed:
-            return "目前無法連上伺服器，請稍後再試。"
-        case .cancelled:
-            return "操作已取消。"
-        default:
-            return "網路連線暫時異常，請稍後再試。"
-        }
-    }
-}
-
 struct ErrorMessageView: View {
+
+    // MARK: - Types
+
     enum State: Equatable {
         case network(String)
         case noSearchResults(String)
@@ -50,13 +18,19 @@ struct ErrorMessageView: View {
         case unavailable(String)
     }
 
+    // MARK: - Properties
+
     let state: State
     var height: CGFloat?
+
+    // MARK: - Lifecycle
 
     init(state: State, height: CGFloat? = nil) {
         self.state = state
         self.height = height
     }
+
+    // MARK: - Body
 
     var body: some View {
         Group {
@@ -68,8 +42,33 @@ struct ErrorMessageView: View {
         }
     }
 
-    private var messageText: String {
-        switch state {
+    // MARK: - Private Views
+
+    private var content: some View {
+        VStack(spacing: 12) {
+            ZStack {
+                Circle()
+                    .fill(state.iconColor.opacity(0.14))
+                    .frame(width: 56, height: 56)
+
+                Image(systemName: state.iconSystemName)
+                    .font(.system(size: 24, weight: .semibold))
+                    .foregroundStyle(state.iconColor)
+            }
+
+            Text(state.message)
+                .font(.subheadline)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(.secondary)
+        }
+    }
+}
+
+// MARK: - State Presentation
+
+private extension ErrorMessageView.State {
+    var message: String {
+        switch self {
         case .network(let text),
              .noSearchResults(let text),
              .emptyCollection(let text),
@@ -78,30 +77,8 @@ struct ErrorMessageView: View {
         }
     }
 
-    private var content: some View {
-        VStack(spacing: 12) {
-            ZStack {
-                Circle()
-                    .fill(iconColor.opacity(0.14))
-                    .frame(width: 56, height: 56)
-
-                Image(systemName: iconSystemName)
-                    .font(.system(size: 24, weight: .semibold))
-                    .foregroundStyle(iconColor)
-            }
-            .accessibilityHidden(true)
-
-            Text(messageText)
-                .font(.subheadline)
-                .multilineTextAlignment(.center)
-                .foregroundStyle(.secondary)
-        }
-        .accessibilityElement(children: .combine)
-        .accessibilityValue(messageText)
-    }
-
-    private var iconSystemName: String {
-        switch state {
+    var iconSystemName: String {
+        switch self {
         case .network:
             "wifi.exclamationmark"
         case .noSearchResults:
@@ -113,8 +90,8 @@ struct ErrorMessageView: View {
         }
     }
 
-    private var iconColor: Color {
-        switch state {
+    var iconColor: Color {
+        switch self {
         case .network:
             Color.red
         case .noSearchResults, .unavailable:
@@ -124,6 +101,8 @@ struct ErrorMessageView: View {
         }
     }
 }
+
+// MARK: - Preview
 
 #Preview("網路錯誤") {
     ErrorMessageView(state: .network("Failed to load data."), height: 200)

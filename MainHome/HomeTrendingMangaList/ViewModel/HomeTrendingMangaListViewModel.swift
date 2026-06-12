@@ -14,7 +14,7 @@ final class HomeTrendingMangaListViewModel: ObservableObject {
         case loading
         case content(items: [MangaCategoryItemDTO])
         case empty
-        case error(message: String)
+        case error(FeatureLoadFailure)
     }
 
     typealias LoadMoreState = PaginationFooterState
@@ -106,7 +106,7 @@ final class HomeTrendingMangaListViewModel: ObservableObject {
             return
         } catch {
             guard pagination.isCurrent(generation) else { return }
-            screenState = .error(message: error.userFacingMessage)
+            screenState = .error(FeatureLoadFailure(error))
             loadMoreState = .hidden
         }
     }
@@ -133,7 +133,7 @@ final class HomeTrendingMangaListViewModel: ObservableObject {
             }
             return
         } catch {
-            guard pagination.failLoadMore(message: "載入更多失敗", generation: generation) else { return }
+            guard pagination.failLoadMore(FeatureLoadFailure(message: "載入更多失敗"), generation: generation) else { return }
             loadMoreState = pagination.footerState
         }
     }

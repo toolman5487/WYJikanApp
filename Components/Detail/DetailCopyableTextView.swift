@@ -34,6 +34,12 @@ struct DetailCopyableText: View {
                         )
                 }
             }
+            .animation(
+                viewModel.showsCopiedFeedback
+                    ? .spring(response: 0.32, dampingFraction: 0.72)
+                    : .easeOut(duration: 0.2),
+                value: viewModel.showsCopiedFeedback
+            )
             .onLongPressGesture(minimumDuration: 0.35) {
                 viewModel.copy(text: text)
             }

@@ -23,7 +23,7 @@ nonisolated struct HomeWatchListHeaderContent: Equatable, Sendable {
 
 nonisolated enum HomeWatchSectionState<Item: Equatable & Sendable>: Equatable, Sendable {
     case loading
-    case error(String)
+    case error(FeatureLoadFailure)
     case empty
     case content([Item])
 

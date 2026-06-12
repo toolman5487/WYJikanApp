@@ -14,7 +14,7 @@ final class CharacterDetailViewModel: ObservableObject {
     enum ScreenState {
         case loading
         case loaded(CharacterDetailDTO)
-        case error(String)
+        case error(FeatureLoadFailure)
 
         var detail: CharacterDetailDTO? {
             switch self {
@@ -68,7 +68,7 @@ final class CharacterDetailViewModel: ObservableObject {
         } catch is CancellationError {
             return
         } catch {
-            screenState = .error(error.userFacingMessage)
+            screenState = .error(FeatureLoadFailure(error))
         }
     }
 }

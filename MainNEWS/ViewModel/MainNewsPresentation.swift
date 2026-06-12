@@ -10,7 +10,7 @@ nonisolated enum MainNewsScreenState: Sendable {
     case content(MainNewsContent)
     case refreshing(MainNewsContent)
     case empty
-    case error(message: String)
+    case error(FeatureLoadFailure)
 }
 
 nonisolated enum MainNewsSourceFilter: Hashable, Identifiable, Sendable {

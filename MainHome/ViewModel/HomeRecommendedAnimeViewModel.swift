@@ -10,7 +10,7 @@ import Foundation
 
 enum HomeRecommendedAnimeScreenState: Equatable {
     case loading
-    case error(String)
+    case error(FeatureLoadFailure)
     case empty
     case content([HomeRecommendedAnimeCardItem])
 
@@ -175,7 +175,7 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
                 visibleCount = previousVisibleCount
                 startTitleEnrichmentIfNeeded()
             } else {
-                screenState = .error(error.userFacingMessage)
+                screenState = .error(FeatureLoadFailure(error))
             }
         }
     }

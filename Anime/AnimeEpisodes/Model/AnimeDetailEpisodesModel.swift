@@ -74,7 +74,7 @@ nonisolated struct AnimeDetailEpisodeSummaryPresentation: Sendable, Equatable {
 nonisolated enum AnimeDetailEpisodeDetailPresentation: Sendable, Equatable {
     case loading(AnimeDetailEpisodeExpandedPresentation)
     case content(AnimeDetailEpisodeExpandedPresentation)
-    case error(String, AnimeDetailEpisodeExpandedPresentation)
+    case error(FeatureLoadFailure, AnimeDetailEpisodeExpandedPresentation)
 }
 
 nonisolated struct AnimeDetailEpisodeExpandedPresentation: Sendable, Equatable {

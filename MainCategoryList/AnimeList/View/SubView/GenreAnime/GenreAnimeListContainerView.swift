@@ -24,8 +24,8 @@ struct GenreAnimeListContainerView: View {
             case .loading:
                 GenreAnimeListSkeletonView()
 
-            case .error(let message):
-                Text(message)
+            case .error(let failure):
+                Text(failure.message)
                     .font(.footnote)
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, alignment: .leading)

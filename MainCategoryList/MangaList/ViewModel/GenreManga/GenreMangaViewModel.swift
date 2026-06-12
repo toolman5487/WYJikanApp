@@ -19,7 +19,7 @@ final class GenreMangaViewModel: ObservableObject {
         case loadingMore
         case paused
         case loaded
-        case error(message: String)
+        case error(FeatureLoadFailure)
     }
 
     enum LoadMoreState: Equatable {
@@ -30,7 +30,7 @@ final class GenreMangaViewModel: ObservableObject {
 
     enum ScreenState {
         case loading
-        case error(String)
+        case error(FeatureLoadFailure)
         case empty
         case content(sections: [MangaGenreSection], inlineError: String?, loadMoreState: LoadMoreState)
     }
@@ -54,8 +54,8 @@ final class GenreMangaViewModel: ObservableObject {
         switch loadState {
         case .loadingInitial where genreSections.isEmpty:
             return .loading
-        case .error(let message) where genreSections.isEmpty:
-            return .error(message)
+        case .error(let failure) where genreSections.isEmpty:
+            return .error(failure)
         case .idle, .loadingInitial, .loadingMore, .paused, .loaded, .error:
             if genreSections.isEmpty {
                 return .empty
@@ -150,8 +150,8 @@ private extension GenreMangaViewModel {
     }
 
     var inlineErrorMessage: String? {
-        guard case .error(let message) = loadState else { return nil }
-        return message
+        guard case .error(let failure) = loadState else { return nil }
+        return failure.message
     }
 
     var footerLoadMoreState: LoadMoreState {
@@ -231,7 +231,7 @@ private extension GenreMangaViewModel {
             await startGenreBatch(.initial)
         } catch {
             guard !Task.isCancelled else { return }
-            loadState = .error(message: Self.genreErrorMessage)
+            loadState = .error(FeatureLoadFailure(message: Self.genreErrorMessage))
             canLoadMore = false
         }
     }
@@ -288,7 +288,7 @@ private extension GenreMangaViewModel {
             loadState = .loaded
         case .empty:
             canLoadMore = false
-            loadState = genreSections.isEmpty ? .error(message: Self.genreErrorMessage) : .loaded
+            loadState = genreSections.isEmpty ? .error(FeatureLoadFailure(message: Self.genreErrorMessage)) : .loaded
         case .cancelled:
             break
         }

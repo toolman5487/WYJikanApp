@@ -12,7 +12,7 @@ import Foundation
 final class AnimeReviewViewModel: ObservableObject {
     enum ScreenState {
         case loading
-        case error(String)
+        case error(FeatureLoadFailure)
         case empty
         case content([AnimeReviewEntryDTO])
 
@@ -30,7 +30,7 @@ final class AnimeReviewViewModel: ObservableObject {
         case hidden
         case available
         case loading
-        case error(String)
+        case error(FeatureLoadFailure)
     }
 
     private enum LoadingPhase {
@@ -87,7 +87,7 @@ final class AnimeReviewViewModel: ObservableObject {
         } catch is CancellationError {
             return
         } catch {
-            screenState = .error(error.userFacingMessage)
+            screenState = .error(FeatureLoadFailure(error))
         }
     }
 
@@ -108,7 +108,7 @@ final class AnimeReviewViewModel: ObservableObject {
         } catch is CancellationError {
             return
         } catch {
-            loadMoreState = .error("載入更多失敗")
+            loadMoreState = .error(FeatureLoadFailure(message: "載入更多失敗"))
         }
     }
 }

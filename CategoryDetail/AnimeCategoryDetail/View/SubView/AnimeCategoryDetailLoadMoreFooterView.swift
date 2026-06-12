@@ -36,9 +36,9 @@ struct AnimeCategoryDetailLoadMoreFooterView: View {
             ProgressView()
                 .frame(maxWidth: .infinity, minHeight: 116)
 
-        case let .error(message):
+        case let .error(failure):
             VStack(alignment: .leading, spacing: 12) {
-                Text(message)
+                Text(failure.message)
                     .font(.footnote)
                     .foregroundStyle(ThemeColor.textSecondary)
 

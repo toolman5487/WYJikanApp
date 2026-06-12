@@ -49,8 +49,8 @@ private struct PeopleDetailBodyView: View {
                         sectionView(section, person: person)
                     }
                 }
-            case .error(let message):
-                ErrorMessageView(state: .network(message), height: 200)
+            case .error(let failure):
+                ErrorMessageView(state: .network(failure.message), height: 200)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             case .loading:
                 detailScroll {

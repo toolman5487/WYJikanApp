@@ -54,8 +54,8 @@ private struct AnimeDetailEpisodesListBodyView: View {
             case .empty:
                 ErrorMessageView(state: .emptyCollection("目前沒有可顯示的集數資料"), height: 200)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-            case .error(let message):
-                ErrorMessageView(state: .network(message), height: 200)
+            case .error(let failure):
+                ErrorMessageView(state: .network(failure.message), height: 200)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             case .content:
                 ScrollView {

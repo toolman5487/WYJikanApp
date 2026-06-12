@@ -112,8 +112,8 @@ private struct HomeTrendingMangaListBodyView: View {
                 )
             }
 
-        case .error(let message):
-            errorStateCard(message: message)
+        case .error(let failure):
+            errorStateCard(message: failure.message)
 
         case .content(let items):
             MangaCategoryDetailGridSectionView(

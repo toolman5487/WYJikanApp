@@ -14,7 +14,7 @@ final class HomeWatchListViewModel: ObservableObject {
         case loading
         case content([HomeWatchListItem])
         case empty
-        case error(message: String)
+        case error(FeatureLoadFailure)
     }
 
     typealias LoadMoreState = PaginationFooterState
@@ -104,7 +104,7 @@ final class HomeWatchListViewModel: ObservableObject {
         } catch {
             guard selectedFeed == feed,
                   pagination.isCurrent(generation) else { return }
-            screenState = .error(message: error.userFacingMessage)
+            screenState = .error(FeatureLoadFailure(error))
             loadMoreState = .hidden
         }
     }
@@ -129,7 +129,7 @@ final class HomeWatchListViewModel: ObservableObject {
             }
             return
         } catch {
-            guard pagination.failLoadMore(message: "載入更多失敗", generation: generation) else { return }
+            guard pagination.failLoadMore(FeatureLoadFailure(message: "載入更多失敗"), generation: generation) else { return }
             loadMoreState = pagination.footerState
         }
     }

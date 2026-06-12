@@ -119,9 +119,9 @@ struct HomeWatchListLoadMoreFooterView: View {
             ProgressView()
                 .frame(maxWidth: .infinity, minHeight: 116)
 
-        case .error(let message):
+        case .error(let failure):
             VStack(alignment: .leading, spacing: 12) {
-                Text(message)
+                Text(failure.message)
                     .font(.footnote)
                     .foregroundStyle(ThemeColor.textSecondary)
 

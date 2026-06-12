@@ -15,14 +15,14 @@ final class AnimeDetailEpisodesListViewModel: ObservableObject {
         case loading
         case empty
         case content
-        case error(String)
+        case error(FeatureLoadFailure)
     }
 
     enum LoadMoreState: Equatable {
         case hidden
         case available
         case loading
-        case error(message: String)
+        case error(FeatureLoadFailure)
     }
 
     @Published private(set) var screenState: ScreenState = .loading
@@ -103,7 +103,7 @@ final class AnimeDetailEpisodesListViewModel: ObservableObject {
             rebuildEpisodeRows()
         } catch {
             episodeDetailStates[episodeNumber] = .error(
-                error.userFacingMessage,
+                FeatureLoadFailure(error),
                 rowPresenter.expandedPresentation(for: episode)
             )
             rebuildEpisodeRows()
@@ -129,7 +129,7 @@ final class AnimeDetailEpisodesListViewModel: ObservableObject {
             loadMoreState = resolvedLoadMoreState()
         } catch is CancellationError {
         } catch {
-            screenState = .error(error.userFacingMessage)
+            screenState = .error(FeatureLoadFailure(error))
             loadMoreState = .hidden
         }
     }
@@ -160,7 +160,7 @@ final class AnimeDetailEpisodesListViewModel: ObservableObject {
                 "Anime episodes load-more failed: \(error.localizedDescription, privacy: .public)"
             )
             isLoadingMore = false
-            loadMoreState = .error(message: "載入更多集數失敗")
+            loadMoreState = .error(FeatureLoadFailure(message: "載入更多集數失敗"))
         }
     }
 
@@ -175,8 +175,8 @@ final class AnimeDetailEpisodesListViewModel: ObservableObject {
         if isLoadingMore {
             return .loading
         }
-        if case .error(let message) = loadMoreState {
-            return .error(message: message)
+        if case .error(let failure) = loadMoreState {
+            return .error(failure)
         }
         return hasNextPage ? .available : .hidden
     }

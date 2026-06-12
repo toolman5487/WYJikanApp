@@ -105,9 +105,9 @@ struct AnimeDetailEpisodeRowView: View, Equatable {
         case .content(let content):
             detailContent(content)
 
-        case .error(let message, let content):
+        case .error(let failure, let content):
             VStack(alignment: .leading, spacing: 16) {
-                errorBanner(message: message)
+                errorBanner(message: failure.message)
                 detailContent(content)
             }
         }

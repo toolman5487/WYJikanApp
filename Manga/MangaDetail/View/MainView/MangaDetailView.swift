@@ -167,8 +167,8 @@ private struct MangaDetailBodyView: View {
                     .padding()
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
-            case let .error(message):
-                ErrorMessageView(state: .network(message), height: 200)
+            case let .error(failure):
+                ErrorMessageView(state: .network(failure.message), height: 200)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             case .idle, .loading:
                 ScrollView {

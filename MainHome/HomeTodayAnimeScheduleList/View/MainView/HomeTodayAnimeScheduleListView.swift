@@ -90,8 +90,8 @@ private struct HomeTodayAnimeScheduleListBodyView: View {
             HomeTodayAnimeScheduleListEmptyStateView()
                 .transition(.opacity.combined(with: .move(edge: .bottom)))
 
-        case .error(let message):
-            HomeTodayAnimeScheduleListErrorStateView(message: message) {
+        case .error(let failure):
+            HomeTodayAnimeScheduleListErrorStateView(message: failure.message) {
                 Task { await viewModel.reload() }
             }
             .transition(.opacity.combined(with: .move(edge: .bottom)))

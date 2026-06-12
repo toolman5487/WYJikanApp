@@ -36,13 +36,13 @@ struct MainSearchResultsContentView<FilterHeader: View>: View {
                     MainSearchListSkeletonView()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
-            case .error(let message):
+            case .error(let failure):
                 VStack(spacing: 0) {
                     filterHeader()
                     ContentUnavailableView {
                         Label("搜尋失敗", systemImage: "exclamationmark.triangle")
                     } description: {
-                        Text(message)
+                        Text(failure.message)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
@@ -80,9 +80,9 @@ struct MainSearchResultsContentView<FilterHeader: View>: View {
                     switch loadMoreState {
                     case .hidden, .available, .loading:
                         EmptyView()
-                    case .error(let loadMoreErrorMessage):
+                    case .error(let loadMoreErrorFailure):
                         VStack(spacing: 8) {
-                            Text(loadMoreErrorMessage)
+                            Text(loadMoreErrorFailure.message)
                                 .font(.footnote)
                                 .foregroundStyle(ThemeColor.textSecondary)
                                 .multilineTextAlignment(.center)

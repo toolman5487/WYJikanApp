@@ -96,7 +96,7 @@ final class HomeWatchPromosViewModel: ObservableObject {
             if forceRefresh, previousState.hasContent {
                 screenState = previousState
             } else {
-                screenState = .error(error.userFacingMessage)
+                screenState = .error(FeatureLoadFailure(error))
             }
         }
     }

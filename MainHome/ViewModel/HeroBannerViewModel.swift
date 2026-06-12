@@ -10,7 +10,7 @@ import Foundation
 
 enum HeroBannerScreenState: Equatable {
     case loading
-    case error(String)
+    case error(FeatureLoadFailure)
     case empty
     case content([BannerItem])
 
@@ -201,7 +201,7 @@ final class HeroBannerViewModel: ObservableObject {
                 startAutoScrollIfNeeded()
             } else {
                 currentIndex = 0
-                screenState = .error(error.userFacingMessage)
+                screenState = .error(FeatureLoadFailure(error))
                 stopAutoScroll()
             }
         }

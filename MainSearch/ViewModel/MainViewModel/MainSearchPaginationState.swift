@@ -11,7 +11,7 @@ enum MainSearchRequestState: Equatable, Sendable {
     case idle
     case searching
     case loadingMore
-    case loadMoreError(String)
+    case loadMoreError(FeatureLoadFailure)
 
     var canStartLoadMore: Bool {
         switch self {
@@ -93,8 +93,8 @@ struct MainSearchPaginationState: Sendable {
         requestState = .idle
     }
 
-    mutating func failLoadMore(message: String) {
-        requestState = .loadMoreError(message)
+    mutating func failLoadMore(_ failure: FeatureLoadFailure) {
+        requestState = .loadMoreError(failure)
     }
 
     mutating func updateLoadMoreTriggers(from sortedRows: [MainSearchResultRow]) {

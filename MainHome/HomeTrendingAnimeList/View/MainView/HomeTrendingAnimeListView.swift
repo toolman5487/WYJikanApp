@@ -104,8 +104,8 @@ private struct HomeTrendingAnimeListBodyView: View {
             HomeTrendingAnimeListEmptyStateView()
                 .transition(.opacity.combined(with: .move(edge: .bottom)))
 
-        case .error(let message):
-            HomeTrendingAnimeListErrorStateView(message: message) {
+        case .error(let failure):
+            HomeTrendingAnimeListErrorStateView(message: failure.message) {
                 Task { await viewModel.reload() }
             }
             .transition(.opacity.combined(with: .move(edge: .bottom)))

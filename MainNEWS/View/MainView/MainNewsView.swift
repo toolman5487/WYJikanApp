@@ -93,8 +93,8 @@ struct MainNewsView: View {
         case .empty:
             MainNewsEmptyStateView(filterTitle: viewModel.selectedFilter.title)
                 .transition(.opacity)
-        case .error(let message):
-            MainNewsErrorStateView(message: message) {
+        case .error(let failure):
+            MainNewsErrorStateView(message: failure.message) {
                 startReload()
             }
             .transition(.opacity)

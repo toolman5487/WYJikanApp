@@ -27,8 +27,8 @@ struct MainSearchPresentationBuilder: Sendable {
         switch requestState {
         case .loadingMore:
             return .loading
-        case .loadMoreError(let message):
-            return .error(message)
+        case .loadMoreError(let failure):
+            return .error(failure)
         case .idle, .searching:
             return hasNextPage ? .available : .hidden
         }

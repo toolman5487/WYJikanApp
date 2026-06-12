@@ -332,7 +332,7 @@ nonisolated struct MainSearchResultRow: Identifiable, Hashable, Sendable {
 enum MainSearchScreenState: Equatable {
     case emptyPrompt
     case loading
-    case error(String)
+    case error(FeatureLoadFailure)
     case emptyResults(query: String)
     case content([MainSearchResultRow])
 }
@@ -341,5 +341,5 @@ enum MainSearchLoadMoreState: Equatable {
     case hidden
     case available
     case loading
-    case error(String)
+    case error(FeatureLoadFailure)
 }

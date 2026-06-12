@@ -6,7 +6,7 @@
 //
 
 import Combine
-import SwiftUI
+import Foundation
 
 @MainActor
 final class DetailCopyableTextViewModel: ObservableObject {
@@ -42,18 +42,13 @@ final class DetailCopyableTextViewModel: ObservableObject {
 
     private func presentCopiedFeedback() {
         dismissFeedbackTask?.cancel()
-
-        withAnimation(.spring(response: 0.32, dampingFraction: 0.72)) {
-            showsCopiedFeedback = true
-        }
+        showsCopiedFeedback = true
 
         dismissFeedbackTask = Task {
             try? await Task.sleep(for: FeedbackTiming.displayDuration)
             guard !Task.isCancelled else { return }
             await MainActor.run {
-                withAnimation(.easeOut(duration: 0.2)) {
-                    showsCopiedFeedback = false
-                }
+                showsCopiedFeedback = false
             }
         }
     }

@@ -35,7 +35,7 @@ struct AnimeCategoryDetailHeaderView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(20)
+        .padding(16)
         .background(headerBackground)
         .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
     }

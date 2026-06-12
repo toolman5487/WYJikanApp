@@ -14,7 +14,7 @@ final class PeopleDetailViewModel: ObservableObject {
     enum ScreenState {
         case loading
         case loaded(PeopleDetailDTO)
-        case error(String)
+        case error(FeatureLoadFailure)
 
         var detail: PeopleDetailDTO? {
             switch self {
@@ -68,7 +68,7 @@ final class PeopleDetailViewModel: ObservableObject {
         } catch is CancellationError {
             return
         } catch {
-            screenState = .error(error.userFacingMessage)
+            screenState = .error(FeatureLoadFailure(error))
         }
     }
 }

@@ -191,7 +191,7 @@ private extension MainSearchViewModel {
         }
 
         pagination.failSearch()
-        screenState = .error(error)
+        screenState = .error(FeatureLoadFailure(message: error))
         loadMoreState = .hidden
     }
 }
@@ -221,7 +221,7 @@ private extension MainSearchViewModel {
                 self.applySortedResults()
             } catch {
                 guard !Task.isCancelled else { return }
-                self.pagination.failLoadMore(message: error.userFacingMessage)
+                self.pagination.failLoadMore(FeatureLoadFailure(error))
                 self.loadMoreState = self.presentationBuilder.loadMoreState(
                     requestState: self.pagination.requestState,
                     hasNextPage: self.pagination.hasNextPage

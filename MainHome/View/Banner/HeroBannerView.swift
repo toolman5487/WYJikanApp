@@ -55,8 +55,8 @@ struct HeroBannerView: View {
         switch viewModel.screenState {
         case .loading:
             BannerSkeletonView()
-        case .error(let errorMessage):
-            bannerMessageView(message: errorMessage, buttonTitle: "重試")
+        case .error(let failure):
+            bannerMessageView(message: failure.message, buttonTitle: "重試")
         case .empty:
             bannerMessageView(message: viewModel.emptyStateMessage, buttonTitle: "重新整理")
         case .content:

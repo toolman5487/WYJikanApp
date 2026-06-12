@@ -15,7 +15,7 @@ final class MangaDetailViewModel: ObservableObject {
         case loading
         case refreshing(MangaDetailDTO)
         case loaded(MangaDetailDTO)
-        case error(String)
+        case error(FeatureLoadFailure)
     }
 
     @Published private(set) var screenState: ScreenState = .idle
@@ -84,7 +84,7 @@ final class MangaDetailViewModel: ObservableObject {
             if let existingDetail, forceRefresh {
                 screenState = .loaded(existingDetail)
             } else {
-                screenState = .error(error.userFacingMessage)
+                screenState = .error(FeatureLoadFailure(error))
                 resetSupplementaryContent()
             }
         }
