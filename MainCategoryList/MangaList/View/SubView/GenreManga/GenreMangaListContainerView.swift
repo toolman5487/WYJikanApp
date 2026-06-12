@@ -23,27 +23,32 @@ struct GenreMangaListContainerView: View {
             switch viewModel.screenState {
             case .loading:
                 GenreMangaListSkeletonView()
+
             case .error(let failure):
-                Text(failure.message)
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 8)
+                ErrorMessageRetryCardView(
+                    state: ErrorMessageView.State(failure: failure),
+                    title: "漫畫分類暫時載入失敗",
+                    retryTitle: "重新載入"
+                ) {
+                    viewModel.loadSections()
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+
             case .empty:
-                Text("目前沒有分類資料")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.vertical, 24)
+                ErrorMessageView(
+                    state: .emptyCollection("目前沒有分類資料"),
+                    height: 180
+                )
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 24)
+
             case .content(let sections, let inlineError, let loadMoreState):
                 LazyVStack(alignment: .leading, spacing: 0, pinnedViews: [.sectionHeaders]) {
-                    if let message = inlineError {
-                        Text(message)
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.horizontal, 16)
+                    if let failure = inlineError {
+                        ErrorMessageView(state: ErrorMessageView.State(failure: failure))
+                            .frame(maxWidth: .infinity)
+                            .padding(.horizontal, 8)
                             .padding(.bottom, 8)
                     }
 
@@ -64,6 +69,7 @@ struct GenreMangaListContainerView: View {
                     switch loadMoreState {
                     case .hidden:
                         EmptyView()
+
                     case .available, .loading:
                         EmptyView()
                     }

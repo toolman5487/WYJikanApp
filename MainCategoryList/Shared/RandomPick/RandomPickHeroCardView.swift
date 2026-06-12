@@ -21,7 +21,7 @@ struct RandomPickHeroCardView<DetailDestination: View>: View {
     let item: RandomPickHeroItem?
     let style: RandomPickHeroStyle
     let isDrawing: Bool
-    var errorMessage: String? = nil
+    var loadFailure: FeatureLoadFailure? = nil
     var cooldownText: String? = nil
     let drawButtonTitle: String
     let canDraw: Bool
@@ -194,15 +194,9 @@ struct RandomPickHeroCardView<DetailDestination: View>: View {
                     .lineLimit(2)
                     .minimumScaleFactor(0.88)
                     .multilineTextAlignment(.leading)
-            } else if let errorMessage {
-                Text("載入失敗")
-                    .font(.system(.title2, design: .rounded).weight(.bold))
-                    .foregroundStyle(ThemeColor.textPrimary)
-
-                Text(errorMessage)
-                    .font(.footnote)
-                    .foregroundStyle(ThemeColor.textPrimary.opacity(0.9))
-                    .lineLimit(2)
+            } else if let loadFailure {
+                ErrorMessageView(state: ErrorMessageView.State(failure: loadFailure))
+                    .colorScheme(.dark)
             } else {
                 Text(style.emptyTitle)
                     .font(.system(.title2, design: .rounded).weight(.bold))
@@ -237,7 +231,7 @@ struct RandomPickHeroCardView<DetailDestination: View>: View {
 
     @ViewBuilder
     private var heroSynopsis: some View {
-        if errorMessage == nil, let synopsis = item?.synopsisPreview {
+        if loadFailure == nil, let synopsis = item?.synopsisPreview {
             Text(synopsis)
                 .font(.footnote)
                 .foregroundStyle(ThemeColor.textPrimary.opacity(0.9))

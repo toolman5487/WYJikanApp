@@ -44,7 +44,7 @@ struct RandomHeroSectionView: View {
             RandomHeroCardView(
                 pick: nil,
                 isDrawing: false,
-                errorMessage: nil,
+                loadFailure: nil,
                 cooldownText: nil,
                 drawButtonTitle: viewModel.drawButtonTitle,
                 canDraw: viewModel.canDraw,
@@ -83,7 +83,7 @@ struct RandomHeroSectionView: View {
             RandomHeroCardView(
                 pick: viewModel.randomPick,
                 isDrawing: false,
-                errorMessage: viewModel.drawError,
+                loadFailure: viewModel.drawFailure,
                 cooldownText: nil,
                 drawButtonTitle: viewModel.drawButtonTitle,
                 canDraw: viewModel.canDraw,

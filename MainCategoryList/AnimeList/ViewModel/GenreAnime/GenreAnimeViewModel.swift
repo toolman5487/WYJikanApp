@@ -32,7 +32,7 @@ final class GenreAnimeViewModel: ObservableObject {
         case loading
         case error(FeatureLoadFailure)
         case empty
-        case content(sections: [AnimeGenreSection], inlineError: String?, loadMoreState: LoadMoreState)
+        case content(sections: [AnimeGenreSection], inlineError: FeatureLoadFailure?, loadMoreState: LoadMoreState)
     }
 
     // MARK: - Constants
@@ -149,9 +149,9 @@ private extension GenreAnimeViewModel {
         }
     }
 
-    var inlineErrorMessage: String? {
+    var inlineErrorMessage: FeatureLoadFailure? {
         guard case .error(let failure) = loadState else { return nil }
-        return failure.message
+        return failure
     }
 
     var footerLoadMoreState: LoadMoreState {

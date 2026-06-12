@@ -16,7 +16,7 @@ final class RandomHeroViewModel: ObservableObject {
         case idle
         case loading
         case ready
-        case failure(message: String)
+        case failure(FeatureLoadFailure)
         case cooldown(remainingSeconds: Int)
     }
 
@@ -42,10 +42,10 @@ final class RandomHeroViewModel: ObservableObject {
         }
     }
 
-    var drawError: String? {
+    var drawFailure: FeatureLoadFailure? {
         switch drawState {
-        case .failure(let message):
-            return message
+        case .failure(let failure):
+            return failure
         default:
             return nil
         }
@@ -157,7 +157,7 @@ final class RandomHeroViewModel: ObservableObject {
                 if isAutomatic, self.randomPick == nil {
                     self.drawState = .idle
                 } else {
-                    self.drawState = .failure(message: error.userFacingMessage)
+                    self.drawState = .failure(FeatureLoadFailure(error))
                 }
             }
         }

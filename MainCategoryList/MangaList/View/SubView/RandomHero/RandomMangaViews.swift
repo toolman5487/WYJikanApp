@@ -47,7 +47,7 @@ struct RandomMangaSectionView: View {
             RandomMangaCardView(
                 pick: nil,
                 isDrawing: false,
-                errorMessage: nil,
+                loadFailure: nil,
                 cooldownText: nil,
                 drawButtonTitle: viewModel.drawButtonTitle,
                 canDraw: viewModel.canDraw,
@@ -86,7 +86,7 @@ struct RandomMangaSectionView: View {
             RandomMangaCardView(
                 pick: viewModel.randomPick,
                 isDrawing: false,
-                errorMessage: viewModel.drawError,
+                loadFailure: viewModel.drawFailure,
                 cooldownText: nil,
                 drawButtonTitle: viewModel.drawButtonTitle,
                 canDraw: viewModel.canDraw,
@@ -117,7 +117,7 @@ private struct RandomMangaCardView: View {
 
     let pick: MangaListRandomDTO?
     let isDrawing: Bool
-    var errorMessage: String? = nil
+    var loadFailure: FeatureLoadFailure? = nil
     var cooldownText: String? = nil
     let drawButtonTitle: String
     let canDraw: Bool
@@ -132,7 +132,7 @@ private struct RandomMangaCardView: View {
             item: pick.map(RandomPickHeroItem.init(manga:)),
             style: Self.style,
             isDrawing: isDrawing,
-            errorMessage: errorMessage,
+            loadFailure: loadFailure,
             cooldownText: cooldownText,
             drawButtonTitle: drawButtonTitle,
             canDraw: canDraw,

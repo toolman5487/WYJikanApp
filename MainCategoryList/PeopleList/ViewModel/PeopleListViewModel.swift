@@ -27,7 +27,7 @@ final class PeopleListViewModel: ObservableObject {
         case loading
         case error(FeatureLoadFailure)
         case empty
-        case content(rows: [PeopleListRow], inlineError: String?, footer: FooterState)
+        case content(rows: [PeopleListRow], inlineError: FeatureLoadFailure?, footer: FooterState)
     }
 
     @Published private(set) var rows: [PeopleListRow] = []
@@ -56,9 +56,9 @@ final class PeopleListViewModel: ObservableObject {
                 return .empty
             }
 
-            let inlineError: String?
+            let inlineError: FeatureLoadFailure?
             if case .error(let failure) = paginationState {
-                inlineError = failure.message
+                inlineError = failure
             } else {
                 inlineError = nil
             }

@@ -14,7 +14,7 @@ final class RandomMangaViewModel: ObservableObject {
         case idle
         case loading
         case ready
-        case failure(message: String)
+        case failure(FeatureLoadFailure)
         case cooldown(remainingSeconds: Int)
     }
 
@@ -34,10 +34,10 @@ final class RandomMangaViewModel: ObservableObject {
         }
     }
 
-    var drawError: String? {
+    var drawFailure: FeatureLoadFailure? {
         switch drawState {
-        case .failure(let message):
-            return message
+        case .failure(let failure):
+            return failure
         case .idle, .loading, .ready, .cooldown:
             return nil
         }
@@ -143,7 +143,7 @@ final class RandomMangaViewModel: ObservableObject {
                 if isAutomatic, self.randomPick == nil {
                     self.drawState = .idle
                 } else {
-                    self.drawState = .failure(message: error.userFacingMessage)
+                    self.drawState = .failure(FeatureLoadFailure(error))
                 }
             }
         }

@@ -25,7 +25,7 @@ struct RandomHeroCardView: View {
 
     let pick: AnimeListRandomDTO?
     let isDrawing: Bool
-    var errorMessage: String? = nil
+    var loadFailure: FeatureLoadFailure? = nil
     var cooldownText: String? = nil
     let drawButtonTitle: String
     let canDraw: Bool
@@ -40,7 +40,7 @@ struct RandomHeroCardView: View {
             item: pick.map(RandomPickHeroItem.init(anime:)),
             style: Self.style,
             isDrawing: isDrawing,
-            errorMessage: errorMessage,
+            loadFailure: loadFailure,
             cooldownText: cooldownText,
             drawButtonTitle: drawButtonTitle,
             canDraw: canDraw,
@@ -115,7 +115,7 @@ private extension RandomPickHeroItem {
         RandomHeroCardView(
             pick: nil,
             isDrawing: false,
-            errorMessage: "網路連線不穩，請稍後再試。",
+            loadFailure: FeatureLoadFailure(message: "網路連線不穩，請稍後再試。", kind: .network),
             drawButtonTitle: "開始抽獎",
             canDraw: true,
             detailMalId: nil,

@@ -22,14 +22,21 @@ struct CharacterListContentView: View {
                 CharacterListLoadingView()
 
             case .error(let failure):
-                ErrorMessageView(state: .network(failure.message), height: 180)
+                ErrorMessageRetryCardView(
+                    state: ErrorMessageView.State(failure: failure),
+                    title: "角色列表暫時載入失敗",
+                    retryTitle: "重新載入"
+                ) {
+                    viewModel.reload()
+                }
 
             case .empty:
-                Text("目前沒有角色資料")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.vertical, 48)
+                ErrorMessageView(
+                    state: .emptyCollection("目前沒有角色資料"),
+                    height: 180
+                )
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 48)
 
             case .content(let rows, let inlineError, let footer):
                 LazyVStack(alignment: .leading, spacing: 12) {
@@ -43,8 +50,8 @@ struct CharacterListContentView: View {
                     }
                 }
 
-                if let message = inlineError {
-                    ErrorMessageView(state: .network(message))
+                if let failure = inlineError {
+                    ErrorMessageView(state: ErrorMessageView.State(failure: failure))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 8)
                 }
