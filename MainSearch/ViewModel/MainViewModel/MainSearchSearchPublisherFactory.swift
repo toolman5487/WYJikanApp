@@ -31,7 +31,7 @@ struct MainSearchIntent: Equatable, Sendable {
 enum MainSearchSearchOutput: Sendable {
     case reset
     case loading(clearExistingRows: Bool)
-    case result(intent: MainSearchIntent, page: MainSearchPage, error: String?)
+    case result(intent: MainSearchIntent, page: MainSearchPage, error: FeatureLoadFailure?)
 }
 
 @MainActor
@@ -80,7 +80,7 @@ struct MainSearchSearchPublisherFactory {
                                 currentPage: 1,
                                 hasNextPage: false
                             ),
-                            error: error.userFacingMessage
+                            error: FeatureLoadFailure(error)
                         )
                     )
                 }

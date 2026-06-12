@@ -182,7 +182,7 @@ private extension MainSearchViewModel {
     func finishSearch(
         intent: MainSearchIntent,
         page: MainSearchPage,
-        error: String?
+        error: FeatureLoadFailure?
     ) {
         guard let error else {
             pagination.finishSearch(intent: intent, page: page)
@@ -191,7 +191,7 @@ private extension MainSearchViewModel {
         }
 
         pagination.failSearch()
-        screenState = .error(FeatureLoadFailure(message: error))
+        screenState = .error(error)
         loadMoreState = .hidden
     }
 }

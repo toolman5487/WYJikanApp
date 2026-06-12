@@ -39,21 +39,19 @@ struct MainSearchResultsContentView<FilterHeader: View>: View {
             case .error(let failure):
                 VStack(spacing: 0) {
                     filterHeader()
-                    ContentUnavailableView {
-                        Label("搜尋失敗", systemImage: "exclamationmark.triangle")
-                    } description: {
-                        Text(failure.message)
-                    }
+                    ErrorMessageView(
+                        state: ErrorMessageView.State(failure: failure),
+                        height: 200
+                    )
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             case .emptyResults(let query):
                 VStack(spacing: 0) {
                     filterHeader()
-                    ContentUnavailableView {
-                        Label("找不到結果", systemImage: "magnifyingglass")
-                    } description: {
-                        Text("沒有符合「\(query)」的結果，請換個關鍵字試試。")
-                    }
+                    ErrorMessageView(
+                        state: .noSearchResults("沒有符合「\(query)」的結果，請換個關鍵字試試。"),
+                        height: 200
+                    )
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             case .content(let rows):
@@ -82,10 +80,9 @@ struct MainSearchResultsContentView<FilterHeader: View>: View {
                         EmptyView()
                     case .error(let loadMoreErrorFailure):
                         VStack(spacing: 8) {
-                            Text(loadMoreErrorFailure.message)
-                                .font(.footnote)
-                                .foregroundStyle(ThemeColor.textSecondary)
-                                .multilineTextAlignment(.center)
+                            ErrorMessageView(
+                                state: ErrorMessageView.State(failure: loadMoreErrorFailure)
+                            )
 
                             Button("重試載入更多") {
                                 onRetryLoadMore()
