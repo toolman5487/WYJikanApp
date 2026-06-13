@@ -9,7 +9,7 @@ import Foundation
 
 // MARK: - Search Kind
 
-nonisolated enum MainSearchKind: String, CaseIterable, Hashable, Sendable {
+nonisolated enum MainSearchKind: String, CaseIterable, Codable, Hashable, Sendable {
     case anime
     case manga
     case character
@@ -177,6 +177,27 @@ nonisolated struct MainSearchPage: Sendable {
     let rows: [MainSearchResultRow]
     let currentPage: Int
     let hasNextPage: Bool
+}
+
+// MARK: - Search History
+
+nonisolated struct MainSearchHistoryItem: Codable, Identifiable, Equatable, Sendable {
+    let id: UUID
+    let query: String
+    let kind: MainSearchKind
+    let searchedAt: Date
+
+    init(
+        id: UUID = UUID(),
+        query: String,
+        kind: MainSearchKind,
+        searchedAt: Date = Date()
+    ) {
+        self.id = id
+        self.query = query
+        self.kind = kind
+        self.searchedAt = searchedAt
+    }
 }
 
 // MARK: - Result Row

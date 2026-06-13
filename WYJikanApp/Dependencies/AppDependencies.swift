@@ -31,6 +31,7 @@ struct AppDependencies {
 
     let favoriteRepository: any FavoriteRepository
     let broadcastReminderRepository: any AnimeBroadcastReminderRepository
+    let mainSearchHistoryRepository: any MainSearchHistoryRepository
 
     // MARK: - Live
 
@@ -42,6 +43,7 @@ struct AppDependencies {
     static let live: AppDependencies = {
         let favoriteRepository = SwiftDataFavoriteRepository()
         let broadcastReminderRepository = SwiftDataAnimeBroadcastReminderRepository()
+        let mainSearchHistoryRepository = UserDefaultsMainSearchHistoryRepository()
 
         return AppDependencies(
             mainHomeService: MainHomeService(),
@@ -61,7 +63,8 @@ struct AppDependencies {
             homeTrendingAnimeListService: HomeTrendingAnimeListService(),
             homeTrendingMangaListService: HomeTrendingMangaListService(),
             favoriteRepository: favoriteRepository,
-            broadcastReminderRepository: broadcastReminderRepository
+            broadcastReminderRepository: broadcastReminderRepository,
+            mainSearchHistoryRepository: mainSearchHistoryRepository
         )
     }()
 
@@ -74,6 +77,7 @@ struct AppDependencies {
     ) -> MainSearchViewModel {
         MainSearchViewModel(
             service: mainSearchService,
+            historyRepository: mainSearchHistoryRepository,
             initialKind: initialKind,
             initialQuery: initialQuery,
             initialSortOption: initialSortOption

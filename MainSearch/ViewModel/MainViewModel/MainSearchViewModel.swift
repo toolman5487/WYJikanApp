@@ -22,8 +22,10 @@ final class MainSearchViewModel: ObservableObject {
 
     @Published private(set) var screenState: MainSearchScreenState = .emptyPrompt
     @Published private(set) var loadMoreState: MainSearchLoadMoreState = .hidden
+    @Published private(set) var searchHistory: [MainSearchHistoryItem] = []
 
     private let searchPublisherFactory: MainSearchSearchPublisherFactory
+    private let historyRepository: any MainSearchHistoryRepository
     private let sorter: MainSearchResultSorter
     private let presentationBuilder: MainSearchPresentationBuilder
 
@@ -33,6 +35,7 @@ final class MainSearchViewModel: ObservableObject {
 
     init(
         service: MainSearchServicing,
+        historyRepository: any MainSearchHistoryRepository,
         initialKind: MainSearchKind = .anime,
         initialQuery: String = "",
         initialSortOption: MainSearchSortOption = .default,
@@ -43,10 +46,12 @@ final class MainSearchViewModel: ObservableObject {
             service: service,
             resultLimit: Self.searchResultLimit
         )
+        self.historyRepository = historyRepository
         self.sorter = sorter
         self.presentationBuilder = presentationBuilder
         self.query = initialQuery
         self.kind = initialKind
+        self.searchHistory = historyRepository.loadHistory()
         if MainSearchSortOption.supportedOptions(for: initialKind).contains(initialSortOption) {
             self.sortOption = initialSortOption
         }
@@ -74,6 +79,29 @@ final class MainSearchViewModel: ObservableObject {
     func loadMoreFromEndBounce() {
         guard canLoadMoreFromEndBounce else { return }
         loadMore()
+    }
+
+    func submitSearch() {
+        let trimmedQuery = Self.trim(query)
+        guard !trimmedQuery.isEmpty else { return }
+
+        searchHistory = historyRepository.recordSearch(
+            query: trimmedQuery,
+            kind: kind
+        )
+    }
+
+    func applyHistory(_ item: MainSearchHistoryItem) {
+        query = item.query
+        kind = item.kind
+    }
+
+    func removeHistoryItem(_ item: MainSearchHistoryItem) {
+        searchHistory = historyRepository.removeHistoryItem(id: item.id)
+    }
+
+    func clearSearchHistory() {
+        searchHistory = historyRepository.clearHistory()
     }
 }
 

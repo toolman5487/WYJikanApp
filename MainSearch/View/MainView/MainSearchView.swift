@@ -19,6 +19,9 @@ struct MainSearchView: View {
     var body: some View {
         searchNavigationStack
             .searchable(text: $viewModel.query, prompt: viewModel.kind.searchPrompt)
+            .onSubmit(of: .search) {
+                viewModel.submitSearch()
+            }
     }
 
     // MARK: - Private Views
@@ -29,10 +32,14 @@ struct MainSearchView: View {
                 screenState: viewModel.screenState,
                 loadMoreState: viewModel.loadMoreState,
                 loadMoreProgress: loadMoreBounceProgress,
+                searchHistory: viewModel.searchHistory,
                 filterHeader: { filterHeader },
                 onRowAppear: { _ in },
                 onLoadMore: viewModel.loadMoreFromEndBounce,
-                onRetryLoadMore: viewModel.retryLoadMore
+                onRetryLoadMore: viewModel.retryLoadMore,
+                onSelectHistory: viewModel.applyHistory,
+                onRemoveHistory: viewModel.removeHistoryItem,
+                onClearHistory: viewModel.clearSearchHistory
             )
             .onEndBounce(
                 axis: .vertical,
@@ -81,6 +88,7 @@ struct MainSearchView: View {
                 .frame(width: 40, height: 40)
         }
     }
+
 }
 
 #Preview {
