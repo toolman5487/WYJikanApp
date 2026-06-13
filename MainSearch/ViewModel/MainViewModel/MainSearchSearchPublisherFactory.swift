@@ -8,6 +8,8 @@
 import Combine
 import Foundation
 
+// MARK: - MainSearchEvent
+
 enum MainSearchEvent: Equatable, Sendable {
     case queryAdjusted
     case kindAdjusted
@@ -22,11 +24,15 @@ enum MainSearchEvent: Equatable, Sendable {
     }
 }
 
+// MARK: - MainSearchIntent
+
 struct MainSearchIntent: Equatable, Sendable {
     let trimmedQuery: String
     let kind: MainSearchKind
     let event: MainSearchEvent
 }
+
+// MARK: - MainSearchSearchOutput
 
 enum MainSearchSearchOutput: Sendable {
     case reset
@@ -34,15 +40,24 @@ enum MainSearchSearchOutput: Sendable {
     case result(intent: MainSearchIntent, page: MainSearchPage, error: FeatureLoadFailure?)
 }
 
+// MARK: - MainSearchSearchPublisherFactory
+
 @MainActor
 struct MainSearchSearchPublisherFactory {
+
+    // MARK: - Properties
+
     private let service: MainSearchServicing
     private let resultLimit: Int
+
+    // MARK: - Lifecycle
 
     init(service: MainSearchServicing, resultLimit: Int) {
         self.service = service
         self.resultLimit = resultLimit
     }
+
+    // MARK: - Publishers
 
     func publisher(for intent: MainSearchIntent) -> AnyPublisher<MainSearchSearchOutput, Never> {
         guard !intent.trimmedQuery.isEmpty else {
@@ -97,6 +112,8 @@ struct MainSearchSearchPublisherFactory {
         }
         .eraseToAnyPublisher()
     }
+
+    // MARK: - Loading
 
     func loadPage(
         for intent: MainSearchIntent,

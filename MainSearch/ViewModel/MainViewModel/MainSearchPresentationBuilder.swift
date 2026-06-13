@@ -8,6 +8,9 @@
 import Foundation
 
 struct MainSearchPresentationBuilder: Sendable {
+
+    // MARK: - Screen State
+
     func screenState(
         query: String,
         sortedRows: [MainSearchResultRow]
@@ -19,6 +22,8 @@ struct MainSearchPresentationBuilder: Sendable {
 
         return .content(sortedRows)
     }
+
+    // MARK: - Load More State
 
     func loadMoreState(
         requestState: MainSearchRequestState,

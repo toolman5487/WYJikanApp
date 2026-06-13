@@ -6,8 +6,13 @@
 import SwiftUI
 
 struct MainSearchHistoryFlowLayout: Layout {
+
+    // MARK: - Properties
+
     var horizontalSpacing: CGFloat
     var verticalSpacing: CGFloat
+
+    // MARK: - Layout
 
     func sizeThatFits(
         proposal: ProposedViewSize,
@@ -41,6 +46,8 @@ struct MainSearchHistoryFlowLayout: Layout {
             }
         }
     }
+
+    // MARK: - Private Methods
 
     private func rows(in maxWidth: CGFloat, subviews: Subviews) -> [MainSearchHistoryFlowRow] {
         guard !subviews.isEmpty else { return [] }
@@ -94,6 +101,8 @@ struct MainSearchHistoryFlowLayout: Layout {
         return rows
     }
 }
+
+// MARK: - Layout Models
 
 private struct MainSearchHistoryFlowRow {
     let y: CGFloat

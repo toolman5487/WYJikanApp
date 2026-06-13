@@ -8,7 +8,12 @@
 import SwiftUI
 
 struct MainSearchResultRowView: View {
+
+    // MARK: - Properties
+
     let row: MainSearchResultRow
+
+    // MARK: - Body
 
     var body: some View {
         HStack(alignment: .center, spacing: 12) {
@@ -32,6 +37,8 @@ struct MainSearchResultRowView: View {
         }
         .padding(.vertical, 4)
     }
+
+    // MARK: - Private Views
 
     @ViewBuilder
     private var poster: some View {

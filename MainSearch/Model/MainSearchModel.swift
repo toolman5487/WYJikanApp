@@ -81,16 +81,30 @@ nonisolated enum MainSearchSortOption: String, CaseIterable, Hashable, Sendable 
     static func supportedOptions(for kind: MainSearchKind) -> [MainSearchSortOption] {
         switch kind {
         case .anime, .manga:
-            return [.default, .titleAscending, .titleDescending, .newest, .oldest, .popularityDescending, .popularityAscending]
+            return [
+                .default,
+                .titleAscending,
+                .titleDescending,
+                .newest,
+                .oldest,
+                .popularityDescending,
+                .popularityAscending
+            ]
         case .character, .people:
-            return [.default, .titleAscending, .titleDescending, .popularityDescending, .popularityAscending]
+            return [
+                .default,
+                .titleAscending,
+                .titleDescending,
+                .popularityDescending,
+                .popularityAscending
+            ]
         }
     }
 }
 
 // MARK: - API
 
-// MARK: Pagination
+// MARK: - Pagination
 
 nonisolated struct MainSearchPaginationDTO: Codable, Hashable, Sendable {
     let lastVisiblePage: Int?
@@ -98,7 +112,7 @@ nonisolated struct MainSearchPaginationDTO: Codable, Hashable, Sendable {
     let currentPage: Int?
 }
 
-// MARK: List Item DTOs
+// MARK: - List Item DTOs
 
 nonisolated struct MainSearchAnimeListDTO: Codable, Identifiable, Hashable, Sendable {
     let malId: Int
@@ -151,7 +165,7 @@ nonisolated struct MainSearchPersonListDTO: Codable, Identifiable, Hashable, Sen
     var id: Int { malId }
 }
 
-// MARK: Search Responses
+// MARK: - Search Responses
 
 nonisolated struct MainSearchAnimeSearchResponse: Codable, Sendable {
     let pagination: MainSearchPaginationDTO?
@@ -214,13 +228,13 @@ nonisolated struct MainSearchResultRow: Identifiable, Hashable, Sendable {
     let year: Int?
     let popularityScore: Int?
 
-    // MARK: Shared Mapping
+    // MARK: - Shared Mapping
 
     static func posterURL(from images: AnimeImagesDTO?) -> URL? {
         JikanImageURLResolver.url(from: images, tier: .card)
     }
 
-    // MARK: Factory Methods
+    // MARK: - Factory Methods
 
     static func from(anime dto: MainSearchAnimeListDTO) -> MainSearchResultRow {
         let title = Self.displayWorkTitle(
@@ -303,9 +317,13 @@ nonisolated struct MainSearchResultRow: Identifiable, Hashable, Sendable {
         )
     }
 
-    // MARK: Private
+    // MARK: - Private Methods
 
-    private static func displayWorkTitle(japanese: String?, english: String?, fallback: String?) -> String {
+    private static func displayWorkTitle(
+        japanese: String?,
+        english: String?,
+        fallback: String?
+    ) -> String {
         if let t = japanese?.trimmingCharacters(in: .whitespacesAndNewlines), !t.isEmpty { return t }
         if let t = english?.trimmingCharacters(in: .whitespacesAndNewlines), !t.isEmpty { return t }
         if let t = fallback?.trimmingCharacters(in: .whitespacesAndNewlines), !t.isEmpty { return t }

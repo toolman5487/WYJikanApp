@@ -8,6 +8,9 @@
 import Foundation
 
 struct MainSearchResultSorter: Sendable {
+
+    // MARK: - Sorting
+
     func sortedRows(
         from rows: [MainSearchResultRow],
         using option: MainSearchSortOption
@@ -61,6 +64,8 @@ struct MainSearchResultSorter: Sendable {
             }
         }
     }
+
+    // MARK: - Private Methods
 
     private func compareOptionalAscending<T: Comparable>(
         _ lhs: T?,

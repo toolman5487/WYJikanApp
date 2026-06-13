@@ -7,16 +7,27 @@
 
 import Foundation
 
+// MARK: - MainSearchServicing
+
 nonisolated protocol MainSearchServicing: Sendable {
     func search(kind: MainSearchKind, query: String, limit: Int) async throws -> [MainSearchResultRow]
-    func searchPage(kind: MainSearchKind, query: String, page: Int, limit: Int) async throws -> MainSearchPage
+    func searchPage(
+        kind: MainSearchKind,
+        query: String,
+        page: Int,
+        limit: Int
+    ) async throws -> MainSearchPage
 }
+
+// MARK: - MainSearchService
 
 nonisolated final class MainSearchService: MainSearchServicing {
 
-    // MARK: - SearchRequestSpec
-    
+    // MARK: - Properties
+
     private let apiService: JikanAPIServicing
+
+    // MARK: - SearchRequestSpec
 
     private enum SearchRequestSpec {
         case anime(queryItems: [URLQueryItem])
@@ -68,9 +79,13 @@ nonisolated final class MainSearchService: MainSearchServicing {
         }
     }
 
+    // MARK: - Lifecycle
+
     init(apiService: JikanAPIServicing = JikanAPIService.shared) {
         self.apiService = apiService
     }
+
+    // MARK: - MainSearchServicing
 
     func search(kind: MainSearchKind, query: String, limit: Int) async throws -> [MainSearchResultRow] {
         let page = try await searchPage(
@@ -82,7 +97,12 @@ nonisolated final class MainSearchService: MainSearchServicing {
         return page.rows
     }
 
-    func searchPage(kind: MainSearchKind, query: String, page: Int, limit: Int) async throws -> MainSearchPage {
+    func searchPage(
+        kind: MainSearchKind,
+        query: String,
+        page: Int,
+        limit: Int
+    ) async throws -> MainSearchPage {
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else {
             return MainSearchPage(rows: [], currentPage: 1, hasNextPage: false)

@@ -9,7 +9,11 @@ import SwiftUI
 
 struct MainSearchListSkeletonView: View {
 
+    // MARK: - Properties
+
     private static let rowCount = 8
+
+    // MARK: - Body
 
     var body: some View {
         List {
@@ -24,6 +28,8 @@ struct MainSearchListSkeletonView: View {
 }
 
 struct MainSearchRowSkeletonView: View {
+
+    // MARK: - Body
 
     var body: some View {
         HStack(alignment: .center, spacing: 12) {

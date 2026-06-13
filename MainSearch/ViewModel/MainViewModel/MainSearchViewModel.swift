@@ -33,6 +33,8 @@ final class MainSearchViewModel: ObservableObject {
     private var pagination = MainSearchPaginationState()
     private var loadMoreTask: Task<Void, Never>?
 
+    // MARK: - Lifecycle
+
     init(
         service: MainSearchServicing,
         historyRepository: any MainSearchHistoryRepository,

@@ -5,6 +5,8 @@
 
 import Foundation
 
+// MARK: - MainSearchHistoryRepository
+
 protocol MainSearchHistoryRepository {
     func loadHistory() -> [MainSearchHistoryItem]
     func recordSearch(query: String, kind: MainSearchKind) -> [MainSearchHistoryItem]
@@ -12,13 +14,20 @@ protocol MainSearchHistoryRepository {
     func clearHistory() -> [MainSearchHistoryItem]
 }
 
+// MARK: - UserDefaultsMainSearchHistoryRepository
+
 struct UserDefaultsMainSearchHistoryRepository: MainSearchHistoryRepository {
+
+    // MARK: - Properties
+
     private static let storageKey = "mainSearch.history"
     private static let maximumHistoryCount = 20
 
     private let userDefaults: UserDefaults
     private let jsonEncoder: JSONEncoder
     private let jsonDecoder: JSONDecoder
+
+    // MARK: - Lifecycle
 
     init(
         userDefaults: UserDefaults = .standard,
@@ -29,6 +38,8 @@ struct UserDefaultsMainSearchHistoryRepository: MainSearchHistoryRepository {
         self.jsonEncoder = jsonEncoder
         self.jsonDecoder = jsonDecoder
     }
+
+    // MARK: - MainSearchHistoryRepository
 
     func loadHistory() -> [MainSearchHistoryItem] {
         guard let data = userDefaults.data(forKey: Self.storageKey) else {
@@ -75,6 +86,8 @@ struct UserDefaultsMainSearchHistoryRepository: MainSearchHistoryRepository {
         userDefaults.removeObject(forKey: Self.storageKey)
         return []
     }
+
+    // MARK: - Private Methods
 
     private func persist(_ history: [MainSearchHistoryItem]) {
         do {

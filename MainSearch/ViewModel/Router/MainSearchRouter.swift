@@ -9,6 +9,8 @@ import SwiftUI
 
 enum MainSearchRouter {
 
+    // MARK: - Destination
+
     @ViewBuilder
     static func destination(for row: MainSearchResultRow) -> some View {
         switch row.kind {
@@ -20,7 +22,6 @@ enum MainSearchRouter {
             CharacterDetailView(malId: row.malId)
         case .people:
             PeopleDetailView(malId: row.malId)
-
         }
     }
 }

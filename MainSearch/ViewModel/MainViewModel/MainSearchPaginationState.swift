@@ -7,6 +7,8 @@
 
 import Foundation
 
+// MARK: - MainSearchRequestState
+
 enum MainSearchRequestState: Equatable, Sendable {
     case idle
     case searching
@@ -23,13 +25,20 @@ enum MainSearchRequestState: Equatable, Sendable {
     }
 }
 
+// MARK: - MainSearchPaginationState
+
 struct MainSearchPaginationState: Sendable {
+
+    // MARK: - Properties
+
     private(set) var unsortedRows: [MainSearchResultRow] = []
     private(set) var currentPage = 0
     private(set) var hasNextPage = false
     private(set) var loadMoreTriggerIDs = Set<String>()
     private(set) var requestState: MainSearchRequestState = .idle
     private(set) var activeIntent: MainSearchIntent?
+
+    // MARK: - Derived State
 
     var canStartLoadMore: Bool {
         requestState.canStartLoadMore
@@ -39,11 +48,15 @@ struct MainSearchPaginationState: Sendable {
         currentPage + 1
     }
 
+    // MARK: - Loading Rules
+
     func shouldLoadMore(currentRow: MainSearchResultRow) -> Bool {
         hasNextPage
             && canStartLoadMore
             && loadMoreTriggerIDs.contains(currentRow.id)
     }
+
+    // MARK: - Mutations
 
     mutating func reset() {
         activeIntent = nil

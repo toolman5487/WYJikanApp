@@ -74,7 +74,10 @@ struct MainSearchView: View {
 
     private var sortMenu: some View {
         Menu {
-            ForEach(MainSearchSortOption.supportedOptions(for: viewModel.kind), id: \.self) { option in
+            ForEach(
+                MainSearchSortOption.supportedOptions(for: viewModel.kind),
+                id: \.self
+            ) { option in
                 Button {
                     viewModel.sortOption = option
                 } label: {
@@ -88,8 +91,9 @@ struct MainSearchView: View {
                 .frame(width: 40, height: 40)
         }
     }
-
 }
+
+// MARK: - Preview
 
 #Preview {
     struct MainSearchPreview: View {
