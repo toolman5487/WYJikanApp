@@ -354,6 +354,9 @@
 		16F9001C2FEA10000000001C /* HomeWatchListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F9001B2FEA10000000001B /* HomeWatchListView.swift */; };
 		16F9001E2FEA20000000001E /* HomeWatchFeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F9001D2FEA20000000001D /* HomeWatchFeed.swift */; };
 		16F900202FEA200000000020 /* HomeWatchPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F9001F2FEA20000000001F /* HomeWatchPresentation.swift */; };
+		16FA00112FEF000000000001 /* MainSearchHistorySectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FA00102FEF000000000001 /* MainSearchHistorySectionView.swift */; };
+		16FA00132FEF000000000001 /* MainSearchHistoryChipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FA00122FEF000000000001 /* MainSearchHistoryChipView.swift */; };
+		16FA00152FEF000000000001 /* MainSearchHistoryFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FA00142FEF000000000001 /* MainSearchHistoryFlowLayout.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -704,6 +707,9 @@
 		16F9001B2FEA10000000001B /* HomeWatchListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeWatchListView.swift; sourceTree = "<group>"; };
 		16F9001D2FEA20000000001D /* HomeWatchFeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeWatchFeed.swift; sourceTree = "<group>"; };
 		16F9001F2FEA20000000001F /* HomeWatchPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeWatchPresentation.swift; sourceTree = "<group>"; };
+		16FA00102FEF000000000001 /* MainSearchHistorySectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSearchHistorySectionView.swift; sourceTree = "<group>"; };
+		16FA00122FEF000000000001 /* MainSearchHistoryChipView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSearchHistoryChipView.swift; sourceTree = "<group>"; };
+		16FA00142FEF000000000001 /* MainSearchHistoryFlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSearchHistoryFlowLayout.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -1791,6 +1797,9 @@
 		15B80E692F8E100600DDB201 /* Section */ = {
 			isa = PBXGroup;
 			children = (
+				16FA00122FEF000000000001 /* MainSearchHistoryChipView.swift */,
+				16FA00142FEF000000000001 /* MainSearchHistoryFlowLayout.swift */,
+				16FA00102FEF000000000001 /* MainSearchHistorySectionView.swift */,
 				15B80E642F8E100100DDB201 /* MainSearchResultsContentView.swift */,
 			);
 			path = Section;
@@ -3028,6 +3037,9 @@
 				15D4SK022F7C600200E37D02 /* MangaDetailSectionSkeletonViews.swift in Sources */,
 				15A80E402F7E560600DDB201 /* MainSearchView.swift in Sources */,
 				15B80E602F8E100100DDB201 /* MainSearchResultsContentView.swift in Sources */,
+				16FA00112FEF000000000001 /* MainSearchHistorySectionView.swift in Sources */,
+				16FA00132FEF000000000001 /* MainSearchHistoryChipView.swift in Sources */,
+				16FA00152FEF000000000001 /* MainSearchHistoryFlowLayout.swift in Sources */,
 				15B80E612F8E100200DDB201 /* MainSearchListSkeletonView.swift in Sources */,
 				16A001082F89000000A1B2C3 /* RandomMangaViews.swift in Sources */,
 				16F800042FDB100000000004 /* RandomPickHeroCardView.swift in Sources */,
