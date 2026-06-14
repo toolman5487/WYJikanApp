@@ -8,8 +8,13 @@
 import Foundation
 import SwiftData
 
+// MARK: - MyListCollectionItem
+
 @Model
 final class MyListCollectionItem {
+
+    // MARK: - Stored Properties
+
     var malId: Int
     var mediaKindRawValue: String
     var title: String
@@ -26,6 +31,8 @@ final class MyListCollectionItem {
     var currentChapter: Int?
     var totalChaptersSnapshot: Int?
     var progressUpdatedAt: Date?
+
+    // MARK: - Lifecycle
 
     init(
         malId: Int,
@@ -63,6 +70,8 @@ final class MyListCollectionItem {
         self.progressUpdatedAt = progressUpdatedAt
     }
 }
+
+// MARK: - AnimeWatchStatus
 
 nonisolated enum AnimeWatchStatus: String, Codable, CaseIterable, Identifiable, Sendable {
     case planned
@@ -104,6 +113,8 @@ nonisolated enum AnimeWatchStatus: String, Codable, CaseIterable, Identifiable, 
     }
 }
 
+// MARK: - MangaReadingStatus
+
 nonisolated enum MangaReadingStatus: String, Codable, CaseIterable, Identifiable, Sendable {
     case planned
     case reading
@@ -144,7 +155,12 @@ nonisolated enum MangaReadingStatus: String, Codable, CaseIterable, Identifiable
     }
 }
 
+// MARK: - MyListCollectionItem Helpers
+
 extension MyListCollectionItem {
+
+    // MARK: - Computed Properties
+
     var mediaKind: MyListMediaKind {
         MyListMediaKind(rawValue: mediaKindRawValue) ?? .anime
     }
@@ -193,6 +209,8 @@ extension MyListCollectionItem {
     var hasMangaReadingProgress: Bool {
         mangaReadingStatusRawValue != nil || currentChapter != nil
     }
+
+    // MARK: - Progress Presentation
 
     func watchProgressFraction(totalEpisodes: Int? = nil) -> Double? {
         let resolvedTotalEpisodes = Self.normalizedProgressValue(totalEpisodes) ?? totalEpisodesSnapshot
@@ -264,6 +282,8 @@ extension MyListCollectionItem {
         }
     }
 
+    // MARK: - Progress Mutation
+
     func updateAnimeWatchProgress(
         status: AnimeWatchStatus,
         currentEpisode: Int?,
@@ -299,6 +319,8 @@ extension MyListCollectionItem {
         totalChaptersSnapshot = normalizedTotalChapters
         progressUpdatedAt = updatedAt
     }
+
+    // MARK: - Normalization
 
     private static func serializeGenreNames(_ genreNames: [String]) -> String? {
         let normalizedGenreNames = normalizedGenreNames(from: genreNames)

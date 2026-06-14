@@ -36,7 +36,7 @@ final class MainMyListViewModel: ObservableObject {
         connectToRepository()
     }
 
-    // MARK: - Public Methods
+    // MARK: - Actions
 
     func remove(_ item: MyListCollectionItem) {
         do {
@@ -45,6 +45,8 @@ final class MainMyListViewModel: ObservableObject {
             AppLogger.persistence.error("MyList delete failed: \(error.localizedDescription, privacy: .public)")
         }
     }
+
+    // MARK: - Empty State
 
     func emptyTitle(for filter: MyListFilter) -> String {
         filter == .all ? "還沒有收藏" : "還沒有收藏\(filter.title)"
@@ -298,7 +300,7 @@ final class MainMyListViewModel: ObservableObject {
         )
     }
 
-    // MARK: - Analysis
+    // MARK: - Genre Analysis
 
     private func makeGenreAnalysis(
         from items: [MyListCollectionItem],
@@ -336,6 +338,8 @@ final class MainMyListViewModel: ObservableObject {
             missingGenreItemCount: missingGenreItemCount
         )
     }
+
+    // MARK: - Format Analysis
 
     private func makeFormatAnalysis(
         from items: [MyListCollectionItem],
@@ -378,6 +382,8 @@ final class MainMyListViewModel: ObservableObject {
             missingTypeItemCount: missingTypeItemCount
         )
     }
+
+    // MARK: - Progress Status Summary
 
     private func makeAnimeWatchStatusSummary(
         from items: [MyListCollectionItem]

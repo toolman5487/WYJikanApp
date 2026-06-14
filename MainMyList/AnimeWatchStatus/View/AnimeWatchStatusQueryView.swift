@@ -46,17 +46,17 @@ struct AnimeWatchStatusQueryView: View {
             subtitle: "\(viewModel.presentation.summary.totalCount) 筆動畫收藏"
         ) {
             HStack(spacing: 8) {
-                summaryChip(
+                MyListProgressSummaryChipView(
                     title: "觀看中",
                     count: viewModel.presentation.summary.watchingCount,
                     systemImageName: AnimeWatchStatus.watching.systemImageName
                 )
-                summaryChip(
+                MyListProgressSummaryChipView(
                     title: "想看",
                     count: viewModel.presentation.summary.plannedCount,
                     systemImageName: AnimeWatchStatus.planned.systemImageName
                 )
-                summaryChip(
+                MyListProgressSummaryChipView(
                     title: "已看完",
                     count: viewModel.presentation.summary.completedCount,
                     systemImageName: AnimeWatchStatus.completed.systemImageName
@@ -99,31 +99,6 @@ struct AnimeWatchStatusQueryView: View {
                 }
             }
         }
-    }
-
-    private func summaryChip(
-        title: String,
-        count: Int,
-        systemImageName: String
-    ) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Image(systemName: systemImageName)
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(ThemeColor.sakura)
-
-            Text("\(count)")
-                .font(.title3.weight(.bold))
-                .foregroundStyle(ThemeColor.textPrimary)
-
-            Text(title)
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(ThemeColor.textSecondary)
-                .lineLimit(1)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(12)
-        .background(Color(.tertiarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 
     // MARK: - Private Methods

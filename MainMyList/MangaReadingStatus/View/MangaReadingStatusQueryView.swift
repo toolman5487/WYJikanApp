@@ -46,17 +46,17 @@ struct MangaReadingStatusQueryView: View {
             subtitle: "\(viewModel.presentation.summary.totalCount) 筆漫畫收藏"
         ) {
             HStack(spacing: 8) {
-                summaryChip(
+                MyListProgressSummaryChipView(
                     title: "閱讀中",
                     count: viewModel.presentation.summary.readingCount,
                     systemImageName: MangaReadingStatus.reading.systemImageName
                 )
-                summaryChip(
+                MyListProgressSummaryChipView(
                     title: "想讀",
                     count: viewModel.presentation.summary.plannedCount,
                     systemImageName: MangaReadingStatus.planned.systemImageName
                 )
-                summaryChip(
+                MyListProgressSummaryChipView(
                     title: "已完成",
                     count: viewModel.presentation.summary.completedCount,
                     systemImageName: MangaReadingStatus.completed.systemImageName
@@ -99,31 +99,6 @@ struct MangaReadingStatusQueryView: View {
                 }
             }
         }
-    }
-
-    private func summaryChip(
-        title: String,
-        count: Int,
-        systemImageName: String
-    ) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Image(systemName: systemImageName)
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(ThemeColor.sakura)
-
-            Text("\(count)")
-                .font(.title3.weight(.bold))
-                .foregroundStyle(ThemeColor.textPrimary)
-
-            Text(title)
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(ThemeColor.textSecondary)
-                .lineLimit(1)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(12)
-        .background(Color(.tertiarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 
     // MARK: - Private Methods

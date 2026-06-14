@@ -284,6 +284,8 @@
 		16E200092FAA200000000009 /* MyListItemRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E2000A2FAA20000000000A /* MyListItemRowView.swift */; };
 		16E2000B2FAA20000000000B /* MyListEmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E2000C2FAA20000000000C /* MyListEmptyStateView.swift */; };
 		16E2000D2FAA20000000000D /* MyListCollectionStatusBadgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E2000E2FAA20000000000E /* MyListCollectionStatusBadgeView.swift */; };
+		16E200122FAA200000000012 /* MyListProgressStatusEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E200132FAA200000000013 /* MyListProgressStatusEntryView.swift */; };
+		16E200142FAA200000000014 /* MyListProgressSummaryChipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E200152FAA200000000015 /* MyListProgressSummaryChipView.swift */; };
 		16E200102FAA200000000010 /* MyListEmptyState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E200112FAA200000000011 /* MyListEmptyState.swift */; };
 		16E201022FAA210000000002 /* FavoriteRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E201012FAA210000000001 /* FavoriteRepository.swift */; };
 		16E201052FAA210000000005 /* FavoriteStatusStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E201042FAA210000000004 /* FavoriteStatusStore.swift */; };
@@ -648,6 +650,8 @@
 		16E2000A2FAA20000000000A /* MyListItemRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListItemRowView.swift; sourceTree = "<group>"; };
 		16E2000C2FAA20000000000C /* MyListEmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListEmptyStateView.swift; sourceTree = "<group>"; };
 		16E2000E2FAA20000000000E /* MyListCollectionStatusBadgeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListCollectionStatusBadgeView.swift; sourceTree = "<group>"; };
+		16E200132FAA200000000013 /* MyListProgressStatusEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListProgressStatusEntryView.swift; sourceTree = "<group>"; };
+		16E200152FAA200000000015 /* MyListProgressSummaryChipView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListProgressSummaryChipView.swift; sourceTree = "<group>"; };
 		16E200112FAA200000000011 /* MyListEmptyState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListEmptyState.swift; sourceTree = "<group>"; };
 		16E201012FAA210000000001 /* FavoriteRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteRepository.swift; sourceTree = "<group>"; };
 		16E201042FAA210000000004 /* FavoriteStatusStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteStatusStore.swift; sourceTree = "<group>"; };
@@ -2081,6 +2085,8 @@
 				16E2000E2FAA20000000000E /* MyListCollectionStatusBadgeView.swift */,
 				16E2000C2FAA20000000000C /* MyListEmptyStateView.swift */,
 				16E2000A2FAA20000000000A /* MyListItemRowView.swift */,
+				16E200132FAA200000000013 /* MyListProgressStatusEntryView.swift */,
+				16E200152FAA200000000015 /* MyListProgressSummaryChipView.swift */,
 				16E201062FB8000000000006 /* MyListStatisticsSectionView.swift */,
 				16E200082FAA200000000008 /* MyListSummaryTile.swift */,
 				15F3B6ED2F9CA192000754C1 /* Skeleton */,
@@ -3250,6 +3256,8 @@
 				16FC00132FF1000000000001 /* AnimeWatchStatusEntryView.swift in Sources */,
 				16FC00152FF1000000000001 /* AnimeWatchStatusQueryView.swift in Sources */,
 				16FC00172FF1000000000001 /* AnimeWatchStatusQueryViewModel.swift in Sources */,
+				16E200122FAA200000000012 /* MyListProgressStatusEntryView.swift in Sources */,
+				16E200142FAA200000000014 /* MyListProgressSummaryChipView.swift in Sources */,
 				15ACFD022FD916DC00B38F89 /* MyListFormatCollectionsDetailView.swift in Sources */,
 				15ACFD032FD916DC00B38F89 /* MyListGenreCollectionsSectionBuilder.swift in Sources */,
 				15ACFD042FD916DC00B38F89 /* MyListFormatCollectionsRoute.swift in Sources */,
