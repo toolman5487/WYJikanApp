@@ -33,7 +33,10 @@ struct MyListItemRowView: View {
                         .lineLimit(1)
                 }
 
-                if item.mediaKind == .manga {
+                switch item.mediaKind {
+                case .anime:
+                    animeWatchProgressView
+                case .manga:
                     mangaReadingProgressView
                 }
             }
@@ -64,6 +67,26 @@ struct MyListItemRowView: View {
                     Image(systemName: "photo")
                         .foregroundStyle(ThemeColor.textTertiary)
                 }
+        }
+    }
+
+    private var animeWatchProgressView: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 8) {
+                Image(systemName: item.animeWatchStatus.systemImageName)
+                    .font(.caption.weight(.semibold))
+                Text(item.watchProgressSummary())
+                    .font(.caption.weight(.semibold))
+                    .lineLimit(1)
+            }
+            .foregroundStyle(ThemeColor.textSecondary)
+
+            if let progress = item.watchProgressFraction() {
+                ProgressView(value: progress)
+                    .progressViewStyle(.linear)
+                    .tint(ThemeColor.sakura)
+                    .frame(height: 4)
+            }
         }
     }
 

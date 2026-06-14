@@ -32,6 +32,7 @@ struct MainMyListView: View {
 
     @State private var genreCollectionsRoute: MyListGenreCollectionsRoute?
     @State private var formatCollectionsRoute: MyListFormatCollectionsRoute?
+    @State private var isShowingAnimeWatchStatusQuery = false
     @State private var isShowingMangaReadingStatusQuery = false
 
     init(dependencies: AppDependencies) {
@@ -50,7 +51,7 @@ struct MainMyListView: View {
                     headerView
                     filterView
                     summaryView(presentation: presentation)
-                    mangaReadingStatusEntryView(presentation: presentation)
+                    progressStatusSectionView(presentation: presentation)
                     contentView(presentation: presentation)
                 }
                 .padding(.horizontal, Layout.horizontalPadding)
@@ -65,6 +66,9 @@ struct MainMyListView: View {
             }
             .navigationDestination(item: $formatCollectionsRoute) { route in
                 MyListFormatCollectionsDetailView(route: route)
+            }
+            .navigationDestination(isPresented: $isShowingAnimeWatchStatusQuery) {
+                AnimeWatchStatusQueryView(dependencies: dependencies)
             }
             .navigationDestination(isPresented: $isShowingMangaReadingStatusQuery) {
                 MangaReadingStatusQueryView(dependencies: dependencies)
@@ -108,10 +112,54 @@ struct MainMyListView: View {
     }
 
     @ViewBuilder
-    private func mangaReadingStatusEntryView(presentation: MyListPresentation) -> some View {
-        if presentation.mangaReadingStatusSummary.totalCount > 0 {
-            MangaReadingStatusEntryView(
+    private func progressStatusSectionView(presentation: MyListPresentation) -> some View {
+        switch viewModel.selectedFilter {
+        case .all:
+            animeWatchStatusEntryView(
+                title: "動畫觀看狀態",
+                summary: presentation.animeWatchStatusSummary
+            )
+            mangaReadingStatusEntryView(
+                title: "漫畫閱讀狀態",
                 summary: presentation.mangaReadingStatusSummary
+            )
+        case .anime:
+            animeWatchStatusEntryView(
+                title: "觀看狀態",
+                summary: presentation.animeWatchStatusSummary
+            )
+        case .manga:
+            mangaReadingStatusEntryView(
+                title: "閱讀狀態",
+                summary: presentation.mangaReadingStatusSummary
+            )
+        }
+    }
+
+    @ViewBuilder
+    private func animeWatchStatusEntryView(
+        title: String,
+        summary: AnimeWatchStatusSummary
+    ) -> some View {
+        if summary.totalCount > 0 {
+            AnimeWatchStatusEntryView(
+                title: title,
+                summary: summary
+            ) {
+                isShowingAnimeWatchStatusQuery = true
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func mangaReadingStatusEntryView(
+        title: String,
+        summary: MangaReadingStatusSummary
+    ) -> some View {
+        if summary.totalCount > 0 {
+            MangaReadingStatusEntryView(
+                title: title,
+                summary: summary
             ) {
                 isShowingMangaReadingStatusQuery = true
             }

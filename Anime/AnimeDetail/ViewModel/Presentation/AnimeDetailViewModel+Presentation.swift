@@ -111,7 +111,9 @@ extension AnimeDetailViewModel {
             genreNames: (anime.genres ?? []).compactMap(\.name),
             type: anime.type,
             year: anime.year,
-            addedAt: Date()
+            addedAt: Date(),
+            animeWatchStatus: .planned,
+            totalEpisodesSnapshot: anime.episodes
         )
     }
 
@@ -745,4 +747,3 @@ enum AnimeDetailBroadcastReminderError: LocalizedError, Equatable {
         }
     }
 }
-

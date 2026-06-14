@@ -28,11 +28,13 @@ final class AnimeDetailViewModel: ObservableObject {
     @Published private(set) var charactersFailure: FeatureLoadFailure?
     @Published private(set) var picturesFailure: FeatureLoadFailure?
     @Published private(set) var recommendationsFailure: FeatureLoadFailure?
+    @Published private(set) var favoriteCollectionItem: MyListCollectionItem?
 
     private let malId: Int
     private let service: AnimeDetailServicing
     private let favoriteRepository: any FavoriteRepository
     private let broadcastReminderRepository: any AnimeBroadcastReminderRepository
+    private var myListCancellable: AnyCancellable?
 
     init(
         malId: Int,
@@ -44,6 +46,7 @@ final class AnimeDetailViewModel: ObservableObject {
         self.service = service
         self.favoriteRepository = favoriteRepository
         self.broadcastReminderRepository = broadcastReminderRepository
+        connectToMyList()
     }
 
     var detail: AnimeDetailDTO? {
@@ -195,6 +198,18 @@ final class AnimeDetailViewModel: ObservableObject {
         detail != nil
     }
 
+    // MARK: - MyList
+
+    private func connectToMyList() {
+        myListCancellable = favoriteRepository.myListPublisher
+            .sink { [weak self] items in
+                guard let self else { return }
+                favoriteCollectionItem = items.first { item in
+                    item.malId == malId && item.mediaKind == .anime
+                }
+            }
+    }
+
     func toggleFavorite(isFavorite: Bool) {
         do {
             if isFavorite {
@@ -213,6 +228,80 @@ final class AnimeDetailViewModel: ObservableObject {
         } catch {
             AppLogger.persistence.error("Anime favorite update failed: \(error.localizedDescription, privacy: .public)")
         }
+    }
+
+    func updateWatchProgress(
+        for item: MyListCollectionItem,
+        status: AnimeWatchStatus,
+        currentEpisode: Int?,
+        totalEpisodes: Int?
+    ) {
+        item.updateAnimeWatchProgress(
+            status: status,
+            currentEpisode: currentEpisode,
+            totalEpisodes: totalEpisodes
+        )
+
+        do {
+            try favoriteRepository.saveChanges()
+        } catch {
+            AppLogger.persistence.error("Anime watch progress update failed: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    func watchProgressEditorDraft(
+        for item: MyListCollectionItem,
+        anime: AnimeDetailDTO
+    ) -> AnimeWatchProgressEditorDraft {
+        AnimeWatchProgressEditorDraft(
+            item: item,
+            totalEpisodes: totalEpisodes(for: anime)
+        )
+    }
+
+    func incrementWatchProgress(
+        for item: MyListCollectionItem,
+        anime: AnimeDetailDTO
+    ) {
+        let resolvedTotalEpisodes = totalEpisodes(for: anime)
+        let nextEpisode = min(
+            (item.currentEpisode ?? 0) + 1,
+            resolvedTotalEpisodes ?? Int.max
+        )
+        let nextStatus: AnimeWatchStatus
+        if let resolvedTotalEpisodes, nextEpisode >= resolvedTotalEpisodes {
+            nextStatus = .completed
+        } else {
+            nextStatus = .watching
+        }
+
+        updateWatchProgress(
+            for: item,
+            status: nextStatus,
+            currentEpisode: nextEpisode,
+            totalEpisodes: resolvedTotalEpisodes
+        )
+    }
+
+    func decrementWatchProgress(
+        for item: MyListCollectionItem,
+        anime: AnimeDetailDTO
+    ) {
+        let resolvedTotalEpisodes = totalEpisodes(for: anime)
+        let nextEpisode = max((item.currentEpisode ?? 0) - 1, 0)
+        let nextStatus: AnimeWatchStatus = nextEpisode > 0 ? .watching : .planned
+
+        updateWatchProgress(
+            for: item,
+            status: nextStatus,
+            currentEpisode: nextEpisode,
+            totalEpisodes: resolvedTotalEpisodes
+        )
+    }
+
+    private func totalEpisodes(for anime: AnimeDetailDTO) -> Int? {
+        guard let episodes = anime.episodes, episodes > 0 else { return nil }
+        return episodes
     }
 
     // MARK: - Broadcast Reminder

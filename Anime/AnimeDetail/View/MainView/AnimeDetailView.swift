@@ -45,6 +45,7 @@ private struct AnimeDetailBodyView: View {
     @State private var isShowingCharacterList = false
     @State private var isShowingRecommendationList = false
     @State private var broadcastReminderAlertMessage: String?
+    @State private var watchProgressEditorDraft: AnimeWatchProgressEditorDraft?
 
     // MARK: - Lifecycle
 
@@ -165,6 +166,17 @@ private struct AnimeDetailBodyView: View {
                 selectedIndex: imagePreviewSelectedIndexBinding(for: session)
             )
         }
+        .sheet(item: $watchProgressEditorDraft) { draft in
+            AnimeWatchProgressEditorView(draft: draft) { updatedDraft in
+                guard let favoriteItem = viewModel.favoriteCollectionItem else { return }
+                viewModel.updateWatchProgress(
+                    for: favoriteItem,
+                    status: updatedDraft.status,
+                    currentEpisode: updatedDraft.currentEpisode,
+                    totalEpisodes: updatedDraft.totalEpisodes
+                )
+            }
+        }
         .task(id: malId) {
             await viewModel.load()
             await viewModel.syncBroadcastReminderIfNeeded(
@@ -222,13 +234,33 @@ private struct AnimeDetailBodyView: View {
     ) -> some View {
         switch section {
         case .header:
-            AnimeDetailHeaderSectionView(
-                viewModel: viewModel,
-                anime: anime,
-                onTapPoster: {
-                    showImagePreview(for: anime, selectedImageURL: viewModel.posterURL(for: anime))
+            VStack(alignment: .leading, spacing: 20) {
+                AnimeDetailHeaderSectionView(
+                    viewModel: viewModel,
+                    anime: anime,
+                    onTapPoster: {
+                        showImagePreview(for: anime, selectedImageURL: viewModel.posterURL(for: anime))
+                    }
+                )
+                if let favoriteItem = viewModel.favoriteCollectionItem {
+                    AnimeWatchProgressSectionView(
+                        item: favoriteItem,
+                        anime: anime,
+                        onIncrement: { item in
+                            viewModel.incrementWatchProgress(for: item, anime: anime)
+                        },
+                        onDecrement: { item in
+                            viewModel.decrementWatchProgress(for: item, anime: anime)
+                        },
+                        onEdit: { item in
+                            watchProgressEditorDraft = viewModel.watchProgressEditorDraft(
+                                for: item,
+                                anime: anime
+                            )
+                        }
+                    )
                 }
-            )
+            }
         case .highlights:
             AnimeDetailHighlightsSectionView(viewModel: viewModel, anime: anime)
         case .basicInfo:

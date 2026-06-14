@@ -217,6 +217,7 @@ final class MainMyListViewModel: ObservableObject {
             formatSections: MyListFormatCollectionsSectionBuilder.makeSections(from: filteredItems),
             statistics: statistics,
             summaryTile: summaryTile,
+            animeWatchStatusSummary: makeAnimeWatchStatusSummary(from: items),
             mangaReadingStatusSummary: makeMangaReadingStatusSummary(from: items)
         )
     }
@@ -292,6 +293,7 @@ final class MainMyListViewModel: ObservableObject {
             formatSections: [],
             statistics: statistics,
             summaryTile: summaryTile,
+            animeWatchStatusSummary: .empty,
             mangaReadingStatusSummary: .empty
         )
     }
@@ -375,6 +377,49 @@ final class MainMyListViewModel: ObservableObject {
             formatSlices: Array(formatSlices.prefix(6)),
             missingTypeItemCount: missingTypeItemCount
         )
+    }
+
+    private func makeAnimeWatchStatusSummary(
+        from items: [MyListCollectionItem]
+    ) -> AnimeWatchStatusSummary {
+        let animeItems = items.filter { $0.mediaKind == .anime }
+        var countsByStatus: [AnimeWatchStatus: Int] = [:]
+
+        for item in animeItems {
+            countsByStatus[item.animeWatchStatus, default: 0] += 1
+        }
+
+        let statusCounts = AnimeWatchStatusFilter.allCases.map { filter in
+            AnimeWatchStatusCount(
+                filter: filter,
+                count: animeWatchStatusCount(
+                    for: filter,
+                    in: animeItems,
+                    countsByStatus: countsByStatus
+                )
+            )
+        }
+
+        return AnimeWatchStatusSummary(
+            totalCount: animeItems.count,
+            watchingCount: countsByStatus[.watching, default: 0],
+            plannedCount: countsByStatus[.planned, default: 0],
+            completedCount: countsByStatus[.completed, default: 0],
+            statusCounts: statusCounts
+        )
+    }
+
+    private func animeWatchStatusCount(
+        for filter: AnimeWatchStatusFilter,
+        in animeItems: [MyListCollectionItem],
+        countsByStatus: [AnimeWatchStatus: Int]
+    ) -> Int {
+        switch filter {
+        case .all:
+            return animeItems.count
+        case .status(let status):
+            return countsByStatus[status, default: 0]
+        }
     }
 
     private func makeMangaReadingStatusSummary(

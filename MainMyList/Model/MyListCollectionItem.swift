@@ -19,6 +19,9 @@ final class MyListCollectionItem {
     var type: String?
     var year: Int?
     var addedAt: Date
+    var animeWatchStatusRawValue: String?
+    var currentEpisode: Int?
+    var totalEpisodesSnapshot: Int?
     var mangaReadingStatusRawValue: String?
     var currentChapter: Int?
     var totalChaptersSnapshot: Int?
@@ -34,6 +37,9 @@ final class MyListCollectionItem {
         type: String? = nil,
         year: Int? = nil,
         addedAt: Date,
+        animeWatchStatus: AnimeWatchStatus? = nil,
+        currentEpisode: Int? = nil,
+        totalEpisodesSnapshot: Int? = nil,
         mangaReadingStatus: MangaReadingStatus? = nil,
         currentChapter: Int? = nil,
         totalChaptersSnapshot: Int? = nil,
@@ -48,10 +54,53 @@ final class MyListCollectionItem {
         self.type = Self.normalizedText(type)
         self.year = year
         self.addedAt = addedAt
+        self.animeWatchStatusRawValue = animeWatchStatus?.rawValue
+        self.currentEpisode = Self.normalizedProgressValue(currentEpisode)
+        self.totalEpisodesSnapshot = Self.normalizedProgressValue(totalEpisodesSnapshot)
         self.mangaReadingStatusRawValue = mangaReadingStatus?.rawValue
-        self.currentChapter = Self.normalizedChapter(currentChapter)
-        self.totalChaptersSnapshot = Self.normalizedChapter(totalChaptersSnapshot)
+        self.currentChapter = Self.normalizedProgressValue(currentChapter)
+        self.totalChaptersSnapshot = Self.normalizedProgressValue(totalChaptersSnapshot)
         self.progressUpdatedAt = progressUpdatedAt
+    }
+}
+
+nonisolated enum AnimeWatchStatus: String, Codable, CaseIterable, Identifiable, Sendable {
+    case planned
+    case watching
+    case onHold
+    case completed
+    case dropped
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .planned:
+            return "想看"
+        case .watching:
+            return "觀看中"
+        case .onHold:
+            return "暫停"
+        case .completed:
+            return "已看完"
+        case .dropped:
+            return "棄番"
+        }
+    }
+
+    var systemImageName: String {
+        switch self {
+        case .planned:
+            return "bookmark"
+        case .watching:
+            return "play.circle"
+        case .onHold:
+            return "pause.circle"
+        case .completed:
+            return "checkmark.circle"
+        case .dropped:
+            return "xmark.circle"
+        }
     }
 }
 
@@ -117,6 +166,16 @@ extension MyListCollectionItem {
         return Self.normalizedGenreNames(from: decodedGenreNames)
     }
 
+    var animeWatchStatus: AnimeWatchStatus {
+        get {
+            guard let animeWatchStatusRawValue else { return .planned }
+            return AnimeWatchStatus(rawValue: animeWatchStatusRawValue) ?? .planned
+        }
+        set {
+            animeWatchStatusRawValue = newValue.rawValue
+        }
+    }
+
     var mangaReadingStatus: MangaReadingStatus {
         get {
             guard let mangaReadingStatusRawValue else { return .planned }
@@ -127,12 +186,51 @@ extension MyListCollectionItem {
         }
     }
 
+    var hasAnimeWatchProgress: Bool {
+        animeWatchStatusRawValue != nil || currentEpisode != nil
+    }
+
     var hasMangaReadingProgress: Bool {
         mangaReadingStatusRawValue != nil || currentChapter != nil
     }
 
+    func watchProgressFraction(totalEpisodes: Int? = nil) -> Double? {
+        let resolvedTotalEpisodes = Self.normalizedProgressValue(totalEpisodes) ?? totalEpisodesSnapshot
+        guard
+            let currentEpisode,
+            let resolvedTotalEpisodes,
+            resolvedTotalEpisodes > 0
+        else {
+            return nil
+        }
+
+        return min(Double(currentEpisode) / Double(resolvedTotalEpisodes), 1)
+    }
+
+    func watchProgressSummary(totalEpisodes: Int? = nil) -> String {
+        let status = animeWatchStatus
+        let resolvedTotalEpisodes = Self.normalizedProgressValue(totalEpisodes) ?? totalEpisodesSnapshot
+
+        switch (status, currentEpisode, resolvedTotalEpisodes) {
+        case (.planned, nil, _):
+            return "尚未開始"
+        case (.completed, _, let totalEpisodes?):
+            return "已看完 \(totalEpisodes) 集"
+        case (.completed, let currentEpisode?, nil):
+            return "已看完 \(currentEpisode) 集"
+        case (.completed, nil, nil):
+            return "已看完"
+        case let (status, currentEpisode?, totalEpisodes?):
+            return "\(status.title) \(currentEpisode) / \(totalEpisodes) 集"
+        case let (status, currentEpisode?, nil):
+            return "\(status.title)到第 \(currentEpisode) 集"
+        case let (status, nil, _):
+            return status.title
+        }
+    }
+
     func readingProgressFraction(totalChapters: Int? = nil) -> Double? {
-        let resolvedTotalChapters = Self.normalizedChapter(totalChapters) ?? totalChaptersSnapshot
+        let resolvedTotalChapters = Self.normalizedProgressValue(totalChapters) ?? totalChaptersSnapshot
         guard
             let currentChapter,
             let resolvedTotalChapters,
@@ -146,7 +244,7 @@ extension MyListCollectionItem {
 
     func readingProgressSummary(totalChapters: Int? = nil) -> String {
         let status = mangaReadingStatus
-        let resolvedTotalChapters = Self.normalizedChapter(totalChapters) ?? totalChaptersSnapshot
+        let resolvedTotalChapters = Self.normalizedProgressValue(totalChapters) ?? totalChaptersSnapshot
 
         switch (status, currentChapter, resolvedTotalChapters) {
         case (.planned, nil, _):
@@ -166,16 +264,34 @@ extension MyListCollectionItem {
         }
     }
 
+    func updateAnimeWatchProgress(
+        status: AnimeWatchStatus,
+        currentEpisode: Int?,
+        totalEpisodes: Int?,
+        updatedAt: Date = Date()
+    ) {
+        let normalizedTotalEpisodes = Self.normalizedProgressValue(totalEpisodes)
+        let normalizedCurrentEpisode = Self.clampedProgressValue(
+            currentEpisode,
+            totalValue: normalizedTotalEpisodes
+        )
+
+        animeWatchStatus = status
+        self.currentEpisode = normalizedCurrentEpisode
+        totalEpisodesSnapshot = normalizedTotalEpisodes
+        progressUpdatedAt = updatedAt
+    }
+
     func updateMangaReadingProgress(
         status: MangaReadingStatus,
         currentChapter: Int?,
         totalChapters: Int?,
         updatedAt: Date = Date()
     ) {
-        let normalizedTotalChapters = Self.normalizedChapter(totalChapters)
-        let normalizedCurrentChapter = Self.clampedChapter(
+        let normalizedTotalChapters = Self.normalizedProgressValue(totalChapters)
+        let normalizedCurrentChapter = Self.clampedProgressValue(
             currentChapter,
-            totalChapters: normalizedTotalChapters
+            totalValue: normalizedTotalChapters
         )
 
         mangaReadingStatus = status
@@ -202,15 +318,15 @@ extension MyListCollectionItem {
         return trimmedText.isEmpty ? nil : trimmedText
     }
 
-    private static func normalizedChapter(_ chapter: Int?) -> Int? {
-        guard let chapter, chapter > 0 else { return nil }
-        return chapter
+    private static func normalizedProgressValue(_ value: Int?) -> Int? {
+        guard let value, value > 0 else { return nil }
+        return value
     }
 
-    private static func clampedChapter(_ chapter: Int?, totalChapters: Int?) -> Int? {
-        guard let chapter = normalizedChapter(chapter) else { return nil }
-        guard let totalChapters else { return chapter }
-        return min(chapter, totalChapters)
+    private static func clampedProgressValue(_ value: Int?, totalValue: Int?) -> Int? {
+        guard let value = normalizedProgressValue(value) else { return nil }
+        guard let totalValue else { return value }
+        return min(value, totalValue)
     }
 
     private static func normalizedGenreNames(from genreNames: [String]) -> [String] {

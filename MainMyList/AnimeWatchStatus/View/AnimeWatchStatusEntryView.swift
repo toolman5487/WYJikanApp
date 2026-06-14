@@ -1,16 +1,16 @@
 //
-//  MangaReadingStatusEntryView.swift
+//  AnimeWatchStatusEntryView.swift
 //  WYJikanApp
 //
 
 import SwiftUI
 
-struct MangaReadingStatusEntryView: View {
+struct AnimeWatchStatusEntryView: View {
 
     // MARK: - Properties
 
     let title: String
-    let summary: MangaReadingStatusSummary
+    let summary: AnimeWatchStatusSummary
     let action: () -> Void
 
     // MARK: - Body
@@ -43,7 +43,7 @@ struct MangaReadingStatusEntryView: View {
     // MARK: - Private Views
 
     private var iconView: some View {
-        Image(systemName: "books.vertical.fill")
+        Image(systemName: "play.rectangle.fill")
             .font(.title3.weight(.semibold))
             .foregroundStyle(ThemeColor.sakura)
             .frame(width: 44, height: 44)
@@ -57,7 +57,7 @@ struct MangaReadingStatusEntryView: View {
                 .font(.headline)
                 .foregroundStyle(ThemeColor.textPrimary)
 
-            Text("\(summary.totalCount) 筆漫畫收藏")
+            Text("\(summary.totalCount) 筆動畫收藏")
                 .font(.footnote)
                 .foregroundStyle(ThemeColor.textSecondary)
         }
@@ -65,9 +65,9 @@ struct MangaReadingStatusEntryView: View {
 
     private var statusSummaryView: some View {
         HStack(spacing: 8) {
-            summaryChip(title: "閱讀中", count: summary.readingCount)
-            summaryChip(title: "想讀", count: summary.plannedCount)
-            summaryChip(title: "已完成", count: summary.completedCount)
+            summaryChip(title: "觀看中", count: summary.watchingCount)
+            summaryChip(title: "想看", count: summary.plannedCount)
+            summaryChip(title: "已看完", count: summary.completedCount)
         }
     }
 
