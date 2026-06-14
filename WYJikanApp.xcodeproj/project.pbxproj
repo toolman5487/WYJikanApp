@@ -112,14 +112,6 @@
 		15ACFCBF2FD9127B00B38F89 /* MyListStatisticsScope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15ACFCB32FD9127B00B38F89 /* MyListStatisticsScope.swift */; };
 		15ACFCC12FD9127B00B38F89 /* MyListStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15ACFCB22FD9127B00B38F89 /* MyListStatistics.swift */; };
 		15ACFCC22FD9127B00B38F89 /* MyListFormatAnalysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15ACFCA82FD9127B00B38F89 /* MyListFormatAnalysis.swift */; };
-		16FB00112FF0000000000001 /* MangaReadingStatusQueryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FB00102FF0000000000001 /* MangaReadingStatusQueryModel.swift */; };
-		16FB00132FF0000000000001 /* MangaReadingStatusEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FB00122FF0000000000001 /* MangaReadingStatusEntryView.swift */; };
-		16FB00152FF0000000000001 /* MangaReadingStatusQueryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FB00142FF0000000000001 /* MangaReadingStatusQueryView.swift */; };
-		16FB00172FF0000000000001 /* MangaReadingStatusQueryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FB00162FF0000000000001 /* MangaReadingStatusQueryViewModel.swift */; };
-		16FC00112FF1000000000001 /* AnimeWatchStatusQueryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FC00102FF1000000000001 /* AnimeWatchStatusQueryModel.swift */; };
-		16FC00132FF1000000000001 /* AnimeWatchStatusEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FC00122FF1000000000001 /* AnimeWatchStatusEntryView.swift */; };
-		16FC00152FF1000000000001 /* AnimeWatchStatusQueryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FC00142FF1000000000001 /* AnimeWatchStatusQueryView.swift */; };
-		16FC00172FF1000000000001 /* AnimeWatchStatusQueryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FC00162FF1000000000001 /* AnimeWatchStatusQueryViewModel.swift */; };
 		15ACFD012FD916DC00B38F89 /* MyListFormatDistributionChartCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15ACFCF22FD916DC00B38F89 /* MyListFormatDistributionChartCardView.swift */; };
 		15ACFD022FD916DC00B38F89 /* MyListFormatCollectionsDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15ACFCF12FD916DC00B38F89 /* MyListFormatCollectionsDetailView.swift */; };
 		15ACFD032FD916DC00B38F89 /* MyListGenreCollectionsSectionBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15ACFCF92FD916DC00B38F89 /* MyListGenreCollectionsSectionBuilder.swift */; };
@@ -284,9 +276,12 @@
 		16E200092FAA200000000009 /* MyListItemRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E2000A2FAA20000000000A /* MyListItemRowView.swift */; };
 		16E2000B2FAA20000000000B /* MyListEmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E2000C2FAA20000000000C /* MyListEmptyStateView.swift */; };
 		16E2000D2FAA20000000000D /* MyListCollectionStatusBadgeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E2000E2FAA20000000000E /* MyListCollectionStatusBadgeView.swift */; };
+		16E200102FAA200000000010 /* MyListEmptyState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E200112FAA200000000011 /* MyListEmptyState.swift */; };
 		16E200122FAA200000000012 /* MyListProgressStatusEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E200132FAA200000000013 /* MyListProgressStatusEntryView.swift */; };
 		16E200142FAA200000000014 /* MyListProgressSummaryChipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E200152FAA200000000015 /* MyListProgressSummaryChipView.swift */; };
-		16E200102FAA200000000010 /* MyListEmptyState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E200112FAA200000000011 /* MyListEmptyState.swift */; };
+		16E200162FAA200000000016 /* MainMyListPresentationBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E200172FAA200000000017 /* MainMyListPresentationBuilder.swift */; };
+		16E200182FAA200000000018 /* MyListStatisticsBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E200192FAA200000000019 /* MyListStatisticsBuilder.swift */; };
+		16E2001A2FAA20000000001A /* MyListProgressStatusSummaryBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E2001B2FAA20000000001B /* MyListProgressStatusSummaryBuilder.swift */; };
 		16E201022FAA210000000002 /* FavoriteRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E201012FAA210000000001 /* FavoriteRepository.swift */; };
 		16E201052FAA210000000005 /* FavoriteStatusStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E201042FAA210000000004 /* FavoriteStatusStore.swift */; };
 		16E201072FB8000000000007 /* MyListStatisticsSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E201062FB8000000000006 /* MyListStatisticsSectionView.swift */; };
@@ -370,6 +365,14 @@
 		16FA00112FEF000000000001 /* MainSearchHistorySectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FA00102FEF000000000001 /* MainSearchHistorySectionView.swift */; };
 		16FA00132FEF000000000001 /* MainSearchHistoryChipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FA00122FEF000000000001 /* MainSearchHistoryChipView.swift */; };
 		16FA00152FEF000000000001 /* MainSearchHistoryFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FA00142FEF000000000001 /* MainSearchHistoryFlowLayout.swift */; };
+		16FB00112FF0000000000001 /* MangaReadingStatusQueryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FB00102FF0000000000001 /* MangaReadingStatusQueryModel.swift */; };
+		16FB00132FF0000000000001 /* MangaReadingStatusEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FB00122FF0000000000001 /* MangaReadingStatusEntryView.swift */; };
+		16FB00152FF0000000000001 /* MangaReadingStatusQueryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FB00142FF0000000000001 /* MangaReadingStatusQueryView.swift */; };
+		16FB00172FF0000000000001 /* MangaReadingStatusQueryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FB00162FF0000000000001 /* MangaReadingStatusQueryViewModel.swift */; };
+		16FC00112FF1000000000001 /* AnimeWatchStatusQueryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FC00102FF1000000000001 /* AnimeWatchStatusQueryModel.swift */; };
+		16FC00132FF1000000000001 /* AnimeWatchStatusEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FC00122FF1000000000001 /* AnimeWatchStatusEntryView.swift */; };
+		16FC00152FF1000000000001 /* AnimeWatchStatusQueryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FC00142FF1000000000001 /* AnimeWatchStatusQueryView.swift */; };
+		16FC00172FF1000000000001 /* AnimeWatchStatusQueryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FC00162FF1000000000001 /* AnimeWatchStatusQueryViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -478,14 +481,6 @@
 		15ACFCB22FD9127B00B38F89 /* MyListStatistics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListStatistics.swift; sourceTree = "<group>"; };
 		15ACFCB32FD9127B00B38F89 /* MyListStatisticsScope.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListStatisticsScope.swift; sourceTree = "<group>"; };
 		15ACFCB42FD9127B00B38F89 /* MyListSummaryContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListSummaryContent.swift; sourceTree = "<group>"; };
-		16FB00102FF0000000000001 /* MangaReadingStatusQueryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MangaReadingStatusQueryModel.swift; sourceTree = "<group>"; };
-		16FB00122FF0000000000001 /* MangaReadingStatusEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MangaReadingStatusEntryView.swift; sourceTree = "<group>"; };
-		16FB00142FF0000000000001 /* MangaReadingStatusQueryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MangaReadingStatusQueryView.swift; sourceTree = "<group>"; };
-		16FB00162FF0000000000001 /* MangaReadingStatusQueryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MangaReadingStatusQueryViewModel.swift; sourceTree = "<group>"; };
-		16FC00102FF1000000000001 /* AnimeWatchStatusQueryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeWatchStatusQueryModel.swift; sourceTree = "<group>"; };
-		16FC00122FF1000000000001 /* AnimeWatchStatusEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeWatchStatusEntryView.swift; sourceTree = "<group>"; };
-		16FC00142FF1000000000001 /* AnimeWatchStatusQueryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeWatchStatusQueryView.swift; sourceTree = "<group>"; };
-		16FC00162FF1000000000001 /* AnimeWatchStatusQueryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeWatchStatusQueryViewModel.swift; sourceTree = "<group>"; };
 		15ACFCED2FD916DC00B38F89 /* MyListFormatCollectionSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListFormatCollectionSection.swift; sourceTree = "<group>"; };
 		15ACFCEE2FD916DC00B38F89 /* MyListFormatCollectionsRoute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListFormatCollectionsRoute.swift; sourceTree = "<group>"; };
 		15ACFCEF2FD916DC00B38F89 /* MyListFormatCollectionsSectionBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListFormatCollectionsSectionBuilder.swift; sourceTree = "<group>"; };
@@ -650,9 +645,12 @@
 		16E2000A2FAA20000000000A /* MyListItemRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListItemRowView.swift; sourceTree = "<group>"; };
 		16E2000C2FAA20000000000C /* MyListEmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListEmptyStateView.swift; sourceTree = "<group>"; };
 		16E2000E2FAA20000000000E /* MyListCollectionStatusBadgeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListCollectionStatusBadgeView.swift; sourceTree = "<group>"; };
+		16E200112FAA200000000011 /* MyListEmptyState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListEmptyState.swift; sourceTree = "<group>"; };
 		16E200132FAA200000000013 /* MyListProgressStatusEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListProgressStatusEntryView.swift; sourceTree = "<group>"; };
 		16E200152FAA200000000015 /* MyListProgressSummaryChipView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListProgressSummaryChipView.swift; sourceTree = "<group>"; };
-		16E200112FAA200000000011 /* MyListEmptyState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListEmptyState.swift; sourceTree = "<group>"; };
+		16E200172FAA200000000017 /* MainMyListPresentationBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMyListPresentationBuilder.swift; sourceTree = "<group>"; };
+		16E200192FAA200000000019 /* MyListStatisticsBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListStatisticsBuilder.swift; sourceTree = "<group>"; };
+		16E2001B2FAA20000000001B /* MyListProgressStatusSummaryBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListProgressStatusSummaryBuilder.swift; sourceTree = "<group>"; };
 		16E201012FAA210000000001 /* FavoriteRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteRepository.swift; sourceTree = "<group>"; };
 		16E201042FAA210000000004 /* FavoriteStatusStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteStatusStore.swift; sourceTree = "<group>"; };
 		16E201062FB8000000000006 /* MyListStatisticsSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListStatisticsSectionView.swift; sourceTree = "<group>"; };
@@ -736,6 +734,14 @@
 		16FA00102FEF000000000001 /* MainSearchHistorySectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSearchHistorySectionView.swift; sourceTree = "<group>"; };
 		16FA00122FEF000000000001 /* MainSearchHistoryChipView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSearchHistoryChipView.swift; sourceTree = "<group>"; };
 		16FA00142FEF000000000001 /* MainSearchHistoryFlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSearchHistoryFlowLayout.swift; sourceTree = "<group>"; };
+		16FB00102FF0000000000001 /* MangaReadingStatusQueryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MangaReadingStatusQueryModel.swift; sourceTree = "<group>"; };
+		16FB00122FF0000000000001 /* MangaReadingStatusEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MangaReadingStatusEntryView.swift; sourceTree = "<group>"; };
+		16FB00142FF0000000000001 /* MangaReadingStatusQueryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MangaReadingStatusQueryView.swift; sourceTree = "<group>"; };
+		16FB00162FF0000000000001 /* MangaReadingStatusQueryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MangaReadingStatusQueryViewModel.swift; sourceTree = "<group>"; };
+		16FC00102FF1000000000001 /* AnimeWatchStatusQueryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeWatchStatusQueryModel.swift; sourceTree = "<group>"; };
+		16FC00122FF1000000000001 /* AnimeWatchStatusEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeWatchStatusEntryView.swift; sourceTree = "<group>"; };
+		16FC00142FF1000000000001 /* AnimeWatchStatusQueryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeWatchStatusQueryView.swift; sourceTree = "<group>"; };
+		16FC00162FF1000000000001 /* AnimeWatchStatusQueryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeWatchStatusQueryViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -1649,76 +1655,6 @@
 				15ACFCFF2FD916DC00B38F89 /* ViewModel */,
 			);
 			path = GenreCollections;
-			sourceTree = "<group>";
-		};
-		16FB00182FF0000000000001 /* Model */ = {
-			isa = PBXGroup;
-			children = (
-				16FB00102FF0000000000001 /* MangaReadingStatusQueryModel.swift */,
-			);
-			path = Model;
-			sourceTree = "<group>";
-		};
-		16FB00192FF0000000000001 /* View */ = {
-			isa = PBXGroup;
-			children = (
-				16FB00122FF0000000000001 /* MangaReadingStatusEntryView.swift */,
-				16FB00142FF0000000000001 /* MangaReadingStatusQueryView.swift */,
-			);
-			path = View;
-			sourceTree = "<group>";
-		};
-		16FB001A2FF0000000000001 /* ViewModel */ = {
-			isa = PBXGroup;
-			children = (
-				16FB00162FF0000000000001 /* MangaReadingStatusQueryViewModel.swift */,
-			);
-			path = ViewModel;
-			sourceTree = "<group>";
-		};
-		16FB001B2FF0000000000001 /* MangaReadingStatus */ = {
-			isa = PBXGroup;
-			children = (
-				16FB00182FF0000000000001 /* Model */,
-				16FB00192FF0000000000001 /* View */,
-				16FB001A2FF0000000000001 /* ViewModel */,
-			);
-			path = MangaReadingStatus;
-			sourceTree = "<group>";
-		};
-		16FC00182FF1000000000001 /* Model */ = {
-			isa = PBXGroup;
-			children = (
-				16FC00102FF1000000000001 /* AnimeWatchStatusQueryModel.swift */,
-			);
-			path = Model;
-			sourceTree = "<group>";
-		};
-		16FC00192FF1000000000001 /* View */ = {
-			isa = PBXGroup;
-			children = (
-				16FC00122FF1000000000001 /* AnimeWatchStatusEntryView.swift */,
-				16FC00142FF1000000000001 /* AnimeWatchStatusQueryView.swift */,
-			);
-			path = View;
-			sourceTree = "<group>";
-		};
-		16FC001A2FF1000000000001 /* ViewModel */ = {
-			isa = PBXGroup;
-			children = (
-				16FC00162FF1000000000001 /* AnimeWatchStatusQueryViewModel.swift */,
-			);
-			path = ViewModel;
-			sourceTree = "<group>";
-		};
-		16FC001B2FF1000000000001 /* AnimeWatchStatus */ = {
-			isa = PBXGroup;
-			children = (
-				16FC00182FF1000000000001 /* Model */,
-				16FC00192FF1000000000001 /* View */,
-				16FC001A2FF1000000000001 /* ViewModel */,
-			);
-			path = AnimeWatchStatus;
 			sourceTree = "<group>";
 		};
 		15ADF0942F9A10C7004B3BB0 /* People */ = {
@@ -2726,7 +2662,10 @@
 		16E200062FAA200000000006 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
+				16E200172FAA200000000017 /* MainMyListPresentationBuilder.swift */,
 				16E200022FAA200000000002 /* MainMyListViewModel.swift */,
+				16E2001B2FAA20000000001B /* MyListProgressStatusSummaryBuilder.swift */,
+				16E200192FAA200000000019 /* MyListStatisticsBuilder.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -3016,6 +2955,76 @@
 			path = View;
 			sourceTree = "<group>";
 		};
+		16FB00182FF0000000000001 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				16FB00102FF0000000000001 /* MangaReadingStatusQueryModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		16FB00192FF0000000000001 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				16FB00122FF0000000000001 /* MangaReadingStatusEntryView.swift */,
+				16FB00142FF0000000000001 /* MangaReadingStatusQueryView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		16FB001A2FF0000000000001 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				16FB00162FF0000000000001 /* MangaReadingStatusQueryViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		16FB001B2FF0000000000001 /* MangaReadingStatus */ = {
+			isa = PBXGroup;
+			children = (
+				16FB00182FF0000000000001 /* Model */,
+				16FB00192FF0000000000001 /* View */,
+				16FB001A2FF0000000000001 /* ViewModel */,
+			);
+			path = MangaReadingStatus;
+			sourceTree = "<group>";
+		};
+		16FC00182FF1000000000001 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				16FC00102FF1000000000001 /* AnimeWatchStatusQueryModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		16FC00192FF1000000000001 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				16FC00122FF1000000000001 /* AnimeWatchStatusEntryView.swift */,
+				16FC00142FF1000000000001 /* AnimeWatchStatusQueryView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		16FC001A2FF1000000000001 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				16FC00162FF1000000000001 /* AnimeWatchStatusQueryViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		16FC001B2FF1000000000001 /* AnimeWatchStatus */ = {
+			isa = PBXGroup;
+			children = (
+				16FC00182FF1000000000001 /* Model */,
+				16FC00192FF1000000000001 /* View */,
+				16FC001A2FF1000000000001 /* ViewModel */,
+			);
+			path = AnimeWatchStatus;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -3294,6 +3303,9 @@
 				15FA4A002F97C81700EC4C09 /* MainMyListView.swift in Sources */,
 				16E200032FAA200000000003 /* MyListCollectionItem.swift in Sources */,
 				16E200042FAA200000000004 /* MainMyListViewModel.swift in Sources */,
+				16E200162FAA200000000016 /* MainMyListPresentationBuilder.swift in Sources */,
+				16E200182FAA200000000018 /* MyListStatisticsBuilder.swift in Sources */,
+				16E2001A2FAA20000000001A /* MyListProgressStatusSummaryBuilder.swift in Sources */,
 				16E201022FAA210000000002 /* FavoriteRepository.swift in Sources */,
 				16E201082FAA220000000008 /* AnimeBroadcastReminderRepository.swift in Sources */,
 				16E201052FAA210000000005 /* FavoriteStatusStore.swift in Sources */,
