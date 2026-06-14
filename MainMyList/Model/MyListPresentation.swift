@@ -13,4 +13,5 @@ struct MyListPresentation {
     let formatSections: [MyListFormatCollectionSection]
     let statistics: MyListStatistics
     let summaryTile: MyListSummaryContent
+    let mangaReadingStatusSummary: MangaReadingStatusSummary
 }

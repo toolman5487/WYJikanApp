@@ -92,6 +92,10 @@ struct AppDependencies {
         MainMyListViewModel(favoriteRepository: favoriteRepository)
     }
 
+    func makeMangaReadingStatusQueryViewModel() -> MangaReadingStatusQueryViewModel {
+        MangaReadingStatusQueryViewModel(favoriteRepository: favoriteRepository)
+    }
+
     func makeMainCategoryListViewModel() -> MainCategoryListViewModel {
         MainCategoryListViewModel(
             animeListViewModel: AnimeListViewModel(

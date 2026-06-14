@@ -16,14 +16,26 @@ struct MainMyListView: View {
         case populated
     }
 
+    private enum Layout {
+        static let sectionSpacing: CGFloat = 16
+        static let rowSpacing: CGFloat = 16
+        static let horizontalPadding: CGFloat = 16
+        static let topPadding: CGFloat = 16
+        static let bottomPadding: CGFloat = 16
+    }
+
     // MARK: - Properties
+
+    private let dependencies: AppDependencies
 
     @StateObject private var viewModel: MainMyListViewModel
 
     @State private var genreCollectionsRoute: MyListGenreCollectionsRoute?
     @State private var formatCollectionsRoute: MyListFormatCollectionsRoute?
+    @State private var isShowingMangaReadingStatusQuery = false
 
     init(dependencies: AppDependencies) {
+        self.dependencies = dependencies
         _viewModel = StateObject(wrappedValue: dependencies.makeMainMyListViewModel())
     }
 
@@ -34,15 +46,16 @@ struct MainMyListView: View {
 
         NavigationStack {
             ScrollView {
-                LazyVStack(alignment: .leading, spacing: 20) {
+                LazyVStack(alignment: .leading, spacing: Layout.sectionSpacing) {
                     headerView
                     filterView
                     summaryView(presentation: presentation)
+                    mangaReadingStatusEntryView(presentation: presentation)
                     contentView(presentation: presentation)
                 }
-                .padding(.horizontal, 20)
-                .padding(.top, 20)
-                .padding(.bottom, 32)
+                .padding(.horizontal, Layout.horizontalPadding)
+                .padding(.top, Layout.topPadding)
+                .padding(.bottom, Layout.bottomPadding)
             }
             .background(Color(.systemBackground))
             .navigationTitle("我的收藏")
@@ -52,6 +65,9 @@ struct MainMyListView: View {
             }
             .navigationDestination(item: $formatCollectionsRoute) { route in
                 MyListFormatCollectionsDetailView(route: route)
+            }
+            .navigationDestination(isPresented: $isShowingMangaReadingStatusQuery) {
+                MangaReadingStatusQueryView(dependencies: dependencies)
             }
         }
     }
@@ -92,13 +108,24 @@ struct MainMyListView: View {
     }
 
     @ViewBuilder
+    private func mangaReadingStatusEntryView(presentation: MyListPresentation) -> some View {
+        if presentation.mangaReadingStatusSummary.totalCount > 0 {
+            MangaReadingStatusEntryView(
+                summary: presentation.mangaReadingStatusSummary
+            ) {
+                isShowingMangaReadingStatusQuery = true
+            }
+        }
+    }
+
+    @ViewBuilder
     private func contentView(presentation: MyListPresentation) -> some View {
         switch contentState(for: presentation) {
         case .empty:
             MyListEmptyStateView(emptyState: viewModel.emptyState())
 
         case .populated:
-            LazyVStack(spacing: 12) {
+            LazyVStack(spacing: Layout.rowSpacing) {
                 ForEach(presentation.filteredItems, id: \.persistentModelID) { item in
                     NavigationLink {
                         destinationView(for: item)

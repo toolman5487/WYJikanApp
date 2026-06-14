@@ -216,7 +216,8 @@ final class MainMyListViewModel: ObservableObject {
             genreSections: MyListGenreCollectionsSectionBuilder.makeSections(from: filteredItems),
             formatSections: MyListFormatCollectionsSectionBuilder.makeSections(from: filteredItems),
             statistics: statistics,
-            summaryTile: summaryTile
+            summaryTile: summaryTile,
+            mangaReadingStatusSummary: makeMangaReadingStatusSummary(from: items)
         )
     }
 
@@ -290,7 +291,8 @@ final class MainMyListViewModel: ObservableObject {
             genreSections: [],
             formatSections: [],
             statistics: statistics,
-            summaryTile: summaryTile
+            summaryTile: summaryTile,
+            mangaReadingStatusSummary: .empty
         )
     }
 
@@ -373,6 +375,49 @@ final class MainMyListViewModel: ObservableObject {
             formatSlices: Array(formatSlices.prefix(6)),
             missingTypeItemCount: missingTypeItemCount
         )
+    }
+
+    private func makeMangaReadingStatusSummary(
+        from items: [MyListCollectionItem]
+    ) -> MangaReadingStatusSummary {
+        let mangaItems = items.filter { $0.mediaKind == .manga }
+        var countsByStatus: [MangaReadingStatus: Int] = [:]
+
+        for item in mangaItems {
+            countsByStatus[item.mangaReadingStatus, default: 0] += 1
+        }
+
+        let statusCounts = MangaReadingStatusFilter.allCases.map { filter in
+            MangaReadingStatusCount(
+                filter: filter,
+                count: mangaReadingStatusCount(
+                    for: filter,
+                    in: mangaItems,
+                    countsByStatus: countsByStatus
+                )
+            )
+        }
+
+        return MangaReadingStatusSummary(
+            totalCount: mangaItems.count,
+            readingCount: countsByStatus[.reading, default: 0],
+            plannedCount: countsByStatus[.planned, default: 0],
+            completedCount: countsByStatus[.completed, default: 0],
+            statusCounts: statusCounts
+        )
+    }
+
+    private func mangaReadingStatusCount(
+        for filter: MangaReadingStatusFilter,
+        in mangaItems: [MyListCollectionItem],
+        countsByStatus: [MangaReadingStatus: Int]
+    ) -> Int {
+        switch filter {
+        case .all:
+            return mangaItems.count
+        case .status(let status):
+            return countsByStatus[status, default: 0]
+        }
     }
 
     // MARK: - Private Methods

@@ -112,6 +112,10 @@
 		15ACFCBF2FD9127B00B38F89 /* MyListStatisticsScope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15ACFCB32FD9127B00B38F89 /* MyListStatisticsScope.swift */; };
 		15ACFCC12FD9127B00B38F89 /* MyListStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15ACFCB22FD9127B00B38F89 /* MyListStatistics.swift */; };
 		15ACFCC22FD9127B00B38F89 /* MyListFormatAnalysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15ACFCA82FD9127B00B38F89 /* MyListFormatAnalysis.swift */; };
+		16FB00112FF0000000000001 /* MangaReadingStatusQueryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FB00102FF0000000000001 /* MangaReadingStatusQueryModel.swift */; };
+		16FB00132FF0000000000001 /* MangaReadingStatusEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FB00122FF0000000000001 /* MangaReadingStatusEntryView.swift */; };
+		16FB00152FF0000000000001 /* MangaReadingStatusQueryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FB00142FF0000000000001 /* MangaReadingStatusQueryView.swift */; };
+		16FB00172FF0000000000001 /* MangaReadingStatusQueryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FB00162FF0000000000001 /* MangaReadingStatusQueryViewModel.swift */; };
 		15ACFD012FD916DC00B38F89 /* MyListFormatDistributionChartCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15ACFCF22FD916DC00B38F89 /* MyListFormatDistributionChartCardView.swift */; };
 		15ACFD022FD916DC00B38F89 /* MyListFormatCollectionsDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15ACFCF12FD916DC00B38F89 /* MyListFormatCollectionsDetailView.swift */; };
 		15ACFD032FD916DC00B38F89 /* MyListGenreCollectionsSectionBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15ACFCF92FD916DC00B38F89 /* MyListGenreCollectionsSectionBuilder.swift */; };
@@ -465,6 +469,10 @@
 		15ACFCB22FD9127B00B38F89 /* MyListStatistics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListStatistics.swift; sourceTree = "<group>"; };
 		15ACFCB32FD9127B00B38F89 /* MyListStatisticsScope.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListStatisticsScope.swift; sourceTree = "<group>"; };
 		15ACFCB42FD9127B00B38F89 /* MyListSummaryContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListSummaryContent.swift; sourceTree = "<group>"; };
+		16FB00102FF0000000000001 /* MangaReadingStatusQueryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MangaReadingStatusQueryModel.swift; sourceTree = "<group>"; };
+		16FB00122FF0000000000001 /* MangaReadingStatusEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MangaReadingStatusEntryView.swift; sourceTree = "<group>"; };
+		16FB00142FF0000000000001 /* MangaReadingStatusQueryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MangaReadingStatusQueryView.swift; sourceTree = "<group>"; };
+		16FB00162FF0000000000001 /* MangaReadingStatusQueryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MangaReadingStatusQueryViewModel.swift; sourceTree = "<group>"; };
 		15ACFCED2FD916DC00B38F89 /* MyListFormatCollectionSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListFormatCollectionSection.swift; sourceTree = "<group>"; };
 		15ACFCEE2FD916DC00B38F89 /* MyListFormatCollectionsRoute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListFormatCollectionsRoute.swift; sourceTree = "<group>"; };
 		15ACFCEF2FD916DC00B38F89 /* MyListFormatCollectionsSectionBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListFormatCollectionsSectionBuilder.swift; sourceTree = "<group>"; };
@@ -1625,6 +1633,41 @@
 			path = GenreCollections;
 			sourceTree = "<group>";
 		};
+		16FB00182FF0000000000001 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				16FB00102FF0000000000001 /* MangaReadingStatusQueryModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		16FB00192FF0000000000001 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				16FB00122FF0000000000001 /* MangaReadingStatusEntryView.swift */,
+				16FB00142FF0000000000001 /* MangaReadingStatusQueryView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		16FB001A2FF0000000000001 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				16FB00162FF0000000000001 /* MangaReadingStatusQueryViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		16FB001B2FF0000000000001 /* MangaReadingStatus */ = {
+			isa = PBXGroup;
+			children = (
+				16FB00182FF0000000000001 /* Model */,
+				16FB00192FF0000000000001 /* View */,
+				16FB001A2FF0000000000001 /* ViewModel */,
+			);
+			path = MangaReadingStatus;
+			sourceTree = "<group>";
+		};
 		15ADF0942F9A10C7004B3BB0 /* People */ = {
 			isa = PBXGroup;
 			children = (
@@ -1962,6 +2005,7 @@
 			children = (
 				15ACFCF62FD916DC00B38F89 /* FormatCollections */,
 				15ACFD002FD916DC00B38F89 /* GenreCollections */,
+				16FB001B2FF0000000000001 /* MangaReadingStatus */,
 				16E200052FAA200000000005 /* Model */,
 				16E201032FAA210000000003 /* Repository */,
 				16E201062FAA210000000006 /* Store */,
@@ -3145,6 +3189,10 @@
 				16D1001B2FAA10000000001B /* ZoomableRemoteImageView.swift in Sources */,
 				15FF295D2F76332700D3241C /* AnimeDetailView.swift in Sources */,
 				15ACFD012FD916DC00B38F89 /* MyListFormatDistributionChartCardView.swift in Sources */,
+				16FB00112FF0000000000001 /* MangaReadingStatusQueryModel.swift in Sources */,
+				16FB00132FF0000000000001 /* MangaReadingStatusEntryView.swift in Sources */,
+				16FB00152FF0000000000001 /* MangaReadingStatusQueryView.swift in Sources */,
+				16FB00172FF0000000000001 /* MangaReadingStatusQueryViewModel.swift in Sources */,
 				15ACFD022FD916DC00B38F89 /* MyListFormatCollectionsDetailView.swift in Sources */,
 				15ACFD032FD916DC00B38F89 /* MyListGenreCollectionsSectionBuilder.swift in Sources */,
 				15ACFD042FD916DC00B38F89 /* MyListFormatCollectionsRoute.swift in Sources */,
