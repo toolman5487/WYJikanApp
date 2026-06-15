@@ -59,10 +59,10 @@ struct MainHomeView: View {
 
     private let sections: [HomeSection] = [
         .todayAnime,
-        .trendingAnime,
-        .trendingManga,
         .watchPromos,
         .watchEpisodes,
+        .trendingAnime,
+        .trendingManga,
         .recommendedAnime
     ]
 

@@ -20,6 +20,7 @@ struct GenreMangaSectionView: View {
 
     let section: MangaGenreSection
     let favoriteIDs: Set<Int>
+    let skeletonItemCount: Int
     let onOpenCategoryDetail: () -> Void
 
     @State private var endBounceProgress: CGFloat = 0
@@ -86,7 +87,7 @@ struct GenreMangaSectionView: View {
     private var contentSkeletonView: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: Self.cardSpacing) {
-                ForEach(0..<6, id: \.self) { _ in
+                ForEach(0..<skeletonItemCount, id: \.self) { _ in
                     RoundedRectangle(cornerRadius: Self.cardCornerRadius, style: .continuous)
                         .fill(Color(.systemGray5))
                         .frame(width: Self.cardWidth, height: Self.cardHeight)

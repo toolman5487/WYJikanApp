@@ -9,6 +9,14 @@ import SwiftUI
 
 struct GenreAnimeListSkeletonView: View {
 
+    // MARK: - Properties
+
+    let cardCount: Int
+
+    init(cardCount: Int = 5) {
+        self.cardCount = cardCount
+    }
+
     // MARK: - Body
 
     var body: some View {
@@ -20,7 +28,7 @@ struct GenreAnimeListSkeletonView: View {
 
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 12) {
-                            ForEach(0..<6, id: \.self) { _ in
+                            ForEach(0..<cardCount, id: \.self) { _ in
                                 RoundedRectangle(cornerRadius: 16, style: .continuous)
                                     .fill(Color(.systemGray5))
                                     .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
@@ -38,5 +46,5 @@ struct GenreAnimeListSkeletonView: View {
 // MARK: - Preview
 
 #Preview {
-    GenreAnimeListSkeletonView()
+    GenreAnimeListSkeletonView(cardCount: 5)
 }

@@ -15,7 +15,9 @@ final class MainCategoryListViewModel: ObservableObject {
 
     private enum GenreBatchMetrics {
         static let phoneInitialCount = 3
-        static let padInitialCount = 5
+        static let padInitialCount = 4
+        static let phoneItemRequestLimit = 5
+        static let padItemRequestLimit = 8
     }
 
     // MARK: - Properties
@@ -57,7 +59,13 @@ final class MainCategoryListViewModel: ObservableObject {
         let initialBatchSize = isPadScreen
             ? GenreBatchMetrics.padInitialCount
             : GenreBatchMetrics.phoneInitialCount
-        configureGenreBatch(initialBatchSize: initialBatchSize)
+        let itemRequestLimit = isPadScreen
+            ? GenreBatchMetrics.padItemRequestLimit
+            : GenreBatchMetrics.phoneItemRequestLimit
+        configureGenreBatch(
+            initialBatchSize: initialBatchSize,
+            itemRequestLimit: itemRequestLimit
+        )
         activateKind(selectedKind)
     }
 
@@ -217,9 +225,10 @@ private extension MainCategoryListViewModel {
         }
     }
 
-    func configureGenreBatch(initialBatchSize: Int) {
+    func configureGenreBatch(initialBatchSize: Int, itemRequestLimit: Int) {
         let configuration = MainCategoryGenreBatchConfiguration.platformAdaptive(
-            initialBatchSize: initialBatchSize
+            initialBatchSize: initialBatchSize,
+            itemRequestLimit: itemRequestLimit
         )
         animeListViewModel.configureGenreBatchIfNeeded(configuration)
         mangaListViewModel.configureGenreBatchIfNeeded(configuration)

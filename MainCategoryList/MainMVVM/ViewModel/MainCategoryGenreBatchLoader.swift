@@ -28,20 +28,23 @@ enum MainCategoryGenreBatchPhase: Equatable, Sendable {
 struct MainCategoryGenreBatchConfiguration: Sendable {
     let initialBatchSize: Int
     let loadMoreBatchSize: Int
+    let itemRequestLimit: Int
     let initialItemRequestDelay: Duration
     let requestInterval: Duration
 
     static let standard = MainCategoryGenreBatchConfiguration(
         initialBatchSize: 3,
         loadMoreBatchSize: 5,
+        itemRequestLimit: 5,
         initialItemRequestDelay: .milliseconds(1200),
         requestInterval: .seconds(1)
     )
 
-    static func platformAdaptive(initialBatchSize: Int) -> Self {
+    static func platformAdaptive(initialBatchSize: Int, itemRequestLimit: Int) -> Self {
         MainCategoryGenreBatchConfiguration(
             initialBatchSize: initialBatchSize,
             loadMoreBatchSize: 5,
+            itemRequestLimit: itemRequestLimit,
             initialItemRequestDelay: .milliseconds(1200),
             requestInterval: .seconds(1)
         )

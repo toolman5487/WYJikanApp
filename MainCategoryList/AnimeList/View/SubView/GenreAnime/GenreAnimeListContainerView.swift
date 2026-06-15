@@ -22,7 +22,7 @@ struct GenreAnimeListContainerView: View {
         Group {
             switch viewModel.screenState {
             case .loading:
-                GenreAnimeListSkeletonView()
+                GenreAnimeListSkeletonView(cardCount: viewModel.skeletonItemCount)
 
             case .error(let failure):
                 ErrorMessageRetryCardView(
@@ -60,6 +60,7 @@ struct GenreAnimeListContainerView: View {
                             GenreAnimeSectionView(
                                 section: section,
                                 favoriteIDs: favoriteIDs,
+                                skeletonItemCount: viewModel.skeletonItemCount,
                                 onOpenCategoryDetail: {
                                     selectedGenre = section.genre
                                 }

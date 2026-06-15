@@ -3034,9 +3034,9 @@
 			children = (
 				16F9000B2FEA00000000000B /* HomeWatchEpisodesView.swift */,
 				16F900152FEA100000000015 /* HomeWatchFeedControlBarView.swift */,
-				16F9001B2FEA10000000001B /* HomeWatchListView.swift */,
 				16F900172FEA100000000017 /* HomeWatchListRowView.swift */,
 				16F900192FEA100000000019 /* HomeWatchListStateViews.swift */,
+				16F9001B2FEA10000000001B /* HomeWatchListView.swift */,
 				16F900092FEA000000000009 /* HomeWatchPromosView.swift */,
 			);
 			path = View;

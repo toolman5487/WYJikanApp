@@ -31,7 +31,6 @@ final class GenreAnimeViewModel: ObservableObject {
 
     // MARK: - Constants
 
-    private static let genreAnimeLimit = 5
     private static let maxRetryCount = 2
     private static let retryBackoff: Duration = .milliseconds(800)
     private static let genreErrorMessage = "目前無法載入分類資料，請稍後再試"
@@ -72,6 +71,7 @@ final class GenreAnimeViewModel: ObservableObject {
 
     private let service: MainCategoryListServicing
     private var batchLoader: MainCategoryGenreBatchLoader<AnimeListGenreDTO, AnimeListRandomDTO>
+    private var itemRequestLimit: Int
 
     // MARK: - Loading State
 
@@ -85,6 +85,7 @@ final class GenreAnimeViewModel: ObservableObject {
         batchConfiguration: MainCategoryGenreBatchConfiguration = .standard
     ) {
         self.service = service
+        self.itemRequestLimit = batchConfiguration.itemRequestLimit
         self.batchLoader = MainCategoryGenreBatchLoader(configuration: batchConfiguration)
     }
 
@@ -92,6 +93,7 @@ final class GenreAnimeViewModel: ObservableObject {
 
     func configureBatchIfNeeded(_ configuration: MainCategoryGenreBatchConfiguration) {
         guard canReplaceBatchConfiguration else { return }
+        itemRequestLimit = configuration.itemRequestLimit
         batchLoader = MainCategoryGenreBatchLoader(configuration: configuration)
     }
 
@@ -158,6 +160,10 @@ private extension GenreAnimeViewModel {
 extension GenreAnimeViewModel {
     var isLoadingMore: Bool {
         loadState == .loadingMore
+    }
+
+    var skeletonItemCount: Int {
+        itemRequestLimit
     }
 }
 
@@ -349,7 +355,7 @@ private extension GenreAnimeViewModel {
             do {
                 let response = try await service.fetchAnimeByGenre(
                     genreId: genreId,
-                    limit: Self.genreAnimeLimit
+                    limit: itemRequestLimit
                 )
                 return response.data
             } catch {

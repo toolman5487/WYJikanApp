@@ -11,13 +11,20 @@ struct GenreMangaListSkeletonView: View {
 
     // MARK: - Constants
 
-    private static let cardCount: Int = 6
     private static let cardHeight: CGFloat = 240
     private static let posterAspectRatio: CGFloat = 2.0 / 3.0
     private static let cardCornerRadius: CGFloat = 16
     private static let cardSpacing: CGFloat = 12
     private static let horizontalPadding: CGFloat = 16
     private static let sectionCount: Int = 3
+
+    // MARK: - Properties
+
+    let cardCount: Int
+
+    init(cardCount: Int = 5) {
+        self.cardCount = cardCount
+    }
 
     // MARK: - Body
 
@@ -30,7 +37,7 @@ struct GenreMangaListSkeletonView: View {
 
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: Self.cardSpacing) {
-                            ForEach(0..<Self.cardCount, id: \.self) { _ in
+                            ForEach(0..<cardCount, id: \.self) { _ in
                                 RoundedRectangle(
                                     cornerRadius: Self.cardCornerRadius,
                                     style: .continuous
