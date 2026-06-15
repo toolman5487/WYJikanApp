@@ -8,30 +8,7 @@
 import Combine
 import Foundation
 
-enum HomeRecommendedAnimeScreenState: Equatable {
-    case loading
-    case error(FeatureLoadFailure)
-    case empty
-    case content([HomeRecommendedAnimeCardItem])
-
-    var items: [HomeRecommendedAnimeCardItem] {
-        switch self {
-        case .content(let items):
-            return items
-        case .loading, .error, .empty:
-            return []
-        }
-    }
-
-    var hasContent: Bool {
-        switch self {
-        case .content:
-            return true
-        case .loading, .error, .empty:
-            return false
-        }
-    }
-}
+typealias HomeRecommendedAnimeScreenState = LoadableContentState<[HomeRecommendedAnimeCardItem]>
 
 @MainActor
 final class HomeRecommendedAnimeViewModel: ObservableObject {

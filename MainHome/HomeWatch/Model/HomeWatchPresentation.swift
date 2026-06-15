@@ -21,30 +21,7 @@ nonisolated struct HomeWatchListHeaderContent: Equatable, Sendable {
     let loadedCountText: String
 }
 
-nonisolated enum HomeWatchSectionState<Item: Equatable & Sendable>: Equatable, Sendable {
-    case loading
-    case error(FeatureLoadFailure)
-    case empty
-    case content([Item])
-
-    var items: [Item] {
-        switch self {
-        case .content(let items):
-            return items
-        case .loading, .error, .empty:
-            return []
-        }
-    }
-
-    var hasContent: Bool {
-        switch self {
-        case .content:
-            return true
-        case .loading, .error, .empty:
-            return false
-        }
-    }
-}
+typealias HomeWatchSectionState<Item> = LoadableContentState<[Item]>
 
 nonisolated struct HomeWatchPromoItem: Identifiable, Equatable, Hashable, Sendable {
     let id: String

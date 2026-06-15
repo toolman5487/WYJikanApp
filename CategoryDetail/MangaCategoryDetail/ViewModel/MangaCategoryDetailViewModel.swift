@@ -35,7 +35,7 @@ final class MangaCategoryDetailViewModel: ObservableObject {
     // MARK: - Pagination State
 
     private let pageSize = 24
-    private var pagination = PaginatedListState<MangaCategoryItemDTO>()
+    private let paginationController = PaginatedListLoadingController<MangaCategoryItemDTO>()
     private var cancellables: Set<AnyCancellable> = []
     private var filterRequestTask: Task<Void, Never>?
 
@@ -61,14 +61,18 @@ final class MangaCategoryDetailViewModel: ObservableObject {
     }
 
     var loadedCountText: String {
-        "已載入 \(pagination.items.count) 部"
+        "已載入 \(paginationController.items.count) 部"
     }
 
     // MARK: - Public Methods
 
     func loadIfNeeded() async {
-        guard !pagination.hasLoaded else { return }
-        await fetchFirstPage(showSkeleton: true)
+        await paginationController.loadIfNeeded(
+            setLoading: applyLoading,
+            fetchPage: fetchPage,
+            applyPresentation: applyPresentation,
+            applyError: applyInitialLoadError
+        )
     }
 
     func reload() async {
@@ -102,7 +106,7 @@ final class MangaCategoryDetailViewModel: ObservableObject {
         )
         .dropFirst()
         .sink { [weak self] _, _ in
-            guard let self, self.pagination.hasLoaded else { return }
+            guard let self, self.paginationController.hasLoaded else { return }
             self.filterRequestTask?.cancel()
             self.filterRequestTask = Task { [weak self] in
                 guard let self else { return }
@@ -115,82 +119,75 @@ final class MangaCategoryDetailViewModel: ObservableObject {
     // MARK: - Loading
 
     private func fetchFirstPage(showSkeleton: Bool) async {
-        let generation = pagination.beginReload(clearItems: showSkeleton)
         filterRequestTask = nil
-
-        if showSkeleton {
-            screenState = .loading
-            loadMoreState = pagination.footerState
-        }
-
-        do {
-            let page = try await service.fetchInitialPage(
-                genreId: genre.id,
-                pageSize: pageSize,
-                filter: currentFilter
-            )
-            guard pagination.finishReload(
-                PaginatedPage(
-                    items: page.items,
-                    currentPage: page.currentPage,
-                    hasNextPage: page.hasNextPage
-                ),
-                generation: generation
-            ) else { return }
-            applyPresentation()
-        } catch is CancellationError {
-            return
-        } catch {
-            guard pagination.isCurrent(generation) else { return }
-            screenState = .error(FeatureLoadFailure(error))
-            loadMoreState = pagination.footerState
-        }
+        await paginationController.reload(
+            showSkeleton: showSkeleton,
+            setLoading: applyLoading,
+            fetchPage: fetchPage,
+            applyPresentation: applyPresentation,
+            applyError: applyInitialLoadError
+        )
     }
 
     private func loadMorePage() async {
-        guard let generation = pagination.beginLoadMore() else { return }
-        loadMoreState = pagination.footerState
+        await paginationController.loadMore(
+            fetchPage: fetchPage,
+            setFooterState: applyFooterState,
+            applyPresentation: applyPresentation
+        )
+    }
 
-        do {
-            let page = try await service.fetchPage(
+    private func fetchPage(_ page: Int) async throws -> PaginatedPage<MangaCategoryItemDTO> {
+        let categoryPage: MangaCategoryPage
+        if page == 1 {
+            categoryPage = try await service.fetchInitialPage(
                 genreId: genre.id,
-                page: pagination.currentPage + 1,
                 pageSize: pageSize,
                 filter: currentFilter
             )
-            guard pagination.finishLoadMore(
-                PaginatedPage(
-                    items: page.items,
-                    currentPage: page.currentPage,
-                    hasNextPage: page.hasNextPage
-                ),
-                generation: generation
-            ) else { return }
-            applyPresentation()
-        } catch is CancellationError {
-            if pagination.cancelLoadMore(generation: generation) {
-                loadMoreState = pagination.footerState
-            }
-            return
-        } catch {
-            guard pagination.failLoadMore(FeatureLoadFailure.loadMore(), generation: generation) else { return }
-            loadMoreState = pagination.footerState
+        } else {
+            categoryPage = try await service.fetchPage(
+                genreId: genre.id,
+                page: page,
+                pageSize: pageSize,
+                filter: currentFilter
+            )
         }
+
+        return PaginatedPage(
+            items: categoryPage.items,
+            currentPage: categoryPage.currentPage,
+            hasNextPage: categoryPage.hasNextPage
+        )
     }
 
-    private func applyPresentation() {
-        guard !pagination.items.isEmpty else {
+    private func applyLoading(footerState: PaginationFooterState) {
+        screenState = .loading
+        loadMoreState = footerState
+    }
+
+    private func applyInitialLoadError(_ failure: FeatureLoadFailure, footerState: PaginationFooterState) {
+        screenState = .error(failure)
+        loadMoreState = footerState
+    }
+
+    private func applyFooterState(_ footerState: PaginationFooterState) {
+        loadMoreState = footerState
+    }
+
+    private func applyPresentation(items: [MangaCategoryItemDTO], footerState: PaginationFooterState) {
+        guard !items.isEmpty else {
             screenState = .empty
             loadMoreState = .hidden
             return
         }
 
-        screenState = .content(items: pagination.items)
-        loadMoreState = pagination.footerState
+        screenState = .content(items: items)
+        loadMoreState = footerState
     }
 
     private func shouldLoadMore(after item: MangaCategoryItemDTO) -> Bool {
         guard case .content(let items) = screenState else { return false }
-        return pagination.shouldLoadMore(after: item, visibleItems: items)
+        return paginationController.shouldLoadMore(after: item, visibleItems: items)
     }
 }

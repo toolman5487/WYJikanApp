@@ -25,7 +25,7 @@ final class HomeWatchListViewModel: ObservableObject {
 
     private let service: HomeWatchServicing
     private let pageSize = 12
-    private var pagination = PaginatedListState<HomeWatchListItem>()
+    private let paginationController = PaginatedListLoadingController<HomeWatchListItem>()
     private var feedChangeTask: Task<Void, Never>?
 
     init(
@@ -44,7 +44,7 @@ final class HomeWatchListViewModel: ObservableObject {
         HomeWatchListHeaderContent(
             title: selectedFeed.title,
             subtitle: selectedFeed.subtitle,
-            loadedCountText: "已載入 \(pagination.items.count) 筆"
+            loadedCountText: "已載入 \(paginationController.items.count) 筆"
         )
     }
 
@@ -58,8 +58,17 @@ final class HomeWatchListViewModel: ObservableObject {
     }
 
     func loadIfNeeded() async {
-        guard !pagination.hasLoaded else { return }
-        await fetchFirstPage(showSkeleton: true, forceRefresh: false)
+        await paginationController.loadIfNeeded(
+            setLoading: applyLoading,
+            fetchPage: { [weak self] page in
+                guard let self else {
+                    return PaginatedPage(items: [], currentPage: page, hasNextPage: false)
+                }
+                return try await self.fetchPage(page: page, forceRefresh: false)
+            },
+            applyPresentation: applyPresentation,
+            applyError: applyInitialLoadError
+        )
     }
 
     func reload() async {
@@ -86,59 +95,39 @@ final class HomeWatchListViewModel: ObservableObject {
     }
 
     private func fetchFirstPage(showSkeleton: Bool, forceRefresh: Bool) async {
-        let feed = selectedFeed
-        let generation = pagination.beginReload(clearItems: showSkeleton)
-
-        if showSkeleton {
-            screenState = .loading
-            loadMoreState = pagination.footerState
-        }
-
-        do {
-            let page = try await fetchPage(feed: feed, page: 1, forceRefresh: forceRefresh)
-            guard selectedFeed == feed,
-                  pagination.finishReload(page, generation: generation) else { return }
-            applyPresentation()
-        } catch is CancellationError {
-            return
-        } catch {
-            guard selectedFeed == feed,
-                  pagination.isCurrent(generation) else { return }
-            screenState = .error(FeatureLoadFailure(error))
-            loadMoreState = .hidden
-        }
+        await paginationController.reload(
+            showSkeleton: showSkeleton,
+            setLoading: applyLoading,
+            fetchPage: { [weak self] page in
+                guard let self else {
+                    return PaginatedPage(items: [], currentPage: page, hasNextPage: false)
+                }
+                return try await self.fetchPage(page: page, forceRefresh: forceRefresh)
+            },
+            applyPresentation: applyPresentation,
+            applyError: applyInitialLoadError
+        )
     }
 
     private func loadMorePage() async {
-        let feed = selectedFeed
-        guard let generation = pagination.beginLoadMore() else { return }
-        loadMoreState = pagination.footerState
-
-        do {
-            let page = try await fetchPage(feed: feed, page: pagination.currentPage + 1, forceRefresh: false)
-            guard selectedFeed == feed,
-                  pagination.finishLoadMore(
-                page,
-                generation: generation,
-                requiresNewItemsForNextPage: true
-            ) else { return }
-            applyPresentation()
-        } catch is CancellationError {
-            if pagination.cancelLoadMore(generation: generation) {
-                loadMoreState = pagination.footerState
-            }
-            return
-        } catch {
-            guard pagination.failLoadMore(FeatureLoadFailure.loadMore(), generation: generation) else { return }
-            loadMoreState = pagination.footerState
-        }
+        await paginationController.loadMore(
+            requiresNewItemsForNextPage: true,
+            fetchPage: { [weak self] page in
+                guard let self else {
+                    return PaginatedPage(items: [], currentPage: page, hasNextPage: false)
+                }
+                return try await self.fetchPage(page: page, forceRefresh: false)
+            },
+            setFooterState: applyFooterState,
+            applyPresentation: applyPresentation
+        )
     }
 
     private func fetchPage(
-        feed: HomeWatchFeedKind,
         page: Int,
         forceRefresh: Bool
     ) async throws -> PaginatedPage<HomeWatchListItem> {
+        let feed = selectedFeed
         if let episodeFeed = feed.episodeFeed {
             let response = try await service.fetchEpisodes(
                 feed: episodeFeed,
@@ -172,14 +161,28 @@ final class HomeWatchListViewModel: ObservableObject {
         )
     }
 
-    private func applyPresentation() {
-        guard !pagination.items.isEmpty else {
+    private func applyLoading(footerState: PaginationFooterState) {
+        screenState = .loading
+        loadMoreState = footerState
+    }
+
+    private func applyInitialLoadError(_ failure: FeatureLoadFailure, footerState: PaginationFooterState) {
+        screenState = .error(failure)
+        loadMoreState = .hidden
+    }
+
+    private func applyFooterState(_ footerState: PaginationFooterState) {
+        loadMoreState = footerState
+    }
+
+    private func applyPresentation(items: [HomeWatchListItem], footerState: PaginationFooterState) {
+        guard !items.isEmpty else {
             screenState = .empty
             loadMoreState = .hidden
             return
         }
 
-        screenState = .content(pagination.items)
-        loadMoreState = pagination.footerState
+        screenState = .content(items)
+        loadMoreState = footerState
     }
 }

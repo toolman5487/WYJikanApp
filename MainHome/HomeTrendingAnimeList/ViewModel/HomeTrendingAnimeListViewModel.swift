@@ -27,7 +27,7 @@ final class HomeTrendingAnimeListViewModel: ObservableObject {
     private let presentationBuilder: HomeTrendingAnimeListPresentationBuilder
     private let pageSize = 12
 
-    private var pagination = PaginatedListState<HomeTrendingAnimeListItem>()
+    private let paginationController = PaginatedListLoadingController<HomeTrendingAnimeListItem>()
     private var cancellables: Set<AnyCancellable> = []
 
     init(
@@ -40,7 +40,7 @@ final class HomeTrendingAnimeListViewModel: ObservableObject {
     }
 
     var headerContent: HomeTrendingAnimeListHeaderContent {
-        presentationBuilder.headerContent(sort: selectedSort, loadedCount: pagination.items.count)
+        presentationBuilder.headerContent(sort: selectedSort, loadedCount: paginationController.items.count)
     }
 
     var sortChipItems: [HomeTrendingAnimeListSortChipItem] {
@@ -53,8 +53,12 @@ final class HomeTrendingAnimeListViewModel: ObservableObject {
     }
 
     func loadIfNeeded() async {
-        guard !pagination.hasLoaded else { return }
-        await fetchFirstPage(showSkeleton: true)
+        await paginationController.loadIfNeeded(
+            setLoading: applyLoading,
+            fetchPage: fetchPage,
+            applyPresentation: applyPresentation,
+            applyError: applyInitialLoadError
+        )
     }
 
     func reload() async {
@@ -80,75 +84,65 @@ final class HomeTrendingAnimeListViewModel: ObservableObject {
             .removeDuplicates()
             .dropFirst()
             .sink { [weak self] _ in
-                guard let self, self.pagination.hasLoaded else { return }
-                self.applyPresentation()
+                guard let self, self.paginationController.hasLoaded else { return }
+                self.applyPresentation(
+                    items: self.paginationController.items,
+                    footerState: self.paginationController.footerState
+                )
             }
             .store(in: &cancellables)
     }
 
     private func fetchFirstPage(showSkeleton: Bool) async {
-        let generation = pagination.beginReload(clearItems: showSkeleton)
-
-        if showSkeleton {
-            screenState = .loading
-            loadMoreState = pagination.footerState
-        }
-
-        do {
-            let response = try await service.fetchPage(page: 1, limit: pageSize)
-            guard pagination.finishReload(
-                PaginatedPage(
-                    items: response.data.compactMap(presentationBuilder.item(from:)),
-                    currentPage: response.pagination?.currentPage ?? 1,
-                    hasNextPage: response.pagination?.hasNextPage ?? !response.data.isEmpty
-                ),
-                generation: generation
-            ) else { return }
-            applyPresentation()
-        } catch is CancellationError {
-            return
-        } catch {
-            guard pagination.isCurrent(generation) else { return }
-            screenState = .error(FeatureLoadFailure(error))
-            loadMoreState = .hidden
-        }
+        await paginationController.reload(
+            showSkeleton: showSkeleton,
+            setLoading: applyLoading,
+            fetchPage: fetchPage,
+            applyPresentation: applyPresentation,
+            applyError: applyInitialLoadError
+        )
     }
 
     private func loadMorePage() async {
-        guard let generation = pagination.beginLoadMore() else { return }
-        loadMoreState = pagination.footerState
-
-        do {
-            let response = try await service.fetchPage(page: pagination.currentPage + 1, limit: pageSize)
-            guard pagination.finishLoadMore(
-                PaginatedPage(
-                    items: response.data.compactMap(presentationBuilder.item(from:)),
-                    currentPage: response.pagination?.currentPage ?? pagination.currentPage + 1,
-                    hasNextPage: response.pagination?.hasNextPage ?? !response.data.isEmpty
-                ),
-                generation: generation,
-                requiresNewItemsForNextPage: true
-            ) else { return }
-            applyPresentation()
-        } catch is CancellationError {
-            if pagination.cancelLoadMore(generation: generation) {
-                loadMoreState = pagination.footerState
-            }
-            return
-        } catch {
-            guard pagination.failLoadMore(FeatureLoadFailure.loadMore(), generation: generation) else { return }
-            loadMoreState = pagination.footerState
-        }
+        await paginationController.loadMore(
+            requiresNewItemsForNextPage: true,
+            fetchPage: fetchPage,
+            setFooterState: applyFooterState,
+            applyPresentation: applyPresentation
+        )
     }
 
-    private func applyPresentation() {
-        guard !pagination.items.isEmpty else {
+    private func fetchPage(_ page: Int) async throws -> PaginatedPage<HomeTrendingAnimeListItem> {
+        let response = try await service.fetchPage(page: page, limit: pageSize)
+        return PaginatedPage(
+            items: response.data.compactMap(presentationBuilder.item(from:)),
+            currentPage: response.pagination?.currentPage ?? page,
+            hasNextPage: response.pagination?.hasNextPage ?? !response.data.isEmpty
+        )
+    }
+
+    private func applyLoading(footerState: PaginationFooterState) {
+        screenState = .loading
+        loadMoreState = footerState
+    }
+
+    private func applyInitialLoadError(_ failure: FeatureLoadFailure, footerState: PaginationFooterState) {
+        screenState = .error(failure)
+        loadMoreState = .hidden
+    }
+
+    private func applyFooterState(_ footerState: PaginationFooterState) {
+        loadMoreState = footerState
+    }
+
+    private func applyPresentation(items: [HomeTrendingAnimeListItem], footerState: PaginationFooterState) {
+        guard !items.isEmpty else {
             screenState = .empty
             loadMoreState = .hidden
             return
         }
 
-        let rankedItems = presentationBuilder.sortedItems(pagination.items, sort: selectedSort)
+        let rankedItems = presentationBuilder.sortedItems(items, sort: selectedSort)
         let sections = presentationBuilder.sections(from: rankedItems, sort: selectedSort)
 
         screenState = .content(
@@ -156,7 +150,7 @@ final class HomeTrendingAnimeListViewModel: ObservableObject {
                 sections: sections
             )
         )
-        loadMoreState = pagination.footerState
+        loadMoreState = footerState
     }
 
 }

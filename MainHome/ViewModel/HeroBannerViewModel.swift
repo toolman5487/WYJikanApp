@@ -8,30 +8,7 @@
 import Combine
 import Foundation
 
-enum HeroBannerScreenState: Equatable {
-    case loading
-    case error(FeatureLoadFailure)
-    case empty
-    case content([BannerItem])
-
-    var items: [BannerItem] {
-        switch self {
-        case .content(let items):
-            return items
-        case .loading, .error, .empty:
-            return []
-        }
-    }
-
-    var hasContent: Bool {
-        switch self {
-        case .content:
-            return true
-        case .loading, .error, .empty:
-            return false
-        }
-    }
-}
+typealias HeroBannerScreenState = LoadableContentState<[BannerItem]>
 
 @MainActor
 final class HeroBannerViewModel: ObservableObject {

@@ -293,6 +293,7 @@
 		16E700022FE1000000000002 /* AppUserFacingError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E700012FE1000000000001 /* AppUserFacingError.swift */; };
 		16E700042FE1000000000004 /* FeatureLoadFailure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E700032FE1000000000003 /* FeatureLoadFailure.swift */; };
 		16E700062FE1000000000006 /* ErrorMessageKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E700052FE1000000000005 /* ErrorMessageKind.swift */; };
+		16FE00112FF3000000000011 /* LoadableContentState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FE00102FF3000000000010 /* LoadableContentState.swift */; };
 		16E700082FE1000000000008 /* ErrorMessageRetryCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E700072FE1000000000007 /* ErrorMessageRetryCardView.swift */; };
 		16E7000B2FE100000000000B /* FeatureEmptyState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E7000A2FE100000000000A /* FeatureEmptyState.swift */; };
 		16E7000D2FE100000000000C /* FeatureEmptyStateCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E7000C2FE100000000000C /* FeatureEmptyStateCardView.swift */; };
@@ -350,6 +351,7 @@
 		16F6A0022FC200000000002 /* AnimeDetailEpisodeRowPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F6A0012FC200000000001 /* AnimeDetailEpisodeRowPresenter.swift */; };
 		16F6A0042FC200000000004 /* MainCategoryGenreBatchLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F6A0032FC200000000003 /* MainCategoryGenreBatchLoader.swift */; };
 		16F700022FDB000000000002 /* PaginatedListState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F700012FDB000000000001 /* PaginatedListState.swift */; };
+		16FE00132FF3000000000013 /* PaginatedListLoadingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FE00122FF3000000000012 /* PaginatedListLoadingController.swift */; };
 		16F800022FDB100000000002 /* RandomPickHeroItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F800012FDB100000000001 /* RandomPickHeroItem.swift */; };
 		16F800042FDB100000000004 /* RandomPickHeroCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F800032FDB100000000003 /* RandomPickHeroCardView.swift */; };
 		16F800062FDB100000000006 /* RandomPickHeroSkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F800052FDB100000000005 /* RandomPickHeroSkeletonView.swift */; };
@@ -669,6 +671,7 @@
 		16E700012FE1000000000001 /* AppUserFacingError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUserFacingError.swift; sourceTree = "<group>"; };
 		16E700032FE1000000000003 /* FeatureLoadFailure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureLoadFailure.swift; sourceTree = "<group>"; };
 		16E700052FE1000000000005 /* ErrorMessageKind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorMessageKind.swift; sourceTree = "<group>"; };
+		16FE00102FF3000000000010 /* LoadableContentState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadableContentState.swift; sourceTree = "<group>"; };
 		16E700072FE1000000000007 /* ErrorMessageRetryCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorMessageRetryCardView.swift; sourceTree = "<group>"; };
 		16E7000A2FE100000000000A /* FeatureEmptyState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureEmptyState.swift; sourceTree = "<group>"; };
 		16E7000C2FE100000000000C /* FeatureEmptyStateCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureEmptyStateCardView.swift; sourceTree = "<group>"; };
@@ -724,6 +727,7 @@
 		16F6A0012FC200000000001 /* AnimeDetailEpisodeRowPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeDetailEpisodeRowPresenter.swift; sourceTree = "<group>"; };
 		16F6A0032FC200000000003 /* MainCategoryGenreBatchLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainCategoryGenreBatchLoader.swift; sourceTree = "<group>"; };
 		16F700012FDB000000000001 /* PaginatedListState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaginatedListState.swift; sourceTree = "<group>"; };
+		16FE00122FF3000000000012 /* PaginatedListLoadingController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaginatedListLoadingController.swift; sourceTree = "<group>"; };
 		16F800012FDB100000000001 /* RandomPickHeroItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomPickHeroItem.swift; sourceTree = "<group>"; };
 		16F800032FDB100000000003 /* RandomPickHeroCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomPickHeroCardView.swift; sourceTree = "<group>"; };
 		16F800052FDB100000000005 /* RandomPickHeroSkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomPickHeroSkeletonView.swift; sourceTree = "<group>"; };
@@ -2713,6 +2717,7 @@
 				16E700012FE1000000000001 /* AppUserFacingError.swift */,
 				16E700052FE1000000000005 /* ErrorMessageKind.swift */,
 				16E700032FE1000000000003 /* FeatureLoadFailure.swift */,
+				16FE00102FF3000000000010 /* LoadableContentState.swift */,
 				16E7000A2FE100000000000A /* FeatureEmptyState.swift */,
 			);
 			path = Model;
@@ -2902,6 +2907,7 @@
 			isa = PBXGroup;
 			children = (
 				16F700012FDB000000000001 /* PaginatedListState.swift */,
+				16FE00122FF3000000000012 /* PaginatedListLoadingController.swift */,
 			);
 			path = Pagination;
 			sourceTree = "<group>";
@@ -3259,11 +3265,13 @@
 				16F9001A2FEA10000000001A /* HomeWatchListStateViews.swift in Sources */,
 				16B800012FD8000000000001 /* EndBounceView.swift in Sources */,
 				16F700022FDB000000000002 /* PaginatedListState.swift in Sources */,
+				16FE00132FF3000000000013 /* PaginatedListLoadingController.swift in Sources */,
 				15FC4F412F73EB7B0054153E /* MainHomeService.swift in Sources */,
 				15AC996B2F879D8B008EAAEE /* GenreAnimeSectionView.swift in Sources */,
 				16E700022FE1000000000002 /* AppUserFacingError.swift in Sources */,
 				16E700062FE1000000000006 /* ErrorMessageKind.swift in Sources */,
 				16E700042FE1000000000004 /* FeatureLoadFailure.swift in Sources */,
+				16FE00112FF3000000000011 /* LoadableContentState.swift in Sources */,
 				15FC4F452F74C7CF0054153E /* ErrorMessageView.swift in Sources */,
 				16E700082FE1000000000008 /* ErrorMessageRetryCardView.swift in Sources */,
 				16E7000B2FE100000000000B /* FeatureEmptyState.swift in Sources */,
