@@ -18,7 +18,7 @@ final class MainSearchViewModel: ObservableObject {
 
     @Published var query: String = ""
     @Published var kind: MainSearchKind = .anime
-    @Published var sortOption: MainSearchSortOption = .default
+    @Published var sortOption: MainSearchSortOption = .defaultOption
 
     @Published private(set) var screenState: MainSearchScreenState = .emptyPrompt
     @Published private(set) var loadMoreState: MainSearchLoadMoreState = .hidden
@@ -40,7 +40,7 @@ final class MainSearchViewModel: ObservableObject {
         historyRepository: any MainSearchHistoryRepository,
         initialKind: MainSearchKind = .anime,
         initialQuery: String = "",
-        initialSortOption: MainSearchSortOption = .default,
+        initialSortOption: MainSearchSortOption = .defaultOption,
         sorter: MainSearchResultSorter = MainSearchResultSorter(),
         presentationBuilder: MainSearchPresentationBuilder = MainSearchPresentationBuilder()
     ) {
@@ -171,7 +171,7 @@ private extension MainSearchViewModel {
                 guard let self else { return }
                 let supportedOptions = MainSearchSortOption.supportedOptions(for: kind)
                 if !supportedOptions.contains(self.sortOption) {
-                    self.sortOption = .default
+                    self.sortOption = .defaultOption
                 }
             }
             .store(in: &cancellables)

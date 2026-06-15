@@ -46,7 +46,7 @@ nonisolated enum MainSearchKind: String, CaseIterable, Codable, Hashable, Sendab
 // MARK: - Search Sort
 
 nonisolated enum MainSearchSortOption: String, CaseIterable, Hashable, Sendable {
-    case `default`
+    case defaultOption
     case titleAscending
     case titleDescending
     case newest
@@ -56,7 +56,7 @@ nonisolated enum MainSearchSortOption: String, CaseIterable, Hashable, Sendable 
 
     var title: String {
         switch self {
-        case .default: return "預設"
+        case .defaultOption: return "預設"
         case .titleAscending: return "名稱 A-Z"
         case .titleDescending: return "名稱 Z-A"
         case .newest: return "年份新到舊"
@@ -68,7 +68,7 @@ nonisolated enum MainSearchSortOption: String, CaseIterable, Hashable, Sendable 
 
     var systemImageName: String {
         switch self {
-        case .default: return "line.3.horizontal.decrease.circle"
+        case .defaultOption: return "line.3.horizontal.decrease.circle"
         case .titleAscending: return "textformat.abc"
         case .titleDescending: return "textformat.abc.dottedunderline"
         case .newest: return "arrow.down.to.line.compact"
@@ -82,7 +82,7 @@ nonisolated enum MainSearchSortOption: String, CaseIterable, Hashable, Sendable 
         switch kind {
         case .anime, .manga:
             return [
-                .default,
+                .defaultOption,
                 .titleAscending,
                 .titleDescending,
                 .newest,
@@ -92,7 +92,7 @@ nonisolated enum MainSearchSortOption: String, CaseIterable, Hashable, Sendable 
             ]
         case .character, .people:
             return [
-                .default,
+                .defaultOption,
                 .titleAscending,
                 .titleDescending,
                 .popularityDescending,

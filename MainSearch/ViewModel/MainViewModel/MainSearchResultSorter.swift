@@ -16,7 +16,7 @@ struct MainSearchResultSorter: Sendable {
         using option: MainSearchSortOption
     ) -> [MainSearchResultRow] {
         switch option {
-        case .default:
+        case .defaultOption:
             return rows
         case .titleAscending:
             return rows.sorted { lhs, rhs in

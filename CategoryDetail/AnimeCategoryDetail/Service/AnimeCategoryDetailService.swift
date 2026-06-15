@@ -56,7 +56,7 @@ nonisolated final class AnimeCategoryDetailService: AnimeCategoryDetailServicing
             }
 
             switch filter.sort {
-            case .default:
+            case .defaultSort:
                 break
             case .popularity:
                 items.append(URLQueryItem(name: "order_by", value: "popularity"))

@@ -25,22 +25,27 @@ final class HomeTrendingMangaListViewModel: ObservableObject {
     @Published private(set) var loadMoreState: LoadMoreState = .hidden
 
     private let service: HomeTrendingMangaListServicing
+    private let presentationBuilder: HomeTrendingMangaListPresentationBuilder
     private let pageSize = 24
 
     private var pagination = PaginatedListState<MangaCategoryItemDTO>()
     private var cancellables: Set<AnyCancellable> = []
 
-    init(service: HomeTrendingMangaListServicing) {
+    init(
+        service: HomeTrendingMangaListServicing,
+        presentationBuilder: HomeTrendingMangaListPresentationBuilder = HomeTrendingMangaListPresentationBuilder()
+    ) {
         self.service = service
+        self.presentationBuilder = presentationBuilder
         bindPresentation()
     }
 
     var headerTitle: String {
-        headerTitle(sort: selectedSort, format: selectedFormat)
+        presentationBuilder.headerTitle(sort: selectedSort, format: selectedFormat)
     }
 
     var headerSubtitle: String {
-        headerSubtitle(sort: selectedSort, format: selectedFormat)
+        presentationBuilder.headerSubtitle(sort: selectedSort, format: selectedFormat)
     }
 
     var loadedCountText: String {
@@ -145,47 +150,13 @@ final class HomeTrendingMangaListViewModel: ObservableObject {
             return
         }
 
-        let presentedItems = presentedItems(from: pagination.items)
+        let presentedItems = presentationBuilder.presentedItems(
+            from: pagination.items,
+            sort: selectedSort,
+            format: selectedFormat
+        )
         screenState = presentedItems.isEmpty ? .empty : .content(items: presentedItems)
         loadMoreState = pagination.footerState
-    }
-
-    private func presentedItems(from items: [MangaCategoryItemDTO]) -> [MangaCategoryItemDTO] {
-        let filtered = items.filter { item in
-            selectedFormat.matches(type: item.type)
-        }
-
-        switch selectedSort {
-        case .apiDefault:
-            return filtered
-        case .rank:
-            return filtered.sorted { lhs, rhs in
-                compareOptionalAscending(
-                    lhs.rank,
-                    rhs.rank,
-                    fallbackTitleLeft: lhs.displayTitle,
-                    fallbackTitleRight: rhs.displayTitle
-                )
-            }
-        case .popularity:
-            return filtered.sorted { lhs, rhs in
-                compareOptionalAscending(
-                    lhs.popularity,
-                    rhs.popularity,
-                    fallbackTitleLeft: lhs.displayTitle,
-                    fallbackTitleRight: rhs.displayTitle
-                )
-            }
-        case .score:
-            return filtered.sorted { lhs, rhs in
-                compareOptionalDescending(
-                    lhs.score,
-                    rhs.score,
-                    fallbackTitleLeft: lhs.displayTitle,
-                    fallbackTitleRight: rhs.displayTitle
-                )
-            }
-        }
     }
 
     private func shouldLoadMore(after item: MangaCategoryItemDTO) -> Bool {
@@ -198,87 +169,11 @@ final class HomeTrendingMangaListViewModel: ObservableObject {
         case .content(let items):
             return items
         case .loading, .empty, .error:
-            return presentedItems(from: pagination.items)
-        }
-    }
-
-    private func headerTitle(sort: HomeTrendingMangaListSort, format: HomeTrendingMangaListFormat) -> String {
-        let baseTitle: String
-        switch sort {
-        case .apiDefault:
-            baseTitle = "本週熱門漫畫"
-        case .rank:
-            baseTitle = "排名漫畫榜"
-        case .popularity:
-            baseTitle = "人氣漫畫榜"
-        case .score:
-            baseTitle = "高分漫畫榜"
-        }
-
-        switch format {
-        case .all:
-            return baseTitle
-        default:
-            return "\(format.title)\(baseTitle)"
-        }
-    }
-
-    private func headerSubtitle(sort: HomeTrendingMangaListSort, format: HomeTrendingMangaListFormat) -> String {
-        switch (sort, format) {
-        case (.apiDefault, .all):
-            return "把現在榜上最受關注的漫畫一次展開，先看榜首，再慢慢往下挖完整熱門清單。"
-        case (.rank, .all):
-            return "從榜單名次一路往下看，先鎖定站上前段班、討論度高的漫畫作品。"
-        case (.popularity, .all):
-            return "依人氣熱度重新整理，適合先找現在最多人追、最常被提起的熱門作品。"
-        case (.score, .all):
-            return "把評價表現突出的作品拉到前面，想先看口碑穩、分數亮眼的漫畫可以從這裡開始。"
-        case (.apiDefault, _):
-            return "整理目前最受關注的\(format.title)作品，讓你快速找到這個類型裡最值得先看的熱門選擇。"
-        case (.rank, _):
-            return "從名次往下看這批\(format.title)作品，先鎖定榜上前段班與討論度高的焦點名單。"
-        case (.popularity, _):
-            return "依人氣熱度重新整理這批\(format.title)作品，適合先找現在最多人追的熱門選擇。"
-        case (.score, _):
-            return "把高評價的\(format.title)作品拉到前面，想先看口碑穩、分數亮眼的類型可以從這裡開始。"
-        }
-    }
-
-    private func compareOptionalAscending<T: Comparable>(
-        _ lhs: T?,
-        _ rhs: T?,
-        fallbackTitleLeft: String,
-        fallbackTitleRight: String
-    ) -> Bool {
-        switch (lhs, rhs) {
-        case let (lhs?, rhs?):
-            if lhs == rhs { return fallbackTitleLeft < fallbackTitleRight }
-            return lhs < rhs
-        case (_?, nil):
-            return true
-        case (nil, _?):
-            return false
-        case (nil, nil):
-            return fallbackTitleLeft < fallbackTitleRight
-        }
-    }
-
-    private func compareOptionalDescending<T: Comparable>(
-        _ lhs: T?,
-        _ rhs: T?,
-        fallbackTitleLeft: String,
-        fallbackTitleRight: String
-    ) -> Bool {
-        switch (lhs, rhs) {
-        case let (lhs?, rhs?):
-            if lhs == rhs { return fallbackTitleLeft < fallbackTitleRight }
-            return lhs > rhs
-        case (_?, nil):
-            return true
-        case (nil, _?):
-            return false
-        case (nil, nil):
-            return fallbackTitleLeft < fallbackTitleRight
+            return presentationBuilder.presentedItems(
+                from: pagination.items,
+                sort: selectedSort,
+                format: selectedFormat
+            )
         }
     }
 }

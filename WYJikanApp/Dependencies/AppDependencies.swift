@@ -73,7 +73,7 @@ struct AppDependencies {
     func makeMainSearchViewModel(
         initialKind: MainSearchKind = .anime,
         initialQuery: String = "",
-        initialSortOption: MainSearchSortOption = .default
+        initialSortOption: MainSearchSortOption = .defaultOption
     ) -> MainSearchViewModel {
         MainSearchViewModel(
             service: mainSearchService,

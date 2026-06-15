@@ -21,7 +21,7 @@ final class MangaCategoryDetailViewModel: ObservableObject {
 
     // MARK: - Published State
 
-    @Published var selectedSort: MangaCategoryFilter.Sort = .default
+    @Published var selectedSort: MangaCategoryFilter.Sort = .defaultSort
     @Published var selectedFormat: MangaCategoryFilter.Format = .all
     @Published private(set) var screenState: ScreenState = .loading
     @Published private(set) var loadMoreState: LoadMoreState = .hidden

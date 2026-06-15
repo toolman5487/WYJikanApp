@@ -12,7 +12,7 @@ nonisolated struct AnimeCategoryFilter: Equatable, Sendable {
     let format: Format
 
     nonisolated enum Sort: String, CaseIterable, Equatable, Identifiable, Sendable {
-        case `default`
+        case defaultSort
         case popularity
         case score
         case rank
@@ -23,7 +23,7 @@ nonisolated struct AnimeCategoryFilter: Equatable, Sendable {
 
         var title: String {
             switch self {
-            case .default: return "預設"
+            case .defaultSort: return "預設"
             case .popularity: return "人氣"
             case .score: return "評分"
             case .rank: return "排名"
