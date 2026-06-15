@@ -14,6 +14,7 @@ struct HomeRecommendedAnimeTitleEnricher {
     // MARK: - Properties
 
     private let service: AnimeDetailServicing
+    private let textFormatter = MainHomeMediaTextFormatter()
 
     // MARK: - Lifecycle
 
@@ -31,10 +32,11 @@ struct HomeRecommendedAnimeTitleEnricher {
 
             do {
                 let response = try await service.fetchAnimeDetail(malId: malId)
-                titles[malId] = Self.preferredTitle(
+                titles[malId] = textFormatter.preferredTitle(
                     japanese: response.data.titleJapanese,
                     english: response.data.titleEnglish,
-                    fallback: response.data.title
+                    fallback: response.data.title,
+                    defaultTitle: "推薦作品"
                 )
             } catch {
                 continue
@@ -42,26 +44,5 @@ struct HomeRecommendedAnimeTitleEnricher {
         }
 
         return titles
-    }
-
-    // MARK: - Private Methods
-
-    private static func preferredTitle(japanese: String?, english: String?, fallback: String?) -> String {
-        if let japanese = normalizedText(japanese) {
-            return japanese
-        }
-        if let english = normalizedText(english) {
-            return english
-        }
-        if let fallback = normalizedText(fallback) {
-            return fallback
-        }
-        return "推薦作品"
-    }
-
-    private static func normalizedText(_ value: String?) -> String? {
-        guard let value else { return nil }
-        let trimmedValue = value.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmedValue.isEmpty ? nil : trimmedValue
     }
 }

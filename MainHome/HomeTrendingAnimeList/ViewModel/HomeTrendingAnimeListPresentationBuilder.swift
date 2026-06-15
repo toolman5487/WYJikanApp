@@ -10,6 +10,7 @@ import Foundation
 // MARK: - HomeTrendingAnimeListPresentationBuilder
 
 struct HomeTrendingAnimeListPresentationBuilder {
+    private let textFormatter = MainHomeMediaTextFormatter()
 
     // MARK: - Public Methods
 
@@ -71,20 +72,20 @@ struct HomeTrendingAnimeListPresentationBuilder {
     func item(from dto: HomeTrendingAnimeListDTO) -> HomeTrendingAnimeListItem? {
         HomeTrendingAnimeListItem(
             id: dto.id,
-            title: displayTitle(
+            title: textFormatter.preferredTitle(
                 japanese: dto.titleJapanese,
                 english: dto.titleEnglish,
                 fallback: dto.title
             ),
-            typeText: typeDisplayText(dto.type),
-            scoreText: scoreDisplayText(dto.score),
+            typeText: textFormatter.animeTypeText(dto.type),
+            scoreText: textFormatter.scoreText(dto.score, precision: 2),
             rank: dto.rank,
-            popularityText: dto.popularity.map { "人氣 #\($0)" },
-            membersText: membersDisplayText(dto.members),
-            episodeText: dto.episodes.map { "\($0) 集" },
-            statusText: statusDisplayText(dto.status),
-            seasonText: seasonDisplayText(season: dto.season, year: dto.year),
-            synopsisPreview: synopsisPreview(dto.synopsis),
+            popularityText: textFormatter.popularityText(dto.popularity),
+            membersText: textFormatter.memberCountText(dto.members),
+            episodeText: textFormatter.episodeText(dto.episodes),
+            statusText: textFormatter.animeStatusText(dto.status),
+            seasonText: textFormatter.animeSeasonText(season: dto.season, year: dto.year),
+            synopsisPreview: textFormatter.synopsisPreview(dto.synopsis, limit: 110),
             imageURL: posterURL(from: dto)
         )
     }
@@ -172,102 +173,8 @@ private extension HomeTrendingAnimeListPresentationBuilder {
         return Int(text.replacingOccurrences(of: "人氣 #", with: ""))
     }
 
-    func displayTitle(japanese: String?, english: String?, fallback: String?) -> String {
-        if let japanese, !japanese.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            return japanese
-        }
-        if let english, !english.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            return english
-        }
-        if let fallback, !fallback.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            return fallback
-        }
-        return "未命名作品"
-    }
-
     func posterURL(from dto: HomeTrendingAnimeListDTO) -> URL? {
         JikanImageURLResolver.url(from: dto.images, tier: .poster)
-    }
-
-    func typeDisplayText(_ raw: String?) -> String? {
-        guard let raw = raw?.trimmingCharacters(in: .whitespacesAndNewlines), !raw.isEmpty else {
-            return nil
-        }
-
-        switch raw.uppercased() {
-        case "TV": return "電視動畫"
-        case "MOVIE": return "劇場版"
-        case "OVA": return "OVA"
-        case "ONA": return "ONA"
-        case "SPECIAL": return "特別篇"
-        case "MUSIC": return "音樂"
-        default: return raw
-        }
-    }
-
-    func scoreDisplayText(_ score: Double?) -> String? {
-        guard let score else { return nil }
-        return String(format: "%.2f", score)
-    }
-
-    func membersDisplayText(_ members: Int?) -> String? {
-        guard let members else { return nil }
-        if members >= 1_000_000 {
-            return String(format: "%.1fM 收藏", Double(members) / 1_000_000)
-        }
-        if members >= 1_000 {
-            return String(format: "%.1fK 收藏", Double(members) / 1_000)
-        }
-        return "\(members) 收藏"
-    }
-
-    func statusDisplayText(_ raw: String?) -> String? {
-        guard let raw = raw?.trimmingCharacters(in: .whitespacesAndNewlines), !raw.isEmpty else {
-            return nil
-        }
-
-        switch raw.lowercased() {
-        case "currently airing": return "播出中"
-        case "finished airing": return "已完結"
-        case "not yet aired": return "尚未播出"
-        default: return raw
-        }
-    }
-
-    func seasonDisplayText(season: String?, year: Int?) -> String? {
-        let seasonText: String?
-        switch season?.lowercased() {
-        case "winter": seasonText = "冬"
-        case "spring": seasonText = "春"
-        case "summer": seasonText = "夏"
-        case "fall": seasonText = "秋"
-        default: seasonText = nil
-        }
-
-        switch (seasonText, year) {
-        case let (seasonText?, year?):
-            return "\(year) \(seasonText)季"
-        case let (seasonText?, nil):
-            return seasonText
-        case let (nil, year?):
-            return "\(year)"
-        case (nil, nil):
-            return nil
-        }
-    }
-
-    func synopsisPreview(_ synopsis: String?) -> String? {
-        guard let synopsis else { return nil }
-        let trimmed = synopsis.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return nil }
-
-        let limit = 110
-        if trimmed.count <= limit {
-            return trimmed
-        }
-
-        let index = trimmed.index(trimmed.startIndex, offsetBy: limit)
-        return String(trimmed[..<index]) + "..."
     }
 
     struct TrendingSectionDefinition {

@@ -28,6 +28,7 @@ final class HomeTodayAnimeScheduleListViewModel: ObservableObject {
     // MARK: - Dependencies
 
     private let service: HomeTodayAnimeScheduleListServicing
+    private let presentationBuilder: HomeTodayAnimeScheduleListPresentationBuilder
 
     // MARK: - Pagination State
 
@@ -41,10 +42,12 @@ final class HomeTodayAnimeScheduleListViewModel: ObservableObject {
 
     init(
         initialDay: HomeScheduleDay = .current(),
-        service: HomeTodayAnimeScheduleListServicing
+        service: HomeTodayAnimeScheduleListServicing,
+        presentationBuilder: HomeTodayAnimeScheduleListPresentationBuilder = HomeTodayAnimeScheduleListPresentationBuilder()
     ) {
         self.selectedDay = initialDay
         self.service = service
+        self.presentationBuilder = presentationBuilder
         bindSelectedDay()
     }
 
@@ -142,7 +145,7 @@ final class HomeTodayAnimeScheduleListViewModel: ObservableObject {
             limit: pageSize
         )
         return PaginatedPage(
-            items: response.data.compactMap(Self.timelineItem(from:)),
+            items: response.data.compactMap(presentationBuilder.timelineItem(from:)),
             currentPage: response.pagination?.currentPage ?? page,
             hasNextPage: response.pagination?.hasNextPage ?? !response.data.isEmpty
         )
@@ -169,7 +172,7 @@ final class HomeTodayAnimeScheduleListViewModel: ObservableObject {
             return
         }
 
-        screenState = .content(sections: groupedSections(from: items))
+        screenState = .content(sections: presentationBuilder.groupedSections(from: items))
         loadMoreTriggerIDs = Set(items.suffix(5).map(\.id))
         loadMoreState = footerState
     }
@@ -178,154 +181,4 @@ final class HomeTodayAnimeScheduleListViewModel: ObservableObject {
         guard paginationController.canLoadMore else { return false }
         return loadMoreTriggerIDs.contains(item.id)
     }
-
-    // MARK: - Presentation Mapping
-
-    private static func timelineItem(from dto: HomeTodayAnimeDTO) -> HomeTodayAnimeTimelineItem? {
-        let timeInfo = timeInfo(from: dto.broadcast)
-        return HomeTodayAnimeTimelineItem(
-            id: dto.id,
-            title: displayTitle(
-                japanese: dto.titleJapanese,
-                english: dto.titleEnglish,
-                fallback: dto.title
-            ),
-            typeText: typeDisplayText(dto.type),
-            scoreText: scoreDisplayText(dto.score),
-            episodeText: dto.episodes.map { "\($0) 集" },
-            statusText: statusDisplayText(dto.status),
-            studioText: studioDisplayText(dto.studios),
-            synopsisPreview: synopsisPreview(dto.synopsis),
-            imageURL: posterURL(from: dto),
-            timeSectionTitle: timeInfo.sectionTitle,
-            timeSortValue: timeInfo.sortValue,
-            broadcastText: timeInfo.displayText
-        )
-    }
-
-    private func groupedSections(from items: [HomeTodayAnimeTimelineItem]) -> [HomeTodayAnimeTimeSection] {
-        let sortedItems = items.sorted {
-            if $0.timeSortValue == $1.timeSortValue {
-                return $0.title < $1.title
-            }
-            return $0.timeSortValue < $1.timeSortValue
-        }
-
-        let grouped = Dictionary(grouping: sortedItems, by: \.timeSectionTitle)
-        let orderedTitles = sortedItems.map(\.timeSectionTitle).reduce(into: [String]()) { result, title in
-            if !result.contains(title) {
-                result.append(title)
-            }
-        }
-
-        return orderedTitles.compactMap { title in
-            guard let items = grouped[title] else { return nil }
-            return HomeTodayAnimeTimeSection(title: title, items: items)
-        }
-    }
-
-    private static func timeInfo(from broadcast: AnimeBroadcastDTO?) -> (
-        sectionTitle: String,
-        sortValue: Int,
-        displayText: String
-    ) {
-        if let presentation = AnimeDetailDateFormatting.localBroadcastPresentation(from: broadcast) {
-            return (
-                presentation.sectionTitle,
-                presentation.sortValue,
-                presentation.displayText
-            )
-        }
-
-        return ("播出時間未定", Int.max, broadcastDisplayText(from: broadcast) ?? "播出時間未定")
-    }
-
-    private static func broadcastDisplayText(from broadcast: AnimeBroadcastDTO?) -> String? {
-        guard let broadcast else { return nil }
-        if let raw = broadcast.string?.trimmingCharacters(in: .whitespacesAndNewlines), !raw.isEmpty {
-            return AnimeDetailDateFormatting.localBroadcastFromEnglishString(raw)
-                ?? AnimeDetailDateFormatting.translateBroadcastEnglishString(raw)
-        }
-
-        let day = broadcast.day?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        let time = broadcast.time?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        guard !day.isEmpty, !time.isEmpty else { return nil }
-
-        return AnimeDetailDateFormatting.localBroadcastString(
-            dayEnglish: day,
-            timeHHMM: time,
-            sourceTimeZoneIdentifier: AnimeDetailDateFormatting.sourceTimeZoneIdentifier(for: broadcast)
-        ) ?? "\(AnimeDetailDateFormatting.weekdayChinese(from: day)) \(time)"
-    }
-
-    private static func displayTitle(japanese: String?, english: String?, fallback: String?) -> String {
-        if let japanese, !japanese.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            return japanese
-        }
-        if let english, !english.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            return english
-        }
-        if let fallback, !fallback.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            return fallback
-        }
-        return "未命名作品"
-    }
-
-    private static func posterURL(from dto: HomeTodayAnimeDTO) -> URL? {
-        JikanImageURLResolver.url(from: dto.images, tier: .poster)
-    }
-
-    private static func typeDisplayText(_ raw: String?) -> String? {
-        guard let raw = raw?.trimmingCharacters(in: .whitespacesAndNewlines), !raw.isEmpty else {
-            return nil
-        }
-        switch raw.uppercased() {
-        case "TV": return "電視動畫"
-        case "MOVIE": return "劇場版"
-        case "OVA": return "OVA"
-        case "ONA": return "ONA"
-        case "SPECIAL": return "特別篇"
-        case "MUSIC": return "音樂"
-        default: return raw
-        }
-    }
-
-    private static func scoreDisplayText(_ score: Double?) -> String? {
-        guard let score else { return nil }
-        return String(format: "%.1f", score)
-    }
-
-    private static func statusDisplayText(_ raw: String?) -> String? {
-        guard let raw = raw?.trimmingCharacters(in: .whitespacesAndNewlines), !raw.isEmpty else {
-            return nil
-        }
-        switch raw.lowercased() {
-        case "currently airing": return "播出中"
-        case "finished airing": return "已完結"
-        case "not yet aired": return "尚未播出"
-        default: return raw
-        }
-    }
-
-    private static func studioDisplayText(_ studios: [AnimeRelatedEntityDTO]?) -> String? {
-        let names = (studios ?? []).compactMap { studio -> String? in
-            guard let name = studio.name?.trimmingCharacters(in: .whitespacesAndNewlines), !name.isEmpty else {
-                return nil
-            }
-            return name
-        }
-        guard !names.isEmpty else { return nil }
-        return names.prefix(2).joined(separator: "、")
-    }
-
-    private static func synopsisPreview(_ synopsis: String?) -> String? {
-        guard let synopsis else { return nil }
-        let trimmed = synopsis.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return nil }
-        let limit = 96
-        if trimmed.count <= limit { return trimmed }
-        let idx = trimmed.index(trimmed.startIndex, offsetBy: limit)
-        return String(trimmed[..<idx]) + "..."
-    }
-
 }

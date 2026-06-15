@@ -10,6 +10,7 @@ import Foundation
 // MARK: - HomeRecommendedAnimePresentationBuilder
 
 nonisolated struct HomeRecommendedAnimePresentationBuilder: Sendable {
+    private let textFormatter = MainHomeMediaTextFormatter()
 
     // MARK: - Public Methods
 
@@ -29,10 +30,20 @@ nonisolated struct HomeRecommendedAnimePresentationBuilder: Sendable {
 
             return HomeRecommendedAnimeCardItem(
                 id: recommendation.id,
-                sourceTitle: source.title.normalizedRecommendationTitle(fallback: "原作"),
+                sourceTitle: textFormatter.preferredTitle(
+                    japanese: nil,
+                    english: nil,
+                    fallback: source.title,
+                    defaultTitle: "原作"
+                ),
                 recommendedTitle: titleCache.title(for: recommended.malId) ??
-                    recommended.title.normalizedRecommendationTitle(fallback: "推薦作品"),
-                username: recommendation.user?.username.normalizedOptionalText,
+                    textFormatter.preferredTitle(
+                        japanese: nil,
+                        english: nil,
+                        fallback: recommended.title,
+                        defaultTitle: "推薦作品"
+                    ),
+                username: textFormatter.normalizedText(recommendation.user?.username),
                 detailMalId: recommended.malId,
                 imageURL: imageURL
             )
@@ -79,19 +90,5 @@ nonisolated struct HomeRecommendedAnimeTitleCache: Sendable {
         }
 
         return Self(titles: updatedTitles, order: updatedOrder)
-    }
-}
-
-// MARK: - String Helpers
-
-private extension Optional where Wrapped == String {
-    nonisolated var normalizedOptionalText: String? {
-        guard case .some(let value) = self else { return nil }
-        let trimmedValue = value.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmedValue.isEmpty ? nil : trimmedValue
-    }
-
-    nonisolated func normalizedRecommendationTitle(fallback: String) -> String {
-        normalizedOptionalText ?? fallback
     }
 }
