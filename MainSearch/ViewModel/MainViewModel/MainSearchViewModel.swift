@@ -237,7 +237,7 @@ private extension MainSearchViewModel {
         loadMoreTask?.cancel()
         let nextPage = pagination.nextPage
 
-        loadMoreTask = Task { @MainActor [weak self] in
+        loadMoreTask = Task(priority: .userInitiated) { @MainActor [weak self] in
             guard let self else { return }
 
             do {

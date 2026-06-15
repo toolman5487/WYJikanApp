@@ -128,7 +128,7 @@ nonisolated final class MainNewsService: MainNewsServicing {
     ) async throws -> [SourceFetchResult] {
         try await withThrowingTaskGroup(of: SourceFetchResult.self) { group in
             for source in sources {
-                group.addTask { [self] in
+                group.addTask(priority: .utility) { [self] in
                     do {
                         let articles = try await fetchArticles(
                             from: source,

@@ -69,7 +69,7 @@ struct MainSearchSearchPublisherFactory {
 
         return Deferred {
             let subject = PassthroughSubject<MainSearchSearchOutput, Never>()
-            let task = Task { @MainActor in
+            let task = Task(priority: .userInitiated) { @MainActor in
                 do {
                     let page = try await service.searchPage(
                         kind: intent.kind,

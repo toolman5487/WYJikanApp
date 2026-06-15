@@ -44,7 +44,7 @@ final class DetailCopyableTextViewModel: ObservableObject {
         dismissFeedbackTask?.cancel()
         showsCopiedFeedback = true
 
-        dismissFeedbackTask = Task {
+        dismissFeedbackTask = Task(priority: .low) {
             try? await Task.sleep(for: FeedbackTiming.displayDuration)
             guard !Task.isCancelled else { return }
             await MainActor.run {

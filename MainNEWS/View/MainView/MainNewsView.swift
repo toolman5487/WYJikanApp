@@ -57,7 +57,7 @@ struct MainNewsView: View {
                     reloadButton
                 }
             }
-            .task {
+            .task(priority: .userInitiated) {
                 await viewModel.loadIfNeeded()
             }
             .onDisappear {
@@ -124,7 +124,7 @@ struct MainNewsView: View {
 
     private func startReload() {
         reloadTask?.cancel()
-        reloadTask = Task {
+        reloadTask = Task(priority: .userInitiated) {
             await viewModel.reload()
         }
     }

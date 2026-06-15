@@ -130,7 +130,7 @@ private struct ImagePreviewSideStepButton: View {
         isWiggling = true
         action()
 
-        wiggleTask = Task {
+        wiggleTask = Task(priority: .low) {
             try? await Task.sleep(for: .milliseconds(700))
             guard !Task.isCancelled else { return }
             await MainActor.run {
