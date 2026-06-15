@@ -266,24 +266,36 @@ private actor JikanAPIResponseCache {
 // MARK: - JikanAPIInFlightRequestStore
 
 private actor JikanAPIInFlightRequestStore {
-    private var tasks: [String: Task<Data, Error>] = [:]
+    private struct Entry {
+        let id: UUID
+        let task: Task<Data, Error>
+        let priority: TaskPriority
+    }
+
+    private var entries: [String: Entry] = [:]
 
     func task(
         for key: String,
+        priority: TaskPriority,
         create: @escaping @Sendable () -> Task<Data, Error>
-    ) -> (task: Task<Data, Error>, isNew: Bool) {
-        switch tasks[key] {
-        case .some(let existingTask):
-            return (existingTask, false)
-        case .none:
-            let task = create()
-            tasks[key] = task
-            return (task, true)
+    ) -> (id: UUID, task: Task<Data, Error>, isNew: Bool) {
+        if let existingEntry = entries[key],
+           existingEntry.priority >= priority {
+            return (existingEntry.id, existingEntry.task, false)
         }
+
+        let entry = Entry(
+            id: UUID(),
+            task: create(),
+            priority: priority
+        )
+        entries[key] = entry
+        return (entry.id, entry.task, true)
     }
 
-    func removeTask(for key: String) {
-        tasks.removeValue(forKey: key)
+    func removeTask(for key: String, id: UUID) {
+        guard entries[key]?.id == id else { return }
+        entries.removeValue(forKey: key)
     }
 }
 
@@ -578,8 +590,9 @@ nonisolated final class JikanAPIService: @unchecked Sendable {
     // MARK: - In-Flight Requests
 
     private func sharedDataTask(for urlRequest: URLRequest, key: String) async throws -> Data {
-        let taskState = await inFlightRequestStore.task(for: key) {
-            Task {
+        let priority = Task.currentPriority
+        let taskState = await inFlightRequestStore.task(for: key, priority: priority) {
+            Task(priority: priority) {
                 try await self.execute(urlRequest)
             }
         }
@@ -592,17 +605,25 @@ nonisolated final class JikanAPIService: @unchecked Sendable {
 
         do {
             let data = try await taskState.task.value
-            await removeSharedDataTaskIfNeeded(isNew: taskState.isNew, key: key)
+            await removeSharedDataTaskIfNeeded(
+                isNew: taskState.isNew,
+                key: key,
+                id: taskState.id
+            )
             return data
         } catch {
-            await removeSharedDataTaskIfNeeded(isNew: taskState.isNew, key: key)
+            await removeSharedDataTaskIfNeeded(
+                isNew: taskState.isNew,
+                key: key,
+                id: taskState.id
+            )
             throw error
         }
     }
 
-    private func removeSharedDataTaskIfNeeded(isNew: Bool, key: String) async {
+    private func removeSharedDataTaskIfNeeded(isNew: Bool, key: String, id: UUID) async {
         guard isNew else { return }
-        await inFlightRequestStore.removeTask(for: key)
+        await inFlightRequestStore.removeTask(for: key, id: id)
     }
 
     // MARK: - Public API

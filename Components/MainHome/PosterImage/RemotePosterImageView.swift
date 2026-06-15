@@ -91,6 +91,11 @@ struct RemotePosterImageView: View {
     // MARK: - Private Methods
 
     private func setDidFail(_ value: Bool) {
+        guard !Thread.isMainThread else {
+            didFail = value
+            return
+        }
+
         Task { @MainActor in
             didFail = value
         }
@@ -98,6 +103,12 @@ struct RemotePosterImageView: View {
 
     private func notifyImageSizeChange(_ size: CGSize) {
         guard let onImageSizeChange else { return }
+
+        guard !Thread.isMainThread else {
+            onImageSizeChange(size)
+            return
+        }
+
         Task { @MainActor in
             onImageSizeChange(size)
         }

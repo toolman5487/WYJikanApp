@@ -347,6 +347,7 @@
 		16F5B0082FC100000000008 /* MainSearchSearchPublisherFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F5B0072FC100000000007 /* MainSearchSearchPublisherFactory.swift */; };
 		16F6A0022FC200000000002 /* AnimeDetailEpisodeRowPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F6A0012FC200000000001 /* AnimeDetailEpisodeRowPresenter.swift */; };
 		16F6A0042FC200000000004 /* MainCategoryGenreBatchLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F6A0032FC200000000003 /* MainCategoryGenreBatchLoader.swift */; };
+		16F6A0062FC200000000006 /* MainCategoryParentChromeStateObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F6A0052FC200000000005 /* MainCategoryParentChromeStateObserver.swift */; };
 		16F700022FDB000000000002 /* PaginatedListState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F700012FDB000000000001 /* PaginatedListState.swift */; };
 		16F800022FDB100000000002 /* RandomPickHeroItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F800012FDB100000000001 /* RandomPickHeroItem.swift */; };
 		16F800042FDB100000000004 /* RandomPickHeroCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F800032FDB100000000003 /* RandomPickHeroCardView.swift */; };
@@ -730,6 +731,7 @@
 		16F5B0072FC100000000007 /* MainSearchSearchPublisherFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSearchSearchPublisherFactory.swift; sourceTree = "<group>"; };
 		16F6A0012FC200000000001 /* AnimeDetailEpisodeRowPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeDetailEpisodeRowPresenter.swift; sourceTree = "<group>"; };
 		16F6A0032FC200000000003 /* MainCategoryGenreBatchLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainCategoryGenreBatchLoader.swift; sourceTree = "<group>"; };
+		16F6A0052FC200000000005 /* MainCategoryParentChromeStateObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainCategoryParentChromeStateObserver.swift; sourceTree = "<group>"; };
 		16F700012FDB000000000001 /* PaginatedListState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaginatedListState.swift; sourceTree = "<group>"; };
 		16F800012FDB100000000001 /* RandomPickHeroItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomPickHeroItem.swift; sourceTree = "<group>"; };
 		16F800032FDB100000000003 /* RandomPickHeroCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomPickHeroCardView.swift; sourceTree = "<group>"; };
@@ -1425,10 +1427,11 @@
 		};
 		15A2955D2F8631AD0056071F /* ViewModel */ = {
 			isa = PBXGroup;
-			children = (
-				16F6A0032FC200000000003 /* MainCategoryGenreBatchLoader.swift */,
-				15A2955F2F8631D60056071F /* MainCategoryListViewModel.swift */,
-			);
+				children = (
+					16F6A0032FC200000000003 /* MainCategoryGenreBatchLoader.swift */,
+					16F6A0052FC200000000005 /* MainCategoryParentChromeStateObserver.swift */,
+					15A2955F2F8631D60056071F /* MainCategoryListViewModel.swift */,
+				);
 			path = ViewModel;
 			sourceTree = "<group>";
 		};
@@ -3504,6 +3507,7 @@
 				15FF80262F765C9500D3241C /* AnimeDetailHeaderSectionView.swift in Sources */,
 				15A295602F8631D60056071F /* MainCategoryListViewModel.swift in Sources */,
 				16F6A0042FC200000000004 /* MainCategoryGenreBatchLoader.swift in Sources */,
+				16F6A0062FC200000000006 /* MainCategoryParentChromeStateObserver.swift in Sources */,
 				15FC4F4B2F74E52B0054153E /* BannerSkeletonView.swift in Sources */,
 				15FC4F4F2F74E6440054153E /* ShimmerView.swift in Sources */,
 				157561A72F728F8B0037E8A5 /* MainTabBarViewModel.swift in Sources */,

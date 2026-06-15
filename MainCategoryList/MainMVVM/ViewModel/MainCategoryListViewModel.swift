@@ -28,7 +28,6 @@ final class MainCategoryListViewModel: ObservableObject {
     let characterListViewModel: CharacterListViewModel
 
     @Published var selectedKind: MainListKind = .anime
-    @Published private var childUpdateToken: Int = 0
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -46,7 +45,8 @@ final class MainCategoryListViewModel: ObservableObject {
         self.characterListViewModel = characterListViewModel
 
         bindSelectedKind()
-        bindChildViewModels()
+        makeParentChromeStateCancellable()
+            .store(in: &cancellables)
     }
 
     func stopLoading() {
@@ -196,19 +196,6 @@ private extension MainCategoryListViewModel {
             .store(in: &cancellables)
     }
 
-    func bindChildViewModels() {
-        Publishers.MergeMany(
-            animeListViewModel.genreAnimeViewModel.objectWillChange.map { _ in },
-            mangaListViewModel.genreMangaViewModel.objectWillChange.map { _ in },
-            peopleListViewModel.objectWillChange.map { _ in },
-            characterListViewModel.objectWillChange.map { _ in }
-        )
-        .receive(on: RunLoop.main)
-        .sink { [weak self] _ in
-            self?.childUpdateToken += 1
-        }
-        .store(in: &cancellables)
-    }
 }
 
 // MARK: - Kind Management
