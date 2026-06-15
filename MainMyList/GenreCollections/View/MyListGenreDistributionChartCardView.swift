@@ -60,12 +60,17 @@ struct MyListGenreDistributionChartCardView: View {
     }
 
     private var chartView: some View {
-        MyListPieChartView(
-            slices: pieChartSlices,
-            totalCount: statistics.selectedAnalysis.itemCount,
-            categoryLabel: "種類",
-            colors: chartColors
-        )
+        Button {
+            selectDefaultGenre()
+        } label: {
+            MyListPieChartView(
+                slices: pieChartSlices,
+                totalCount: statistics.selectedAnalysis.itemCount,
+                categoryLabel: "種類",
+                colors: chartColors
+            )
+        }
+        .buttonStyle(.plain)
     }
 
     private var legendView: some View {
@@ -152,6 +157,11 @@ struct MyListGenreDistributionChartCardView: View {
 
     private func localizedGenreName(_ genreName: String) -> String {
         AnimeGenreLocalizationModel.localizedName(for: genreName)
+    }
+
+    private func selectDefaultGenre() {
+        guard let topGenreSlice = statistics.selectedAnalysis.topGenreSlice else { return }
+        onSelectGenre(topGenreSlice.genreName)
     }
 
     private func percentageText(

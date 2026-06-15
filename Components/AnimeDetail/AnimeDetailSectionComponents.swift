@@ -9,18 +9,38 @@ import SwiftUI
 
 struct AnimeDetailSectionCard<Content: View>: View {
     let title: String
+    private let titleAccessory: AnyView?
     private let content: Content
 
     init(_ title: String, @ViewBuilder content: () -> Content) {
         self.title = title
+        self.titleAccessory = nil
+        self.content = content()
+    }
+
+    init<TitleAccessory: View>(
+        _ title: String,
+        @ViewBuilder titleAccessory: () -> TitleAccessory,
+        @ViewBuilder content: () -> Content
+    ) {
+        self.title = title
+        self.titleAccessory = AnyView(titleAccessory())
         self.content = content()
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(title)
-                .font(.title3)
-                .foregroundStyle(ThemeColor.sakura)
+            HStack(alignment: .center, spacing: 8) {
+                Text(title)
+                    .font(.title3)
+                    .foregroundStyle(ThemeColor.sakura)
+
+                if let titleAccessory {
+                    Spacer(minLength: 8)
+                    titleAccessory
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
 
             content
         }
