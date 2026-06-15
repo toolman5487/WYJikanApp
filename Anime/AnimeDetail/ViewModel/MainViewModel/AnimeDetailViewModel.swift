@@ -34,18 +34,21 @@ final class AnimeDetailViewModel: ObservableObject {
     private let service: AnimeDetailServicing
     private let favoriteRepository: any FavoriteRepository
     private let broadcastReminderRepository: any AnimeBroadcastReminderRepository
+    private let watchProgressController: AnimeWatchProgressController
     private var myListCancellable: AnyCancellable?
 
     init(
         malId: Int,
         service: AnimeDetailServicing,
         favoriteRepository: any FavoriteRepository,
-        broadcastReminderRepository: any AnimeBroadcastReminderRepository
+        broadcastReminderRepository: any AnimeBroadcastReminderRepository,
+        watchProgressController: AnimeWatchProgressController = AnimeWatchProgressController()
     ) {
         self.malId = malId
         self.service = service
         self.favoriteRepository = favoriteRepository
         self.broadcastReminderRepository = broadcastReminderRepository
+        self.watchProgressController = watchProgressController
         connectToMyList()
     }
 
@@ -253,33 +256,20 @@ final class AnimeDetailViewModel: ObservableObject {
         for item: MyListCollectionItem,
         anime: AnimeDetailDTO
     ) -> AnimeWatchProgressEditorDraft {
-        AnimeWatchProgressEditorDraft(
-            item: item,
-            totalEpisodes: totalEpisodes(for: anime)
-        )
+        watchProgressController.editorDraft(for: item, anime: anime)
     }
 
     func incrementWatchProgress(
         for item: MyListCollectionItem,
         anime: AnimeDetailDTO
     ) {
-        let resolvedTotalEpisodes = totalEpisodes(for: anime)
-        let nextEpisode = min(
-            (item.currentEpisode ?? 0) + 1,
-            resolvedTotalEpisodes ?? Int.max
-        )
-        let nextStatus: AnimeWatchStatus
-        if let resolvedTotalEpisodes, nextEpisode >= resolvedTotalEpisodes {
-            nextStatus = .completed
-        } else {
-            nextStatus = .watching
-        }
+        let update = watchProgressController.incrementUpdate(for: item, anime: anime)
 
         updateWatchProgress(
             for: item,
-            status: nextStatus,
-            currentEpisode: nextEpisode,
-            totalEpisodes: resolvedTotalEpisodes
+            status: update.status,
+            currentEpisode: update.currentEpisode,
+            totalEpisodes: update.totalEpisodes
         )
     }
 
@@ -287,21 +277,14 @@ final class AnimeDetailViewModel: ObservableObject {
         for item: MyListCollectionItem,
         anime: AnimeDetailDTO
     ) {
-        let resolvedTotalEpisodes = totalEpisodes(for: anime)
-        let nextEpisode = max((item.currentEpisode ?? 0) - 1, 0)
-        let nextStatus: AnimeWatchStatus = nextEpisode > 0 ? .watching : .planned
+        let update = watchProgressController.decrementUpdate(for: item, anime: anime)
 
         updateWatchProgress(
             for: item,
-            status: nextStatus,
-            currentEpisode: nextEpisode,
-            totalEpisodes: resolvedTotalEpisodes
+            status: update.status,
+            currentEpisode: update.currentEpisode,
+            totalEpisodes: update.totalEpisodes
         )
-    }
-
-    private func totalEpisodes(for anime: AnimeDetailDTO) -> Int? {
-        guard let episodes = anime.episodes, episodes > 0 else { return nil }
-        return episodes
     }
 
     // MARK: - Broadcast Reminder

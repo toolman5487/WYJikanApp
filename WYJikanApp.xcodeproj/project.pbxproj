@@ -330,6 +330,8 @@
 		16F4A0042FC000000000003 /* AnimeDetailImagePreviewBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F4A0032FC000000000003 /* AnimeDetailImagePreviewBuilder.swift */; };
 		16F4A0062FC000000000005 /* MangaDetailSectionBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F4A0052FC000000000005 /* MangaDetailSectionBuilder.swift */; };
 		16F4A0082FC000000000007 /* MangaDetailImagePreviewBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F4A0072FC000000000007 /* MangaDetailImagePreviewBuilder.swift */; };
+		16FD00022FF2000000000002 /* AnimeWatchProgressController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FD00012FF2000000000001 /* AnimeWatchProgressController.swift */; };
+		16FD00042FF2000000000004 /* MangaReadingProgressController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FD00032FF2000000000003 /* MangaReadingProgressController.swift */; };
 		16F4B0112FDA810000000001 /* MangaDetailBasicInfoSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F4B0012FDA810000000001 /* MangaDetailBasicInfoSectionView.swift */; };
 		16F4B0122FDA810000000002 /* MangaDetailCharactersSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F4B0022FDA810000000002 /* MangaDetailCharactersSectionView.swift */; };
 		16F4B0132FDA810000000003 /* MangaDetailCharactersListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F4B0032FDA810000000003 /* MangaDetailCharactersListView.swift */; };
@@ -731,6 +733,8 @@
 		16FA00002FF0000000000001 /* AnimeWatchProgressEditorDraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeWatchProgressEditorDraft.swift; sourceTree = "<group>"; };
 		16FA00042FF0000000000004 /* AnimeWatchProgressEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeWatchProgressEditorView.swift; sourceTree = "<group>"; };
 		16FA00062FF0000000000006 /* AnimeWatchProgressSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeWatchProgressSectionView.swift; sourceTree = "<group>"; };
+		16FD00012FF2000000000001 /* AnimeWatchProgressController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeWatchProgressController.swift; sourceTree = "<group>"; };
+		16FD00032FF2000000000003 /* MangaReadingProgressController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MangaReadingProgressController.swift; sourceTree = "<group>"; };
 		16FA00102FEF000000000001 /* MainSearchHistorySectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSearchHistorySectionView.swift; sourceTree = "<group>"; };
 		16FA00122FEF000000000001 /* MainSearchHistoryChipView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSearchHistoryChipView.swift; sourceTree = "<group>"; };
 		16FA00142FEF000000000001 /* MainSearchHistoryFlowLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSearchHistoryFlowLayout.swift; sourceTree = "<group>"; };
@@ -900,6 +904,7 @@
 		1555A2402F7B988600501496 /* MainViewModel */ = {
 			isa = PBXGroup;
 			children = (
+				16FD00012FF2000000000001 /* AnimeWatchProgressController.swift */,
 				15FF296A2F763B4300D3241C /* AnimeDetailViewModel.swift */,
 			);
 			path = MainViewModel;
@@ -1127,6 +1132,7 @@
 			isa = PBXGroup;
 			children = (
 				16F4A0072FC000000000007 /* MangaDetailImagePreviewBuilder.swift */,
+				16FD00032FF2000000000003 /* MangaReadingProgressController.swift */,
 				16F4A0052FC000000000005 /* MangaDetailSectionBuilder.swift */,
 				1574ECA82F7CB30100E37AE8 /* MangaDetailViewModel.swift */,
 				15D4MD002F7C50000E37C00 /* MangaDetailViewModel+Presentation.swift */,
@@ -3118,6 +3124,7 @@
 				1574ECA92F7CB30100E37AE8 /* MangaDetailViewModel.swift in Sources */,
 				16F4A0062FC000000000005 /* MangaDetailSectionBuilder.swift in Sources */,
 				16F4A0082FC000000000007 /* MangaDetailImagePreviewBuilder.swift in Sources */,
+				16FD00042FF2000000000004 /* MangaReadingProgressController.swift in Sources */,
 				15D4MD012F7C50100E37C01 /* MangaDetailViewModel+Presentation.swift in Sources */,
 				15D4MD032F7C50300E37C03 /* MangaDetailHeaderSectionView.swift in Sources */,
 				15D4MD052F7C50500E37C05 /* MangaDetailHighlightsSectionView.swift in Sources */,
@@ -3282,6 +3289,7 @@
 				15DE55B72F723F2800B292AD /* APIConfig.swift in Sources */,
 				16F4A0022FC000000000001 /* AnimeDetailSectionBuilder.swift in Sources */,
 				16F4A0042FC000000000003 /* AnimeDetailImagePreviewBuilder.swift in Sources */,
+				16FD00022FF2000000000002 /* AnimeWatchProgressController.swift in Sources */,
 				1585971B2F7B614200B0BDA1 /* AnimeDetailViewModel+Presentation.swift in Sources */,
 				15FC4F6E2F752C250054153E /* HomeTrendingMangaView.swift in Sources */,
 				15AFDCAC2FA6512D00C707FD /* MangaCategoryDetailView.swift in Sources */,

@@ -33,16 +33,19 @@ final class MangaDetailViewModel: ObservableObject {
     private let malId: Int
     private let service: MangaDetailServicing
     private let favoriteRepository: any FavoriteRepository
+    private let readingProgressController: MangaReadingProgressController
     private var myListCancellable: AnyCancellable?
 
     init(
         malId: Int,
         service: MangaDetailServicing,
-        favoriteRepository: any FavoriteRepository
+        favoriteRepository: any FavoriteRepository,
+        readingProgressController: MangaReadingProgressController = MangaReadingProgressController()
     ) {
         self.malId = malId
         self.service = service
         self.favoriteRepository = favoriteRepository
+        self.readingProgressController = readingProgressController
         connectToMyList()
     }
 
@@ -249,33 +252,20 @@ final class MangaDetailViewModel: ObservableObject {
         for item: MyListCollectionItem,
         manga: MangaDetailDTO
     ) -> MangaReadingProgressEditorDraft {
-        MangaReadingProgressEditorDraft(
-            item: item,
-            totalChapters: totalChapters(for: manga)
-        )
+        readingProgressController.editorDraft(for: item, manga: manga)
     }
 
     func incrementReadingProgress(
         for item: MyListCollectionItem,
         manga: MangaDetailDTO
     ) {
-        let resolvedTotalChapters = totalChapters(for: manga)
-        let nextChapter = min(
-            (item.currentChapter ?? 0) + 1,
-            resolvedTotalChapters ?? Int.max
-        )
-        let nextStatus: MangaReadingStatus
-        if let resolvedTotalChapters, nextChapter >= resolvedTotalChapters {
-            nextStatus = .completed
-        } else {
-            nextStatus = .reading
-        }
+        let update = readingProgressController.incrementUpdate(for: item, manga: manga)
 
         updateReadingProgress(
             for: item,
-            status: nextStatus,
-            currentChapter: nextChapter,
-            totalChapters: resolvedTotalChapters
+            status: update.status,
+            currentChapter: update.currentChapter,
+            totalChapters: update.totalChapters
         )
     }
 
@@ -283,20 +273,13 @@ final class MangaDetailViewModel: ObservableObject {
         for item: MyListCollectionItem,
         manga: MangaDetailDTO
     ) {
-        let resolvedTotalChapters = totalChapters(for: manga)
-        let nextChapter = max((item.currentChapter ?? 0) - 1, 0)
-        let nextStatus: MangaReadingStatus = nextChapter > 0 ? .reading : .planned
+        let update = readingProgressController.decrementUpdate(for: item, manga: manga)
 
         updateReadingProgress(
             for: item,
-            status: nextStatus,
-            currentChapter: nextChapter,
-            totalChapters: resolvedTotalChapters
+            status: update.status,
+            currentChapter: update.currentChapter,
+            totalChapters: update.totalChapters
         )
-    }
-
-    private func totalChapters(for manga: MangaDetailDTO) -> Int? {
-        guard let chapters = manga.chapters, chapters > 0 else { return nil }
-        return chapters
     }
 }
