@@ -7,6 +7,8 @@
 
 import Foundation
 
+// MARK: - MainHomeServicing
+
 nonisolated protocol MainHomeServicing: Sendable {
     func fetchHeroBanner(forceRefresh: Bool) async throws -> HeroBannerResponse
     func fetchTopAnime(limit: Int, forceRefresh: Bool) async throws -> HomeTrendingAnimeResponse
@@ -15,6 +17,8 @@ nonisolated protocol MainHomeServicing: Sendable {
     func fetchRecommendedAnime(limit: Int, forceRefresh: Bool) async throws -> HomeRecommendedAnimeResponse
     func fetchAnimeDetail(malId: Int, forceRefresh: Bool) async throws -> AnimeDetailResponse
 }
+
+// MARK: - MainHomeServicing Default Implementation
 
 nonisolated extension MainHomeServicing {
     func fetchHeroBanner() async throws -> HeroBannerResponse {
@@ -42,13 +46,21 @@ nonisolated extension MainHomeServicing {
     }
 }
 
+// MARK: - MainHomeService
+
 nonisolated final class MainHomeService: MainHomeServicing {
 
+    // MARK: - Properties
+
     private let apiService: JikanAPIServicing
+
+    // MARK: - Lifecycle
 
     init(apiService: JikanAPIServicing = JikanAPIService.shared) {
         self.apiService = apiService
     }
+
+    // MARK: - Public Methods
 
     func fetchHeroBanner(forceRefresh: Bool) async throws -> HeroBannerResponse {
         try await apiService.fetch(
@@ -66,7 +78,7 @@ nonisolated final class MainHomeService: MainHomeServicing {
             ]
         )
     }
-    
+
     func fetchTopManga(limit: Int, forceRefresh: Bool) async throws -> HomeTrendingMangaResponse {
         try await apiService.fetch(
             endpoint: APIConfig.Top.manga,
@@ -105,5 +117,4 @@ nonisolated final class MainHomeService: MainHomeServicing {
             cachePolicy: .detail(forceRefresh: forceRefresh)
         )
     }
-
 }

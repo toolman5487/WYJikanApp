@@ -7,6 +7,8 @@
 
 import Foundation
 
+// MARK: - HomeTrendingAnimeListSort
+
 nonisolated enum HomeTrendingAnimeListSort: String, CaseIterable, Identifiable, Sendable {
     case apiDefault
     case rank
@@ -33,6 +35,8 @@ nonisolated enum HomeTrendingAnimeListSort: String, CaseIterable, Identifiable, 
         }
     }
 }
+
+// MARK: - API Models
 
 nonisolated struct HomeTrendingAnimeListResponse: Codable, Sendable {
     let pagination: HomeTrendingAnimeListPaginationDTO?
@@ -64,6 +68,8 @@ nonisolated struct HomeTrendingAnimeListDTO: Codable, Identifiable, Hashable, Se
 
     var id: Int { malId }
 }
+
+// MARK: - Presentation Models
 
 nonisolated struct HomeTrendingAnimeListItem: Identifiable, Hashable, Sendable {
     let id: Int

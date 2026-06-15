@@ -7,6 +7,8 @@
 
 import Foundation
 
+// MARK: - HomeTodayAnimeScheduleListServicing
+
 nonisolated protocol HomeTodayAnimeScheduleListServicing: Sendable {
     func fetchSchedulePage(
         day: HomeScheduleDay,
@@ -15,12 +17,21 @@ nonisolated protocol HomeTodayAnimeScheduleListServicing: Sendable {
     ) async throws -> HomeTodayAnimeResponse
 }
 
+// MARK: - HomeTodayAnimeScheduleListService
+
 nonisolated final class HomeTodayAnimeScheduleListService: HomeTodayAnimeScheduleListServicing {
+
+    // MARK: - Properties
+
     private let apiService: JikanAPIServicing
+
+    // MARK: - Lifecycle
 
     init(apiService: JikanAPIServicing = JikanAPIService.shared) {
         self.apiService = apiService
     }
+
+    // MARK: - Public Methods
 
     func fetchSchedulePage(
         day: HomeScheduleDay,

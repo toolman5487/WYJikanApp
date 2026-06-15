@@ -9,6 +9,7 @@ import Foundation
 
 // MARK: - Presentation
 
+
 nonisolated struct BannerItem: Identifiable, Hashable, Sendable {
     let id: Int
     let title: String

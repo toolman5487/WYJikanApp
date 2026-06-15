@@ -8,7 +8,12 @@
 import SwiftUI
 import SDWebImageSwiftUI
 
+// MARK: - RemotePosterImageView
+
 struct RemotePosterImageView: View {
+
+    // MARK: - Properties
+
     let url: URL
     let contentMode: ContentMode
     let fixedSize: CGSize?
@@ -16,6 +21,8 @@ struct RemotePosterImageView: View {
 
     @Environment(\.displayScale) private var displayScale
     @State private var didFail = false
+
+    // MARK: - Lifecycle
 
     init(
         url: URL,
@@ -28,6 +35,8 @@ struct RemotePosterImageView: View {
         self.fixedSize = fixedSize
         self.onImageSizeChange = onImageSizeChange
     }
+
+    // MARK: - Body
 
     var body: some View {
         WebImage(
@@ -48,11 +57,7 @@ struct RemotePosterImageView: View {
         }
         .overlay {
             if didFail {
-                Color(.systemBackground)
-                    .overlay {
-                        Image(systemName: "photo")
-                            .imageScale(.large)
-                    }
+                failurePlaceholder
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -61,6 +66,29 @@ struct RemotePosterImageView: View {
             setDidFail(false)
         }
     }
+
+    // MARK: - Private Views
+
+    private var failurePlaceholder: some View {
+        Color(.systemBackground)
+            .overlay {
+                Image(systemName: "photo")
+                    .imageScale(.large)
+            }
+    }
+
+    private func configuredImage(_ image: Image) -> some View {
+        image
+            .resizable()
+            .aspectRatio(contentMode: contentMode)
+            .frame(
+                width: fixedSize?.width,
+                height: fixedSize?.height
+            )
+            .clipped()
+    }
+
+    // MARK: - Private Methods
 
     private func setDidFail(_ value: Bool) {
         Task { @MainActor in
@@ -74,6 +102,8 @@ struct RemotePosterImageView: View {
             onImageSizeChange(size)
         }
     }
+
+    // MARK: - SDWebImage Configuration
 
     private var imageOptions: SDWebImageOptions {
         [.retryFailed, .scaleDownLargeImages]
@@ -92,16 +122,5 @@ struct RemotePosterImageView: View {
 
     private var usesWebPImage: Bool {
         url.pathExtension.localizedCaseInsensitiveCompare("webp") == .orderedSame
-    }
-
-    private func configuredImage(_ image: Image) -> some View {
-        image
-            .resizable()
-            .aspectRatio(contentMode: contentMode)
-            .frame(
-                width: fixedSize?.width,
-                height: fixedSize?.height
-            )
-            .clipped()
     }
 }

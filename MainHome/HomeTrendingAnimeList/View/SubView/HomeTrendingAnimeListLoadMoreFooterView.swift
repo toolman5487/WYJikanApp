@@ -7,12 +7,18 @@
 
 import SwiftUI
 
+// MARK: - HomeTrendingAnimeListLoadMoreFooterView
+
 struct HomeTrendingAnimeListLoadMoreFooterView: View {
+
+    // MARK: - Properties
 
     let state: HomeTrendingAnimeListViewModel.LoadMoreState
     var progress: CGFloat = 0
     let onLoadMore: () -> Void
     let onRetry: () -> Void
+
+    // MARK: - Body
 
     var body: some View {
         PaginationLoadMoreFooterView(

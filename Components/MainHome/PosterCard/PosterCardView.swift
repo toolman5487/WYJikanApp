@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+// MARK: - MainHomePosterCardMetrics
+
 enum MainHomePosterCardMetrics {
     static let width: CGFloat = 160
     static let height: CGFloat = 240
@@ -17,11 +19,18 @@ enum MainHomePosterCardMetrics {
     }
 }
 
+// MARK: - PosterCardView
+
 struct PosterCardView<ImageContent: View>: View {
+
+    // MARK: - Properties
+
     private static var rankPadding: CGFloat { 6 }
 
     let rank: Int?
     private let imageContent: ImageContent
+
+    // MARK: - Lifecycle
 
     init(
         rank: Int? = nil,
@@ -30,6 +39,8 @@ struct PosterCardView<ImageContent: View>: View {
         self.rank = rank
         self.imageContent = imageContent()
     }
+
+    // MARK: - Body
 
     var body: some View {
         ZStack {
@@ -50,25 +61,39 @@ struct PosterCardView<ImageContent: View>: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .overlay(alignment: .bottomLeading) {
-            if let rank {
-                Text("#\(rank)")
-                    .font(.caption.weight(.bold))
-                    .padding(8)
-                    .foregroundStyle(ThemeColor.textPrimary)
-                    .background(ThemeColor.sakuraGlassStrong)
-                    .clipShape(Capsule())
-                    .padding(Self.rankPadding)
-            }
+            rankBadge
         }
         .compositingGroup()
         .clipShape(RoundedRectangle(cornerRadius: MainHomePosterCardMetrics.cornerRadius, style: .continuous))
     }
+
+    // MARK: - Private Views
+
+    @ViewBuilder
+    private var rankBadge: some View {
+        if let rank {
+            Text("#\(rank)")
+                .font(.caption.weight(.bold))
+                .padding(8)
+                .foregroundStyle(ThemeColor.textPrimary)
+                .background(ThemeColor.sakuraGlassStrong)
+                .clipShape(Capsule())
+                .padding(Self.rankPadding)
+        }
+    }
 }
 
+// MARK: - PosterCardMetadataOverlayView
+
 struct PosterCardMetadataOverlayView: View {
+
+    // MARK: - Properties
+
     let title: String
     let type: String?
     let score: Double?
+
+    // MARK: - Body
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -91,6 +116,8 @@ struct PosterCardMetadataOverlayView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(12)
     }
+
+    // MARK: - Private Methods
 
     private func chip(text: String) -> some View {
         Text(text)

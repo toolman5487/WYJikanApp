@@ -10,8 +10,13 @@ import Foundation
 import OSLog
 import UserNotifications
 
+// MARK: - HomeTodayAnimeNotificationScheduler
+
 @MainActor
 final class HomeTodayAnimeNotificationScheduler: BaseUserNotificationManager {
+
+    // MARK: - Properties
+
     private let reminderFactory: HomeTodayAnimeBroadcastReminderFactory
     private let requestFactory: HomeTodayAnimeNotificationRequestFactory
     private let subscriptionProvider: () -> [AnimeBroadcastReminderSnapshot]
@@ -23,6 +28,8 @@ final class HomeTodayAnimeNotificationScheduler: BaseUserNotificationManager {
     private var lastRefreshAttemptDate: Date? {
         userDefaults.object(forKey: HomeTodayAnimeNotificationConfig.lastRefreshAttemptDateKey) as? Date
     }
+
+    // MARK: - Lifecycle
 
     init(
         subscriptionProvider: @escaping @MainActor () -> [AnimeBroadcastReminderSnapshot] = { [] },
@@ -43,6 +50,8 @@ final class HomeTodayAnimeNotificationScheduler: BaseUserNotificationManager {
             userDefaults: userDefaults
         )
     }
+
+    // MARK: - Public Methods
 
     func refreshAuthorizationStatus() async {
         guard await refreshAuthorizationState() == .denied else { return }
@@ -110,6 +119,8 @@ final class HomeTodayAnimeNotificationScheduler: BaseUserNotificationManager {
         setState(.disabled)
         clearLastRefreshDate()
     }
+
+    // MARK: - Private Methods
 
     private func scheduleBroadcastReminderNotifications() async throws -> Int {
         let subscriptions = subscriptionProvider()

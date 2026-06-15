@@ -10,8 +10,13 @@ import Foundation
 
 typealias HeroBannerScreenState = LoadableContentState<[BannerItem]>
 
+// MARK: - HeroBannerViewModel
+
 @MainActor
 final class HeroBannerViewModel: ObservableObject {
+
+    // MARK: - Properties
+
     let emptyStateMessage: String
     private static let maxBannerItems = 15
     private static let autoScrollNanoseconds: UInt64 = 4_000_000_000
@@ -22,6 +27,8 @@ final class HeroBannerViewModel: ObservableObject {
     private let service: MainHomeServicing
     private let sectionLoader = HomeFeedSectionLoader()
     private var autoScrollTask: Task<Void, Never>?
+
+    // MARK: - Lifecycle
 
     init(
         service: MainHomeServicing,
@@ -35,6 +42,24 @@ final class HeroBannerViewModel: ObservableObject {
         sectionLoader.cancel()
         autoScrollTask?.cancel()
     }
+
+    // MARK: - Derived State
+
+    var currentItem: BannerItem? {
+        guard items.indices.contains(currentIndex) else { return nil }
+        return items[currentIndex]
+    }
+
+    var pageLabel: String {
+        guard !items.isEmpty else { return "" }
+        return "\(currentIndex + 1) / \(items.count)"
+    }
+
+    var items: [BannerItem] {
+        screenState.items
+    }
+
+    // MARK: - Public Methods
 
     func loadIfNeeded() {
         sectionLoader.loadIfNeeded(isContentEmpty: items.isEmpty) {
@@ -62,20 +87,6 @@ final class HeroBannerViewModel: ObservableObject {
         startAutoScrollIfNeeded()
     }
 
-    var currentItem: BannerItem? {
-        guard items.indices.contains(currentIndex) else { return nil }
-        return items[currentIndex]
-    }
-
-    var pageLabel: String {
-        guard !items.isEmpty else { return "" }
-        return "\(currentIndex + 1) / \(items.count)"
-    }
-
-    var items: [BannerItem] {
-        screenState.items
-    }
-
     func load() {
         sectionLoader.load { [weak self] forceRefresh, showsLoadingState in
             await self?.performLoad(forceRefresh: forceRefresh, showsLoadingState: showsLoadingState)
@@ -101,6 +112,8 @@ final class HeroBannerViewModel: ObservableObject {
         autoScrollTask?.cancel()
         autoScrollTask = nil
     }
+
+    // MARK: - Private Methods
 
     private func performLoad(forceRefresh: Bool, showsLoadingState: Bool) async {
         let previousState = screenState

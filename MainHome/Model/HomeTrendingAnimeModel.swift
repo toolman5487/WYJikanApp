@@ -9,6 +9,7 @@ import Foundation
 
 // MARK: - Response (Jikan /top/anime)
 
+
 nonisolated struct HomeTrendingAnimeResponse: Codable, Sendable {
     let data: [HomeTrendingAnimeDTO]
 }

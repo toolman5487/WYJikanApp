@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+// MARK: - HomeTrendingMangaView
+
 struct HomeTrendingMangaView: View {
 
     // MARK: - Properties

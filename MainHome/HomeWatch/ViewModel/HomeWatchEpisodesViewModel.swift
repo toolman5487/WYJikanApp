@@ -8,14 +8,21 @@
 import Combine
 import Foundation
 
+// MARK: - HomeWatchEpisodesViewModel
+
 @MainActor
 final class HomeWatchEpisodesViewModel: ObservableObject {
+
+    // MARK: - Properties
+
     private static let maxCards = 10
 
     @Published private(set) var screenState: HomeWatchSectionState<HomeWatchEpisodeItem> = .loading
 
     private let service: HomeWatchServicing
     private let sectionLoader = HomeFeedSectionLoader()
+
+    // MARK: - Lifecycle
 
     init(service: HomeWatchServicing) {
         self.service = service
@@ -25,9 +32,13 @@ final class HomeWatchEpisodesViewModel: ObservableObject {
         sectionLoader.cancel()
     }
 
+    // MARK: - Derived State
+
     var items: [HomeWatchEpisodeItem] {
         screenState.items
     }
+
+    // MARK: - Public Methods
 
     func loadIfNeeded() {
         sectionLoader.loadIfNeeded(isContentEmpty: items.isEmpty) {
@@ -46,6 +57,8 @@ final class HomeWatchEpisodesViewModel: ObservableObject {
             await self?.performLoad(forceRefresh: forceRefresh, showsLoadingState: showsLoadingState)
         }
     }
+
+    // MARK: - Private Methods
 
     private func performLoad(forceRefresh: Bool, showsLoadingState: Bool) async {
         let previousState = screenState

@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+// MARK: - HomeWatchListView
+
 struct HomeWatchListView: View {
 
     // MARK: - Properties

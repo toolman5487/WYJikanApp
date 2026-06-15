@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+// MARK: - HomeTodayAnimeScheduleListSectionHeaderView
+
 struct HomeTodayAnimeScheduleListSectionHeaderView: View {
 
     // MARK: - Properties

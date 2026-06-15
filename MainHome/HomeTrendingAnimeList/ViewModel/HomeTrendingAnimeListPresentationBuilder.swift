@@ -7,7 +7,12 @@
 
 import Foundation
 
+// MARK: - HomeTrendingAnimeListPresentationBuilder
+
 struct HomeTrendingAnimeListPresentationBuilder {
+
+    // MARK: - Public Methods
+
     func headerContent(
         sort: HomeTrendingAnimeListSort,
         loadedCount: Int
@@ -84,6 +89,8 @@ struct HomeTrendingAnimeListPresentationBuilder {
         )
     }
 }
+
+// MARK: - Private Methods
 
 private extension HomeTrendingAnimeListPresentationBuilder {
     func headerTitle(for sort: HomeTrendingAnimeListSort) -> String {
@@ -270,6 +277,8 @@ private extension HomeTrendingAnimeListPresentationBuilder {
         let range: Range<Int>
     }
 }
+
+// MARK: - Array Extension
 
 private extension Array {
     subscript(safe range: Range<Int>) -> [Element] {

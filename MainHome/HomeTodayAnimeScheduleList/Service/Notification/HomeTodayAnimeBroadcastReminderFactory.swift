@@ -7,6 +7,8 @@
 
 import Foundation
 
+// MARK: - AnimeBroadcastReminderScheduling
+
 nonisolated enum AnimeBroadcastReminderScheduling {
     static func canSubscribe(to anime: AnimeDetailDTO) -> Bool {
         isCurrentlyAiring(anime) && canSchedule(broadcast: anime.broadcast)
@@ -90,6 +92,8 @@ nonisolated enum AnimeBroadcastReminderScheduling {
 
         return nil
     }
+
+    // MARK: - Private Methods
 
     private static func reminder(
         animeID: Int,
@@ -192,7 +196,12 @@ nonisolated enum AnimeBroadcastReminderScheduling {
     }
 }
 
+// MARK: - HomeTodayAnimeBroadcastReminderFactory
+
 struct HomeTodayAnimeBroadcastReminderFactory {
+
+    // MARK: - Public Methods
+
     func makeReminders(
         from subscriptions: [AnimeBroadcastReminderSnapshot],
         now: Date = Date()
@@ -202,6 +211,8 @@ struct HomeTodayAnimeBroadcastReminderFactory {
         }
         return deduplicatedReminders(reminders)
     }
+
+    // MARK: - Private Methods
 
     private func deduplicatedReminders(
         _ reminders: [HomeTodayAnimeBroadcastReminder]

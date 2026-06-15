@@ -10,8 +10,13 @@ import Foundation
 
 typealias HomeTodayAnimeScreenState = LoadableContentState<[HomeTodayAnimeCardItem]>
 
+// MARK: - HomeTodayAnimeViewModel
+
 @MainActor
 final class HomeTodayAnimeViewModel: ObservableObject {
+
+    // MARK: - Properties
+
     private static let maxCards = 10
     private static let scheduleFetchLimit = 25
 
@@ -19,6 +24,8 @@ final class HomeTodayAnimeViewModel: ObservableObject {
 
     private let service: MainHomeServicing
     private let sectionLoader = HomeFeedSectionLoader()
+
+    // MARK: - Lifecycle
 
     init(service: MainHomeServicing) {
         self.service = service
@@ -28,9 +35,13 @@ final class HomeTodayAnimeViewModel: ObservableObject {
         sectionLoader.cancel()
     }
 
+    // MARK: - Derived State
+
     var items: [HomeTodayAnimeCardItem] {
         screenState.items
     }
+
+    // MARK: - Public Methods
 
     func loadIfNeeded() {
         sectionLoader.loadIfNeeded(isContentEmpty: items.isEmpty) {
@@ -49,6 +60,8 @@ final class HomeTodayAnimeViewModel: ObservableObject {
             await self?.performLoad(forceRefresh: forceRefresh, showsLoadingState: showsLoadingState)
         }
     }
+
+    // MARK: - Private Methods
 
     private func performLoad(forceRefresh: Bool, showsLoadingState: Bool) async {
         let previousState = screenState

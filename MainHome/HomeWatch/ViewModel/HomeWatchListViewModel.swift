@@ -8,8 +8,13 @@
 import Combine
 import Foundation
 
+// MARK: - HomeWatchListViewModel
+
 @MainActor
 final class HomeWatchListViewModel: ObservableObject {
+
+    // MARK: - Nested Types
+
     enum ScreenState {
         case loading
         case content([HomeWatchListItem])
@@ -19,6 +24,8 @@ final class HomeWatchListViewModel: ObservableObject {
 
     typealias LoadMoreState = PaginationFooterState
 
+    // MARK: - Properties
+
     @Published private(set) var selectedFeed: HomeWatchFeedKind
     @Published private(set) var screenState: ScreenState = .loading
     @Published private(set) var loadMoreState: LoadMoreState = .hidden
@@ -27,6 +34,8 @@ final class HomeWatchListViewModel: ObservableObject {
     private let pageSize = 12
     private let paginationController = PaginatedListLoadingController<HomeWatchListItem>()
     private var feedChangeTask: Task<Void, Never>?
+
+    // MARK: - Lifecycle
 
     init(
         initialFeed: HomeWatchFeedKind = .latestEpisodes,
@@ -39,6 +48,8 @@ final class HomeWatchListViewModel: ObservableObject {
     deinit {
         feedChangeTask?.cancel()
     }
+
+    // MARK: - Derived State
 
     var headerContent: HomeWatchListHeaderContent {
         HomeWatchListHeaderContent(
@@ -56,6 +67,8 @@ final class HomeWatchListViewModel: ObservableObject {
             )
         }
     }
+
+    // MARK: - Public Methods
 
     func loadIfNeeded() async {
         await paginationController.loadIfNeeded(
@@ -93,6 +106,8 @@ final class HomeWatchListViewModel: ObservableObject {
             await self.fetchFirstPage(showSkeleton: true, forceRefresh: false)
         }
     }
+
+    // MARK: - Private Methods
 
     private func fetchFirstPage(showSkeleton: Bool, forceRefresh: Bool) async {
         await paginationController.reload(

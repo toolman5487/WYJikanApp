@@ -8,8 +8,13 @@
 import Combine
 import Foundation
 
+// MARK: - HomeTrendingMangaListViewModel
+
 @MainActor
 final class HomeTrendingMangaListViewModel: ObservableObject {
+
+    // MARK: - Nested Types
+
     enum ScreenState {
         case loading
         case content(items: [MangaCategoryItemDTO])
@@ -18,6 +23,8 @@ final class HomeTrendingMangaListViewModel: ObservableObject {
     }
 
     typealias LoadMoreState = PaginationFooterState
+
+    // MARK: - Properties
 
     @Published var selectedSort: HomeTrendingMangaListSort = .apiDefault
     @Published var selectedFormat: HomeTrendingMangaListFormat = .all
@@ -31,6 +38,8 @@ final class HomeTrendingMangaListViewModel: ObservableObject {
     private let paginationController = PaginatedListLoadingController<MangaCategoryItemDTO>()
     private var cancellables: Set<AnyCancellable> = []
 
+    // MARK: - Lifecycle
+
     init(
         service: HomeTrendingMangaListServicing,
         presentationBuilder: HomeTrendingMangaListPresentationBuilder = HomeTrendingMangaListPresentationBuilder()
@@ -39,6 +48,8 @@ final class HomeTrendingMangaListViewModel: ObservableObject {
         self.presentationBuilder = presentationBuilder
         bindPresentation()
     }
+
+    // MARK: - Derived State
 
     var headerTitle: String {
         presentationBuilder.headerTitle(sort: selectedSort, format: selectedFormat)
@@ -51,6 +62,8 @@ final class HomeTrendingMangaListViewModel: ObservableObject {
     var loadedCountText: String {
         "已載入 \(paginationController.items.count) 部"
     }
+
+    // MARK: - Public Methods
 
     func loadIfNeeded() async {
         await paginationController.loadIfNeeded(
@@ -78,6 +91,8 @@ final class HomeTrendingMangaListViewModel: ObservableObject {
         guard shouldLoadMore(after: item) else { return }
         await loadMorePage()
     }
+
+    // MARK: - Private Methods
 
     private func bindPresentation() {
         Publishers.CombineLatest(

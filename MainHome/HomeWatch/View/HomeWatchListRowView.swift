@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+// MARK: - HomeWatchListRowView
+
 struct HomeWatchListRowView: View {
 
     // MARK: - Properties

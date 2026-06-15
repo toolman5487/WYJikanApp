@@ -7,16 +7,27 @@
 
 import Foundation
 
+// MARK: - HomeTrendingMangaListServicing
+
 nonisolated protocol HomeTrendingMangaListServicing: Sendable {
     func fetchPage(page: Int, limit: Int) async throws -> MangaCategoryPage
 }
 
+// MARK: - HomeTrendingMangaListService
+
 nonisolated final class HomeTrendingMangaListService: HomeTrendingMangaListServicing {
+
+    // MARK: - Properties
+
     private let apiService: JikanAPIServicing
+
+    // MARK: - Lifecycle
 
     init(apiService: JikanAPIServicing = JikanAPIService.shared) {
         self.apiService = apiService
     }
+
+    // MARK: - Public Methods
 
     func fetchPage(page: Int, limit: Int) async throws -> MangaCategoryPage {
         let response: MangaCategoryResponse = try await apiService.fetch(

@@ -10,14 +10,21 @@ import Foundation
 
 typealias HomeTrendingAnimeScreenState = LoadableContentState<[HomeTrendingAnimeCardItem]>
 
+// MARK: - HomeTrendingAnimeViewModel
+
 @MainActor
 final class HomeTrendingAnimeViewModel: ObservableObject {
+
+    // MARK: - Properties
+
     private static let maxCards = 10
 
     @Published private(set) var screenState: HomeTrendingAnimeScreenState = .loading
 
     private let service: MainHomeServicing
     private let sectionLoader = HomeFeedSectionLoader()
+
+    // MARK: - Lifecycle
 
     init(service: MainHomeServicing) {
         self.service = service
@@ -27,9 +34,13 @@ final class HomeTrendingAnimeViewModel: ObservableObject {
         sectionLoader.cancel()
     }
 
+    // MARK: - Derived State
+
     var items: [HomeTrendingAnimeCardItem] {
         screenState.items
     }
+
+    // MARK: - Public Methods
 
     func loadIfNeeded() {
         sectionLoader.loadIfNeeded(isContentEmpty: items.isEmpty) {
@@ -48,6 +59,8 @@ final class HomeTrendingAnimeViewModel: ObservableObject {
             await self?.performLoad(forceRefresh: forceRefresh, showsLoadingState: showsLoadingState)
         }
     }
+
+    // MARK: - Private Methods
 
     private func performLoad(forceRefresh: Bool, showsLoadingState: Bool) async {
         let previousState = screenState

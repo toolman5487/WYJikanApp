@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+// MARK: - HomeWatchPromosView
+
 struct HomeWatchPromosView: View {
 
     // MARK: - Properties

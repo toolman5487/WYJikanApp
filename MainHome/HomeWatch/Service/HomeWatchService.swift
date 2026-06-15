@@ -7,6 +7,8 @@
 
 import Foundation
 
+// MARK: - HomeWatchServiceError
+
 nonisolated enum HomeWatchServiceError: LocalizedError, AppUserFacingError {
     case invalidPagination(page: Int, limit: Int)
 
@@ -25,6 +27,8 @@ nonisolated enum HomeWatchServiceError: LocalizedError, AppUserFacingError {
     }
 }
 
+// MARK: - HomeWatchServicing
+
 nonisolated protocol HomeWatchServicing: Sendable {
     func fetchLatestPromos(forceRefresh: Bool) async throws -> HomeWatchPromosResponse
     func fetchLatestEpisodes(forceRefresh: Bool) async throws -> HomeWatchEpisodesResponse
@@ -42,6 +46,8 @@ nonisolated protocol HomeWatchServicing: Sendable {
     ) async throws -> HomeWatchEpisodesResponse
 }
 
+// MARK: - HomeWatchServicing Default Implementation
+
 nonisolated extension HomeWatchServicing {
     func fetchLatestPromos() async throws -> HomeWatchPromosResponse {
         try await fetchLatestPromos(forceRefresh: false)
@@ -52,7 +58,12 @@ nonisolated extension HomeWatchServicing {
     }
 }
 
+// MARK: - HomeWatchService
+
 nonisolated final class HomeWatchService: HomeWatchServicing {
+
+    // MARK: - Constants
+
     private enum Constants {
         static let firstPage = 1
         static let latestPromosLimit = 8
@@ -61,11 +72,17 @@ nonisolated final class HomeWatchService: HomeWatchServicing {
         static let popularFeedCacheTTL: TimeInterval = 600
     }
 
+    // MARK: - Properties
+
     private let apiService: JikanAPIServicing
+
+    // MARK: - Lifecycle
 
     init(apiService: JikanAPIServicing = JikanAPIService.shared) {
         self.apiService = apiService
     }
+
+    // MARK: - Public Methods
 
     func fetchLatestPromos(forceRefresh: Bool) async throws -> HomeWatchPromosResponse {
         try await fetchPromos(
@@ -116,6 +133,8 @@ nonisolated final class HomeWatchService: HomeWatchServicing {
         )
         return response
     }
+
+    // MARK: - Private Methods
 
     private func endpoint(for feed: HomeWatchPromoFeed) -> String {
         switch feed {

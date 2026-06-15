@@ -7,7 +7,12 @@
 
 import Foundation
 
+// MARK: - HomeTrendingMangaListPresentationBuilder
+
 struct HomeTrendingMangaListPresentationBuilder {
+
+    // MARK: - Public Methods
+
     func headerTitle(
         sort: HomeTrendingMangaListSort,
         format: HomeTrendingMangaListFormat
@@ -98,6 +103,8 @@ struct HomeTrendingMangaListPresentationBuilder {
         }
     }
 }
+
+// MARK: - Private Methods
 
 private extension HomeTrendingMangaListPresentationBuilder {
     func compareOptionalAscending<T: Comparable>(

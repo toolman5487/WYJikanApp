@@ -47,6 +47,8 @@ private protocol HomeFeedInitialLoadable: AnyObject {
     func refresh() async
 }
 
+// MARK: - HomeFeedInitialLoadable Conformance
+
 extension HeroBannerViewModel: HomeFeedInitialLoadable {
     var hasFeedContent: Bool { screenState.hasContent }
 }
@@ -177,6 +179,9 @@ final class HomeFeedCoordinator {
 
 @MainActor
 final class HomeFeedSectionLoader {
+
+    // MARK: - Nested Types
+
     enum State {
         case idle
         case loading(Task<Void, Never>)
@@ -187,12 +192,16 @@ final class HomeFeedSectionLoader {
         }
     }
 
+    // MARK: - Properties
+
     private(set) var state: State = .idle
     private nonisolated(unsafe) var activeTask: Task<Void, Never>?
 
     var isLoading: Bool { state.isLoading }
 
     var task: Task<Void, Never>? { activeTask }
+
+    // MARK: - Public Methods
 
     func loadIfNeeded(isContentEmpty: Bool, load: () -> Void) {
         guard isContentEmpty, !isLoading else { return }
@@ -226,10 +235,14 @@ final class HomeFeedSectionLoader {
         return task
     }
 
+    // MARK: - State Management
+
     func markIdle() {
         activeTask = nil
         state = .idle
     }
+
+    // MARK: - Cancellation
 
     nonisolated func cancel() {
         activeTask?.cancel()

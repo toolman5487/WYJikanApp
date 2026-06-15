@@ -10,34 +10,47 @@ import Foundation
 
 typealias HomeRecommendedAnimeScreenState = LoadableContentState<[HomeRecommendedAnimeCardItem]>
 
+// MARK: - HomeRecommendedAnimeViewModel
+
 @MainActor
 final class HomeRecommendedAnimeViewModel: ObservableObject {
+
+    // MARK: - Properties
+
     private static let initialVisibleCards = 9
     private static let loadMoreStep = 9
     private static let maxCards = 30
     private static let maxTitleEnrichmentsPerPass = 3
-    private static let titleEnrichmentDelayNanoseconds: UInt64 = 1_000_000_000
     private static let titleCacheLimit = 100
-    private static var titleCache: [Int: String] = [:]
-    private static var titleCacheOrder: [Int] = []
 
     @Published private(set) var screenState: HomeRecommendedAnimeScreenState = .loading
     @Published private(set) var visibleCount: Int = 9
 
     private let service: MainHomeServicing
-    private let animeDetailService: AnimeDetailServicing
+    private let presentationBuilder: HomeRecommendedAnimePresentationBuilder
+    private let titleEnricher: HomeRecommendedAnimeTitleEnricher
     private let sectionLoader = HomeFeedSectionLoader()
+    private var titleCache = HomeRecommendedAnimeTitleCache()
     private var titleEnrichmentTask: Task<Void, Never>?
 
-    init(service: MainHomeServicing, animeDetailService: AnimeDetailServicing) {
+    // MARK: - Lifecycle
+
+    init(
+        service: MainHomeServicing,
+        animeDetailService: AnimeDetailServicing,
+        presentationBuilder: HomeRecommendedAnimePresentationBuilder = HomeRecommendedAnimePresentationBuilder()
+    ) {
         self.service = service
-        self.animeDetailService = animeDetailService
+        self.presentationBuilder = presentationBuilder
+        self.titleEnricher = HomeRecommendedAnimeTitleEnricher(service: animeDetailService)
     }
 
     deinit {
         sectionLoader.cancel()
         titleEnrichmentTask?.cancel()
     }
+
+    // MARK: - Derived State
 
     private var allItems: [HomeRecommendedAnimeCardItem] {
         screenState.items
@@ -50,6 +63,8 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
     var canLoadMore: Bool {
         visibleCount < allItems.count
     }
+
+    // MARK: - Public Methods
 
     func loadIfNeeded() {
         sectionLoader.loadIfNeeded(isContentEmpty: allItems.isEmpty) {
@@ -76,6 +91,8 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
         startTitleEnrichmentIfNeeded()
     }
 
+    // MARK: - Private Methods
+
     private func performLoad(forceRefresh: Bool, showsLoadingState: Bool) async {
         let previousState = screenState
         let previousVisibleCount = visibleCount
@@ -94,29 +111,10 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
                 limit: Self.maxCards,
                 forceRefresh: forceRefresh
             )
-            let mapped: [HomeRecommendedAnimeCardItem] = response.data.compactMap { dto in
-                guard dto.entry.count >= 2 else { return nil }
-                let source = dto.entry[0]
-                let recommended = dto.entry[1]
-                guard let url = JikanImageURLResolver.url(
-                    from: recommended.images,
-                    tier: .card
-                ) else { return nil }
-
-                return HomeRecommendedAnimeCardItem(
-                    id: dto.id,
-                    sourceTitle: source.title?.trimmingCharacters(in: .whitespacesAndNewlines).nonEmpty ?? "原作",
-                    recommendedTitle: Self.cachedTitle(for: recommended.malId) ??
-                        recommended.title?.trimmingCharacters(in: .whitespacesAndNewlines).nonEmpty ??
-                        "推薦作品",
-                    username: dto.user?.username?.trimmingCharacters(in: .whitespacesAndNewlines).nonEmpty,
-                    detailMalId: recommended.malId,
-                    imageURL: url
-                )
-            }
-
-            var seenRecommendationIDs = Set<String>()
-            let items = mapped.filter { seenRecommendationIDs.insert($0.id).inserted }
+            let items = presentationBuilder.cardItems(
+                from: response.data,
+                titleCache: titleCache
+            )
             visibleCount = resolvedVisibleCount(
                 itemCount: items.count,
                 previousVisibleCount: previousVisibleCount,
@@ -140,30 +138,17 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
     private func startTitleEnrichmentIfNeeded() {
         titleEnrichmentTask?.cancel()
         let uncachedIDs = displayedItems.compactMap { item in
-            Self.cachedTitle(for: item.detailMalId) == nil ? item.detailMalId : nil
+            titleCache.title(for: item.detailMalId) == nil ? item.detailMalId : nil
         }
         let idsToFetch = Array(uncachedIDs.prefix(Self.maxTitleEnrichmentsPerPass))
         guard !idsToFetch.isEmpty else { return }
 
         titleEnrichmentTask = Task { [weak self] in
             guard let self else { return }
-            for id in idsToFetch {
-                if Task.isCancelled { return }
-                do {
-                    let response = try await self.animeDetailService.fetchAnimeDetail(malId: id)
-                    let anime = response.data
-                    let title = Self.preferredTitle(
-                        japanese: anime.titleJapanese,
-                        english: anime.titleEnglish,
-                        fallback: anime.title
-                    )
-                    Self.storeTitle(title, for: id)
-                    self.replaceRecommendedTitle(for: id, with: title)
-                    try? await Task.sleep(nanoseconds: Self.titleEnrichmentDelayNanoseconds)
-                } catch {
-                    continue
-                }
-            }
+            let titles = await titleEnricher.enrichedTitles(for: idsToFetch)
+            guard !Task.isCancelled, !titles.isEmpty else { return }
+
+            applyEnrichedTitles(titles)
 
             if !Task.isCancelled {
                 startTitleEnrichmentIfNeeded()
@@ -185,9 +170,17 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
         return min(Self.initialVisibleCards, itemCount)
     }
 
-    private func replaceRecommendedTitle(for malId: Int, with title: String) {
+    private func applyEnrichedTitles(_ titles: [Int: String]) {
+        for (malId, title) in titles {
+            titleCache = titleCache.storing(
+                title,
+                for: malId,
+                limit: Self.titleCacheLimit
+            )
+        }
+
         let updatedItems = allItems.map { item in
-            guard item.detailMalId == malId else { return item }
+            guard let title = titles[item.detailMalId] else { return item }
             return HomeRecommendedAnimeCardItem(
                 id: item.id,
                 sourceTitle: item.sourceTitle,
@@ -198,38 +191,5 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
             )
         }
         screenState = updatedItems.isEmpty ? .empty : .content(updatedItems)
-    }
-
-    private static func cachedTitle(for malId: Int) -> String? {
-        titleCache[malId]
-    }
-
-    private static func storeTitle(_ title: String, for malId: Int) {
-        titleCache[malId] = title
-        titleCacheOrder.removeAll { $0 == malId }
-        titleCacheOrder.append(malId)
-        while titleCacheOrder.count > titleCacheLimit {
-            let removed = titleCacheOrder.removeFirst()
-            titleCache.removeValue(forKey: removed)
-        }
-    }
-
-    private nonisolated static func preferredTitle(japanese: String?, english: String?, fallback: String?) -> String {
-        if let japanese, !japanese.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            return japanese
-        }
-        if let english, !english.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            return english
-        }
-        if let fallback, !fallback.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            return fallback
-        }
-        return "推薦作品"
-    }
-}
-
-private extension String {
-    var nonEmpty: String? {
-        isEmpty ? nil : self
     }
 }

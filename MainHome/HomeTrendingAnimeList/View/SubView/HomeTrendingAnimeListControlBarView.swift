@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+// MARK: - HomeTrendingAnimeListControlBarContainerView
+
 struct HomeTrendingAnimeListControlBarContainerView: View {
 
     // MARK: - Properties

@@ -8,6 +8,8 @@
 import Foundation
 import SwiftData
 
+// MARK: - HomeScheduleDay
+
 nonisolated enum HomeScheduleDay: String, CaseIterable, Identifiable, Sendable {
     case monday
     case tuesday

@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+// MARK: - HomeWatchEpisodesView
+
 struct HomeWatchEpisodesView: View {
 
     // MARK: - Properties

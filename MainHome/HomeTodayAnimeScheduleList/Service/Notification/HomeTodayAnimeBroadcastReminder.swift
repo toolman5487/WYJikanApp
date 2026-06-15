@@ -7,6 +7,8 @@
 
 import Foundation
 
+// MARK: - HomeTodayAnimeBroadcastReminder
+
 struct HomeTodayAnimeBroadcastReminder: Hashable {
     let animeID: Int
     let title: String

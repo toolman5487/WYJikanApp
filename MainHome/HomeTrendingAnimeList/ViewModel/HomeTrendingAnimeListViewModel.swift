@@ -8,8 +8,13 @@
 import Combine
 import Foundation
 
+// MARK: - HomeTrendingAnimeListViewModel
+
 @MainActor
 final class HomeTrendingAnimeListViewModel: ObservableObject {
+
+    // MARK: - Nested Types
+
     enum ScreenState {
         case loading
         case content(HomeTrendingAnimeListContent)
@@ -18,6 +23,8 @@ final class HomeTrendingAnimeListViewModel: ObservableObject {
     }
 
     typealias LoadMoreState = PaginationFooterState
+
+    // MARK: - Properties
 
     @Published var selectedSort: HomeTrendingAnimeListSort = .apiDefault
     @Published private(set) var screenState: ScreenState = .loading
@@ -30,6 +37,8 @@ final class HomeTrendingAnimeListViewModel: ObservableObject {
     private let paginationController = PaginatedListLoadingController<HomeTrendingAnimeListItem>()
     private var cancellables: Set<AnyCancellable> = []
 
+    // MARK: - Lifecycle
+
     init(
         service: HomeTrendingAnimeListServicing,
         presentationBuilder: HomeTrendingAnimeListPresentationBuilder = HomeTrendingAnimeListPresentationBuilder()
@@ -38,6 +47,8 @@ final class HomeTrendingAnimeListViewModel: ObservableObject {
         self.presentationBuilder = presentationBuilder
         bindSelectedSort()
     }
+
+    // MARK: - Derived State
 
     var headerContent: HomeTrendingAnimeListHeaderContent {
         presentationBuilder.headerContent(sort: selectedSort, loadedCount: paginationController.items.count)
@@ -51,6 +62,8 @@ final class HomeTrendingAnimeListViewModel: ObservableObject {
             )
         }
     }
+
+    // MARK: - Public Methods
 
     func loadIfNeeded() async {
         await paginationController.loadIfNeeded(
@@ -78,6 +91,8 @@ final class HomeTrendingAnimeListViewModel: ObservableObject {
         guard selectedSort != sort else { return }
         selectedSort = sort
     }
+
+    // MARK: - Private Methods
 
     private func bindSelectedSort() {
         $selectedSort
@@ -152,5 +167,4 @@ final class HomeTrendingAnimeListViewModel: ObservableObject {
         )
         loadMoreState = footerState
     }
-
 }

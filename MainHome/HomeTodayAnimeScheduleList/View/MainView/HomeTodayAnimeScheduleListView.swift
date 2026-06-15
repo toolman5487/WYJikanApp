@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+// MARK: - HomeTodayAnimeScheduleListView
+
 struct HomeTodayAnimeScheduleListView: View {
     var body: some View {
         HomeTodayAnimeScheduleListConfiguredView()

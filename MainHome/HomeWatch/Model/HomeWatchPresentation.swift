@@ -7,6 +7,9 @@
 
 import Foundation
 
+// MARK: - Presentation Models
+
+
 nonisolated struct HomeWatchFeedChipItem: Hashable, Sendable {
     let feed: HomeWatchFeedKind
     let isSelected: Bool
@@ -21,7 +24,11 @@ nonisolated struct HomeWatchListHeaderContent: Equatable, Sendable {
     let loadedCountText: String
 }
 
+// MARK: - Type Aliases
+
 typealias HomeWatchSectionState<Item> = LoadableContentState<[Item]>
+
+// MARK: - Section Items
 
 nonisolated struct HomeWatchPromoItem: Identifiable, Equatable, Hashable, Sendable {
     let id: String
@@ -51,6 +58,8 @@ nonisolated struct HomeWatchListItem: Identifiable, Equatable, Hashable, Sendabl
     let actionURL: URL?
     let contentKind: HomeWatchContentKind
 }
+
+// MARK: - HomeWatchPresentationText
 
 nonisolated enum HomeWatchPresentationText {
     static func title(from entry: HomeWatchEntryDTO) -> String {
@@ -109,7 +118,12 @@ nonisolated enum HomeWatchPresentationText {
     }
 }
 
+// MARK: - HomeWatchPresentationBuilder
+
 nonisolated enum HomeWatchPresentationBuilder {
+
+    // MARK: - Public Methods
+
     static func promoItems(
         from response: HomeWatchPromosResponse,
         limit: Int
@@ -139,6 +153,8 @@ nonisolated enum HomeWatchPresentationBuilder {
     ) -> [HomeWatchListItem] {
         response.data.compactMap { listItem(from: $0, feed: feed) }
     }
+
+    // MARK: - Private Methods
 
     private static func promoItem(from dto: HomeWatchPromoDTO) -> HomeWatchPromoItem? {
         guard let entry = dto.entry else { return nil }

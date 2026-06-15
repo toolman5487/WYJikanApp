@@ -7,17 +7,40 @@
 
 import SwiftUI
 
+// MARK: - GlassSectionHeaderView
+
 struct GlassSectionHeaderView: View {
+
+    // MARK: - Types
+
     enum State {
         case plain
         case accessoryText(String)
         case navigable(action: () -> Void)
     }
 
+    // MARK: - Properties
+
     let title: String
     let state: State
     let showsDisclosureIndicator: Bool
     let outerVerticalPadding: CGFloat
+
+    // MARK: - Lifecycle
+
+    init(
+        title: String,
+        state: State = .plain,
+        showsDisclosureIndicator: Bool = false,
+        outerVerticalPadding: CGFloat = 12
+    ) {
+        self.title = title
+        self.state = state
+        self.showsDisclosureIndicator = showsDisclosureIndicator
+        self.outerVerticalPadding = outerVerticalPadding
+    }
+
+    // MARK: - Body
 
     var body: some View {
         Group {
@@ -34,17 +57,7 @@ struct GlassSectionHeaderView: View {
         .padding(.vertical, outerVerticalPadding)
     }
 
-    init(
-        title: String,
-        state: State = .plain,
-        showsDisclosureIndicator: Bool = false,
-        outerVerticalPadding: CGFloat = 12
-    ) {
-        self.title = title
-        self.state = state
-        self.showsDisclosureIndicator = showsDisclosureIndicator
-        self.outerVerticalPadding = outerVerticalPadding
-    }
+    // MARK: - Private Views
 
     @ViewBuilder
     private var trailingContent: some View {

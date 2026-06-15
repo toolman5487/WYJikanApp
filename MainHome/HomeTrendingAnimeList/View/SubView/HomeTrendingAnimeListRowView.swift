@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+// MARK: - HomeTrendingAnimeListRowView
+
 struct HomeTrendingAnimeListRowView: View {
 
     // MARK: - Properties

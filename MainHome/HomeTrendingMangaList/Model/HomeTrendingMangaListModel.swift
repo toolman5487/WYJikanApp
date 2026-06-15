@@ -7,6 +7,8 @@
 
 import Foundation
 
+// MARK: - HomeTrendingMangaListSort
+
 nonisolated enum HomeTrendingMangaListSort: String, CaseIterable, Identifiable, Sendable {
     case apiDefault
     case rank
@@ -24,6 +26,8 @@ nonisolated enum HomeTrendingMangaListSort: String, CaseIterable, Identifiable, 
         }
     }
 }
+
+// MARK: - HomeTrendingMangaListFormat
 
 nonisolated enum HomeTrendingMangaListFormat: String, CaseIterable, Identifiable, Sendable {
     case all

@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+// MARK: - HomeTodayAnimeScheduleListLoadingView
+
 struct HomeTodayAnimeScheduleListLoadingView: View {
 
     // MARK: - Body

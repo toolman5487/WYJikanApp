@@ -7,15 +7,21 @@
 
 import Foundation
 
+// MARK: - HomeWatchEpisodeFeed
+
 nonisolated enum HomeWatchEpisodeFeed: Sendable {
     case latest
     case popular
 }
 
+// MARK: - HomeWatchPromoFeed
+
 nonisolated enum HomeWatchPromoFeed: Sendable {
     case latest
     case popular
 }
+
+// MARK: - HomeWatchContentKind
 
 nonisolated enum HomeWatchContentKind: Sendable {
     case episode
@@ -30,6 +36,8 @@ nonisolated enum HomeWatchContentKind: Sendable {
         }
     }
 }
+
+// MARK: - HomeWatchFeedKind
 
 nonisolated enum HomeWatchFeedKind: String, CaseIterable, Identifiable, Sendable {
     case latestEpisodes

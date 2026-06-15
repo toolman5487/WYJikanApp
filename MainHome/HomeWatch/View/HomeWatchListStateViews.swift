@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+// MARK: - HomeWatchListLoadingView
+
 struct HomeWatchListLoadingView: View {
 
     // MARK: - Body

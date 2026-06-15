@@ -7,7 +7,12 @@
 
 import SwiftUI
 
+// MARK: - PosterTextGradientOverlayView
+
 struct PosterTextGradientOverlayView: View {
+
+    // MARK: - Body
+
     var body: some View {
         LinearGradient(
             colors: [
@@ -20,6 +25,8 @@ struct PosterTextGradientOverlayView: View {
         .allowsHitTesting(false)
     }
 }
+
+// MARK: - Preview
 
 #Preview {
     PosterTextGradientOverlayView()

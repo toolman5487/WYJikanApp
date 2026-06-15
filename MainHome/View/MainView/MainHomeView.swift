@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+// MARK: - MainHomeView
+
 struct MainHomeView: View {
 
     // MARK: - Properties

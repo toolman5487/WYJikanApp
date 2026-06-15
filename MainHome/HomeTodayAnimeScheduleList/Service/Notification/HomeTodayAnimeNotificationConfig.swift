@@ -7,6 +7,8 @@
 
 import Foundation
 
+// MARK: - HomeTodayAnimeNotificationConfig
+
 enum HomeTodayAnimeNotificationConfig {
     static let enabledKey = "homeTodayAnimeDailyNotificationEnabled"
     static let lastRefreshDateKey = "homeTodayAnimeNotificationLastRefreshDate"

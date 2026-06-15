@@ -9,6 +9,8 @@ import Combine
 import Foundation
 import SwiftUI
 
+// MARK: - MainHomeRoute
+
 enum MainHomeRoute: Hashable {
     case watch(feed: HomeWatchFeedKind)
     case webPage(BaseWebPage)
@@ -19,11 +21,17 @@ enum MainHomeRoute: Hashable {
     case mangaDetail(malId: Int)
 }
 
+// MARK: - MainHomeRouter
+
 @MainActor
 final class MainHomeRouter: ObservableObject {
     static let shared = MainHomeRouter()
 
+    // MARK: - Properties
+
     @Published var path = NavigationPath()
+
+    // MARK: - Public Methods
 
     func push(_ route: MainHomeRoute) {
         path.append(route)

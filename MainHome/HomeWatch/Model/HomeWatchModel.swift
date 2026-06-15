@@ -9,6 +9,7 @@ import Foundation
 
 // MARK: - Response
 
+
 nonisolated struct HomeWatchPromosResponse: Codable, Sendable {
     let pagination: HomeWatchPaginationDTO?
     let data: [HomeWatchPromoDTO]

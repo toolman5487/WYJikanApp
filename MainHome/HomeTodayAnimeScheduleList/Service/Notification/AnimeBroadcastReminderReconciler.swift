@@ -6,9 +6,16 @@
 import Foundation
 import OSLog
 
+// MARK: - AnimeBroadcastReminderReconciler
+
 enum AnimeBroadcastReminderReconciler {
+
+    // MARK: - Constants
+
     private static let bootstrapDeferNanoseconds: UInt64 = 2_000_000_000
     private static let reconcileRequestIntervalNanoseconds: UInt64 = 1_000_000_000
+
+    // MARK: - Public Methods
 
     @MainActor
     static func reconcile(

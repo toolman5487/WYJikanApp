@@ -7,6 +7,9 @@
 
 import Foundation
 
+// MARK: - API Models
+
+
 nonisolated struct HomeRecommendedAnimeResponse: Codable, Sendable {
     let data: [HomeRecommendedAnimeDTO]
 }
@@ -31,6 +34,8 @@ nonisolated struct HomeRecommendedAnimeEntryDTO: Codable, Identifiable, Hashable
 nonisolated struct HomeRecommendedAnimeUserDTO: Codable, Hashable, Sendable {
     let username: String?
 }
+
+// MARK: - Presentation Models
 
 nonisolated struct HomeRecommendedAnimeCardItem: Identifiable, Hashable, Sendable {
     let id: String

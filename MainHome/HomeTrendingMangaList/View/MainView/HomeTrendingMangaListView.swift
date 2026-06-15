@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+// MARK: - HomeTrendingMangaListView
+
 struct HomeTrendingMangaListView: View {
     var body: some View {
         HomeTrendingMangaListConfiguredView()

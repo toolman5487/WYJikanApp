@@ -8,7 +8,12 @@
 import Foundation
 import UserNotifications
 
+// MARK: - HomeTodayAnimeNotificationRequestFactory
+
 struct HomeTodayAnimeNotificationRequestFactory {
+
+    // MARK: - Nested Types
+
     private enum NotificationRoute: String {
         case todayAnimeSchedule
     }
@@ -19,11 +24,17 @@ struct HomeTodayAnimeNotificationRequestFactory {
         static let animeID = "animeID"
     }
 
+    // MARK: - Properties
+
     private var calendar: Calendar
+
+    // MARK: - Lifecycle
 
     init(calendar: Calendar = .autoupdatingCurrent) {
         self.calendar = calendar
     }
+
+    // MARK: - Public Methods
 
     func makeRequest(for reminder: HomeTodayAnimeBroadcastReminder) -> UNNotificationRequest {
         let content = UNMutableNotificationContent()
@@ -38,6 +49,8 @@ struct HomeTodayAnimeNotificationRequestFactory {
             trigger: trigger(for: reminder)
         )
     }
+
+    // MARK: - Private Methods
 
     private func identifier(for reminder: HomeTodayAnimeBroadcastReminder) -> String {
         let timestamp = Int(reminder.scheduledDate.timeIntervalSince1970)

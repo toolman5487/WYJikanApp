@@ -7,12 +7,18 @@
 
 import SwiftUI
 
+// MARK: - HomeTodayAnimeScheduleListLoadMoreFooterView
+
 struct HomeTodayAnimeScheduleListLoadMoreFooterView: View {
+
+    // MARK: - Properties
 
     let state: HomeTodayAnimeScheduleListViewModel.LoadMoreState
     var progress: CGFloat = 0
     let onLoadMore: () -> Void
     let onRetry: () -> Void
+
+    // MARK: - Body
 
     var body: some View {
         PaginationLoadMoreFooterView(

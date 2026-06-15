@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+// MARK: - HeroBannerSlideView
+
 struct HeroBannerSlideView: View {
 
     // MARK: - Properties

@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+// MARK: - HomeWatchFeedControlBarContainerView
+
 struct HomeWatchFeedControlBarContainerView: View {
 
     // MARK: - Properties

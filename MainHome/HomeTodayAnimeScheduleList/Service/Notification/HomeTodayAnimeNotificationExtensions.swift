@@ -1,4 +1,11 @@
+//
+//  HomeTodayAnimeNotificationExtensions.swift
+//  WYJikanApp
+//
+
 import Foundation
+
+// MARK: - HomeScheduleDay
 
 nonisolated extension HomeScheduleDay {
     var calendarWeekday: Int {

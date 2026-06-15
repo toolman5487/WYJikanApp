@@ -9,6 +9,7 @@ import Foundation
 
 // MARK: - Presentation
 
+
 nonisolated struct HomeTrendingMangaCardItem: Identifiable, Hashable, Sendable {
     let id: Int
     let title: String

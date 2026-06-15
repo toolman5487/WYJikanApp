@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+// MARK: - HomeTodayAnimeView
+
 struct HomeTodayAnimeView: View {
 
     // MARK: - Properties
