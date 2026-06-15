@@ -47,7 +47,7 @@ private struct AnimeCategoryDetailBodyView: View {
             .navigationTitle(viewModel.genreTitle)
             .navigationBarTitleDisplayMode(.inline)
             .background(Color(.systemBackground))
-            .task {
+            .task(priority: .userInitiated) {
                 await viewModel.loadIfNeeded()
             }
     }
@@ -75,7 +75,7 @@ private struct AnimeCategoryDetailBodyView: View {
             revealDistance: 220,
             progress: $loadMoreBounceProgress
         ) {
-            Task { await viewModel.loadMore() }
+            Task(priority: .userInitiated) { await viewModel.loadMore() }
         }
         .safeAreaInset(edge: .top, spacing: 0) {
             AnimeCategoryDetailControlBarContainerView(
@@ -86,7 +86,7 @@ private struct AnimeCategoryDetailBodyView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    Task { await viewModel.reload() }
+                    Task(priority: .userInitiated) { await viewModel.reload() }
                 } label: {
                     Image(systemName: "arrow.trianglehead.counterclockwise")
                         .font(.body.weight(.bold))
@@ -119,7 +119,7 @@ private struct AnimeCategoryDetailBodyView: View {
                 title: "這個分類暫時打不開",
                 retryTitle: "重新載入"
             ) {
-                Task { await viewModel.reload() }
+                Task(priority: .userInitiated) { await viewModel.reload() }
             }
 
         case let .content(items):
@@ -131,10 +131,10 @@ private struct AnimeCategoryDetailBodyView: View {
                 onItemAppear: { _ in
                 },
                 onLoadMore: {
-                    Task { await viewModel.loadMore() }
+                    Task(priority: .userInitiated) { await viewModel.loadMore() }
                 },
                 onRetryLoadMore: {
-                    Task { await viewModel.retryLoadMore() }
+                    Task(priority: .userInitiated) { await viewModel.retryLoadMore() }
                 }
             )
         }

@@ -18,12 +18,12 @@ struct AnimeDetailEpisodesLoadMoreFooterView: View {
             availablePresentation: .prominentButton(title: "載入更多集數"),
             loadingMinHeight: 44,
             onAvailableTap: {
-                Task {
+                Task(priority: .userInitiated) {
                     await onLoadMore()
                 }
             },
             onRetry: {
-                Task {
+                Task(priority: .userInitiated) {
                     await onRetry()
                 }
             }

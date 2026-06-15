@@ -65,7 +65,7 @@ private struct HomeTrendingAnimeListBodyView: View {
             revealDistance: 220,
             progress: $loadMoreBounceProgress
         ) {
-            Task { await viewModel.loadMore() }
+            Task(priority: .userInitiated) { await viewModel.loadMore() }
         }
         .safeAreaInset(edge: .top, spacing: 0) {
             HomeTrendingAnimeListControlBarContainerView(
@@ -79,7 +79,7 @@ private struct HomeTrendingAnimeListBodyView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    Task { await viewModel.reload() }
+                    Task(priority: .userInitiated) { await viewModel.reload() }
                 } label: {
                     Image(systemName: "arrow.trianglehead.counterclockwise")
                         .font(.body.weight(.bold))
@@ -88,7 +88,7 @@ private struct HomeTrendingAnimeListBodyView: View {
                 }
             }
         }
-        .task {
+        .task(priority: .userInitiated) {
             await viewModel.loadIfNeeded()
         }
     }
@@ -117,7 +117,7 @@ private struct HomeTrendingAnimeListBodyView: View {
                 title: "熱門榜單暫時讀不到",
                 retryTitle: "重新載入"
             ) {
-                Task { await viewModel.reload() }
+                Task(priority: .userInitiated) { await viewModel.reload() }
             }
             .transition(.opacity.combined(with: .move(edge: .bottom)))
 
@@ -151,10 +151,10 @@ private struct HomeTrendingAnimeListBodyView: View {
                 state: viewModel.loadMoreState,
                 progress: loadMoreBounceProgress,
                 onLoadMore: {
-                    Task { await viewModel.loadMore() }
+                    Task(priority: .userInitiated) { await viewModel.loadMore() }
                 },
                 onRetry: {
-                    Task { await viewModel.retryLoadMore() }
+                    Task(priority: .userInitiated) { await viewModel.retryLoadMore() }
                 }
             )
         }

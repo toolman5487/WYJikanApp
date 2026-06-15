@@ -62,7 +62,7 @@ private struct HomeTrendingMangaListBodyView: View {
             revealDistance: 220,
             progress: $loadMoreBounceProgress
         ) {
-            Task { await viewModel.loadMore() }
+            Task(priority: .userInitiated) { await viewModel.loadMore() }
         }
         .safeAreaInset(edge: .top, spacing: 0) {
             HomeTrendingMangaListControlBarContainerView(
@@ -76,7 +76,7 @@ private struct HomeTrendingMangaListBodyView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    Task { await viewModel.reload() }
+                    Task(priority: .userInitiated) { await viewModel.reload() }
                 } label: {
                     Image(systemName: "arrow.trianglehead.counterclockwise")
                         .font(.body.weight(.bold))
@@ -85,7 +85,7 @@ private struct HomeTrendingMangaListBodyView: View {
                 }
             }
         }
-        .task {
+        .task(priority: .userInitiated) {
             await viewModel.loadIfNeeded()
         }
     }
@@ -110,10 +110,10 @@ private struct HomeTrendingMangaListBodyView: View {
                         progress: loadMoreBounceProgress
                     ),
                     onAvailableTap: {
-                        Task { await viewModel.loadMore() }
+                        Task(priority: .userInitiated) { await viewModel.loadMore() }
                     },
                     onRetry: {
-                        Task { await viewModel.retryLoadMore() }
+                        Task(priority: .userInitiated) { await viewModel.retryLoadMore() }
                     }
                 )
             }
@@ -124,7 +124,7 @@ private struct HomeTrendingMangaListBodyView: View {
                 title: "熱門漫畫榜單暫時讀不到",
                 retryTitle: "重新載入"
             ) {
-                Task { await viewModel.reload() }
+                Task(priority: .userInitiated) { await viewModel.reload() }
             }
 
         case .content(let items):
@@ -136,10 +136,10 @@ private struct HomeTrendingMangaListBodyView: View {
                 onItemAppear: { _ in
                 },
                 onLoadMore: {
-                    Task { await viewModel.loadMore() }
+                    Task(priority: .userInitiated) { await viewModel.loadMore() }
                 },
                 onRetryLoadMore: {
-                    Task { await viewModel.retryLoadMore() }
+                    Task(priority: .userInitiated) { await viewModel.retryLoadMore() }
                 }
             )
         }

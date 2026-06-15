@@ -30,7 +30,7 @@ struct AnimeReviewListView: View {
                         progress: loadMoreBounceProgress
                     ),
                     onRetry: {
-                        Task { await viewModel.loadMore() }
+                        Task(priority: .userInitiated) { await viewModel.loadMore() }
                     }
                 )
             }
@@ -44,7 +44,7 @@ struct AnimeReviewListView: View {
             revealDistance: 220,
             progress: $loadMoreBounceProgress
         ) {
-            Task { await viewModel.loadMore() }
+            Task(priority: .userInitiated) { await viewModel.loadMore() }
         }
     }
 

@@ -174,7 +174,7 @@ private extension GenreAnimeViewModel {
         _ operation: @escaping @MainActor (GenreAnimeViewModel) async -> Void
     ) {
         loadTask?.cancel()
-        loadTask = Task { [weak self] in
+        loadTask = Task(priority: .utility) { [weak self] in
             guard let self else { return }
             await operation(self)
         }

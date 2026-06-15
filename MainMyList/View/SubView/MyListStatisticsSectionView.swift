@@ -5,6 +5,8 @@ struct MyListStatisticsSectionView: View {
     let onSelectGenre: (String) -> Void
     let onSelectFormat: (String) -> Void
 
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+
     private enum ContentState {
         case empty
         case populated
@@ -12,6 +14,10 @@ struct MyListStatisticsSectionView: View {
 
     private var contentState: ContentState {
         presentation.filteredItems.isEmpty ? .empty : .populated
+    }
+
+    private var chartCardMinHeight: CGFloat? {
+        horizontalSizeClass == .regular ? 320 : nil
     }
 
     var body: some View {
@@ -35,18 +41,42 @@ struct MyListStatisticsSectionView: View {
                 }
 
             case .populated:
-                VStack(alignment: .leading, spacing: 16) {
-                    MyListDistributionChartCardView(
-                        statistics: presentation.statistics,
-                        onSelectGenre: onSelectGenre
-                    )
-                    MyListFormatDistributionChartCardView(
-                        statistics: presentation.statistics,
-                        onSelectFormat: onSelectFormat
-                    )
-                }
+                chartContent
             }
         }
+    }
+
+    @ViewBuilder
+    private var chartContent: some View {
+        if horizontalSizeClass == .regular {
+            HStack(alignment: .top, spacing: 16) {
+                formatChart
+                genreChart
+            }
+        } else {
+            VStack(alignment: .leading, spacing: 16) {
+                genreChart
+                formatChart
+            }
+        }
+    }
+
+    private var genreChart: some View {
+        MyListGenreDistributionChartCardView(
+            statistics: presentation.statistics,
+            cardMinHeight: chartCardMinHeight,
+            onSelectGenre: onSelectGenre
+        )
+        .frame(maxWidth: .infinity, alignment: .topLeading)
+    }
+
+    private var formatChart: some View {
+        MyListFormatDistributionChartCardView(
+            statistics: presentation.statistics,
+            cardMinHeight: chartCardMinHeight,
+            onSelectFormat: onSelectFormat
+        )
+        .frame(maxWidth: .infinity, alignment: .topLeading)
     }
 
 }

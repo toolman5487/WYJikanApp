@@ -5,13 +5,13 @@
 //  Created by Codex on 2026/5/21.
 //
 
-import Charts
 import SwiftUI
 
 struct MyListFormatDistributionChartCardView: View {
     // MARK: - Properties
 
     let statistics: MyListStatistics
+    let cardMinHeight: CGFloat?
     let onSelectFormat: (String) -> Void
 
     // MARK: - Body
@@ -33,7 +33,8 @@ struct MyListFormatDistributionChartCardView: View {
     private var cardContent: some View {
         MyListStatisticsCardContainer(
             title: "\(statistics.formatAnalysis.scope.title)收藏形式比例",
-            subtitle: distributionSubtitle
+            subtitle: distributionSubtitle,
+            minHeight: cardMinHeight
         ) {
             if statistics.formatAnalysis.formatSlices.isEmpty {
                 FeatureEmptyStateInlineView(
@@ -44,7 +45,6 @@ struct MyListFormatDistributionChartCardView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     HStack(alignment: .center, spacing: 20) {
                         chartView
-                            .frame(width: 164, height: 164)
 
                         legendView
                     }
@@ -70,31 +70,12 @@ struct MyListFormatDistributionChartCardView: View {
     // MARK: - Private Views
 
     private var chartView: some View {
-        Chart(statistics.formatAnalysis.formatSlices) { slice in
-            SectorMark(
-                angle: .value("收藏數量", slice.count),
-                innerRadius: .ratio(0.58),
-                angularInset: 2
-            )
-            .cornerRadius(4)
-            .foregroundStyle(by: .value("作品形式", slice.title))
-        }
-        .chartLegend(.hidden)
-        .chartForegroundStyleScale(
-            domain: statistics.formatAnalysis.formatSlices.map(\.title),
-            range: chartColors
+        MyListPieChartView(
+            slices: pieChartSlices,
+            totalCount: statistics.formatAnalysis.itemCount,
+            categoryLabel: "作品形式",
+            colors: chartColors
         )
-        .chartBackground { _ in
-            VStack(spacing: 2) {
-                Text("\(statistics.formatAnalysis.itemCount)")
-                    .font(.title3.weight(.bold))
-                    .foregroundStyle(ThemeColor.textPrimary)
-
-                Text("收藏")
-                    .font(.caption2.weight(.medium))
-                    .foregroundStyle(ThemeColor.textSecondary)
-            }
-        }
     }
 
     private var legendView: some View {
@@ -152,6 +133,16 @@ struct MyListFormatDistributionChartCardView: View {
         }
 
         return "尚無作品形式資料"
+    }
+
+    private var pieChartSlices: [MyListPieChartSlice] {
+        statistics.formatAnalysis.formatSlices.map { slice in
+            MyListPieChartSlice(
+                id: slice.id,
+                title: slice.title,
+                count: slice.count
+            )
+        }
     }
 
     private func color(for index: Int) -> Color {

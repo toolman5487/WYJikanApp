@@ -189,7 +189,7 @@ private extension MainCategoryListViewModel {
             .dropFirst()
             .removeDuplicates()
             .sink { [weak self] kind in
-                Task { @MainActor in
+                Task(priority: .userInitiated) { @MainActor in
                     self?.activateKind(kind)
                 }
             }

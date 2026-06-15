@@ -43,7 +43,7 @@ struct HomeFeedViewModels {
 @MainActor
 private protocol HomeFeedInitialLoadable: AnyObject {
     var hasFeedContent: Bool { get }
-    func loadIfNeeded()
+    func loadIfNeeded(priority: TaskPriority)
     func refresh() async
 }
 
@@ -96,13 +96,13 @@ final class HomeFeedCoordinator {
     // MARK: - Public Methods
 
     func loadInitial() async {
-        await loadPhase(.heroBanner, .todayAnime)
-        await loadPhase(.trendingAnime, .trendingManga)
+        await loadPhase(.heroBanner, .todayAnime, priority: .userInitiated)
+        await loadPhase(.trendingAnime, .trendingManga, priority: .userInitiated)
     }
 
     func loadSectionIfNeeded(_ section: HomeFeedSection) async {
         guard section.isDeferred else { return }
-        await load(section)
+        await load(section, priority: .utility)
     }
 
     func refreshAll() async {
@@ -114,9 +114,13 @@ final class HomeFeedCoordinator {
 
     // MARK: - Phase Loading
 
-    private func loadPhase(_ first: HomeFeedSection, _ second: HomeFeedSection) async {
-        async let firstLoad = load(first)
-        async let secondLoad = load(second)
+    private func loadPhase(
+        _ first: HomeFeedSection,
+        _ second: HomeFeedSection,
+        priority: TaskPriority
+    ) async {
+        async let firstLoad = load(first, priority: priority)
+        async let secondLoad = load(second, priority: priority)
         _ = await (firstLoad, secondLoad)
     }
 
@@ -128,24 +132,24 @@ final class HomeFeedCoordinator {
 
     // MARK: - Section Operations
 
-    private func load(_ section: HomeFeedSection) async {
+    private func load(_ section: HomeFeedSection, priority: TaskPriority) async {
         guard loadedSections.insert(section).inserted else { return }
 
         switch section {
         case .heroBanner:
-            await loadIfNeeded(viewModels.heroBanner)
+            await loadIfNeeded(viewModels.heroBanner, priority: priority)
         case .todayAnime:
-            await loadIfNeeded(viewModels.todayAnime)
+            await loadIfNeeded(viewModels.todayAnime, priority: priority)
         case .trendingAnime:
-            await loadIfNeeded(viewModels.trendingAnime)
+            await loadIfNeeded(viewModels.trendingAnime, priority: priority)
         case .trendingManga:
-            await loadIfNeeded(viewModels.trendingManga)
+            await loadIfNeeded(viewModels.trendingManga, priority: priority)
         case .watchPromos:
-            await loadIfNeeded(viewModels.watchPromos)
+            await loadIfNeeded(viewModels.watchPromos, priority: priority)
         case .watchEpisodes:
-            await loadIfNeeded(viewModels.watchEpisodes)
+            await loadIfNeeded(viewModels.watchEpisodes, priority: priority)
         case .recommendedAnime:
-            await loadIfNeeded(viewModels.recommendedAnime)
+            await loadIfNeeded(viewModels.recommendedAnime, priority: priority)
         }
     }
 
@@ -168,9 +172,12 @@ final class HomeFeedCoordinator {
         }
     }
 
-    private func loadIfNeeded(_ viewModel: some HomeFeedInitialLoadable) async {
+    private func loadIfNeeded(
+        _ viewModel: some HomeFeedInitialLoadable,
+        priority: TaskPriority
+    ) async {
         guard !viewModel.hasFeedContent else { return }
-        viewModel.loadIfNeeded()
+        viewModel.loadIfNeeded(priority: priority)
         await viewModel.refresh()
     }
 }
@@ -208,28 +215,38 @@ final class HomeFeedSectionLoader {
         load()
     }
 
-    func refresh(hasContent: Bool, performLoad: @escaping (Bool, Bool) async -> Void) async {
+    func refresh(
+        hasContent: Bool,
+        priority: TaskPriority = .userInitiated,
+        performLoad: @escaping (Bool, Bool) async -> Void
+    ) async {
         if let task = activeTask {
             await task.value
             return
         }
 
-        let task = beginLoad {
+        let task = beginLoad(priority: priority) {
             await performLoad(true, !hasContent)
         }
         await task.value
     }
 
-    func load(performLoad: @escaping (Bool, Bool) async -> Void) {
+    func load(
+        priority: TaskPriority = .userInitiated,
+        performLoad: @escaping (Bool, Bool) async -> Void
+    ) {
         guard !isLoading else { return }
-        _ = beginLoad {
+        _ = beginLoad(priority: priority) {
             await performLoad(false, true)
         }
     }
 
     @discardableResult
-    func beginLoad(operation: @escaping () async -> Void) -> Task<Void, Never> {
-        let task = Task { await operation() }
+    func beginLoad(
+        priority: TaskPriority = .userInitiated,
+        operation: @escaping () async -> Void
+    ) -> Task<Void, Never> {
+        let task = Task(priority: priority) { await operation() }
         activeTask = task
         state = .loading(task)
         return task

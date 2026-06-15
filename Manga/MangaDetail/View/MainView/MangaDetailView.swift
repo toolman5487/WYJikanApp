@@ -97,7 +97,7 @@ private struct MangaDetailBodyView: View {
                     failure: failure,
                     retryTitle: "重試"
                 ) {
-                    Task { await viewModel.reloadCharacters() }
+                    Task(priority: .userInitiated) { await viewModel.reloadCharacters() }
                 }
             } else {
                 MangaDetailCharactersSectionView(
@@ -117,7 +117,7 @@ private struct MangaDetailBodyView: View {
                     failure: failure,
                     retryTitle: "重試"
                 ) {
-                    Task { await viewModel.reloadPictures() }
+                    Task(priority: .userInitiated) { await viewModel.reloadPictures() }
                 }
             } else {
                 MangaDetailPicturesSectionView(
@@ -136,7 +136,7 @@ private struct MangaDetailBodyView: View {
                     failure: failure,
                     retryTitle: "重試"
                 ) {
-                    Task { await viewModel.reloadRecommendations() }
+                    Task(priority: .userInitiated) { await viewModel.reloadRecommendations() }
                 }
             } else {
                 MangaDetailRecommendationsSectionView(
@@ -200,7 +200,7 @@ private struct MangaDetailBodyView: View {
                     title: "作品資料暫時載入失敗",
                     retryTitle: "重新載入"
                 ) {
-                    Task { await viewModel.load(forceRefresh: true) }
+                    Task(priority: .userInitiated) { await viewModel.load(forceRefresh: true) }
                 }
                 .padding(16)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -251,7 +251,7 @@ private struct MangaDetailBodyView: View {
                     viewModel.toggleFavorite(isFavorite: isFavorite)
                 },
                 onRefreshTap: {
-                    Task {
+                    Task(priority: .userInitiated) {
                         await viewModel.load(forceRefresh: true)
                     }
                 },
@@ -285,7 +285,7 @@ private struct MangaDetailBodyView: View {
                 )
             }
         }
-        .task(id: malId) {
+        .task(id: malId, priority: .userInitiated) {
             await viewModel.load()
         }
     }

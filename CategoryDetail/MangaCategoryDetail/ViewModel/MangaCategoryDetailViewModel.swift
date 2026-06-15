@@ -108,7 +108,7 @@ final class MangaCategoryDetailViewModel: ObservableObject {
         .sink { [weak self] _, _ in
             guard let self, self.paginationController.hasLoaded else { return }
             self.filterRequestTask?.cancel()
-            self.filterRequestTask = Task { [weak self] in
+            self.filterRequestTask = Task(priority: .userInitiated) { [weak self] in
                 guard let self else { return }
                 await self.fetchFirstPage(showSkeleton: true)
             }

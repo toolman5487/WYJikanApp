@@ -122,8 +122,9 @@ final class RandomMangaViewModel: ObservableObject {
         drawTask?.cancel()
         drawState = .loading
         let drawStartedAt = ContinuousClock().now
+        let taskPriority: TaskPriority = isAutomatic ? .utility : .userInitiated
 
-        drawTask = Task { [weak self] in
+        drawTask = Task(priority: taskPriority) { [weak self] in
             guard let self else { return }
             do {
                 let response = try await self.service.fetchRandomManga()

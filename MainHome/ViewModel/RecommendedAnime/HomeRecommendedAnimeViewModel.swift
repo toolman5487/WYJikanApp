@@ -66,9 +66,9 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
 
     // MARK: - Public Methods
 
-    func loadIfNeeded() {
+    func loadIfNeeded(priority: TaskPriority = .userInitiated) {
         sectionLoader.loadIfNeeded(isContentEmpty: allItems.isEmpty) {
-            load()
+            load(priority: priority)
         }
     }
 
@@ -78,8 +78,8 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
         }
     }
 
-    func load() {
-        sectionLoader.load { [weak self] forceRefresh, showsLoadingState in
+    func load(priority: TaskPriority = .userInitiated) {
+        sectionLoader.load(priority: priority) { [weak self] forceRefresh, showsLoadingState in
             await self?.performLoad(forceRefresh: forceRefresh, showsLoadingState: showsLoadingState)
         }
     }
@@ -143,7 +143,7 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
         let idsToFetch = Array(uncachedIDs.prefix(Self.maxTitleEnrichmentsPerPass))
         guard !idsToFetch.isEmpty else { return }
 
-        titleEnrichmentTask = Task { [weak self] in
+        titleEnrichmentTask = Task(priority: .utility) { [weak self] in
             guard let self else { return }
             let titles = await titleEnricher.enrichedTitles(for: idsToFetch)
             guard !Task.isCancelled, !titles.isEmpty else { return }

@@ -135,7 +135,7 @@ struct MainHomeView: View {
             .refreshable {
                 await refreshAllContent()
             }
-            .task {
+            .task(priority: .userInitiated) {
                 await feedCoordinator?.loadInitial()
             }
             .toolbarBackground(.hidden, for: .navigationBar)
@@ -206,7 +206,7 @@ struct MainHomeView: View {
                 )
             }
         }
-        .task {
+        .task(priority: .utility) {
             if feedCoordinator == nil {
                 feedCoordinator = makeFeedCoordinator()
             }

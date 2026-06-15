@@ -70,7 +70,7 @@ private struct AnimeDetailEpisodesListBodyView: View {
                             AnimeDetailEpisodeRowView(
                                 row: row
                             ) {
-                                Task {
+                                Task(priority: .userInitiated) {
                                     await viewModel.toggleEpisodeDetail(for: row.id)
                                 }
                             }
@@ -90,7 +90,7 @@ private struct AnimeDetailEpisodesListBodyView: View {
         }
         .navigationTitle("\(animeTitle) 集數")
         .navigationBarTitleDisplayMode(.inline)
-        .task(id: malId) {
+        .task(id: malId, priority: .userInitiated) {
             await viewModel.loadIfNeeded()
         }
     }

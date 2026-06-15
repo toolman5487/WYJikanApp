@@ -56,7 +56,7 @@ private struct AnimeReviewBodyView: View {
                     title: "評論暫時載入失敗",
                     retryTitle: "重新載入"
                 ) {
-                    Task { await viewModel.load() }
+                    Task(priority: .userInitiated) { await viewModel.load() }
                 }
                 .padding(16)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -77,7 +77,7 @@ private struct AnimeReviewBodyView: View {
         }
         .navigationTitle(navigationTitleText)
         .navigationBarTitleDisplayMode(.inline)
-        .task(id: malId) {
+        .task(id: malId, priority: .userInitiated) {
             await viewModel.load()
         }
     }

@@ -67,7 +67,7 @@ private struct HomeTodayAnimeScheduleListBodyView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    Task { await viewModel.reload() }
+                    Task(priority: .userInitiated) { await viewModel.reload() }
                 } label: {
                     Image(systemName: "arrow.trianglehead.counterclockwise")
                         .font(.body.weight(.bold))
@@ -76,7 +76,7 @@ private struct HomeTodayAnimeScheduleListBodyView: View {
                 }
             }
         }
-        .task {
+        .task(priority: .userInitiated) {
             await viewModel.loadIfNeeded()
         }
     }
@@ -103,7 +103,7 @@ private struct HomeTodayAnimeScheduleListBodyView: View {
                 title: "播出表暫時讀不到",
                 retryTitle: "重新載入"
             ) {
-                Task { await viewModel.reload() }
+                Task(priority: .userInitiated) { await viewModel.reload() }
             }
             .transition(.opacity.combined(with: .move(edge: .bottom)))
 
@@ -127,7 +127,7 @@ private struct HomeTodayAnimeScheduleListBodyView: View {
                             router.push(.animeDetail(malId: item.id))
                         }
                         .onAppear {
-                            Task {
+                            Task(priority: .userInitiated) {
                                 await viewModel.loadMoreIfNeeded(currentItem: item)
                             }
                         }
@@ -140,10 +140,10 @@ private struct HomeTodayAnimeScheduleListBodyView: View {
             HomeTodayAnimeScheduleListLoadMoreFooterView(
                 state: viewModel.loadMoreState,
                 onLoadMore: {
-                    Task { await viewModel.loadMore() }
+                    Task(priority: .userInitiated) { await viewModel.loadMore() }
                 },
                 onRetry: {
-                    Task { await viewModel.retryLoadMore() }
+                    Task(priority: .userInitiated) { await viewModel.retryLoadMore() }
                 }
             )
         }

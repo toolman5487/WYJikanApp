@@ -12,6 +12,7 @@ struct MyListStatisticsCardContainer<Content: View>: View {
 
     let title: String
     let subtitle: String?
+    let minHeight: CGFloat?
     @ViewBuilder let content: Content
 
     // MARK: - Init
@@ -19,10 +20,12 @@ struct MyListStatisticsCardContainer<Content: View>: View {
     init(
         title: String,
         subtitle: String? = nil,
+        minHeight: CGFloat? = nil,
         @ViewBuilder content: () -> Content
     ) {
         self.title = title
         self.subtitle = subtitle
+        self.minHeight = minHeight
         self.content = content()
     }
 
@@ -45,7 +48,7 @@ struct MyListStatisticsCardContainer<Content: View>: View {
             content
         }
         .padding(16)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity, minHeight: minHeight, alignment: .topLeading)
         .background(Color(.secondarySystemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }

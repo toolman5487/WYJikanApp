@@ -14,6 +14,7 @@
 		1504E4FC2FAB8A51009EB340 /* HomeTrendingMangaListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1504E4F02FAB8A51009EB340 /* HomeTrendingMangaListView.swift */; };
 		15186B832FBEE4D2008C60D9 /* MyListStatisticsCardContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15186B7F2FBEE4D2008C60D9 /* MyListStatisticsCardContainer.swift */; };
 		15186B842FBF6000008C60D9 /* MyListGenreInsightsCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15186B852FBF6000008C60D9 /* MyListGenreInsightsCardView.swift */; };
+		15186B862FF40000008C60D9 /* MyListPieChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15186B872FF40000008C60D9 /* MyListPieChartView.swift */; };
 		155399752F7C0F5B0028BD24 /* AnimeReviewSkeletonViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 155399742F7C0F5B0028BD24 /* AnimeReviewSkeletonViews.swift */; };
 		1553997B2F7C18BD0028BD24 /* MangaDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1553997A2F7C18BD0028BD24 /* MangaDetailView.swift */; };
 		1555A2382F7B94F300501496 /* AnimeDetailMediaKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1555A2372F7B94F300501496 /* AnimeDetailMediaKind.swift */; };
@@ -120,7 +121,7 @@
 		15ACFD062FD916DC00B38F89 /* MyListGenreCollectionsDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15ACFCFE2FD916DC00B38F89 /* MyListGenreCollectionsDetailViewModel.swift */; };
 		15ACFD072FD916DC00B38F89 /* MyListGenreCollectionsDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15ACFCFC2FD916DC00B38F89 /* MyListGenreCollectionsDetailView.swift */; };
 		15ACFD082FD916DC00B38F89 /* MyListFormatCollectionSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15ACFCED2FD916DC00B38F89 /* MyListFormatCollectionSection.swift */; };
-		15ACFD092FD916DC00B38F89 /* MyListDistributionChartCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15ACFCFB2FD916DC00B38F89 /* MyListDistributionChartCardView.swift */; };
+		15ACFD092FD916DC00B38F89 /* MyListGenreDistributionChartCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15ACFCFB2FD916DC00B38F89 /* MyListGenreDistributionChartCardView.swift */; };
 		15ACFD0A2FD916DC00B38F89 /* MyListGenreCollectionSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15ACFCF72FD916DC00B38F89 /* MyListGenreCollectionSection.swift */; };
 		15ACFD0B2FD916DC00B38F89 /* MyListGenreCollectionsRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15ACFCF82FD916DC00B38F89 /* MyListGenreCollectionsRoute.swift */; };
 		15ACFD0C2FD916DC00B38F89 /* MyListFormatCollectionsSectionBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15ACFCEF2FD916DC00B38F89 /* MyListFormatCollectionsSectionBuilder.swift */; };
@@ -396,6 +397,7 @@
 		1504E4F52FAB8A51009EB340 /* HomeTrendingMangaListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTrendingMangaListViewModel.swift; sourceTree = "<group>"; };
 		15186B7F2FBEE4D2008C60D9 /* MyListStatisticsCardContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListStatisticsCardContainer.swift; sourceTree = "<group>"; };
 		15186B852FBF6000008C60D9 /* MyListGenreInsightsCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListGenreInsightsCardView.swift; sourceTree = "<group>"; };
+		15186B872FF40000008C60D9 /* MyListPieChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListPieChartView.swift; sourceTree = "<group>"; };
 		155399742F7C0F5B0028BD24 /* AnimeReviewSkeletonViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeReviewSkeletonViews.swift; sourceTree = "<group>"; };
 		1553997A2F7C18BD0028BD24 /* MangaDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MangaDetailView.swift; sourceTree = "<group>"; };
 		1555A2372F7B94F300501496 /* AnimeDetailMediaKind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeDetailMediaKind.swift; sourceTree = "<group>"; };
@@ -503,7 +505,7 @@
 		15ACFCF72FD916DC00B38F89 /* MyListGenreCollectionSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListGenreCollectionSection.swift; sourceTree = "<group>"; };
 		15ACFCF82FD916DC00B38F89 /* MyListGenreCollectionsRoute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListGenreCollectionsRoute.swift; sourceTree = "<group>"; };
 		15ACFCF92FD916DC00B38F89 /* MyListGenreCollectionsSectionBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListGenreCollectionsSectionBuilder.swift; sourceTree = "<group>"; };
-		15ACFCFB2FD916DC00B38F89 /* MyListDistributionChartCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListDistributionChartCardView.swift; sourceTree = "<group>"; };
+		15ACFCFB2FD916DC00B38F89 /* MyListGenreDistributionChartCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListGenreDistributionChartCardView.swift; sourceTree = "<group>"; };
 		15ACFCFC2FD916DC00B38F89 /* MyListGenreCollectionsDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListGenreCollectionsDetailView.swift; sourceTree = "<group>"; };
 		15ACFCFE2FD916DC00B38F89 /* MyListGenreCollectionsDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListGenreCollectionsDetailViewModel.swift; sourceTree = "<group>"; };
 		15ADF0982F9A10F4004B3BB0 /* PeopleDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleDetailView.swift; sourceTree = "<group>"; };
@@ -864,6 +866,7 @@
 			isa = PBXGroup;
 			children = (
 				15186B852FBF6000008C60D9 /* MyListGenreInsightsCardView.swift */,
+				15186B872FF40000008C60D9 /* MyListPieChartView.swift */,
 				15186B7F2FBEE4D2008C60D9 /* MyListStatisticsCardContainer.swift */,
 			);
 			path = Group;
@@ -1663,7 +1666,7 @@
 		15ACFCFD2FD916DC00B38F89 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				15ACFCFB2FD916DC00B38F89 /* MyListDistributionChartCardView.swift */,
+				15ACFCFB2FD916DC00B38F89 /* MyListGenreDistributionChartCardView.swift */,
 				15ACFCFC2FD916DC00B38F89 /* MyListGenreCollectionsDetailView.swift */,
 			);
 			path = View;
@@ -3366,7 +3369,7 @@
 				15ACFD062FD916DC00B38F89 /* MyListGenreCollectionsDetailViewModel.swift in Sources */,
 				15ACFD072FD916DC00B38F89 /* MyListGenreCollectionsDetailView.swift in Sources */,
 				15ACFD082FD916DC00B38F89 /* MyListFormatCollectionSection.swift in Sources */,
-				15ACFD092FD916DC00B38F89 /* MyListDistributionChartCardView.swift in Sources */,
+				15ACFD092FD916DC00B38F89 /* MyListGenreDistributionChartCardView.swift in Sources */,
 				15ACFD0A2FD916DC00B38F89 /* MyListGenreCollectionSection.swift in Sources */,
 				15ACFD0B2FD916DC00B38F89 /* MyListGenreCollectionsRoute.swift in Sources */,
 				15ACFD0C2FD916DC00B38F89 /* MyListFormatCollectionsSectionBuilder.swift in Sources */,
@@ -3493,6 +3496,7 @@
 				16B1001C2F8A10000000001C /* PeopleListModel.swift in Sources */,
 				16B100102F8A000000000010 /* PeopleListViewModel.swift in Sources */,
 				15186B842FBF6000008C60D9 /* MyListGenreInsightsCardView.swift in Sources */,
+				15186B862FF40000008C60D9 /* MyListPieChartView.swift in Sources */,
 				15186B832FBEE4D2008C60D9 /* MyListStatisticsCardContainer.swift in Sources */,
 				16B100122F8A000000000012 /* PeopleListContentView.swift in Sources */,
 				16B100142F8A000000000014 /* PeopleGridItemView.swift in Sources */,

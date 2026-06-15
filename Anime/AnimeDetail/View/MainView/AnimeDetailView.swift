@@ -71,7 +71,7 @@ private struct AnimeDetailBodyView: View {
                     title: "作品資料暫時載入失敗",
                     retryTitle: "重新載入"
                 ) {
-                    Task { await viewModel.load(forceRefresh: true) }
+                    Task(priority: .userInitiated) { await viewModel.load(forceRefresh: true) }
                 }
                 .padding(16)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -121,12 +121,12 @@ private struct AnimeDetailBodyView: View {
                     viewModel.toggleFavorite(isFavorite: isFavorite)
                 },
                 onBroadcastReminderTap: {
-                    Task {
+                    Task(priority: .userInitiated) {
                         await toggleBroadcastReminder()
                     }
                 },
                 onRefreshTap: {
-                    Task {
+                    Task(priority: .userInitiated) {
                         await viewModel.load(forceRefresh: true)
                         await viewModel.syncBroadcastReminderIfNeeded(
                             isSubscribed: broadcastReminderStatusStore.isSubscribed(malId: malId),
@@ -177,7 +177,7 @@ private struct AnimeDetailBodyView: View {
                 )
             }
         }
-        .task(id: malId) {
+        .task(id: malId, priority: .userInitiated) {
             await viewModel.load()
             await viewModel.syncBroadcastReminderIfNeeded(
                 isSubscribed: broadcastReminderStatusStore.isSubscribed(malId: malId),
@@ -285,7 +285,7 @@ private struct AnimeDetailBodyView: View {
                     failure: failure,
                     retryTitle: "重試"
                 ) {
-                    Task { await viewModel.reloadCharacters() }
+                    Task(priority: .userInitiated) { await viewModel.reloadCharacters() }
                 }
             } else {
                 AnimeDetailCharactersSectionView(
@@ -305,7 +305,7 @@ private struct AnimeDetailBodyView: View {
                     failure: failure,
                     retryTitle: "重試"
                 ) {
-                    Task { await viewModel.reloadPictures() }
+                    Task(priority: .userInitiated) { await viewModel.reloadPictures() }
                 }
             } else {
                 AnimeDetailPicturesSectionView(
@@ -324,7 +324,7 @@ private struct AnimeDetailBodyView: View {
                     failure: failure,
                     retryTitle: "重試"
                 ) {
-                    Task { await viewModel.reloadRecommendations() }
+                    Task(priority: .userInitiated) { await viewModel.reloadRecommendations() }
                 }
             } else {
                 AnimeDetailRecommendationsSectionView(

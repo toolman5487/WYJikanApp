@@ -108,7 +108,7 @@ final class HomeTodayAnimeScheduleListViewModel: ObservableObject {
             .sink { [weak self] _ in
                 guard let self else { return }
                 self.dayRequestTask?.cancel()
-                self.dayRequestTask = Task { [weak self] in
+                self.dayRequestTask = Task(priority: .userInitiated) { [weak self] in
                     guard let self else { return }
                     await self.fetchFirstPage(showSkeleton: true)
                 }

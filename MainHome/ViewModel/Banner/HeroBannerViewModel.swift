@@ -61,9 +61,9 @@ final class HeroBannerViewModel: ObservableObject {
 
     // MARK: - Public Methods
 
-    func loadIfNeeded() {
+    func loadIfNeeded(priority: TaskPriority = .userInitiated) {
         sectionLoader.loadIfNeeded(isContentEmpty: items.isEmpty) {
-            load()
+            load(priority: priority)
         }
     }
 
@@ -87,8 +87,8 @@ final class HeroBannerViewModel: ObservableObject {
         startAutoScrollIfNeeded()
     }
 
-    func load() {
-        sectionLoader.load { [weak self] forceRefresh, showsLoadingState in
+    func load(priority: TaskPriority = .userInitiated) {
+        sectionLoader.load(priority: priority) { [weak self] forceRefresh, showsLoadingState in
             await self?.performLoad(forceRefresh: forceRefresh, showsLoadingState: showsLoadingState)
         }
     }
@@ -97,7 +97,7 @@ final class HeroBannerViewModel: ObservableObject {
         stopAutoScroll()
         guard items.count > 1 else { return }
 
-        autoScrollTask = Task { @MainActor [weak self] in
+        autoScrollTask = Task(priority: .low) { @MainActor [weak self] in
             while !Task.isCancelled {
                 try? await Task.sleep(nanoseconds: Self.autoScrollNanoseconds)
                 guard let self, !Task.isCancelled else { return }

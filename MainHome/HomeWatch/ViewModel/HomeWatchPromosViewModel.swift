@@ -40,9 +40,9 @@ final class HomeWatchPromosViewModel: ObservableObject {
 
     // MARK: - Public Methods
 
-    func loadIfNeeded() {
+    func loadIfNeeded(priority: TaskPriority = .userInitiated) {
         sectionLoader.loadIfNeeded(isContentEmpty: items.isEmpty) {
-            load()
+            load(priority: priority)
         }
     }
 
@@ -52,8 +52,8 @@ final class HomeWatchPromosViewModel: ObservableObject {
         }
     }
 
-    func load() {
-        sectionLoader.load { [weak self] forceRefresh, showsLoadingState in
+    func load(priority: TaskPriority = .userInitiated) {
+        sectionLoader.load(priority: priority) { [weak self] forceRefresh, showsLoadingState in
             await self?.performLoad(forceRefresh: forceRefresh, showsLoadingState: showsLoadingState)
         }
     }

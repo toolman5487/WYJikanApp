@@ -101,7 +101,7 @@ final class HomeWatchListViewModel: ObservableObject {
         guard selectedFeed != feed else { return }
         selectedFeed = feed
         feedChangeTask?.cancel()
-        feedChangeTask = Task { [weak self] in
+        feedChangeTask = Task(priority: .userInitiated) { [weak self] in
             guard let self else { return }
             await self.fetchFirstPage(showSkeleton: true, forceRefresh: false)
         }

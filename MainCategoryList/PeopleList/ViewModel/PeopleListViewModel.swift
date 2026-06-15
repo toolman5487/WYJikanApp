@@ -117,7 +117,7 @@ final class PeopleListViewModel: ObservableObject {
         let isFirstPage = page == 1
         paginationState = isFirstPage ? .loadingInitial : .loadingMore
 
-        loadTask = Task { [weak self] in
+        loadTask = Task(priority: .userInitiated) { [weak self] in
             guard let self else { return }
 
             do {

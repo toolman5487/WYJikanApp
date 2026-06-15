@@ -50,7 +50,7 @@ struct HomeWatchListView: View {
             revealDistance: 220,
             progress: $loadMoreBounceProgress
         ) {
-            Task { await viewModel.loadMore() }
+            Task(priority: .userInitiated) { await viewModel.loadMore() }
         }
         .safeAreaInset(edge: .top, spacing: 0) {
             HomeWatchFeedControlBarContainerView(
@@ -64,7 +64,7 @@ struct HomeWatchListView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    Task { await viewModel.reload() }
+                    Task(priority: .userInitiated) { await viewModel.reload() }
                 } label: {
                     Image(systemName: "arrow.trianglehead.counterclockwise")
                         .font(.body.weight(.bold))
@@ -73,7 +73,7 @@ struct HomeWatchListView: View {
                 }
             }
         }
-        .task {
+        .task(priority: .userInitiated) {
             await viewModel.loadIfNeeded()
         }
     }
@@ -104,7 +104,7 @@ struct HomeWatchListView: View {
                 title: "影音資料載入失敗",
                 retryTitle: "重新整理",
                 onRetry: {
-                    Task { await viewModel.reload() }
+                    Task(priority: .userInitiated) { await viewModel.reload() }
                 },
                 minHeight: 0,
                 alignment: .leading
@@ -134,10 +134,10 @@ struct HomeWatchListView: View {
                 state: viewModel.loadMoreState,
                 progress: loadMoreBounceProgress,
                 onLoadMore: {
-                    Task { await viewModel.loadMore() }
+                    Task(priority: .userInitiated) { await viewModel.loadMore() }
                 },
                 onRetry: {
-                    Task { await viewModel.retryLoadMore() }
+                    Task(priority: .userInitiated) { await viewModel.retryLoadMore() }
                 }
             )
         }

@@ -29,7 +29,7 @@ struct MainCategoryListView: View {
         NavigationStack {
             scrollView
                 .toolbar(.hidden, for: .navigationBar)
-                .task {
+                .task(priority: .userInitiated) {
                     viewModel.prepareSelectedKind(
                         isPadScreen: horizontalSizeClass == .regular
                     )
@@ -86,13 +86,13 @@ struct MainCategoryListView: View {
                 topFilterHeader
             }
             .onChange(of: viewModel.selectedKind) { _, _ in
-                Task { @MainActor in
+                Task(priority: .userInitiated) { @MainActor in
                     proxy.scrollTo(topAnchorId, anchor: .top)
                 }
             }
             .onChange(of: viewModel.activeTopFilterSelectionIdentifier) { _, _ in
                 guard viewModel.activeTopFilterSelectionIdentifier != nil else { return }
-                Task { @MainActor in
+                Task(priority: .userInitiated) { @MainActor in
                     withAnimation(.easeInOut(duration: 0.2)) {
                         proxy.scrollTo(topAnchorId, anchor: .top)
                     }
