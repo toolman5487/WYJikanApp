@@ -54,10 +54,6 @@ final class AnimeDetailViewModel: ObservableObject {
         connectToMyList()
     }
 
-    deinit {
-        synopsisTranslationViewModel.cancel()
-    }
-
     var detail: AnimeDetailDTO? {
         switch screenState {
         case let .refreshing(detail), let .loaded(detail):

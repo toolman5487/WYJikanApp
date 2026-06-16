@@ -58,10 +58,6 @@ final class MangaDetailViewModel: ObservableObject {
         connectToMyList()
     }
 
-    deinit {
-        synopsisTranslationViewModel.cancel()
-    }
-
     // MARK: - State
 
     var detail: MangaDetailDTO? {

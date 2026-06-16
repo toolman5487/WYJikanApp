@@ -184,6 +184,17 @@ extension MangaDetailViewModel {
         return names.isEmpty ? "-" : names.joined(separator: "、")
     }
 
+    func authorDisplayItems(for manga: MangaDetailDTO) -> [AnimeRelatedEntityDTO] {
+        guard let authors = manga.authors else { return [] }
+        return authors.filter { author in
+            author.malId > 0 && trimmedText(author.name) != nil
+        }
+    }
+
+    func authorDisplayName(_ author: AnimeRelatedEntityDTO) -> String {
+        trimmedText(author.name) ?? "未命名作者"
+    }
+
     func formatNumber(_ value: Int) -> String {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
