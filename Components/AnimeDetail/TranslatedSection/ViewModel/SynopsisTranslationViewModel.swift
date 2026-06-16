@@ -38,7 +38,7 @@ final class SynopsisTranslationViewModel: ObservableObject {
         translationTask?.cancel()
         state = .translating
 
-        translationTask = Task { [weak self] in
+        translationTask = Task(priority: .userInitiated) { [weak self] in
             guard let self else { return }
             let translationState = await translator.translate(trimmedSynopsis, context: context)
             guard !Task.isCancelled else { return }

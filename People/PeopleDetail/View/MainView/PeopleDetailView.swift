@@ -99,7 +99,7 @@ private struct PeopleDetailBodyView: View {
                 externalPageState: viewModel.externalPageNavigationState()
             )
         }
-        .task(id: malId) {
+        .task(id: malId, priority: .userInitiated) {
             await viewModel.load()
         }
     }

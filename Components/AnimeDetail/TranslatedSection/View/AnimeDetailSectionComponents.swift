@@ -9,6 +9,8 @@ import SwiftUI
 
 struct SynopsisTranslationButton: View {
     let state: SynopsisTranslationState
+    var idleTitle: String = "翻譯劇情"
+    var translatedTitle: String = "重新翻譯"
     let action: () -> Void
 
     var body: some View {
@@ -22,14 +24,25 @@ struct SynopsisTranslationButton: View {
                         .font(.footnote.weight(.semibold))
                 }
 
-                Text(state.buttonTitle)
+                Text(title)
                     .font(.footnote.weight(.semibold))
             }
         }
         .buttonStyle(.bordered)
         .controlSize(.small)
         .disabled(state.isTranslating)
-        .accessibilityLabel(state.buttonTitle)
+        .accessibilityLabel(title)
+    }
+
+    private var title: String {
+        switch state {
+        case .idle, .failed:
+            return idleTitle
+        case .translating:
+            return "翻譯中"
+        case .translated:
+            return translatedTitle
+        }
     }
 }
 

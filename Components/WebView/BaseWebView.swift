@@ -146,7 +146,7 @@ enum ExternalURLOpener {
 
         UIApplication.shared.open(url, options: [:]) { accepted in
             guard !accepted else { return }
-            Task { @MainActor in
+            Task(priority: .userInitiated) { @MainActor in
                 open(candidates.dropFirst())
             }
         }

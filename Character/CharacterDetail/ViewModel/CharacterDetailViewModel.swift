@@ -41,6 +41,7 @@ final class CharacterDetailViewModel: ObservableObject {
     }
 
     @Published private(set) var screenState: ScreenState = .loading
+    let synopsisTranslationViewModel: SynopsisTranslationViewModel
 
     private let malId: Int
     private let service: CharacterDetailServicing
@@ -49,6 +50,7 @@ final class CharacterDetailViewModel: ObservableObject {
     init(malId: Int, service: CharacterDetailServicing) {
         self.malId = malId
         self.service = service
+        self.synopsisTranslationViewModel = SynopsisTranslationViewModel(context: .characterProfile)
     }
 
     var detail: CharacterDetailDTO? {
@@ -65,10 +67,24 @@ final class CharacterDetailViewModel: ObservableObject {
         do {
             let response = try await service.fetchCharacterDetail(malId: malId)
             screenState = .loaded(response.data)
+            resetSynopsisTranslationIfNeeded(for: response.data)
         } catch is CancellationError {
             return
         } catch {
             screenState = .error(FeatureLoadFailure(error))
         }
+    }
+
+    // MARK: - Synopsis Translation
+
+    func requestSynopsisTranslation(for character: CharacterDetailDTO) {
+        synopsisTranslationViewModel.requestTranslation(
+            for: aboutText(for: character) ?? "",
+            emptyFailureMessage: "沒有可翻譯的角色介紹。"
+        )
+    }
+
+    private func resetSynopsisTranslationIfNeeded(for character: CharacterDetailDTO) {
+        synopsisTranslationViewModel.reset()
     }
 }

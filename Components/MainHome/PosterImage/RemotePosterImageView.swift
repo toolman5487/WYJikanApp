@@ -96,7 +96,7 @@ struct RemotePosterImageView: View {
             return
         }
 
-        Task { @MainActor in
+        Task(priority: .utility) { @MainActor in
             didFail = value
         }
     }
@@ -109,7 +109,7 @@ struct RemotePosterImageView: View {
             return
         }
 
-        Task { @MainActor in
+        Task(priority: .utility) { @MainActor in
             onImageSizeChange(size)
         }
     }
