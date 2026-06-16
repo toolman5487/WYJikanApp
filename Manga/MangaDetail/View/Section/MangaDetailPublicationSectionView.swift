@@ -8,8 +8,13 @@
 import SwiftUI
 
 struct MangaDetailPublicationSectionView: View {
+
+    // MARK: - Properties
+
     let viewModel: MangaDetailViewModel
     let manga: MangaDetailDTO
+
+    // MARK: - Body
 
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {

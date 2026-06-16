@@ -7,15 +7,26 @@
 
 import Combine
 import Foundation
+import FoundationModels
 import OSLog
 @MainActor
 final class MangaDetailViewModel: ObservableObject {
+
+    // MARK: - Types
+
     enum ScreenState {
         case idle
         case loading
         case refreshing(MangaDetailDTO)
         case loaded(MangaDetailDTO)
         case error(FeatureLoadFailure)
+    }
+
+    enum SynopsisTranslationState: Equatable {
+        case idle
+        case translating
+        case translated(String)
+        case failed(String)
     }
 
     @Published private(set) var screenState: ScreenState = .idle
@@ -29,12 +40,18 @@ final class MangaDetailViewModel: ObservableObject {
     @Published private(set) var picturesFailure: FeatureLoadFailure?
     @Published private(set) var recommendationsFailure: FeatureLoadFailure?
     @Published private(set) var favoriteCollectionItem: MyListCollectionItem?
+    @Published private(set) var synopsisTranslationState: SynopsisTranslationState = .idle
+
+    // MARK: - Dependencies
 
     private let malId: Int
     private let service: MangaDetailServicing
     private let favoriteRepository: any FavoriteRepository
     private let readingProgressController: MangaReadingProgressController
     private var myListCancellable: AnyCancellable?
+    private var synopsisTranslationTask: Task<Void, Never>?
+
+    // MARK: - Lifecycle
 
     init(
         malId: Int,
@@ -48,6 +65,12 @@ final class MangaDetailViewModel: ObservableObject {
         self.readingProgressController = readingProgressController
         connectToMyList()
     }
+
+    deinit {
+        synopsisTranslationTask?.cancel()
+    }
+
+    // MARK: - State
 
     var detail: MangaDetailDTO? {
         switch screenState {
@@ -88,7 +111,9 @@ final class MangaDetailViewModel: ObservableObject {
 
         do {
             let response = try await service.fetchMangaDetail(malId: malId)
-            screenState = .loaded(response.data)
+            let detail = response.data
+            screenState = .loaded(detail)
+            resetSynopsisTranslationIfNeeded(for: detail)
             await loadSupplementaryContent(resetOnFailure: existingDetail == nil)
         } catch is CancellationError {
             return
@@ -120,6 +145,110 @@ final class MangaDetailViewModel: ObservableObject {
     func reloadRecommendations() async {
         await loadRecommendations(resetOnFailure: false)
     }
+
+    // MARK: - Synopsis Translation
+
+    var isTranslatingSynopsis: Bool {
+        if case .translating = synopsisTranslationState {
+            return true
+        }
+        return false
+    }
+
+    var synopsisTranslationButtonTitle: String {
+        switch synopsisTranslationState {
+        case .idle, .failed:
+            return "翻譯劇情"
+        case .translating:
+            return "翻譯中"
+        case .translated:
+            return "重新翻譯"
+        }
+    }
+
+    func requestSynopsisTranslation(for manga: MangaDetailDTO) {
+        let synopsis = synopsisDisplayText(for: manga)
+        guard synopsis != "-" else {
+            synopsisTranslationState = .failed("沒有可翻譯的作品簡介。")
+            return
+        }
+
+        synopsisTranslationTask?.cancel()
+        synopsisTranslationState = .translating
+
+        synopsisTranslationTask = Task { [weak self] in
+            let translationState = await Self.translateSynopsis(synopsis)
+            guard !Task.isCancelled else { return }
+            self?.synopsisTranslationState = translationState
+        }
+    }
+
+    private func resetSynopsisTranslationIfNeeded(for manga: MangaDetailDTO) {
+        guard synopsisTranslationState != .idle else { return }
+        synopsisTranslationTask?.cancel()
+        synopsisTranslationState = .idle
+    }
+
+    private nonisolated static func translateSynopsis(
+        _ synopsis: String
+    ) async -> SynopsisTranslationState {
+        let model = SystemLanguageModel.default
+
+        switch model.availability {
+        case .available:
+            break
+
+        case let .unavailable(reason):
+            return .failed(availabilityMessage(for: reason))
+        }
+
+        do {
+            let session = LanguageModelSession(
+                model: model,
+                instructions: """
+                你是漫畫作品簡介翻譯助手。只輸出繁體中文譯文，不要加入解釋、標題、評論或額外內容。
+                保留角色名、作品專有名詞與括號中的來源標記原意，語氣自然但不要改寫劇情。
+                """
+            )
+            let prompt = """
+            請將以下英文漫畫劇情簡介翻譯成繁體中文：
+
+            \(synopsis)
+            """
+            let response = try await session.respond(
+                to: prompt,
+                options: GenerationOptions(temperature: 0.1, maximumResponseTokens: 1_200)
+            )
+            let translatedText = response.content.trimmingCharacters(in: .whitespacesAndNewlines)
+
+            guard !translatedText.isEmpty else {
+                return .failed("本地 AI 沒有產生可顯示內容。")
+            }
+
+            return .translated(translatedText)
+        } catch is CancellationError {
+            return .idle
+        } catch {
+            return .failed("本地 AI 翻譯暫時無法使用。")
+        }
+    }
+
+    private nonisolated static func availabilityMessage(
+        for reason: SystemLanguageModel.Availability.UnavailableReason
+    ) -> String {
+        switch reason {
+        case .deviceNotEligible:
+            return "此裝置不支援本地 AI 翻譯。"
+        case .appleIntelligenceNotEnabled:
+            return "請先在系統設定開啟 Apple Intelligence，才能使用本地 AI 翻譯。"
+        case .modelNotReady:
+            return "本地 AI 模型尚未準備完成，稍後再試。"
+        @unknown default:
+            return "此裝置目前無法使用本地 AI 翻譯。"
+        }
+    }
+
+    // MARK: - Supplementary Content
 
     private func loadPictures(resetOnFailure: Bool) async {
         isLoadingPictures = true

@@ -25,6 +25,9 @@ private struct MangaDetailConfiguredView: View {
 }
 
 private struct MangaDetailBodyView: View {
+
+    // MARK: - Types
+
     private struct ImagePreviewSession: Identifiable {
         let id = UUID()
         let items: [ImagePreviewItem]
@@ -34,7 +37,6 @@ private struct MangaDetailBodyView: View {
     // MARK: - Properties
 
     let malId: Int
-
     @StateObject private var viewModel: MangaDetailViewModel
     @EnvironmentObject private var favoriteStatusStore: FavoriteStatusStore
     @State private var imagePreviewSession: ImagePreviewSession?
@@ -42,15 +44,149 @@ private struct MangaDetailBodyView: View {
     @State private var isShowingCharacterList = false
     @State private var isShowingRecommendationList = false
 
-    // MARK: - Initialization
+    // MARK: - Lifecycle
 
     init(malId: Int, dependencies: AppDependencies) {
         self.malId = malId
         _viewModel = StateObject(wrappedValue: dependencies.makeMangaDetailViewModel(malId: malId))
     }
 
+    // MARK: - Body
+
+    var body: some View {
+        Group {
+            switch viewModel.screenState {
+            case let .refreshing(manga), let .loaded(manga):
+                detailScroll {
+                    ForEach(viewModel.sections(for: manga)) { section in
+                        sectionView(section, viewModel: viewModel, manga: manga)
+                    }
+                }
+            case let .error(failure):
+                ErrorMessageRetryCardView(
+                    state: ErrorMessageView.State(failure: failure),
+                    title: "作品資料暫時載入失敗",
+                    retryTitle: "重新載入"
+                ) {
+                    Task(priority: .userInitiated) { await viewModel.load(forceRefresh: true) }
+                }
+                .padding(16)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            case .idle, .loading:
+                detailScroll {
+                    MangaDetailHeaderSectionSkeletonView()
+                    MangaDetailHighlightsSectionSkeletonView()
+                    AnimeDetailBasicInfoSectionSkeletonView()
+                    MangaDetailScoreSectionSkeletonView()
+                    MangaDetailSynopsisSectionSkeletonView()
+                    MangaDetailCharactersSectionSkeletonView()
+                    MangaDetailPublicationSectionSkeletonView()
+                    AnimeDetailPicturesSectionSkeletonView()
+                    MangaDetailRecommendationsSectionSkeletonView()
+                }
+            }
+        }
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationDestination(isPresented: $isShowingCharacterList) {
+            if let manga = currentManga {
+                MangaDetailCharactersListView(
+                    mangaTitle: viewModel.displayTitle(for: manga),
+                    roles: viewModel.allCharacterRoles,
+                    viewModel: viewModel
+                )
+            }
+        }
+        .navigationDestination(isPresented: $isShowingRecommendationList) {
+            if let manga = currentManga {
+                MangaDetailRecommendationsListView(
+                    mangaTitle: viewModel.displayTitle(for: manga),
+                    rows: viewModel.recommendationRows(for: .list)
+                )
+            }
+        }
+        .toolbar {
+            DetailNavigationToolbar(
+                isFavorite: isFavorite,
+                isFavoriteActionEnabled: viewModel.isFavoriteActionEnabled,
+                shareState: viewModel.shareNavigationState(),
+                reviewState: viewModel.reviewNavigationState(),
+                isRefreshing: viewModel.isRefreshing,
+                onFavoriteTap: {
+                    viewModel.toggleFavorite(isFavorite: isFavorite)
+                },
+                onRefreshTap: {
+                    Task(priority: .userInitiated) {
+                        await viewModel.load(forceRefresh: true)
+                    }
+                },
+                reviewDestination: { title in
+                    MangaReviewView(
+                        malId: malId,
+                        mangaTitle: title
+                    )
+                }
+            )
+        }
+        .fullScreenCover(item: $imagePreviewSession) { session in
+            ImagePreviewViewer(
+                items: session.items,
+                selectedIndex: imagePreviewSelectedIndexBinding(for: session)
+            )
+        }
+        .sheet(item: $progressEditorDraft) { draft in
+            MangaReadingProgressEditorView(draft: draft) { updatedDraft in
+                guard let favoriteItem = viewModel.favoriteCollectionItem else { return }
+                viewModel.updateReadingProgress(
+                    for: favoriteItem,
+                    status: updatedDraft.status,
+                    currentChapter: updatedDraft.currentChapter,
+                    totalChapters: updatedDraft.totalChapters
+                )
+            }
+        }
+        .task(id: malId, priority: .userInitiated) {
+            await viewModel.load()
+        }
+    }
+
+    // MARK: - Private Methods
+
+    private var isFavorite: Bool {
+        favoriteStatusStore.isFavorite(malId: malId, mediaKind: .manga)
+    }
+
+    private var currentManga: MangaDetailDTO? {
+        switch viewModel.screenState {
+        case let .loaded(manga), let .refreshing(manga):
+            return manga
+        case .idle, .loading, .error:
+            return nil
+        }
+    }
+
+    private func detailScroll<Content: View>(@ViewBuilder content: () -> Content) -> some View {
+        ScrollView {
+            LazyVStack(alignment: .leading, spacing: 20) {
+                content()
+            }
+            .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    private func imagePreviewSelectedIndexBinding(for session: ImagePreviewSession) -> Binding<Int> {
+        Binding(
+            get: { imagePreviewSession?.selectedIndex ?? session.selectedIndex },
+            set: { imagePreviewSession?.selectedIndex = $0 }
+        )
+    }
+
     @ViewBuilder
-    private func sectionView(_ section: MangaDetailViewModel.Section, viewModel: MangaDetailViewModel, manga: MangaDetailDTO) -> some View {
+    private func sectionView(
+        _ section: MangaDetailViewModel.Section,
+        viewModel: MangaDetailViewModel,
+        manga: MangaDetailDTO
+    ) -> some View {
         switch section {
         case .header:
             VStack(alignment: .leading, spacing: 20) {
@@ -164,130 +300,6 @@ private struct MangaDetailBodyView: View {
             selectedPictureIndex: selectedPictureIndex
         )
         imagePreviewSession = ImagePreviewSession(items: items, selectedIndex: selectedIndex)
-    }
-
-    private var isFavorite: Bool {
-        favoriteStatusStore.isFavorite(malId: malId, mediaKind: .manga)
-    }
-
-    private var currentManga: MangaDetailDTO? {
-        switch viewModel.screenState {
-        case let .loaded(manga), let .refreshing(manga):
-            return manga
-        case .idle, .loading, .error:
-            return nil
-        }
-    }
-
-    // MARK: - Body
-
-    var body: some View {
-        Group {
-            switch viewModel.screenState {
-            case let .refreshing(manga), let .loaded(manga):
-                ScrollView {
-                    LazyVStack(alignment: .leading, spacing: 20) {
-                        ForEach(viewModel.sections(for: manga)) { section in
-                            sectionView(section, viewModel: viewModel, manga: manga)
-                        }
-                    }
-                    .padding()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                }
-            case let .error(failure):
-                ErrorMessageRetryCardView(
-                    state: ErrorMessageView.State(failure: failure),
-                    title: "作品資料暫時載入失敗",
-                    retryTitle: "重新載入"
-                ) {
-                    Task(priority: .userInitiated) { await viewModel.load(forceRefresh: true) }
-                }
-                .padding(16)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            case .idle, .loading:
-                ScrollView {
-                    LazyVStack(alignment: .leading, spacing: 20) {
-                        MangaDetailHeaderSectionSkeletonView()
-                        MangaDetailHighlightsSectionSkeletonView()
-                        AnimeDetailBasicInfoSectionSkeletonView()
-                        MangaDetailScoreSectionSkeletonView()
-                        MangaDetailSynopsisSectionSkeletonView()
-                        MangaDetailCharactersSectionSkeletonView()
-                        MangaDetailPublicationSectionSkeletonView()
-                        AnimeDetailPicturesSectionSkeletonView()
-                        MangaDetailRecommendationsSectionSkeletonView()
-                    }
-                    .padding()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                }
-            }
-        }
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationDestination(isPresented: $isShowingCharacterList) {
-            if let manga = currentManga {
-                MangaDetailCharactersListView(
-                    mangaTitle: viewModel.displayTitle(for: manga),
-                    roles: viewModel.allCharacterRoles,
-                    viewModel: viewModel
-                )
-            }
-        }
-        .navigationDestination(isPresented: $isShowingRecommendationList) {
-            if let manga = currentManga {
-                MangaDetailRecommendationsListView(
-                    mangaTitle: viewModel.displayTitle(for: manga),
-                    rows: viewModel.recommendationRows(for: .list)
-                )
-            }
-        }
-        .toolbar {
-            DetailNavigationToolbar(
-                isFavorite: isFavorite,
-                isFavoriteActionEnabled: viewModel.isFavoriteActionEnabled,
-                shareState: viewModel.shareNavigationState(),
-                reviewState: viewModel.reviewNavigationState(),
-                isRefreshing: viewModel.isRefreshing,
-                onFavoriteTap: {
-                    viewModel.toggleFavorite(isFavorite: isFavorite)
-                },
-                onRefreshTap: {
-                    Task(priority: .userInitiated) {
-                        await viewModel.load(forceRefresh: true)
-                    }
-                },
-                reviewDestination: { title in
-                    MangaReviewView(
-                        malId: malId,
-                        mangaTitle: title
-                    )
-                }
-            )
-        }
-        .fullScreenCover(item: $imagePreviewSession) { session in
-            ImagePreviewViewer(
-                items: session.items,
-                selectedIndex: Binding(
-                    get: { imagePreviewSession?.selectedIndex ?? session.selectedIndex },
-                    set: { newValue in
-                        imagePreviewSession?.selectedIndex = newValue
-                    }
-                )
-            )
-        }
-        .sheet(item: $progressEditorDraft) { draft in
-            MangaReadingProgressEditorView(draft: draft) { updatedDraft in
-                guard let favoriteItem = viewModel.favoriteCollectionItem else { return }
-                viewModel.updateReadingProgress(
-                    for: favoriteItem,
-                    status: updatedDraft.status,
-                    currentChapter: updatedDraft.currentChapter,
-                    totalChapters: updatedDraft.totalChapters
-                )
-            }
-        }
-        .task(id: malId, priority: .userInitiated) {
-            await viewModel.load()
-        }
     }
 }
 

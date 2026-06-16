@@ -8,9 +8,14 @@
 import SwiftUI
 
 struct MangaDetailHeaderSectionView: View {
+
+    // MARK: - Properties
+
     let viewModel: MangaDetailViewModel
     let manga: MangaDetailDTO
     let onTapPoster: (() -> Void)?
+
+    // MARK: - Lifecycle
 
     init(
         viewModel: MangaDetailViewModel,
@@ -21,6 +26,8 @@ struct MangaDetailHeaderSectionView: View {
         self.manga = manga
         self.onTapPoster = onTapPoster
     }
+
+    // MARK: - Body
 
     var body: some View {
         HStack(alignment: .top, spacing: 16) {
@@ -46,6 +53,8 @@ struct MangaDetailHeaderSectionView: View {
             Spacer(minLength: 0)
         }
     }
+
+    // MARK: - Private Views
 
     @ViewBuilder
     private var posterView: some View {

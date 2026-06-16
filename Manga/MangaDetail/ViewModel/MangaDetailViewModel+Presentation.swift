@@ -9,6 +9,8 @@ import Foundation
 
 extension MangaDetailViewModel {
 
+    // MARK: - Section
+
     enum Section: Identifiable {
         case header
         case highlights

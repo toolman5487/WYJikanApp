@@ -8,8 +8,13 @@
 import SwiftUI
 
 struct MangaDetailHighlightsSectionView: View {
+
+    // MARK: - Properties
+
     let viewModel: MangaDetailViewModel
     let manga: MangaDetailDTO
+
+    // MARK: - Body
 
     var body: some View {
         if !highlightItems.isEmpty {
@@ -45,6 +50,8 @@ struct MangaDetailHighlightsSectionView: View {
             }
         }
     }
+
+    // MARK: - Private Methods
 
     private var highlightItems: [(title: String, value: String)] {
         var items: [(String, String)] = []

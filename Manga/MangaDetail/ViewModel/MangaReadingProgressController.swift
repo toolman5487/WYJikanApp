@@ -7,11 +7,15 @@
 
 import Foundation
 
+// MARK: - MangaReadingProgressUpdate
+
 struct MangaReadingProgressUpdate {
     let status: MangaReadingStatus
     let currentChapter: Int?
     let totalChapters: Int?
 }
+
+// MARK: - MangaReadingProgressController
 
 struct MangaReadingProgressController {
 

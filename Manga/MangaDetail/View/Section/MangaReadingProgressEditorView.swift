@@ -8,12 +8,17 @@
 import SwiftUI
 
 struct MangaReadingProgressEditorView: View {
+
+    // MARK: - Properties
+
     @Environment(\.dismiss) private var dismiss
     @State private var draft: MangaReadingProgressEditorDraft
     @State private var chapterText: String
     @FocusState private var isChapterFieldFocused: Bool
 
     let onSave: (MangaReadingProgressEditorDraft) -> Void
+
+    // MARK: - Lifecycle
 
     init(
         draft: MangaReadingProgressEditorDraft,
@@ -23,6 +28,8 @@ struct MangaReadingProgressEditorView: View {
         _chapterText = State(initialValue: draft.currentChapter > 0 ? "\(draft.currentChapter)" : "")
         self.onSave = onSave
     }
+
+    // MARK: - Body
 
     var body: some View {
         NavigationStack {
@@ -76,6 +83,8 @@ struct MangaReadingProgressEditorView: View {
             }
         }
     }
+
+    // MARK: - Private Methods
 
     private func save() {
         draft.currentChapter = normalizedChapter

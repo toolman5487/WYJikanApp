@@ -8,8 +8,13 @@
 import SwiftUI
 
 struct MangaDetailScoreSectionView: View {
+
+    // MARK: - Properties
+
     let viewModel: MangaDetailViewModel
     let manga: MangaDetailDTO
+
+    // MARK: - Body
 
     var body: some View {
         AnimeDetailSectionCard("評分與人氣") {

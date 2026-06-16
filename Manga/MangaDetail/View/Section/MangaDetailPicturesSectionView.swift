@@ -8,8 +8,13 @@
 import SwiftUI
 
 struct MangaDetailPicturesSectionView: View {
+
+    // MARK: - Properties
+
     let viewModel: MangaDetailViewModel
     let onTapImage: (Int) -> Void
+
+    // MARK: - Body
 
     var body: some View {
         if viewModel.canShowFullPictureList {
@@ -31,6 +36,8 @@ struct MangaDetailPicturesSectionView: View {
         }
     }
 
+    // MARK: - Private Views
+
     @ViewBuilder
     private func pictureGrid(items: [MangaDetailPictureItem]) -> some View {
         DetailPictureGridLayout {
@@ -43,9 +50,16 @@ struct MangaDetailPicturesSectionView: View {
     }
 }
 
+// MARK: - MangaDetailPicturesListView
+
 struct MangaDetailPicturesListView: View {
+
+    // MARK: - Properties
+
     let viewModel: MangaDetailViewModel
     let onTapImage: (Int) -> Void
+
+    // MARK: - Body
 
     var body: some View {
         DetailPictureGridLayout(embedInScrollView: true) {

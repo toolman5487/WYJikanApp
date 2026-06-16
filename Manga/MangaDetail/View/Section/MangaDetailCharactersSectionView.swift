@@ -8,10 +8,15 @@
 import SwiftUI
 
 struct MangaDetailCharactersSectionView: View {
+
+    // MARK: - Properties
+
     let viewModel: MangaDetailViewModel
     let mangaTitle: String
     @Binding var isShowingCharacterList: Bool
     @State private var characterListBounceProgress: CGFloat = 0
+
+    // MARK: - Body
 
     var body: some View {
         AnimeDetailLinkedSection(
@@ -66,9 +71,7 @@ struct MangaDetailCharactersSectionView: View {
         }
     }
 
-    private var canShowCharacterList: Bool {
-        viewModel.allCharacterRoles.count > viewModel.previewCharacterRoles.count
-    }
+    // MARK: - Private Views
 
     private var characterListDestination: some View {
         MangaDetailCharactersListView(
@@ -76,5 +79,11 @@ struct MangaDetailCharactersSectionView: View {
             roles: viewModel.allCharacterRoles,
             viewModel: viewModel
         )
+    }
+
+    // MARK: - Private Methods
+
+    private var canShowCharacterList: Bool {
+        viewModel.allCharacterRoles.count > viewModel.previewCharacterRoles.count
     }
 }

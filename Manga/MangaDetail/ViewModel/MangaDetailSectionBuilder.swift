@@ -7,6 +7,8 @@
 
 import Foundation
 
+// MARK: - MangaDetailSectionAvailability
+
 struct MangaDetailSectionAvailability {
     let hasSynopsis: Bool
     let hasCharacters: Bool
@@ -15,6 +17,8 @@ struct MangaDetailSectionAvailability {
     let hasPictures: Bool
     let hasRecommendations: Bool
 }
+
+// MARK: - MangaDetailSectionBuilder
 
 struct MangaDetailSectionBuilder {
     func sections(for availability: MangaDetailSectionAvailability) -> [MangaDetailViewModel.Section] {

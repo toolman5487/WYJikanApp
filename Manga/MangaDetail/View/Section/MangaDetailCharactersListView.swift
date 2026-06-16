@@ -8,9 +8,14 @@
 import SwiftUI
 
 struct MangaDetailCharactersListView: View {
+
+    // MARK: - Properties
+
     let mangaTitle: String
     let roles: [MangaCharacterRoleDTO]
     let viewModel: MangaDetailViewModel
+
+    // MARK: - Body
 
     var body: some View {
         ScrollView {
@@ -58,6 +63,8 @@ struct MangaDetailCharactersListView: View {
         .navigationTitle("\(mangaTitle) 角色")
         .navigationBarTitleDisplayMode(.inline)
     }
+
+    // MARK: - Private Views
 
     @ViewBuilder
     private func characterImage(_ character: AnimeCharacterEntryDTO) -> some View {

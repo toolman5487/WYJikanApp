@@ -8,17 +8,24 @@
 import SwiftUI
 
 struct MangaReadingProgressSectionView: View {
+
+    // MARK: - Properties
+
     let item: MyListCollectionItem
     let manga: MangaDetailDTO
     let onIncrement: (MyListCollectionItem) -> Void
     let onDecrement: (MyListCollectionItem) -> Void
     let onEdit: (MyListCollectionItem) -> Void
 
+    // MARK: - Body
+
     var body: some View {
         AnimeDetailSectionCard("閱讀進度") {
             savedProgressView
         }
     }
+
+    // MARK: - Private Views
 
     private var savedProgressView: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -89,6 +96,8 @@ struct MangaReadingProgressSectionView: View {
             .opacity(isAtLastChapter(item) ? 0.42 : 1)
         }
     }
+
+    // MARK: - Private Methods
 
     private func chapterButtonText(for item: MyListCollectionItem) -> String {
         item.readingProgressSummary(totalChapters: totalChapters)

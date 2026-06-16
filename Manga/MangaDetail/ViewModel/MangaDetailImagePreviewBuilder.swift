@@ -7,7 +7,12 @@
 
 import Foundation
 
+// MARK: - MangaDetailImagePreviewBuilder
+
 struct MangaDetailImagePreviewBuilder {
+
+    // MARK: - Public Methods
+
     func items(
         mangaId: Int,
         posterURL: URL?,

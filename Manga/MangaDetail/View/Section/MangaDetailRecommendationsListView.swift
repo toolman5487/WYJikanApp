@@ -8,8 +8,13 @@
 import SwiftUI
 
 struct MangaDetailRecommendationsListView: View {
+
+    // MARK: - Properties
+
     let mangaTitle: String
     let rows: [DetailRecommendationRow]
+
+    // MARK: - Body
 
     var body: some View {
         DetailPosterGridListLayout {

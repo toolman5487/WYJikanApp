@@ -8,10 +8,15 @@
 import SwiftUI
 
 struct MangaDetailRecommendationsSectionView: View {
+
+    // MARK: - Properties
+
     let viewModel: MangaDetailViewModel
     let mangaTitle: String
     @Binding var isShowingRecommendationList: Bool
     @State private var recommendationListBounceProgress: CGFloat = 0
+
+    // MARK: - Body
 
     var body: some View {
         AnimeDetailLinkedSection(
@@ -54,6 +59,8 @@ struct MangaDetailRecommendationsSectionView: View {
             }
         }
     }
+
+    // MARK: - Private Views
 
     private var recommendationListDestination: some View {
         MangaDetailRecommendationsListView(
