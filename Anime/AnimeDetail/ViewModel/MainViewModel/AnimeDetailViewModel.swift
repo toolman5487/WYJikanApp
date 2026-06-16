@@ -139,6 +139,7 @@ final class AnimeDetailViewModel: ObservableObject {
 
     private func resetSynopsisTranslationIfNeeded(for anime: AnimeDetailDTO) {
         synopsisTranslationViewModel.reset()
+        synopsisTranslationViewModel.prepareTranslation(for: synopsisDisplayText(for: anime))
     }
 
     private func loadPictures(resetOnFailure: Bool) async {

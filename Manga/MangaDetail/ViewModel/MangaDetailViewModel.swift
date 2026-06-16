@@ -145,6 +145,7 @@ final class MangaDetailViewModel: ObservableObject {
 
     private func resetSynopsisTranslationIfNeeded(for manga: MangaDetailDTO) {
         synopsisTranslationViewModel.reset()
+        synopsisTranslationViewModel.prepareTranslation(for: synopsisDisplayText(for: manga))
     }
 
     // MARK: - Supplementary Content

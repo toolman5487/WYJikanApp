@@ -42,7 +42,10 @@ nonisolated struct SynopsisTranslationService: SynopsisTranslating {
             """
             let response = try await session.respond(
                 to: prompt,
-                options: GenerationOptions(temperature: 0.1, maximumResponseTokens: 1_200)
+                options: GenerationOptions(
+                    temperature: 0.1,
+                    maximumResponseTokens: context.maximumResponseTokens
+                )
             )
             let translatedText = response.content.trimmingCharacters(in: .whitespacesAndNewlines)
 

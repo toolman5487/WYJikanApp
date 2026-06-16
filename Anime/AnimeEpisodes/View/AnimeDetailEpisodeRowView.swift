@@ -161,6 +161,10 @@ struct AnimeDetailEpisodeRowView: View, Equatable {
                 }
                 .onChange(of: synopsis) { _, _ in
                     synopsisTranslationViewModel.reset()
+                    synopsisTranslationViewModel.prepareTranslation(for: synopsis)
+                }
+                .onAppear {
+                    synopsisTranslationViewModel.prepareTranslation(for: synopsis)
                 }
             }
 

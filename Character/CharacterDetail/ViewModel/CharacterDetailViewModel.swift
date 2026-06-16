@@ -86,5 +86,6 @@ final class CharacterDetailViewModel: ObservableObject {
 
     private func resetSynopsisTranslationIfNeeded(for character: CharacterDetailDTO) {
         synopsisTranslationViewModel.reset()
+        synopsisTranslationViewModel.prepareTranslation(for: aboutText(for: character) ?? "")
     }
 }
