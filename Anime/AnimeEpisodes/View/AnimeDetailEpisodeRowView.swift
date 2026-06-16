@@ -9,6 +9,9 @@ import SwiftUI
 
 struct AnimeDetailEpisodeRowView: View, Equatable {
     @Environment(\.openURL) private var openURL
+    @StateObject private var synopsisTranslationViewModel = SynopsisTranslationViewModel(
+        context: .animeEpisode
+    )
 
     let row: AnimeDetailEpisodeRowPresentation
     let onToggle: () -> Void
@@ -42,6 +45,12 @@ struct AnimeDetailEpisodeRowView: View, Equatable {
                 style: .continuous
             )
         )
+        .onChange(of: row.id) { _, _ in
+            synopsisTranslationViewModel.reset()
+        }
+        .onDisappear {
+            synopsisTranslationViewModel.cancel()
+        }
     }
 
     private var summaryContent: some View {
@@ -125,14 +134,33 @@ struct AnimeDetailEpisodeRowView: View, Equatable {
 
             if let synopsis = content.synopsisText {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("劇情簡介")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(ThemeColor.textSecondary)
+                    HStack(alignment: .center, spacing: 8) {
+                        Text("劇情簡介")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(ThemeColor.textSecondary)
 
-                    Text(synopsis)
-                        .font(.callout)
-                        .foregroundStyle(ThemeColor.textPrimary.opacity(0.92))
-                        .fixedSize(horizontal: false, vertical: true)
+                        Spacer(minLength: 8)
+
+                        SynopsisTranslationButton(
+                            state: synopsisTranslationViewModel.state,
+                            action: {
+                                synopsisTranslationViewModel.requestTranslation(
+                                    for: synopsis,
+                                    emptyFailureMessage: "沒有可翻譯的劇情簡介。"
+                                )
+                            }
+                        )
+                    }
+
+                    TranslatedSynopsisTextView(
+                        originalText: synopsis,
+                        translationState: synopsisTranslationViewModel.state,
+                        primaryFont: .callout,
+                        originalFont: .callout
+                    )
+                }
+                .onChange(of: synopsis) { _, _ in
+                    synopsisTranslationViewModel.reset()
                 }
             }
 

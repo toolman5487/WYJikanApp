@@ -7,6 +7,83 @@
 
 import SwiftUI
 
+struct SynopsisTranslationButton: View {
+    let state: SynopsisTranslationState
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 4) {
+                if state.isTranslating {
+                    ProgressView()
+                        .controlSize(.mini)
+                } else {
+                    Image(systemName: "translate")
+                        .font(.footnote.weight(.semibold))
+                }
+
+                Text(state.buttonTitle)
+                    .font(.footnote.weight(.semibold))
+            }
+        }
+        .buttonStyle(.bordered)
+        .controlSize(.small)
+        .disabled(state.isTranslating)
+        .accessibilityLabel(state.buttonTitle)
+    }
+}
+
+struct TranslatedSynopsisTextView: View {
+    let originalText: String
+    let translationState: SynopsisTranslationState
+    var primaryFont: Font = .body
+    var originalFont: Font = .body
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            translatedSynopsisView
+
+            originalSynopsisView
+
+            if let failureMessage = translationState.failureMessage {
+                Text(failureMessage)
+                    .font(.footnote)
+                    .foregroundStyle(ThemeColor.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var translatedSynopsisView: some View {
+        switch translationState {
+        case let .translated(text):
+            Text(text)
+                .font(primaryFont)
+                .foregroundStyle(ThemeColor.textPrimary.opacity(0.9))
+                .fixedSize(horizontal: false, vertical: true)
+
+        case .idle, .translating, .failed:
+            Text(originalText)
+                .font(primaryFont)
+                .foregroundStyle(ThemeColor.textPrimary.opacity(0.9))
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    @ViewBuilder
+    private var originalSynopsisView: some View {
+        if case .translated = translationState {
+            DisclosureGroup("原文") {
+                Text(originalText)
+                    .font(originalFont)
+                    .foregroundStyle(ThemeColor.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+}
+
 struct AnimeDetailSectionCard<Content: View>: View {
     let title: String
     private let titleAccessory: AnyView?
