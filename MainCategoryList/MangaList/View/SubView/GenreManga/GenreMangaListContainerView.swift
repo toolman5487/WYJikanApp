@@ -13,8 +13,7 @@ struct GenreMangaListContainerView: View {
 
     @ObservedObject var viewModel: GenreMangaViewModel
     let favoriteIDs: Set<Int>
-
-    @State private var selectedGenre: MangaListGenreDTO?
+    let onSelectGenre: (MangaListGenreDTO) -> Void
 
     // MARK: - Body
 
@@ -62,18 +61,18 @@ struct GenreMangaListContainerView: View {
                                 favoriteIDs: favoriteIDs,
                                 skeletonItemCount: viewModel.skeletonItemCount,
                                 onOpenCategoryDetail: {
-                                    selectedGenre = section.genre
+                                    onSelectGenre(section.genre)
                                 }
                             )
                         } header: {
-                            GenreMangaSectionHeaderView(section: section)
+                            GenreMangaSectionHeaderView(
+                                section: section,
+                                onSelectGenre: onSelectGenre
+                            )
                         }
                     }
                 }
             }
-        }
-        .navigationDestination(item: $selectedGenre) { genre in
-            MangaCategoryDetailView(genre: genre)
         }
     }
 }

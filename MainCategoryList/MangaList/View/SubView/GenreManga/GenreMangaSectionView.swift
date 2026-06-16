@@ -105,12 +105,13 @@ struct GenreMangaSectionHeaderView: View {
     // MARK: - Properties
 
     let section: MangaGenreSection
+    let onSelectGenre: (MangaListGenreDTO) -> Void
 
     // MARK: - Body
 
     var body: some View {
-        NavigationLink {
-            MangaCategoryDetailView(genre: section.genre)
+        Button {
+            onSelectGenre(section.genre)
         } label: {
             GlassSectionHeaderView(
                 title: titleText,

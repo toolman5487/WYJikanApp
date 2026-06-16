@@ -13,14 +13,19 @@ struct AnimeListView: View {
 
     @EnvironmentObject private var favoriteStatusStore: FavoriteStatusStore
     @ObservedObject var viewModel: AnimeListViewModel
+    @State private var selectedGenre: AnimeListGenreDTO?
 
     // MARK: - Body
 
     var body: some View {
         MainView(
             viewModel: viewModel,
-            favoriteIDs: favoriteStatusStore.favoriteIDs(for: .anime)
+            favoriteIDs: favoriteStatusStore.favoriteIDs(for: .anime),
+            onSelectGenre: { selectedGenre = $0 }
         )
+        .navigationDestination(item: $selectedGenre) { genre in
+            AnimeCategoryDetailView(genre: genre)
+        }
     }
 }
 
@@ -32,6 +37,7 @@ private struct MainView: View {
 
     @ObservedObject var viewModel: AnimeListViewModel
     let favoriteIDs: Set<Int>
+    let onSelectGenre: (AnimeListGenreDTO) -> Void
 
     // MARK: - Body
 
@@ -43,7 +49,8 @@ private struct MainView: View {
             )
             GenreAnimeListContainerView(
                 viewModel: viewModel.genreAnimeViewModel,
-                favoriteIDs: favoriteIDs
+                favoriteIDs: favoriteIDs,
+                onSelectGenre: onSelectGenre
             )
         }
         .padding(.top, 8)

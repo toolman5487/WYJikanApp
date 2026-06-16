@@ -24,6 +24,14 @@ private struct HomeTodayAnimeScheduleListConfiguredView: View {
 }
 
 private struct HomeTodayAnimeScheduleListBodyView: View {
+    private enum Layout {
+        static let pageHorizontalPadding: CGFloat = 16
+        static let pageTopPadding: CGFloat = 16
+        static let pageBottomPadding: CGFloat = 32
+        static let contentSpacing: CGFloat = 16
+        static let rowSpacing: CGFloat = 12
+        static let toolbarButtonSize: CGFloat = 44
+    }
 
     // MARK: - Properties
 
@@ -43,7 +51,7 @@ private struct HomeTodayAnimeScheduleListBodyView: View {
 
     var body: some View {
         ScrollView {
-            LazyVStack(alignment: .leading, spacing: 0, pinnedViews: [.sectionHeaders]) {
+            LazyVStack(alignment: .leading, spacing: Layout.contentSpacing, pinnedViews: [.sectionHeaders]) {
                 HomeTodayAnimeScheduleListHeaderView(
                     title: viewModel.headerTitle,
                     subtitle: viewModel.headerSubtitle,
@@ -51,9 +59,9 @@ private struct HomeTodayAnimeScheduleListBodyView: View {
                 )
                 stateContentView
             }
-            .padding(.horizontal, 16)
-            .padding(.top, 16)
-            .padding(.bottom, 28)
+            .padding(.horizontal, Layout.pageHorizontalPadding)
+            .padding(.top, Layout.pageTopPadding)
+            .padding(.bottom, Layout.pageBottomPadding)
         }
         .safeAreaInset(edge: .top, spacing: 0) {
             HomeTodayAnimeScheduleListDayFilterContainerView(
@@ -72,7 +80,7 @@ private struct HomeTodayAnimeScheduleListBodyView: View {
                     Image(systemName: "arrow.trianglehead.counterclockwise")
                         .font(.body.weight(.bold))
                         .foregroundStyle(ThemeColor.sakura)
-                        .frame(width: 44, height: 44)
+                        .frame(width: Layout.toolbarButtonSize, height: Layout.toolbarButtonSize)
                 }
             }
         }
@@ -119,19 +127,22 @@ private struct HomeTodayAnimeScheduleListBodyView: View {
         return LazyVStack(alignment: .leading, spacing: 0, pinnedViews: [.sectionHeaders]) {
             ForEach(sections) { section in
                 Section {
-                    ForEach(section.items) { item in
-                        HomeTodayAnimeScheduleListTimelineRowView(
-                            item: item,
-                            isFavorite: favoriteIDs.contains(item.id)
-                        ) {
-                            router.push(.animeDetail(malId: item.id))
-                        }
-                        .onAppear {
-                            Task(priority: .userInitiated) {
-                                await viewModel.loadMoreIfNeeded(currentItem: item)
+                    VStack(spacing: Layout.rowSpacing) {
+                        ForEach(section.items) { item in
+                            HomeTodayAnimeScheduleListTimelineRowView(
+                                item: item,
+                                isFavorite: favoriteIDs.contains(item.id)
+                            ) {
+                                router.push(.animeDetail(malId: item.id))
+                            }
+                            .onAppear {
+                                Task(priority: .userInitiated) {
+                                    await viewModel.loadMoreIfNeeded(currentItem: item)
+                                }
                             }
                         }
                     }
+                    .padding(.bottom, Layout.contentSpacing)
                 } header: {
                     HomeTodayAnimeScheduleListSectionHeaderView(section: section)
                 }

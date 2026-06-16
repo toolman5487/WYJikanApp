@@ -105,12 +105,13 @@ struct GenreAnimeSectionHeaderView: View {
     // MARK: - Properties
 
     let section: AnimeGenreSection
+    let onSelectGenre: (AnimeListGenreDTO) -> Void
 
     // MARK: - Body
 
     var body: some View {
-        NavigationLink {
-            AnimeCategoryDetailView(genre: section.genre)
+        Button {
+            onSelectGenre(section.genre)
         } label: {
             GlassSectionHeaderView(
                 title: titleText,

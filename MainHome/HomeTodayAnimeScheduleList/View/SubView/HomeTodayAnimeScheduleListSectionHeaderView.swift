@@ -20,7 +20,8 @@ struct HomeTodayAnimeScheduleListSectionHeaderView: View {
     var body: some View {
         GlassSectionHeaderView(
             title: section.title,
-            state: .accessoryText("\(section.items.count) 部")
+            state: .accessoryText("\(section.items.count) 部"),
+            outerVerticalPadding: 8
         )
         .background(Color(.systemBackground).opacity(0.001))
     }

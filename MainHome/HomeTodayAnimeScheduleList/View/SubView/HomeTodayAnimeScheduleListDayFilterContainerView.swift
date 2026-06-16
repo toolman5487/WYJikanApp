@@ -10,6 +10,11 @@ import SwiftUI
 // MARK: - HomeTodayAnimeScheduleListDayFilterContainerView
 
 struct HomeTodayAnimeScheduleListDayFilterContainerView: View {
+    private enum Layout {
+        static let horizontalPadding: CGFloat = 16
+        static let topPadding: CGFloat = 8
+        static let dividerSpacing: CGFloat = 8
+    }
 
     // MARK: - Properties
 
@@ -19,16 +24,16 @@ struct HomeTodayAnimeScheduleListDayFilterContainerView: View {
     // MARK: - Body
 
     var body: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: Layout.dividerSpacing) {
             HomeTodayAnimeScheduleListDayFilterView(
                 selectedDay: selectedDay,
                 onSelectDay: onSelectDay
             )
-            .padding(.horizontal, 16)
+            .padding(.horizontal, Layout.horizontalPadding)
 
             Divider()
         }
-        .padding(.top, 8)
+        .padding(.top, Layout.topPadding)
         .background(.ultraThinMaterial)
     }
 }

@@ -55,6 +55,7 @@ struct HomeTodayAnimeScheduleListTimelineRowView: View {
                 Spacer(minLength: 0)
             }
             .padding(12)
+            .frame(maxWidth: .infinity, alignment: .leading)
             .background(Color(.secondarySystemBackground))
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             .overlay(alignment: .topTrailing) {

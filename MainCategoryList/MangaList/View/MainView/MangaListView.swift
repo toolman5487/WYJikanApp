@@ -13,14 +13,19 @@ struct MangaListView: View {
 
     @EnvironmentObject private var favoriteStatusStore: FavoriteStatusStore
     @ObservedObject var viewModel: MangaListViewModel
+    @State private var selectedGenre: MangaListGenreDTO?
 
     // MARK: - Body
 
     var body: some View {
         MainView(
             viewModel: viewModel,
-            favoriteIDs: favoriteStatusStore.favoriteIDs(for: .manga)
+            favoriteIDs: favoriteStatusStore.favoriteIDs(for: .manga),
+            onSelectGenre: { selectedGenre = $0 }
         )
+        .navigationDestination(item: $selectedGenre) { genre in
+            MangaCategoryDetailView(genre: genre)
+        }
     }
 }
 
@@ -32,6 +37,7 @@ private struct MainView: View {
 
     @ObservedObject var viewModel: MangaListViewModel
     let favoriteIDs: Set<Int>
+    let onSelectGenre: (MangaListGenreDTO) -> Void
 
     // MARK: - Body
 
@@ -43,7 +49,8 @@ private struct MainView: View {
             )
             GenreMangaListContainerView(
                 viewModel: viewModel.genreMangaViewModel,
-                favoriteIDs: favoriteIDs
+                favoriteIDs: favoriteIDs,
+                onSelectGenre: onSelectGenre
             )
         }
         .padding(.top, 8)
