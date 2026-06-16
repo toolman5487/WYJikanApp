@@ -9,7 +9,22 @@ import SwiftData
 import SwiftUI
 
 struct MyListGenreCollectionsDetailView: View {
+
+    // MARK: - Types
+
+    private enum Layout {
+        static let sectionSpacing: CGFloat = 16
+        static let rowSpacing: CGFloat = 12
+        static let horizontalPadding: CGFloat = 20
+        static let topPadding: CGFloat = 20
+        static let bottomPadding: CGFloat = 32
+    }
+
+    // MARK: - Properties
+
     @StateObject private var viewModel: MyListGenreCollectionsDetailViewModel
+
+    // MARK: - Lifecycle
 
     init(
         scopeTitle: String,
@@ -31,13 +46,15 @@ struct MyListGenreCollectionsDetailView: View {
         )
     }
 
+    // MARK: - Body
+
     var body: some View {
         ScrollView {
-            LazyVStack(alignment: .leading, spacing: 16) {
+            LazyVStack(alignment: .leading, spacing: Layout.sectionSpacing) {
                 genreFilterView
 
                 if let selectedSection = viewModel.selectedSection {
-                    LazyVStack(spacing: 12) {
+                    LazyVStack(spacing: Layout.rowSpacing) {
                         ForEach(selectedSection.items, id: \.persistentModelID) { item in
                             NavigationLink {
                                 destinationView(for: item)
@@ -57,14 +74,16 @@ struct MyListGenreCollectionsDetailView: View {
                     )
                 }
             }
-            .padding(.horizontal, 20)
-            .padding(.top, 20)
-            .padding(.bottom, 32)
+            .padding(.horizontal, Layout.horizontalPadding)
+            .padding(.top, Layout.topPadding)
+            .padding(.bottom, Layout.bottomPadding)
         }
         .background(Color(.systemBackground))
         .navigationTitle(viewModel.navigationTitle)
         .navigationBarTitleDisplayMode(.inline)
     }
+
+    // MARK: - Private Views
 
     private var genreFilterView: some View {
         CapsuleFilterBarView(
@@ -74,6 +93,8 @@ struct MyListGenreCollectionsDetailView: View {
         )
         .frame(maxWidth: .infinity, alignment: .leading)
     }
+
+    // MARK: - Private Methods
 
     @ViewBuilder
     private func destinationView(for item: MyListCollectionItem) -> some View {

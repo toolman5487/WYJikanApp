@@ -8,10 +8,15 @@
 import SwiftUI
 
 struct MyListSummaryTile: View {
+
+    // MARK: - Properties
+
     let title: String
     let value: Int
     let iconName: String
     let detail: String
+
+    // MARK: - Body
 
     var body: some View {
         HStack(alignment: .top, spacing: 16) {

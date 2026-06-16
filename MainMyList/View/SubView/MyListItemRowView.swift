@@ -8,7 +8,12 @@
 import SwiftUI
 
 struct MyListItemRowView: View {
+
+    // MARK: - Properties
+
     let item: MyListCollectionItem
+
+    // MARK: - Body
 
     var body: some View {
         HStack(spacing: 12) {
@@ -49,6 +54,8 @@ struct MyListItemRowView: View {
         .background(Color(.secondarySystemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
+
+    // MARK: - Private Views
 
     @ViewBuilder
     private var posterView: some View {

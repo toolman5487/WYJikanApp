@@ -10,9 +10,14 @@ import Foundation
 
 @MainActor
 final class MyListGenreCollectionsDetailViewModel: ObservableObject {
+
+    // MARK: - Properties
+
     let scopeTitle: String
     let genreSections: [MyListGenreCollectionSection]
     @Published var selectedGenreName: String
+
+    // MARK: - Lifecycle
 
     init(
         scopeTitle: String,
@@ -35,6 +40,8 @@ final class MyListGenreCollectionsDetailViewModel: ObservableObject {
         )
     }
 
+    // MARK: - Presentation
+
     var navigationTitle: String {
         "\(scopeTitle)種類收藏"
     }
@@ -51,6 +58,8 @@ final class MyListGenreCollectionsDetailViewModel: ObservableObject {
         "尚無此種類收藏"
     }
 
+    // MARK: - Actions
+
     func localizedGenreName(_ genreName: String) -> String {
         AnimeGenreLocalizationModel.localizedName(for: genreName)
     }
@@ -58,6 +67,8 @@ final class MyListGenreCollectionsDetailViewModel: ObservableObject {
     func selectGenre(_ genreName: String) {
         selectedGenreName = Self.resolvedGenreName(genreName, in: genreSections)
     }
+
+    // MARK: - Private Methods
 
     private static func resolvedGenreName(
         _ genreName: String,

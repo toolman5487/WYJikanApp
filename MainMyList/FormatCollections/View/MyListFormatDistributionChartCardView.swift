@@ -8,10 +8,15 @@
 import SwiftUI
 
 struct MyListFormatDistributionChartCardView: View {
+    private enum Layout {
+        static let legendMarkerSize: CGFloat = 24
+    }
+
     // MARK: - Properties
 
     let statistics: MyListStatistics
     let cardMinHeight: CGFloat?
+    let contentMinHeight: CGFloat
     let onSelectFormat: (String) -> Void
 
     // MARK: - Body
@@ -30,6 +35,8 @@ struct MyListFormatDistributionChartCardView: View {
         }
     }
 
+    // MARK: - Private Views
+
     private var cardContent: some View {
         MyListStatisticsCardContainer(
             title: "\(statistics.formatAnalysis.scope.title)收藏形式比例",
@@ -43,31 +50,45 @@ struct MyListFormatDistributionChartCardView: View {
                 )
             } else {
                 VStack(alignment: .leading, spacing: 16) {
-                    HStack(alignment: .center, spacing: 20) {
-                        chartView
+                    chartLegendView
 
-                        legendView
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    Spacer(minLength: 0)
 
-                    if let topFormatSlice = statistics.formatAnalysis.topFormatSlice {
-                        Text("\(topFormatSlice.title) 佔 \(percentageText(for: topFormatSlice))，是目前收藏中最主要的作品形式。")
-                            .font(.footnote)
-                            .foregroundStyle(ThemeColor.textSecondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-
-                    if statistics.formatAnalysis.missingTypeItemCount > 0 {
-                        Text("有 \(statistics.formatAnalysis.missingTypeItemCount) 筆舊收藏尚未記錄作品形式，重新收藏後會納入統計。")
-                            .font(.footnote)
-                            .foregroundStyle(ThemeColor.textSecondary)
-                    }
+                    footerTextView
                 }
+                .frame(maxWidth: .infinity, minHeight: contentMinHeight, alignment: .topLeading)
             }
         }
     }
 
     // MARK: - Private Views
+
+    private var chartLegendView: some View {
+        HStack(alignment: .center, spacing: 20) {
+            chartView
+
+            legendView
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    @ViewBuilder
+    private var footerTextView: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            if let topFormatSlice = statistics.formatAnalysis.topFormatSlice {
+                Text("\(topFormatSlice.title) 佔 \(percentageText(for: topFormatSlice))，是目前收藏中最主要的作品形式。")
+                    .font(.footnote)
+                    .foregroundStyle(ThemeColor.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            if statistics.formatAnalysis.missingTypeItemCount > 0 {
+                Text("有 \(statistics.formatAnalysis.missingTypeItemCount) 筆舊收藏尚未記錄作品形式，重新收藏後會納入統計。")
+                    .font(.footnote)
+                    .foregroundStyle(ThemeColor.textSecondary)
+            }
+        }
+    }
 
     private var chartView: some View {
         MyListPieChartView(
@@ -85,7 +106,7 @@ struct MyListFormatDistributionChartCardView: View {
                     ZStack {
                         Circle()
                             .fill(color(for: index).opacity(0.18))
-                            .frame(width: 24, height: 24)
+                            .frame(width: Layout.legendMarkerSize, height: Layout.legendMarkerSize)
 
                         Image(systemName: slice.iconName)
                             .font(.caption2.weight(.bold))
@@ -104,6 +125,7 @@ struct MyListFormatDistributionChartCardView: View {
                         .foregroundStyle(ThemeColor.textSecondary)
                         .lineLimit(1)
                 }
+                .frame(minHeight: Layout.legendMarkerSize)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)

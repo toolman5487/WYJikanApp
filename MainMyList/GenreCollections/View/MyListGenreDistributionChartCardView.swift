@@ -8,10 +8,16 @@
 import SwiftUI
 
 struct MyListGenreDistributionChartCardView: View {
+    private enum Layout {
+        static let legendMarkerSize: CGFloat = 24
+        static let legendDotSize: CGFloat = 8
+    }
+
     // MARK: - Properties
 
     let statistics: MyListStatistics
     let cardMinHeight: CGFloat?
+    let contentMinHeight: CGFloat
     let onSelectGenre: (String) -> Void
 
     // MARK: - Body
@@ -35,26 +41,40 @@ struct MyListGenreDistributionChartCardView: View {
                 )
             } else {
                 VStack(alignment: .leading, spacing: 16) {
-                    HStack(alignment: .center, spacing: 20) {
-                        chartView
+                    chartLegendView
 
-                        legendView
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    Spacer(minLength: 0)
 
-                    if let topGenreSlice = statistics.selectedAnalysis.topGenreSlice {
-                        Text("\(localizedGenreName(topGenreSlice.genreName)) 佔 \(percentageText(for: topGenreSlice))，是目前收藏中最明顯的種類。")
-                            .font(.footnote)
-                            .foregroundStyle(ThemeColor.textSecondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-
-                    if statistics.selectedAnalysis.missingGenreItemCount > 0 {
-                        Text("有 \(statistics.selectedAnalysis.missingGenreItemCount) 筆既有收藏尚未記錄種類，重新收藏後會納入統計。")
-                            .font(.footnote)
-                            .foregroundStyle(ThemeColor.textSecondary)
-                    }
+                    footerTextView
                 }
+                .frame(maxWidth: .infinity, minHeight: contentMinHeight, alignment: .topLeading)
+            }
+        }
+    }
+
+    private var chartLegendView: some View {
+        HStack(alignment: .center, spacing: 20) {
+            chartView
+
+            legendView
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    @ViewBuilder
+    private var footerTextView: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            if let topGenreSlice = statistics.selectedAnalysis.topGenreSlice {
+                Text("\(localizedGenreName(topGenreSlice.genreName)) 佔 \(percentageText(for: topGenreSlice))，是目前收藏中最明顯的種類。")
+                    .font(.footnote)
+                    .foregroundStyle(ThemeColor.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            if statistics.selectedAnalysis.missingGenreItemCount > 0 {
+                Text("有 \(statistics.selectedAnalysis.missingGenreItemCount) 筆既有收藏尚未記錄種類，重新收藏後會納入統計。")
+                    .font(.footnote)
+                    .foregroundStyle(ThemeColor.textSecondary)
             }
         }
     }
@@ -80,9 +100,15 @@ struct MyListGenreDistributionChartCardView: View {
                     onSelectGenre(slice.genreName)
                 } label: {
                     HStack(spacing: 8) {
-                        Circle()
-                            .fill(color(for: index))
-                            .frame(width: 10, height: 10)
+                        ZStack {
+                            Circle()
+                                .fill(color(for: index).opacity(0.18))
+                                .frame(width: Layout.legendMarkerSize, height: Layout.legendMarkerSize)
+
+                            Circle()
+                                .fill(color(for: index))
+                                .frame(width: Layout.legendDotSize, height: Layout.legendDotSize)
+                        }
 
                         Text(localizedGenreName(slice.genreName))
                             .font(.caption.weight(.semibold))
@@ -96,6 +122,7 @@ struct MyListGenreDistributionChartCardView: View {
                             .foregroundStyle(ThemeColor.textSecondary)
                             .lineLimit(1)
                     }
+                    .frame(minHeight: Layout.legendMarkerSize)
                 }
                 .buttonStyle(.plain)
             }

@@ -8,6 +8,16 @@ import SwiftUI
 
 struct MangaReadingStatusQueryView: View {
 
+    // MARK: - Types
+
+    private enum Layout {
+        static let sectionSpacing: CGFloat = 20
+        static let rowSpacing: CGFloat = 12
+        static let horizontalPadding: CGFloat = 20
+        static let topPadding: CGFloat = 20
+        static let bottomPadding: CGFloat = 32
+    }
+
     // MARK: - Properties
 
     @StateObject private var viewModel: MangaReadingStatusQueryViewModel
@@ -24,14 +34,14 @@ struct MangaReadingStatusQueryView: View {
 
     var body: some View {
         ScrollView {
-            LazyVStack(alignment: .leading, spacing: 20) {
+            LazyVStack(alignment: .leading, spacing: Layout.sectionSpacing) {
                 summaryView
                 filterView
                 contentView
             }
-            .padding(.horizontal, 20)
-            .padding(.top, 20)
-            .padding(.bottom, 32)
+            .padding(.horizontal, Layout.horizontalPadding)
+            .padding(.top, Layout.topPadding)
+            .padding(.bottom, Layout.bottomPadding)
         }
         .background(Color(.systemBackground))
         .navigationTitle("漫畫閱讀狀態")
@@ -85,7 +95,7 @@ struct MangaReadingStatusQueryView: View {
                 )
             )
         } else {
-            LazyVStack(spacing: 12) {
+            LazyVStack(spacing: Layout.rowSpacing) {
                 ForEach(
                     viewModel.presentation.filteredItems,
                     id: \.persistentModelID

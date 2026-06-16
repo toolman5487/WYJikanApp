@@ -8,19 +8,30 @@
 import Charts
 import SwiftUI
 
+// MARK: - MyListPieChartSlice
+
 struct MyListPieChartSlice: Identifiable, Hashable {
     let id: String
     let title: String
     let count: Int
 }
 
+// MARK: - MyListPieChartView
+
 struct MyListPieChartView: View {
+
+    // MARK: - Constants
+
     private static let chartSize: CGFloat = 148
+
+    // MARK: - Properties
 
     let slices: [MyListPieChartSlice]
     let totalCount: Int
     let categoryLabel: String
     let colors: [Color]
+
+    // MARK: - Body
 
     var body: some View {
         Chart(slices) { slice in

@@ -7,6 +7,8 @@
 
 import Foundation
 
+// MARK: - MyListGenreCollectionsSectionBuilder
+
 enum MyListGenreCollectionsSectionBuilder {
     static func makeSections(
         from items: [MyListCollectionItem]

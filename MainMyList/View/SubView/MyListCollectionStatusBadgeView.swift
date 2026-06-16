@@ -1,7 +1,19 @@
+//
+//  MyListCollectionStatusBadgeView.swift
+//  WYJikanApp
+//
+//  Created by Codex on 2026/4/25.
+//
+
 import SwiftUI
 
 struct MyListCollectionStatusBadgeView: View {
+
+    // MARK: - Properties
+
     let isFavorite: Bool
+
+    // MARK: - Body
 
     var body: some View {
         Image(systemName: isFavorite ? "heart.fill" : "heart")

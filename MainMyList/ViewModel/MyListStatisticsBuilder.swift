@@ -5,6 +5,8 @@
 
 import Foundation
 
+// MARK: - MyListStatisticsBuildResult
+
 struct MyListStatisticsBuildResult {
     let statistics: MyListStatistics
     let filteredItems: [MyListCollectionItem]
@@ -14,6 +16,8 @@ struct MyListStatisticsBuildResult {
     let weeklyAnimeAddedCount: Int
     let weeklyMangaAddedCount: Int
 }
+
+// MARK: - MyListStatisticsBuilder
 
 struct MyListStatisticsBuilder {
 

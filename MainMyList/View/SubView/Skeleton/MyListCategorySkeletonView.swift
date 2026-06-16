@@ -8,7 +8,12 @@
 import SwiftUI
 
 struct MyListCategorySkeletonView: View {
+
+    // MARK: - Properties
+
     private let chipWidths: [CGFloat] = [74, 74, 72, 72]
+
+    // MARK: - Body
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {

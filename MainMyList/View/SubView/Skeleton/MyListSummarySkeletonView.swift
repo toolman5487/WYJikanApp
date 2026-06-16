@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct MyListSummarySkeletonView: View {
+
+    // MARK: - Body
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             MyListSectionHeaderSkeletonView(titleWidth: 120, subtitleWidth: 156)
@@ -21,7 +24,12 @@ struct MyListSummarySkeletonView: View {
     }
 }
 
+// MARK: - MyListSummaryCardSkeletonView
+
 private struct MyListSummaryCardSkeletonView: View {
+
+    // MARK: - Body
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Circle()

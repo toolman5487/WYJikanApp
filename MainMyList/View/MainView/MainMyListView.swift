@@ -35,6 +35,8 @@ struct MainMyListView: View {
     @State private var isShowingAnimeWatchStatusQuery = false
     @State private var isShowingMangaReadingStatusQuery = false
 
+    // MARK: - Lifecycle
+
     init(dependencies: AppDependencies) {
         self.dependencies = dependencies
         _viewModel = StateObject(wrappedValue: dependencies.makeMainMyListViewModel())

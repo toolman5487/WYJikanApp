@@ -2,7 +2,7 @@
 //  MyListFormatCollectionsDetailViewModel.swift
 //  WYJikanApp
 //
-//  Created by Codex on 2026/6/10.
+//  Created by Willy Hsu on 2026/6/10.
 //
 
 import Combine
@@ -10,9 +10,14 @@ import Foundation
 
 @MainActor
 final class MyListFormatCollectionsDetailViewModel: ObservableObject {
+
+    // MARK: - Properties
+
     let scopeTitle: String
     let formatSections: [MyListFormatCollectionSection]
     @Published var selectedFormatTitle: String
+
+    // MARK: - Lifecycle
 
     init(
         scopeTitle: String,
@@ -35,6 +40,8 @@ final class MyListFormatCollectionsDetailViewModel: ObservableObject {
         )
     }
 
+    // MARK: - Presentation
+
     var navigationTitle: String {
         "\(scopeTitle)形式收藏"
     }
@@ -51,6 +58,8 @@ final class MyListFormatCollectionsDetailViewModel: ObservableObject {
         "尚無此形式收藏"
     }
 
+    // MARK: - Actions
+
     func iconName(for title: String) -> String? {
         formatSections.first { $0.title == title }?.iconName
     }
@@ -58,6 +67,8 @@ final class MyListFormatCollectionsDetailViewModel: ObservableObject {
     func selectFormat(_ title: String) {
         selectedFormatTitle = Self.resolvedFormatTitle(title, in: formatSections)
     }
+
+    // MARK: - Private Methods
 
     private static func resolvedFormatTitle(
         _ title: String,

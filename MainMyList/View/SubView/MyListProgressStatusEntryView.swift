@@ -5,12 +5,16 @@
 
 import SwiftUI
 
+// MARK: - MyListProgressStatusEntryChip
+
 struct MyListProgressStatusEntryChip: Identifiable {
     let title: String
     let count: Int
 
     var id: String { title }
 }
+
+// MARK: - MyListProgressStatusEntryView
 
 struct MyListProgressStatusEntryView: View {
 

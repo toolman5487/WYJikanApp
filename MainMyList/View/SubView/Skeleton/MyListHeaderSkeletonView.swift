@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct MyListHeaderSkeletonView: View {
+
+    // MARK: - Body
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(alignment: .center, spacing: 16) {
@@ -34,7 +37,12 @@ struct MyListHeaderSkeletonView: View {
     }
 }
 
+// MARK: - MyListHeroCardSkeletonView
+
 private struct MyListHeroCardSkeletonView: View {
+
+    // MARK: - Body
+
     var body: some View {
         ZStack(alignment: .bottomLeading) {
             RoundedRectangle(cornerRadius: 28, style: .continuous)

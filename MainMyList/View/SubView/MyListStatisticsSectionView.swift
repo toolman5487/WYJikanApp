@@ -1,24 +1,37 @@
+//
+//  MyListStatisticsSectionView.swift
+//  WYJikanApp
+//
+//  Created by Codex on 2026/5/21.
+//
+
 import SwiftUI
 
 struct MyListStatisticsSectionView: View {
-    let presentation: MyListPresentation
-    let onSelectGenre: (String) -> Void
-    let onSelectFormat: (String) -> Void
 
-    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    // MARK: - Types
 
     private enum ContentState {
         case empty
         case populated
     }
 
-    private var contentState: ContentState {
-        presentation.filteredItems.isEmpty ? .empty : .populated
+    private enum ChartLayout {
+        static let iPhoneCardMinHeight: CGFloat = 280
+        static let iPadCardMinHeight: CGFloat = 340
+        static let iPhoneContentMinHeight: CGFloat = 208
+        static let iPadContentMinHeight: CGFloat = 228
     }
 
-    private var chartCardMinHeight: CGFloat? {
-        horizontalSizeClass == .regular ? 320 : nil
-    }
+    // MARK: - Properties
+
+    let presentation: MyListPresentation
+    let onSelectGenre: (String) -> Void
+    let onSelectFormat: (String) -> Void
+
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+
+    // MARK: - Body
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -46,6 +59,8 @@ struct MyListStatisticsSectionView: View {
         }
     }
 
+    // MARK: - Private Views
+
     @ViewBuilder
     private var chartContent: some View {
         if horizontalSizeClass == .regular {
@@ -65,6 +80,7 @@ struct MyListStatisticsSectionView: View {
         MyListGenreDistributionChartCardView(
             statistics: presentation.statistics,
             cardMinHeight: chartCardMinHeight,
+            contentMinHeight: chartContentMinHeight,
             onSelectGenre: onSelectGenre
         )
         .frame(maxWidth: .infinity, alignment: .topLeading)
@@ -74,9 +90,23 @@ struct MyListStatisticsSectionView: View {
         MyListFormatDistributionChartCardView(
             statistics: presentation.statistics,
             cardMinHeight: chartCardMinHeight,
+            contentMinHeight: chartContentMinHeight,
             onSelectFormat: onSelectFormat
         )
         .frame(maxWidth: .infinity, alignment: .topLeading)
     }
 
+    // MARK: - Private Methods
+
+    private var contentState: ContentState {
+        presentation.filteredItems.isEmpty ? .empty : .populated
+    }
+
+    private var chartCardMinHeight: CGFloat? {
+        horizontalSizeClass == .regular ? ChartLayout.iPadCardMinHeight : ChartLayout.iPhoneCardMinHeight
+    }
+
+    private var chartContentMinHeight: CGFloat {
+        horizontalSizeClass == .regular ? ChartLayout.iPadContentMinHeight : ChartLayout.iPhoneContentMinHeight
+    }
 }

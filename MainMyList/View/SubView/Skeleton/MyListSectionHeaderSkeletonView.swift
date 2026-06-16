@@ -8,8 +8,13 @@
 import SwiftUI
 
 struct MyListSectionHeaderSkeletonView: View {
+
+    // MARK: - Properties
+
     let titleWidth: CGFloat
     let subtitleWidth: CGFloat
+
+    // MARK: - Body
 
     var body: some View {
         HStack(alignment: .lastTextBaseline) {

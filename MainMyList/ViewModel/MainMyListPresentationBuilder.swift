@@ -6,8 +6,13 @@
 import Foundation
 
 struct MainMyListPresentationBuilder {
+
+    // MARK: - Dependencies
+
     private let statisticsBuilder: MyListStatisticsBuilder
     private let progressStatusSummaryBuilder: MyListProgressStatusSummaryBuilder
+
+    // MARK: - Lifecycle
 
     init(
         statisticsBuilder: MyListStatisticsBuilder = MyListStatisticsBuilder(),

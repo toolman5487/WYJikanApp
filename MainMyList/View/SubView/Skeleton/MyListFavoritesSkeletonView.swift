@@ -8,10 +8,15 @@
 import SwiftUI
 
 struct MyListFavoritesSkeletonView: View {
+
+    // MARK: - Properties
+
     private let columns: [GridItem] = Array(
         repeating: GridItem(.flexible(), spacing: 16),
         count: 3
     )
+
+    // MARK: - Body
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -27,7 +32,12 @@ struct MyListFavoritesSkeletonView: View {
     }
 }
 
+// MARK: - MyListFavoriteItemSkeletonView
+
 private struct MyListFavoriteItemSkeletonView: View {
+
+    // MARK: - Body
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
