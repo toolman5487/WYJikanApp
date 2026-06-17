@@ -56,18 +56,18 @@ struct MainSearchResultsContentView<FilterHeader: View>: View {
                     minHeight: 200
                 )
             } else {
-                MainSearchHistorySectionView(
-                    items: searchHistory,
-                    onSelect: onSelectHistory,
-                    onRemove: onRemoveHistory,
-                    onClear: onClearHistory
-                )
-                .padding(.top, 16)
-                .padding(.horizontal, 16)
-                .padding(.bottom, 24)
+                ScrollView {
+                    MainSearchHistorySectionView(
+                        items: searchHistory,
+                        onSelect: onSelectHistory,
+                        onRemove: onRemoveHistory,
+                        onClear: onClearHistory
+                    )
+                    .padding(.top, 16)
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 24)
+                }
             }
-
-            Spacer(minLength: 0)
         }
     }
 
