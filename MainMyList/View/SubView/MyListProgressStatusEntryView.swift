@@ -50,7 +50,6 @@ struct MyListProgressStatusEntryView: View {
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(title)
     }
 
     // MARK: - Private Views

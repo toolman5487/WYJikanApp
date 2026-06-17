@@ -42,7 +42,6 @@ struct AnimeWatchProgressSectionView: View {
 
             episodeStepperView(for: item)
         }
-        .accessibilityElement(children: .contain)
     }
 
     private func episodeStepperView(for item: MyListCollectionItem) -> some View {

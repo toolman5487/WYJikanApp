@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct ShimmerView: View {
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var phase: CGFloat = -0.3
 
     private let animation = Animation.linear(duration: 1.1)
@@ -34,20 +33,9 @@ struct ShimmerView: View {
             .rotationEffect(.degrees(18))
             .offset(x: phase * (width + bandWidth))
             .onAppear {
-                guard !reduceMotion else { return }
                 phase = -0.3
                 withAnimation(animation) {
                     phase = 1.0
-                }
-            }
-            .onChange(of: reduceMotion) {
-                if reduceMotion {
-                    phase = -0.3
-                } else {
-                    phase = -0.3
-                    withAnimation(animation) {
-                        phase = 1.0
-                    }
                 }
             }
         }

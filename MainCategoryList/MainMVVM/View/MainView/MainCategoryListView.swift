@@ -164,7 +164,6 @@ struct MainCategoryListView: View {
                     .foregroundStyle(ThemeColor.textPrimary)
                     .frame(width: 40, height: 40)
             }
-            .accessibilityValue(menu.accessibilityValue)
         }
     }
 

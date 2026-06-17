@@ -13,7 +13,6 @@ enum MainCategoryTopFilterState: Hashable, Sendable {
 }
 
 struct MainCategoryTopFilterMenu: Hashable, Sendable {
-    let accessibilityValue: String
     let selectionIdentifier: String
     let options: [MainCategoryTopFilterOption]
 }

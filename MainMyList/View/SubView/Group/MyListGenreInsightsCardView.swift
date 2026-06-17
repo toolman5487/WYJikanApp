@@ -68,7 +68,6 @@ struct MyListGenreInsightsCardView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 4)
-        .accessibilityHidden(true)
     }
 
     // MARK: - Private Methods

@@ -45,7 +45,6 @@ struct PeopleGridItemView: View {
         .background(Color(.secondarySystemBackground))
         .clipShape(cardShape)
         .contentShape(cardShape)
-        .accessibilityElement(children: .combine)
     }
 
     // MARK: - Private Methods

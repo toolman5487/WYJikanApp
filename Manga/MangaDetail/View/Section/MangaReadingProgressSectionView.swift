@@ -44,7 +44,6 @@ struct MangaReadingProgressSectionView: View {
 
             chapterStepperView(for: item)
         }
-        .accessibilityElement(children: .contain)
     }
 
     private func chapterStepperView(for item: MyListCollectionItem) -> some View {

@@ -64,7 +64,6 @@ struct MainSearchHistoryChipView: View {
                 .foregroundStyle(ThemeColor.textSecondary)
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("刪除 \(item.query)")
     }
 }
 

@@ -31,7 +31,6 @@ struct SynopsisTranslationButton: View {
         .buttonStyle(.bordered)
         .controlSize(.small)
         .disabled(state.isTranslating)
-        .accessibilityLabel(title)
     }
 
     private var title: String {
@@ -177,7 +176,6 @@ struct AnimeDetailInfoRow: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .accessibilityElement(children: .combine)
     }
 
     @ViewBuilder

@@ -41,7 +41,6 @@ struct MainSearchHistorySectionView: View {
             }
             .buttonStyle(.plain)
             .foregroundStyle(.secondary)
-            .accessibilityLabel("清除搜尋紀錄")
         }
     }
 

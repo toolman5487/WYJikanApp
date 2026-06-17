@@ -27,6 +27,5 @@ struct MyListCollectionStatusBadgeView: View {
                     .stroke(Color.white.opacity(0.14), lineWidth: 0.8)
             }
             .allowsHitTesting(false)
-            .accessibilityHidden(true)
     }
 }

@@ -146,7 +146,6 @@ final class MainCategoryListViewModel: ObservableObject {
         case .people:
             return .menu(
                 MainCategoryTopFilterMenu(
-                    accessibilityValue: peopleListViewModel.selectedSort.title,
                     selectionIdentifier: peopleListViewModel.selectedSort.rawValue,
                     options: PeopleListSort.allCases.map(MainCategoryTopFilterOption.people)
                 )
@@ -154,7 +153,6 @@ final class MainCategoryListViewModel: ObservableObject {
         case .character:
             return .menu(
                 MainCategoryTopFilterMenu(
-                    accessibilityValue: characterListViewModel.selectedSort.title,
                     selectionIdentifier: characterListViewModel.selectedSort.rawValue,
                     options: CharacterListSort.allCases.map(MainCategoryTopFilterOption.character)
                 )
