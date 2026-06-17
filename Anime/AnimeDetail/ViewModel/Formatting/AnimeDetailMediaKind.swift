@@ -43,17 +43,17 @@ enum AnimeDetailMediaKind: Equatable {
     var displayName: String {
         switch self {
         case .tv:
-            return "電視動畫"
+            return MediaTypeFormatting.localizedName(for: "TV", kind: .anime) ?? "-"
         case .movie:
-            return "劇場版"
+            return MediaTypeFormatting.localizedName(for: "MOVIE", kind: .anime) ?? "-"
         case .ova:
-            return "OVA"
+            return MediaTypeFormatting.localizedName(for: "OVA", kind: .anime) ?? "-"
         case .ona:
-            return "網路動畫"
+            return MediaTypeFormatting.localizedName(for: "ONA", kind: .anime) ?? "-"
         case .special:
-            return "特別篇"
+            return MediaTypeFormatting.localizedName(for: "SPECIAL", kind: .anime) ?? "-"
         case .music:
-            return "音樂"
+            return MediaTypeFormatting.localizedName(for: "MUSIC", kind: .anime) ?? "-"
         case .other(let raw):
             return raw.isEmpty ? "-" : raw
         }

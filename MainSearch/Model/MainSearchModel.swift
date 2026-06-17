@@ -243,7 +243,7 @@ nonisolated struct MainSearchResultRow: Identifiable, Hashable, Sendable {
             fallback: dto.title
         )
         var parts: [String] = []
-        if let type = dto.type, !type.isEmpty { parts.append(type) }
+        if let type = MediaTypeFormatting.localizedName(for: dto.type, kind: .anime) { parts.append(type) }
         if let year = dto.year { parts.append(String(year)) }
         let subtitle = parts.isEmpty ? nil : parts.joined(separator: " · ")
         return MainSearchResultRow(
@@ -267,7 +267,7 @@ nonisolated struct MainSearchResultRow: Identifiable, Hashable, Sendable {
             fallback: dto.title
         )
         var parts: [String] = []
-        if let type = dto.type, !type.isEmpty { parts.append(type) }
+        if let type = MediaTypeFormatting.localizedName(for: dto.type, kind: .manga) { parts.append(type) }
         if let year = dto.year { parts.append(String(year)) }
         let subtitle = parts.isEmpty ? nil : parts.joined(separator: " · ")
         return MainSearchResultRow(

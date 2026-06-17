@@ -135,18 +135,7 @@ extension MangaDetailViewModel {
     // MARK: - Type & Status
 
     func mangaTypeDisplayText(for manga: MangaDetailDTO) -> String {
-        guard let raw = manga.type?.trimmingCharacters(in: .whitespacesAndNewlines), !raw.isEmpty else {
-            return "-"
-        }
-        let lower = raw.lowercased()
-        if lower == "manga" { return "漫畫" }
-        if lower == "novel" { return "小說" }
-        if lower == "one-shot" || lower == "one shot" { return "單篇" }
-        if lower == "doujinshi" { return "同人誌" }
-        if lower == "manhwa" { return "韓漫" }
-        if lower == "manhua" { return "條漫／華漫" }
-        if lower == "oel" { return "OEL" }
-        return raw
+        MediaTypeFormatting.localizedName(for: manga.type, kind: .manga) ?? "-"
     }
 
     func mangaStatusDisplayText(for manga: MangaDetailDTO) -> String {

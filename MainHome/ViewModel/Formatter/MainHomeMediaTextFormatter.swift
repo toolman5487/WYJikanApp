@@ -27,17 +27,7 @@ nonisolated struct MainHomeMediaTextFormatter: Sendable {
     }
 
     func animeTypeText(_ raw: String?) -> String? {
-        guard let raw = normalizedText(raw) else { return nil }
-
-        switch raw.uppercased() {
-        case "TV": return "電視動畫"
-        case "MOVIE": return "劇場版"
-        case "OVA": return "OVA"
-        case "ONA": return "ONA"
-        case "SPECIAL": return "特別篇"
-        case "MUSIC": return "音樂"
-        default: return raw
-        }
+        MediaTypeFormatting.localizedName(for: raw, kind: .anime)
     }
 
     func scoreText(_ score: Double?, precision: Int) -> String? {
