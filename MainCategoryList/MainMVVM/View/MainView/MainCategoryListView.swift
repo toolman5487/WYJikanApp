@@ -90,14 +90,6 @@ struct MainCategoryListView: View {
                     proxy.scrollTo(topAnchorId, anchor: .top)
                 }
             }
-            .onChange(of: viewModel.activeTopFilterSelectionIdentifier) { _, _ in
-                guard viewModel.activeTopFilterSelectionIdentifier != nil else { return }
-                Task(priority: .userInitiated) { @MainActor in
-                    withAnimation(.easeInOut(duration: 0.2)) {
-                        proxy.scrollTo(topAnchorId, anchor: .top)
-                    }
-                }
-            }
         }
     }
 
