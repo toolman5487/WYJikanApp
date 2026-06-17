@@ -22,6 +22,7 @@ struct MainMyListView: View {
         static let horizontalPadding: CGFloat = 16
         static let topPadding: CGFloat = 16
         static let bottomPadding: CGFloat = 16
+        static let toolbarButtonSize: CGFloat = 44
     }
 
     // MARK: - Properties
@@ -34,6 +35,7 @@ struct MainMyListView: View {
     @State private var formatCollectionsRoute: MyListFormatCollectionsRoute?
     @State private var isShowingAnimeWatchStatusQuery = false
     @State private var isShowingMangaReadingStatusQuery = false
+    @State private var isShowingSettings = false
 
     // MARK: - Lifecycle
 
@@ -63,6 +65,14 @@ struct MainMyListView: View {
             .background(Color(.systemBackground))
             .navigationTitle("我的收藏")
             .navigationBarTitleDisplayMode(.large)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    settingsButton
+                }
+            }
+            .navigationDestination(isPresented: $isShowingSettings) {
+                SettingView()
+            }
             .navigationDestination(item: $genreCollectionsRoute) { route in
                 MyListGenreCollectionsDetailView(route: route)
             }
@@ -79,6 +89,18 @@ struct MainMyListView: View {
     }
 
     // MARK: - Private Views
+
+    private var settingsButton: some View {
+        Button {
+            isShowingSettings = true
+        } label: {
+            Image(systemName: "gearshape")
+                .font(.body.weight(.bold))
+                .foregroundStyle(ThemeColor.sakura)
+                .frame(width: Layout.toolbarButtonSize, height: Layout.toolbarButtonSize)
+        }
+        .buttonStyle(.plain)
+    }
 
     private var headerView: some View {
         Text("把想追的動畫與漫畫集中在這裡。")
