@@ -9,21 +9,22 @@ import SwiftUI
 
 struct RandomPickHeroSkeletonView: View {
 
-    // MARK: - Properties
-
-    let height: CGFloat
-
     // MARK: - Body
 
     var body: some View {
         BannerSkeletonView()
-            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-            .frame(height: height)
+            .clipShape(
+                RoundedRectangle(
+                    cornerRadius: RandomPickHeroLayout.cardCornerRadius,
+                    style: .continuous
+                )
+            )
+            .frame(height: RandomPickHeroLayout.heroHeight)
     }
 }
 
 // MARK: - Preview
 
 #Preview {
-    RandomPickHeroSkeletonView(height: 320)
+    RandomPickHeroSkeletonView()
 }

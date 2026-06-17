@@ -12,7 +12,7 @@ struct RandomHeroSkeletonView: View {
     // MARK: - Body
 
     var body: some View {
-        RandomPickHeroSkeletonView(height: 320)
+        RandomPickHeroSkeletonView()
     }
 }
 

@@ -8,8 +8,11 @@
 import SwiftUI
 import SDWebImageSwiftUI
 
-private enum RandomPickHeroLayout {
+enum RandomPickHeroLayout {
     static let heroHeight: CGFloat = 320
+    static let cardCornerRadius: CGFloat = 20
+    static let posterCornerRadius: CGFloat = 16
+    static let actionButtonMinHeight: CGFloat = 44
     static let horizontalPadding: CGFloat = 16
     static let verticalPadding: CGFloat = 16
 }
@@ -79,7 +82,7 @@ struct RandomPickHeroCardView<DetailDestination: View>: View {
                 .padding(.vertical, RandomPickHeroLayout.verticalPadding)
             }
         }
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: RandomPickHeroLayout.cardCornerRadius, style: .continuous))
         .frame(maxWidth: .infinity)
         .frame(height: RandomPickHeroLayout.heroHeight)
         .overlay(alignment: .topTrailing) {
@@ -90,7 +93,7 @@ struct RandomPickHeroCardView<DetailDestination: View>: View {
         }
         .overlay {
             if isDrawing {
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                RoundedRectangle(cornerRadius: RandomPickHeroLayout.cardCornerRadius, style: .continuous)
                     .fill(.ultraThinMaterial)
 
                 VStack(spacing: 12) {
@@ -104,7 +107,7 @@ struct RandomPickHeroCardView<DetailDestination: View>: View {
             }
         }
         .overlay {
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
+            RoundedRectangle(cornerRadius: RandomPickHeroLayout.cardCornerRadius, style: .continuous)
                 .strokeBorder(Color.white.opacity(0.08))
         }
     }
@@ -177,9 +180,9 @@ struct RandomPickHeroCardView<DetailDestination: View>: View {
         }
         .frame(width: width, height: width * 1.48)
         .background(Color.black.opacity(0.18))
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: RandomPickHeroLayout.posterCornerRadius, style: .continuous))
         .overlay {
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
+            RoundedRectangle(cornerRadius: RandomPickHeroLayout.posterCornerRadius, style: .continuous)
                 .strokeBorder(Color.white.opacity(0.14))
         }
         .shadow(color: Color.black.opacity(0.22), radius: 18, y: 10)
@@ -266,9 +269,10 @@ struct RandomPickHeroCardView<DetailDestination: View>: View {
                         Image(systemName: "arrow.right")
                             .font(.caption.weight(.bold))
                     }
-                    .frame(maxWidth: .infinity, minHeight: 44)
+                    .frame(maxWidth: .infinity, minHeight: RandomPickHeroLayout.actionButtonMinHeight)
                 }
                 .buttonStyle(.bordered)
+                .buttonBorderShape(.roundedRectangle(radius: RandomPickHeroLayout.cardCornerRadius))
                 .tint(ThemeColor.sakura)
             }
         } else {
@@ -280,9 +284,10 @@ struct RandomPickHeroCardView<DetailDestination: View>: View {
     private var drawButton: some View {
         Button(action: onDrawTap) {
             Text(drawButtonTitle)
-                .frame(maxWidth: .infinity, minHeight: 44)
+                .frame(maxWidth: .infinity, minHeight: RandomPickHeroLayout.actionButtonMinHeight)
         }
         .buttonStyle(.borderedProminent)
+        .buttonBorderShape(.roundedRectangle(radius: RandomPickHeroLayout.cardCornerRadius))
         .tint(ThemeColor.sakura)
         .disabled(!canDraw)
     }

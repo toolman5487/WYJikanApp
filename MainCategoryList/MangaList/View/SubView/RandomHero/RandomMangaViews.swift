@@ -151,7 +151,7 @@ private struct RandomMangaSkeletonView: View {
     // MARK: - Body
 
     var body: some View {
-        RandomPickHeroSkeletonView(height: 368)
+        RandomPickHeroSkeletonView()
     }
 }
 
