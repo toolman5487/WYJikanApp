@@ -69,6 +69,7 @@ struct MainSearchResultsContentView<FilterHeader: View>: View {
                 }
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 
     private var loadingView: some View {
