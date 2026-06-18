@@ -28,6 +28,10 @@
 		1555A2562F7BB39400501496 /* AnimeDetailPicturesSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1555A2552F7BB39400501496 /* AnimeDetailPicturesSectionView.swift */; };
 		155A9BF62F782B1100E9E3E0 /* SkeletonBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 155A9BF52F782B1100E9E3E0 /* SkeletonBar.swift */; };
 		155A9C022F782C2200F1E4F0 /* SectionCardSkeleton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 155A9C012F782C2200F1E4F0 /* SectionCardSkeleton.swift */; };
+		156175472FE3A1F70033D915 /* SettingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 156175452FE3A1F70033D915 /* SettingViewModel.swift */; };
+		156175482FE3A1F70033D915 /* SettingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 156175432FE3A1F70033D915 /* SettingService.swift */; };
+		156175492FE3A1F70033D915 /* SettingPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 156175412FE3A1F70033D915 /* SettingPresentation.swift */; };
+		1561754B2FE3A2020033D915 /* SettingSectionViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1561754A2FE3A2020033D915 /* SettingSectionViews.swift */; };
 		156C80542F86882A00D0CF6B /* GlobalCooldownTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 156C80522F86882A00D0CF6B /* GlobalCooldownTimer.swift */; };
 		156C80562F8689F700D0CF6B /* CooldownManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 156C80552F8689F700D0CF6B /* CooldownManager.swift */; };
 		156E5D312FB368B300EBA27F /* AppNotificationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 156E5D302FB368B300EBA27F /* AppNotificationDelegate.swift */; };
@@ -417,6 +421,10 @@
 		1555A2552F7BB39400501496 /* AnimeDetailPicturesSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeDetailPicturesSectionView.swift; sourceTree = "<group>"; };
 		155A9BF52F782B1100E9E3E0 /* SkeletonBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkeletonBar.swift; sourceTree = "<group>"; };
 		155A9C012F782C2200F1E4F0 /* SectionCardSkeleton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionCardSkeleton.swift; sourceTree = "<group>"; };
+		156175412FE3A1F70033D915 /* SettingPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingPresentation.swift; sourceTree = "<group>"; };
+		156175432FE3A1F70033D915 /* SettingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingService.swift; sourceTree = "<group>"; };
+		156175452FE3A1F70033D915 /* SettingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingViewModel.swift; sourceTree = "<group>"; };
+		1561754A2FE3A2020033D915 /* SettingSectionViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingSectionViews.swift; sourceTree = "<group>"; };
 		156C80522F86882A00D0CF6B /* GlobalCooldownTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalCooldownTimer.swift; sourceTree = "<group>"; };
 		156C80552F8689F700D0CF6B /* CooldownManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CooldownManager.swift; sourceTree = "<group>"; };
 		156E5D302FB368B300EBA27F /* AppNotificationDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppNotificationDelegate.swift; sourceTree = "<group>"; };
@@ -938,7 +946,10 @@
 		153E21662FE2ABF500E62160 /* Setting */ = {
 			isa = PBXGroup;
 			children = (
+				156175422FE3A1F70033D915 /* Model */,
+				156175442FE3A1F70033D915 /* Service */,
 				153E21672FE2AC0300E62160 /* View */,
+				156175462FE3A1F70033D915 /* ViewModel */,
 			);
 			path = Setting;
 			sourceTree = "<group>";
@@ -946,6 +957,7 @@
 		153E21672FE2AC0300E62160 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				1561754A2FE3A2020033D915 /* SettingSectionViews.swift */,
 				153E216A2FE2AC2F00E62160 /* SettingView.swift */,
 			);
 			path = View;
@@ -1040,6 +1052,30 @@
 				16C201002F99000000000100 /* CharacterDetail */,
 			);
 			path = Character;
+			sourceTree = "<group>";
+		};
+		156175422FE3A1F70033D915 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				156175412FE3A1F70033D915 /* SettingPresentation.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		156175442FE3A1F70033D915 /* Service */ = {
+			isa = PBXGroup;
+			children = (
+				156175432FE3A1F70033D915 /* SettingService.swift */,
+			);
+			path = Service;
+			sourceTree = "<group>";
+		};
+		156175462FE3A1F70033D915 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				156175452FE3A1F70033D915 /* SettingViewModel.swift */,
+			);
+			path = ViewModel;
 			sourceTree = "<group>";
 		};
 		156C80532F86882A00D0CF6B /* Timer */ = {
@@ -3452,6 +3488,9 @@
 				16F4A0022FC000000000001 /* AnimeDetailSectionBuilder.swift in Sources */,
 				16F4A0042FC000000000003 /* AnimeDetailImagePreviewBuilder.swift in Sources */,
 				16FD00022FF2000000000002 /* AnimeWatchProgressController.swift in Sources */,
+				156175472FE3A1F70033D915 /* SettingViewModel.swift in Sources */,
+				156175482FE3A1F70033D915 /* SettingService.swift in Sources */,
+				156175492FE3A1F70033D915 /* SettingPresentation.swift in Sources */,
 				1585971B2F7B614200B0BDA1 /* AnimeDetailViewModel+Presentation.swift in Sources */,
 				15FC4F6E2F752C250054153E /* HomeTrendingMangaView.swift in Sources */,
 				15AFDCAC2FA6512D00C707FD /* MangaCategoryDetailView.swift in Sources */,
@@ -3463,6 +3502,7 @@
 				15FC4F472F74DF4D0054153E /* HeroBannerImageView.swift in Sources */,
 				1574EC432F7BCB8800E37AE8 /* AnimeReviewService.swift in Sources */,
 				15FF80172F76575F00D3241C /* HeroBannerSlideView.swift in Sources */,
+				1561754B2FE3A2020033D915 /* SettingSectionViews.swift in Sources */,
 				15FF296D2F763B4C00D3241C /* AnimeDetailService.swift in Sources */,
 				15AC997A2F87A972008EAAEE /* AnimeGenreLocalizationModel.swift in Sources */,
 				16B100022F8A000000000002 /* CharacterListView.swift in Sources */,

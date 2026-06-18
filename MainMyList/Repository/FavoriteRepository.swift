@@ -41,6 +41,8 @@ protocol FavoriteRepository: AnyObject {
 
     func remove(_ item: MyListCollectionItem) throws
 
+    func removeAllFavorites() throws
+
     func saveChanges() throws
 }
 
@@ -116,6 +118,23 @@ final class SwiftDataFavoriteRepository: FavoriteRepository {
     func remove(_ item: MyListCollectionItem) throws {
         let modelContext = try requireModelContext()
         modelContext.delete(item)
+
+        do {
+            try modelContext.save()
+            try publish(from: modelContext)
+        } catch {
+            modelContext.rollback()
+            throw error
+        }
+    }
+
+    func removeAllFavorites() throws {
+        let modelContext = try requireModelContext()
+        let items = try fetchAllItems(from: modelContext)
+
+        for item in items {
+            modelContext.delete(item)
+        }
 
         do {
             try modelContext.save()

@@ -157,6 +157,7 @@ nonisolated protocol JikanAPIServicing: Sendable {
         queryItems: [URLQueryItem]?
     ) async throws -> T
     func fetchFromURL<T: Decodable & Sendable>(_ urlString: String, cachePolicy: JikanAPICachePolicy) async throws -> T
+    func clearCache() async
 }
 
 // MARK: - JikanAPIServicing Convenience
@@ -246,6 +247,11 @@ private actor JikanAPIResponseCache {
             expirationDate: now.addingTimeInterval(ttl),
             staleFallbackExpirationDate: now.addingTimeInterval(ttl + staleFallbackRetention)
         )
+    }
+
+    func removeAll() {
+        storage.removeAll()
+        nextCleanupDate = .distantPast
     }
 
     private func removeIfStaleFallbackExpired(for key: String, entry: Entry, now: Date) {
@@ -341,6 +347,11 @@ private actor JikanAPITransientFailureBackoffStore {
         storage.removeValue(forKey: key)
     }
 
+    func removeAll() {
+        storage.removeAll()
+        nextCleanupDate = .distantPast
+    }
+
     private func removeExpiredEntriesIfNeeded(now: Date, cleanupInterval: TimeInterval) {
         guard now >= nextCleanupDate else { return }
 
@@ -379,6 +390,12 @@ nonisolated final class JikanAPIService: @unchecked Sendable {
     ) {
         self.session = session
         self.decoder = decoder
+    }
+
+    func clearCache() async {
+        await responseCache.removeAll()
+        await transientFailureBackoffStore.removeAll()
+        session.configuration.urlCache?.removeAllCachedResponses()
     }
     
     // MARK: - Decoder

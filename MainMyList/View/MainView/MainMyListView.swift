@@ -27,6 +27,10 @@ struct MainMyListView: View {
 
     // MARK: - Properties
 
+    @EnvironmentObject private var broadcastReminderStatusStore: AnimeBroadcastReminderStatusStore
+    @EnvironmentObject private var favoriteStatusStore: FavoriteStatusStore
+    @EnvironmentObject private var notificationScheduler: HomeTodayAnimeNotificationScheduler
+
     private let dependencies: AppDependencies
 
     @StateObject private var viewModel: MainMyListViewModel
@@ -71,7 +75,12 @@ struct MainMyListView: View {
                 }
             }
             .navigationDestination(isPresented: $isShowingSettings) {
-                SettingView()
+                SettingView(
+                    dependencies: dependencies,
+                    notificationScheduler: notificationScheduler,
+                    broadcastReminderStatusStore: broadcastReminderStatusStore,
+                    favoriteStatusStore: favoriteStatusStore
+                )
             }
             .navigationDestination(item: $genreCollectionsRoute) { route in
                 MyListGenreCollectionsDetailView(route: route)

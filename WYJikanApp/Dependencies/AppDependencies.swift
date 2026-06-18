@@ -40,6 +40,12 @@ struct AppDependencies {
         broadcastReminderRepository.connect(modelContext: modelContext)
     }
 
+    func clearCachedData() async {
+        await JikanAPIService.shared.clearCache()
+        await mainNewsService.clearCache()
+        URLCache.shared.removeAllCachedResponses()
+    }
+
     static let live: AppDependencies = {
         let favoriteRepository = SwiftDataFavoriteRepository()
         let broadcastReminderRepository = SwiftDataAnimeBroadcastReminderRepository()
@@ -90,6 +96,20 @@ struct AppDependencies {
 
     func makeMainMyListViewModel() -> MainMyListViewModel {
         MainMyListViewModel(favoriteRepository: favoriteRepository)
+    }
+
+    @MainActor
+    func makeSettingViewModel(
+        notificationScheduler: HomeTodayAnimeNotificationScheduler,
+        broadcastReminderStatusStore: AnimeBroadcastReminderStatusStore,
+        favoriteStatusStore: FavoriteStatusStore
+    ) -> SettingViewModel {
+        SettingViewModel(
+            service: SettingService(dependencies: self),
+            notificationScheduler: notificationScheduler,
+            broadcastReminderStatusStore: broadcastReminderStatusStore,
+            favoriteStatusStore: favoriteStatusStore
+        )
     }
 
     func makeMangaReadingStatusQueryViewModel() -> MangaReadingStatusQueryViewModel {

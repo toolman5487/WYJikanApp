@@ -11,6 +11,8 @@ nonisolated protocol MainNewsServicing: Sendable {
         from sources: [MainNewsSource],
         forceRefresh: Bool
     ) async throws -> MainNewsFeed
+
+    func clearCache() async
 }
 
 nonisolated extension MainNewsServicing {
@@ -120,6 +122,11 @@ nonisolated final class MainNewsService: MainNewsServicing {
             updatedAt: Date(),
             articles: Array(visibleArticles)
         )
+    }
+
+    func clearCache() async {
+        await cache.removeAll()
+        session.configuration.urlCache?.removeAllCachedResponses()
     }
 
     private func fetchSourceResults(
@@ -300,6 +307,10 @@ private actor MainNewsResponseCache {
             articles: articles,
             expirationDate: now.addingTimeInterval(ttl)
         )
+    }
+
+    func removeAll() {
+        storage.removeAll()
     }
 }
 
