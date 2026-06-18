@@ -3,10 +3,13 @@
 //  WYJikanApp
 //
 
+import Combine
 import Foundation
 
 @MainActor
 protocol SettingServicing: AnyObject {
+    var searchHistoryCountPublisher: AnyPublisher<Int, Never> { get }
+
     func searchHistoryCount() -> Int
 }
 
@@ -15,17 +18,24 @@ final class SettingService: SettingServicing {
 
     // MARK: - Dependencies
 
-    private let dependencies: AppDependencies
+    private let historyRepository: any MainSearchHistoryRepository
 
     // MARK: - Lifecycle
 
-    init(dependencies: AppDependencies) {
-        self.dependencies = dependencies
+    init(historyRepository: any MainSearchHistoryRepository) {
+        self.historyRepository = historyRepository
     }
 
     // MARK: - SettingServicing
 
+    var searchHistoryCountPublisher: AnyPublisher<Int, Never> {
+        historyRepository.historyPublisher
+            .map(\.count)
+            .removeDuplicates()
+            .eraseToAnyPublisher()
+    }
+
     func searchHistoryCount() -> Int {
-        dependencies.mainSearchHistoryRepository.loadHistory().count
+        historyRepository.loadHistory().count
     }
 }

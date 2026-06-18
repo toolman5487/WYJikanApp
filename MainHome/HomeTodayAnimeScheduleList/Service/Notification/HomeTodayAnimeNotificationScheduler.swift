@@ -93,14 +93,19 @@ final class HomeTodayAnimeNotificationScheduler: BaseUserNotificationManager {
 
     func refreshScheduledNotificationsImmediately() async {
         do {
-            markLastRefreshAttemptDate()
-            try await withProcessingState(.refreshing) {
-                _ = try await scheduleBroadcastReminderNotifications()
-            }
+            _ = try await refreshScheduledNotificationsImmediatelyReportingFailure()
         } catch {
             AppLogger.notifications.error(
                 "Immediate today anime notification refresh failed: \(error.localizedDescription, privacy: .public)"
             )
+        }
+    }
+
+    @discardableResult
+    func refreshScheduledNotificationsImmediatelyReportingFailure() async throws -> Int {
+        markLastRefreshAttemptDate()
+        return try await withProcessingState(.refreshing) {
+            try await scheduleBroadcastReminderNotifications()
         }
     }
 

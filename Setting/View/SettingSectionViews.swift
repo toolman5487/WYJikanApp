@@ -64,9 +64,7 @@ struct SettingNotificationSectionView: View {
     var body: some View {
         Section {
             LabeledContent {
-                SettingValueAccessory(
-                    text: presentation.authorizationStatus.title
-                )
+                authorizationStatusAccessory
             } label: {
                 Label("通知權限", systemImage: "bell.badge")
                     .foregroundStyle(ThemeColor.textPrimary)
@@ -96,7 +94,7 @@ struct SettingNotificationSectionView: View {
     @ViewBuilder
     private var primaryAuthorizationButton: some View {
         switch presentation.authorizationStatus.primaryAction {
-        case .requestAuthorization:
+        case .some(.requestAuthorization):
             Button {
                 onAction(.requestAuthorization)
             } label: {
@@ -107,7 +105,7 @@ struct SettingNotificationSectionView: View {
                 )
             }
             .disabled(presentation.refreshState == .processing)
-        case .openSystemSettings:
+        case .some(.openSystemSettings):
             Button {
                 onAction(.openSystemSettings)
             } label: {
@@ -117,8 +115,22 @@ struct SettingNotificationSectionView: View {
                     state: .idle
                 )
             }
-        case .refreshReminders:
+        case .none:
             EmptyView()
+        }
+    }
+
+    @ViewBuilder
+    private var authorizationStatusAccessory: some View {
+        switch presentation.authorizationStatus {
+        case .loading:
+            ProgressView()
+                .controlSize(.small)
+                .accessibilityLabel("正在讀取通知權限")
+        case .notDetermined, .authorized, .provisional, .ephemeral, .denied:
+            SettingValueAccessory(
+                text: presentation.authorizationStatus.title
+            )
         }
     }
 

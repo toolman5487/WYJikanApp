@@ -105,7 +105,9 @@ struct AppDependencies {
         favoriteStatusStore: FavoriteStatusStore
     ) -> SettingViewModel {
         SettingViewModel(
-            service: SettingService(dependencies: self),
+            service: SettingService(
+                historyRepository: mainSearchHistoryRepository
+            ),
             notificationScheduler: notificationScheduler,
             broadcastReminderStatusStore: broadcastReminderStatusStore,
             favoriteStatusStore: favoriteStatusStore

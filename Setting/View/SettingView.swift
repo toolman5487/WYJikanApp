@@ -131,6 +131,16 @@ struct SettingView: View {
                 title: "無法開啟通知",
                 message: "請前往系統設定允許通知後再試。"
             )
+        case .reminderRefreshSucceeded(let count):
+            return informationAlert(
+                title: "提醒已更新",
+                message: "已重新安排 \(count) 則播出提醒。"
+            )
+        case .reminderRefreshFailed:
+            return informationAlert(
+                title: "無法更新提醒",
+                message: "播出提醒暫時無法更新，請稍後再試。"
+            )
         }
     }
 

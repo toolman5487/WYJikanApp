@@ -59,6 +59,7 @@ final class MainSearchViewModel: ObservableObject {
         }
         bindSearchPipeline()
         bindSortPipeline()
+        bindHistory()
     }
 
     // MARK: - Public
@@ -181,6 +182,15 @@ private extension MainSearchViewModel {
             .sink { [weak self] option in
                 guard let self else { return }
                 self.applySortedResults(using: option)
+            }
+            .store(in: &cancellables)
+    }
+
+    func bindHistory() {
+        historyRepository.historyPublisher
+            .receive(on: RunLoop.main)
+            .sink { [weak self] history in
+                self?.searchHistory = history
             }
             .store(in: &cancellables)
     }

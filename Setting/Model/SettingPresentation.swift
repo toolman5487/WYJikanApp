@@ -8,9 +8,9 @@ import Foundation
 // MARK: - Section
 
 nonisolated enum SettingSection: CaseIterable, Identifiable, Sendable {
-    case appInformation
-    case userInformation
     case notification
+    case userInformation
+    case appInformation
 
     var id: Self { self }
 }
@@ -27,6 +27,7 @@ nonisolated struct SettingUserInformationPresentation: Equatable, Sendable {
 // MARK: - Notification
 
 nonisolated enum SettingNotificationAuthorizationStatus: Equatable, Sendable {
+    case loading
     case notDetermined
     case authorized
     case provisional
@@ -35,6 +36,8 @@ nonisolated enum SettingNotificationAuthorizationStatus: Equatable, Sendable {
 
     var title: String {
         switch self {
+        case .loading:
+            return "讀取中"
         case .notDetermined:
             return "尚未設定"
         case .authorized:
@@ -48,8 +51,10 @@ nonisolated enum SettingNotificationAuthorizationStatus: Equatable, Sendable {
         }
     }
 
-    var primaryAction: SettingNotificationAction {
+    var primaryAction: SettingNotificationPrimaryAction? {
         switch self {
+        case .loading:
+            return nil
         case .notDetermined:
             return .requestAuthorization
         case .authorized, .provisional, .ephemeral, .denied:
@@ -59,12 +64,19 @@ nonisolated enum SettingNotificationAuthorizationStatus: Equatable, Sendable {
 
     var allowsScheduling: Bool {
         switch self {
+        case .loading:
+            return false
         case .authorized, .provisional, .ephemeral:
             return true
         case .notDetermined, .denied:
             return false
         }
     }
+}
+
+nonisolated enum SettingNotificationPrimaryAction: Sendable {
+    case requestAuthorization
+    case openSystemSettings
 }
 
 nonisolated enum SettingNotificationAction: Sendable {
@@ -140,11 +152,17 @@ nonisolated struct SettingPresentation: Sendable {
 
 nonisolated enum SettingAlertMessage: Identifiable, Sendable {
     case notificationAuthorizationFailed
+    case reminderRefreshSucceeded(count: Int)
+    case reminderRefreshFailed
 
     var id: String {
         switch self {
         case .notificationAuthorizationFailed:
             return "notificationAuthorizationFailed"
+        case .reminderRefreshSucceeded:
+            return "reminderRefreshSucceeded"
+        case .reminderRefreshFailed:
+            return "reminderRefreshFailed"
         }
     }
 }

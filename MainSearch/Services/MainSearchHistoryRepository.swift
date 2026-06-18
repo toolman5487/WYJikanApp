@@ -3,11 +3,15 @@
 //  WYJikanApp
 //
 
+import Combine
 import Foundation
 
 // MARK: - MainSearchHistoryRepository
 
-protocol MainSearchHistoryRepository {
+@MainActor
+protocol MainSearchHistoryRepository: AnyObject {
+    var historyPublisher: AnyPublisher<[MainSearchHistoryItem], Never> { get }
+
     func loadHistory() -> [MainSearchHistoryItem]
     func recordSearch(query: String, kind: MainSearchKind) -> [MainSearchHistoryItem]
     func removeHistoryItem(id: MainSearchHistoryItem.ID) -> [MainSearchHistoryItem]
@@ -16,7 +20,8 @@ protocol MainSearchHistoryRepository {
 
 // MARK: - UserDefaultsMainSearchHistoryRepository
 
-struct UserDefaultsMainSearchHistoryRepository: MainSearchHistoryRepository {
+@MainActor
+final class UserDefaultsMainSearchHistoryRepository: MainSearchHistoryRepository {
 
     // MARK: - Properties
 
@@ -26,6 +31,7 @@ struct UserDefaultsMainSearchHistoryRepository: MainSearchHistoryRepository {
     private let userDefaults: UserDefaults
     private let jsonEncoder: JSONEncoder
     private let jsonDecoder: JSONDecoder
+    private let historySubject: CurrentValueSubject<[MainSearchHistoryItem], Never>
 
     // MARK: - Lifecycle
 
@@ -37,21 +43,24 @@ struct UserDefaultsMainSearchHistoryRepository: MainSearchHistoryRepository {
         self.userDefaults = userDefaults
         self.jsonEncoder = jsonEncoder
         self.jsonDecoder = jsonDecoder
+        self.historySubject = CurrentValueSubject(
+            Self.loadHistory(
+                userDefaults: userDefaults,
+                jsonDecoder: jsonDecoder
+            )
+        )
     }
 
     // MARK: - MainSearchHistoryRepository
 
-    func loadHistory() -> [MainSearchHistoryItem] {
-        guard let data = userDefaults.data(forKey: Self.storageKey) else {
-            return []
-        }
+    var historyPublisher: AnyPublisher<[MainSearchHistoryItem], Never> {
+        historySubject
+            .removeDuplicates()
+            .eraseToAnyPublisher()
+    }
 
-        do {
-            return try jsonDecoder.decode([MainSearchHistoryItem].self, from: data)
-        } catch {
-            userDefaults.removeObject(forKey: Self.storageKey)
-            return []
-        }
+    func loadHistory() -> [MainSearchHistoryItem] {
+        historySubject.value
     }
 
     func recordSearch(query: String, kind: MainSearchKind) -> [MainSearchHistoryItem] {
@@ -84,17 +93,36 @@ struct UserDefaultsMainSearchHistoryRepository: MainSearchHistoryRepository {
 
     func clearHistory() -> [MainSearchHistoryItem] {
         userDefaults.removeObject(forKey: Self.storageKey)
+        historySubject.send([])
         return []
     }
 
     // MARK: - Private Methods
 
+    private static func loadHistory(
+        userDefaults: UserDefaults,
+        jsonDecoder: JSONDecoder
+    ) -> [MainSearchHistoryItem] {
+        guard let data = userDefaults.data(forKey: Self.storageKey) else {
+            return []
+        }
+
+        do {
+            return try jsonDecoder.decode([MainSearchHistoryItem].self, from: data)
+        } catch {
+            userDefaults.removeObject(forKey: Self.storageKey)
+            return []
+        }
+    }
+
     private func persist(_ history: [MainSearchHistoryItem]) {
         do {
             let data = try jsonEncoder.encode(history)
             userDefaults.set(data, forKey: Self.storageKey)
+            historySubject.send(history)
         } catch {
             userDefaults.removeObject(forKey: Self.storageKey)
+            historySubject.send([])
         }
     }
 }

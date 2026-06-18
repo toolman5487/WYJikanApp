@@ -22,6 +22,7 @@ final class SettingViewModel: ObservableObject {
     private let favoriteStatusStore: FavoriteStatusStore
 
     private var cancellables = Set<AnyCancellable>()
+    private var hasLoadedAuthorizationState = false
 
     // MARK: - Lifecycle
 
@@ -45,9 +46,7 @@ final class SettingViewModel: ObservableObject {
                 searchHistoryCount: searchHistoryCount
             ),
             notification: SettingNotificationPresentation(
-                authorizationStatus: Self.authorizationStatus(
-                    from: notificationScheduler.authorizationState
-                ),
+                authorizationStatus: .loading,
                 reminderCount: broadcastReminderStatusStore.subscriptions.count,
                 refreshState: Self.actionState(from: notificationScheduler.state)
             ),
@@ -56,6 +55,7 @@ final class SettingViewModel: ObservableObject {
 
         bindNotificationState()
         bindFavoriteState()
+        bindSearchHistoryState()
     }
 
     // MARK: - Public Actions
@@ -63,6 +63,7 @@ final class SettingViewModel: ObservableObject {
     func refresh() async {
         updateSearchHistoryCount()
         await notificationScheduler.refreshAuthorizationState()
+        hasLoadedAuthorizationState = true
         rebuildNotificationPresentation()
     }
 
@@ -73,7 +74,7 @@ final class SettingViewModel: ObservableObject {
         case .openSystemSettings:
             break
         case .refreshReminders:
-            await notificationScheduler.refreshScheduledNotificationsImmediately()
+            await refreshReminders()
         }
     }
 
@@ -110,22 +111,44 @@ final class SettingViewModel: ObservableObject {
         .store(in: &cancellables)
     }
 
+    private func bindSearchHistoryState() {
+        service.searchHistoryCountPublisher
+            .sink { [weak self] count in
+                self?.updateSearchHistoryCount(count)
+            }
+            .store(in: &cancellables)
+    }
+
     // MARK: - Notification
 
     private func requestNotificationAuthorization() async {
         do {
             try await notificationScheduler.ensureAuthorization()
-            await notificationScheduler.refreshScheduledNotificationsImmediately()
         } catch {
             presentedAlert = .notificationAuthorizationFailed
+            return
+        }
+
+        hasLoadedAuthorizationState = true
+        rebuildNotificationPresentation()
+        await refreshReminders()
+    }
+
+    private func refreshReminders() async {
+        do {
+            let count = try await notificationScheduler
+                .refreshScheduledNotificationsImmediatelyReportingFailure()
+            presentedAlert = .reminderRefreshSucceeded(count: count)
+        } catch {
+            presentedAlert = .reminderRefreshFailed
         }
     }
 
     private func rebuildNotificationPresentation() {
         presentation.notification = SettingNotificationPresentation(
-            authorizationStatus: Self.authorizationStatus(
-                from: notificationScheduler.authorizationState
-            ),
+            authorizationStatus: hasLoadedAuthorizationState
+                ? Self.authorizationStatus(from: notificationScheduler.authorizationState)
+                : .loading,
             reminderCount: broadcastReminderStatusStore.subscriptions.count,
             refreshState: Self.actionState(from: notificationScheduler.state)
         )
@@ -160,7 +183,10 @@ final class SettingViewModel: ObservableObject {
     }
 
     private func updateSearchHistoryCount() {
-        let searchHistoryCount = service.searchHistoryCount()
+        updateSearchHistoryCount(service.searchHistoryCount())
+    }
+
+    private func updateSearchHistoryCount(_ searchHistoryCount: Int) {
         presentation.userInformation = SettingUserInformationPresentation(
             animeFavoriteCount: presentation.userInformation.animeFavoriteCount,
             mangaFavoriteCount: presentation.userInformation.mangaFavoriteCount,
