@@ -113,30 +113,9 @@ nonisolated enum SettingActionState: Equatable, Sendable {
     case processing
 }
 
-// MARK: - App Information
-
-nonisolated enum SettingDataSource: Sendable {
-    case jikan
-
-    var title: String {
-        switch self {
-        case .jikan:
-            return "Jikan API"
-        }
-    }
-
-    var url: URL? {
-        switch self {
-        case .jikan:
-            return URL(string: "https://jikan.moe")
-        }
-    }
-}
-
 nonisolated struct SettingAppInformationPresentation: Sendable {
     let appName: String
     let versionText: String
-    let dataSource: SettingDataSource
 
     static func current(bundle: Bundle = .main) -> SettingAppInformationPresentation {
         let appName = bundle.object(
@@ -154,8 +133,7 @@ nonisolated struct SettingAppInformationPresentation: Sendable {
 
         return SettingAppInformationPresentation(
             appName: appName,
-            versionText: versionText(version: version, build: build),
-            dataSource: .jikan
+            versionText: versionText(version: version, build: build)
         )
     }
 

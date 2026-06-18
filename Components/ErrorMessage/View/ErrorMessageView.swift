@@ -53,15 +53,11 @@ struct ErrorMessageView: View {
 
     private var content: some View {
         VStack(spacing: 12) {
-            ZStack {
-                Circle()
-                    .fill(state.iconColor.opacity(0.14))
-                    .frame(width: 56, height: 56)
-
-                Image(systemName: state.iconSystemName)
-                    .font(.system(size: 24, weight: .semibold))
-                    .foregroundStyle(state.iconColor)
-            }
+            ErrorMessageIconView(
+                systemName: state.iconSystemName,
+                color: state.iconColor,
+                effect: state.iconEffect
+            )
 
             Text(state.message)
                 .font(.subheadline)
@@ -69,6 +65,132 @@ struct ErrorMessageView: View {
                 .foregroundStyle(.secondary)
         }
     }
+}
+
+// MARK: - Icon
+
+private struct ErrorMessageIconView: View {
+
+    @Environment(\.accessibilityReduceMotion) private var accessibilityReduceMotion
+
+    let systemName: String
+    let color: Color
+    let effect: ErrorMessageIconEffect
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .fill(color.opacity(0.14))
+                .frame(width: 56, height: 56)
+
+            animatedSymbol
+                .font(.system(size: 24, weight: .semibold))
+                .foregroundStyle(color)
+        }
+        .accessibilityHidden(true)
+    }
+
+    @ViewBuilder
+    private var animatedSymbol: some View {
+        let symbol = Image(systemName: systemName)
+
+        switch effect {
+        case .none:
+            symbol
+
+        case .pulse:
+            symbol.symbolEffect(
+                .pulse,
+                options: .repeating,
+                isActive: !accessibilityReduceMotion
+            )
+
+        case .bounce:
+            symbol.symbolEffect(
+                .bounce,
+                options: .repeating,
+                isActive: !accessibilityReduceMotion
+            )
+
+        case .variableColor:
+            symbol.symbolEffect(
+                .variableColor,
+                options: .repeating,
+                isActive: !accessibilityReduceMotion
+            )
+
+        case .scale:
+            symbol.symbolEffect(
+                .scale,
+                options: .repeating,
+                isActive: !accessibilityReduceMotion
+            )
+
+        case .appear:
+            symbol.symbolEffect(
+                .appear,
+                options: .repeating,
+                isActive: !accessibilityReduceMotion
+            )
+
+        case .disappear:
+            symbol.symbolEffect(
+                .disappear,
+                options: .repeating,
+                isActive: !accessibilityReduceMotion
+            )
+
+        case .wiggle:
+            symbol.symbolEffect(
+                .wiggle,
+                options: .repeating,
+                isActive: !accessibilityReduceMotion
+            )
+
+        case .rotate:
+            symbol.symbolEffect(
+                .rotate,
+                options: .repeating,
+                isActive: !accessibilityReduceMotion
+            )
+
+        case .breathe:
+            symbol.symbolEffect(
+                .breathe,
+                options: .repeating,
+                isActive: !accessibilityReduceMotion
+            )
+
+        case .drawOn:
+            symbol.symbolEffect(
+                .drawOn,
+                options: .repeating,
+                isActive: !accessibilityReduceMotion
+            )
+
+        case .drawOff:
+            symbol.symbolEffect(
+                .drawOff,
+                options: .repeating,
+                isActive: !accessibilityReduceMotion
+            )
+        }
+    }
+}
+
+private enum ErrorMessageIconEffect {
+    case none
+    case pulse
+    case bounce
+    case variableColor
+    case scale
+    case appear
+    case disappear
+    case wiggle
+    case rotate
+    case breathe
+    case drawOn
+    case drawOff
 }
 
 // MARK: - State Mapping
@@ -165,6 +287,17 @@ private extension ErrorMessageView.State {
             ThemeColor.sakura
         case .permissionDenied:
             ThemeColor.sakura
+        }
+    }
+
+    var iconEffect: ErrorMessageIconEffect {
+        switch self {
+        case .rateLimited, .filteredEmpty, .loadMoreFailed:
+            .rotate
+        case .network, .serverError, .timeout, .unavailable:
+            .breathe
+        case .noSearchResults, .emptyCollection, .notFound, .permissionDenied:
+            .none
         }
     }
 }

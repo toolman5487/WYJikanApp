@@ -205,8 +205,6 @@ struct SettingAppInformationSectionView: View {
                     .foregroundStyle(ThemeColor.textPrimary)
             }
 
-            dataSourceLink
-
             LabeledContent {
                 SettingValueAccessory(text: presentation.versionText)
             } label: {
@@ -216,33 +214,6 @@ struct SettingAppInformationSectionView: View {
         } header: {
             Text("App 資訊")
                 .foregroundStyle(ThemeColor.sakura)
-        }
-    }
-
-    @ViewBuilder
-    private var dataSourceLink: some View {
-        switch presentation.dataSource.url {
-        case .some(let url):
-            Link(destination: url) {
-                HStack {
-                    Label("資料來源", systemImage: "network")
-                        .foregroundStyle(ThemeColor.textPrimary)
-                    Spacer()
-                    SettingValueAccessory(
-                        text: presentation.dataSource.title,
-                        systemImage: "arrow.up.right"
-                    )
-                }
-            }
-        case .none:
-            LabeledContent {
-                SettingValueAccessory(
-                    text: presentation.dataSource.title
-                )
-            } label: {
-                Label("資料來源", systemImage: "network")
-                    .foregroundStyle(ThemeColor.textPrimary)
-            }
         }
     }
 }
