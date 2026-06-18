@@ -5,6 +5,56 @@
 
 import SwiftUI
 
+// MARK: - User Information
+
+struct SettingUserInformationSectionView: View {
+    let presentation: SettingUserInformationPresentation
+
+    var body: some View {
+        Section {
+            localValueRow(
+                title: "動畫收藏",
+                systemImage: "play.rectangle",
+                value: "\(presentation.animeFavoriteCount) 部"
+            )
+            localValueRow(
+                title: "漫畫收藏",
+                systemImage: "books.vertical",
+                value: "\(presentation.mangaFavoriteCount) 部"
+            )
+            localValueRow(
+                title: "播出提醒",
+                systemImage: "calendar.badge.clock",
+                value: "\(presentation.reminderCount) 部"
+            )
+            localValueRow(
+                title: "搜尋紀錄",
+                systemImage: "clock.arrow.circlepath",
+                value: "\(presentation.searchHistoryCount) 筆"
+            )
+        } header: {
+            Text("用戶資訊")
+                .foregroundStyle(ThemeColor.sakura)
+        } footer: {
+            Text("以上資料僅儲存在此裝置，不包含登入帳號或雲端個人資料。")
+                .foregroundStyle(ThemeColor.textSecondary)
+        }
+    }
+
+    private func localValueRow(
+        title: String,
+        systemImage: String,
+        value: String
+    ) -> some View {
+        LabeledContent {
+            SettingValueAccessory(text: value)
+        } label: {
+            Label(title, systemImage: systemImage)
+                .foregroundStyle(ThemeColor.textPrimary)
+        }
+    }
+}
+
 // MARK: - Notification
 
 struct SettingNotificationSectionView: View {
@@ -19,15 +69,6 @@ struct SettingNotificationSectionView: View {
                 )
             } label: {
                 Label("通知權限", systemImage: "bell.badge")
-                    .foregroundStyle(ThemeColor.textPrimary)
-            }
-
-            LabeledContent {
-                SettingValueAccessory(
-                    text: "\(presentation.reminderCount) 部動畫"
-                )
-            } label: {
-                Label("播出提醒", systemImage: "calendar.badge.clock")
                     .foregroundStyle(ThemeColor.textPrimary)
             }
 
@@ -99,15 +140,6 @@ struct SettingDataManagementSectionView: View {
 
     var body: some View {
         Section {
-            LabeledContent {
-                SettingValueAccessory(
-                    text: "\(presentation.searchHistoryCount) 筆"
-                )
-            } label: {
-                Label("搜尋紀錄", systemImage: "clock.arrow.circlepath")
-                    .foregroundStyle(ThemeColor.textPrimary)
-            }
-
             Button {
                 onAction(.clearSearchHistory)
             } label: {
@@ -118,15 +150,6 @@ struct SettingDataManagementSectionView: View {
                 )
             }
             .disabled(!presentation.canClearSearchHistory)
-
-            LabeledContent {
-                SettingValueAccessory(
-                    text: "\(presentation.favoriteCount) 個"
-                )
-            } label: {
-                Label("本機收藏", systemImage: "heart")
-                    .foregroundStyle(ThemeColor.textPrimary)
-            }
 
             Button {
                 onAction(.clearFavorites)

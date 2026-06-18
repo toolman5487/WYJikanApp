@@ -81,6 +81,10 @@ struct SettingView: View {
                 presentation: viewModel.presentation.dataManagement,
                 onAction: viewModel.requestDataAction
             )
+        case .userInformation:
+            SettingUserInformationSectionView(
+                presentation: viewModel.presentation.userInformation
+            )
         case .appInformation:
             SettingAppInformationSectionView(
                 presentation: viewModel.presentation.appInformation

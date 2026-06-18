@@ -8,11 +8,21 @@ import Foundation
 // MARK: - Section
 
 nonisolated enum SettingSection: CaseIterable, Identifiable, Sendable {
+    case appInformation
+    case userInformation
     case notification
     case dataManagement
-    case appInformation
 
     var id: Self { self }
+}
+
+// MARK: - User Information
+
+nonisolated struct SettingUserInformationPresentation: Equatable, Sendable {
+    let animeFavoriteCount: Int
+    let mangaFavoriteCount: Int
+    let reminderCount: Int
+    let searchHistoryCount: Int
 }
 
 // MARK: - Notification
@@ -166,6 +176,7 @@ nonisolated struct SettingAppInformationPresentation: Sendable {
 // MARK: - Screen Presentation
 
 nonisolated struct SettingPresentation: Sendable {
+    var userInformation: SettingUserInformationPresentation
     var notification: SettingNotificationPresentation
     var dataManagement: SettingDataManagementPresentation
     let appInformation: SettingAppInformationPresentation

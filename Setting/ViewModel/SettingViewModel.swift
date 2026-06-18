@@ -36,7 +36,14 @@ final class SettingViewModel: ObservableObject {
         self.notificationScheduler = notificationScheduler
         self.broadcastReminderStatusStore = broadcastReminderStatusStore
         self.favoriteStatusStore = favoriteStatusStore
+        let searchHistoryCount = service.searchHistoryCount()
         self.presentation = SettingPresentation(
+            userInformation: SettingUserInformationPresentation(
+                animeFavoriteCount: favoriteStatusStore.animeFavoriteIDs.count,
+                mangaFavoriteCount: favoriteStatusStore.mangaFavoriteIDs.count,
+                reminderCount: broadcastReminderStatusStore.subscriptions.count,
+                searchHistoryCount: searchHistoryCount
+            ),
             notification: SettingNotificationPresentation(
                 authorizationStatus: Self.authorizationStatus(
                     from: notificationScheduler.authorizationState
@@ -45,7 +52,7 @@ final class SettingViewModel: ObservableObject {
                 refreshState: Self.actionState(from: notificationScheduler.state)
             ),
             dataManagement: SettingDataManagementPresentation(
-                searchHistoryCount: service.searchHistoryCount(),
+                searchHistoryCount: searchHistoryCount,
                 favoriteCount: favoriteStatusStore.totalFavoriteCount,
                 cacheState: .idle
             ),
@@ -118,6 +125,7 @@ final class SettingViewModel: ObservableObject {
         )
         .sink { [weak self] _, _, _ in
             self?.rebuildNotificationPresentation()
+            self?.rebuildUserInformationPresentation()
         }
         .store(in: &cancellables)
     }
@@ -128,7 +136,10 @@ final class SettingViewModel: ObservableObject {
             favoriteStatusStore.$mangaFavoriteIDs
         )
         .sink { [weak self] animeIDs, mangaIDs in
-            self?.updateFavoriteCount(animeIDs.count + mangaIDs.count)
+            self?.updateFavoriteCounts(
+                animeCount: animeIDs.count,
+                mangaCount: mangaIDs.count
+            )
         }
         .store(in: &cancellables)
     }
@@ -219,18 +230,31 @@ final class SettingViewModel: ObservableObject {
     }
 
     private func updateSearchHistoryCount() {
+        let searchHistoryCount = service.searchHistoryCount()
         presentation.dataManagement = SettingDataManagementPresentation(
-            searchHistoryCount: service.searchHistoryCount(),
+            searchHistoryCount: searchHistoryCount,
             favoriteCount: presentation.dataManagement.favoriteCount,
             cacheState: presentation.dataManagement.cacheState
         )
+        presentation.userInformation = SettingUserInformationPresentation(
+            animeFavoriteCount: presentation.userInformation.animeFavoriteCount,
+            mangaFavoriteCount: presentation.userInformation.mangaFavoriteCount,
+            reminderCount: presentation.userInformation.reminderCount,
+            searchHistoryCount: searchHistoryCount
+        )
     }
 
-    private func updateFavoriteCount(_ count: Int) {
+    private func updateFavoriteCounts(animeCount: Int, mangaCount: Int) {
         presentation.dataManagement = SettingDataManagementPresentation(
             searchHistoryCount: presentation.dataManagement.searchHistoryCount,
-            favoriteCount: count,
+            favoriteCount: animeCount + mangaCount,
             cacheState: presentation.dataManagement.cacheState
+        )
+        presentation.userInformation = SettingUserInformationPresentation(
+            animeFavoriteCount: animeCount,
+            mangaFavoriteCount: mangaCount,
+            reminderCount: presentation.userInformation.reminderCount,
+            searchHistoryCount: presentation.userInformation.searchHistoryCount
         )
     }
 
@@ -239,6 +263,15 @@ final class SettingViewModel: ObservableObject {
             searchHistoryCount: presentation.dataManagement.searchHistoryCount,
             favoriteCount: presentation.dataManagement.favoriteCount,
             cacheState: state
+        )
+    }
+
+    private func rebuildUserInformationPresentation() {
+        presentation.userInformation = SettingUserInformationPresentation(
+            animeFavoriteCount: favoriteStatusStore.animeFavoriteIDs.count,
+            mangaFavoriteCount: favoriteStatusStore.mangaFavoriteIDs.count,
+            reminderCount: broadcastReminderStatusStore.subscriptions.count,
+            searchHistoryCount: presentation.dataManagement.searchHistoryCount
         )
     }
 }
