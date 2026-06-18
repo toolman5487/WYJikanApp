@@ -9,8 +9,8 @@ import Foundation
 
 nonisolated enum SettingSection: CaseIterable, Identifiable, Sendable {
     case notification
-    case userInformation
     case storage
+    case userInformation
     case appInformation
 
     var id: Self { self }

@@ -12,18 +12,46 @@ struct SettingStorageSectionView: View {
     let onDeleteLocalData: (SettingLocalDataTarget) -> Void
 
     var body: some View {
+        cacheSection
+        localDataSection
+        resetSection
+    }
+
+    private var cacheSection: some View {
         Section {
             cacheSizeRow
             clearCacheButton
+        } header: {
+            Text("快取")
+                .foregroundStyle(ThemeColor.sakura)
+        } footer: {
+            Text("清除後會在需要時重新下載圖片與網路資料，不會影響你的收藏與紀錄。")
+                .foregroundStyle(ThemeColor.textSecondary)
+        }
+    }
 
+    private var localDataSection: some View {
+        Section {
             ForEach(deletionRows) { row in
                 deletionButton(row)
             }
         } header: {
-            Text("儲存空間與資料")
+            Text("本機資料")
                 .foregroundStyle(ThemeColor.sakura)
         } footer: {
-            Text("快取可以重新下載；收藏、進度、提醒與搜尋紀錄刪除後無法復原。")
+            Text("各項資料只儲存在此裝置，刪除後無法復原。")
+                .foregroundStyle(ThemeColor.textSecondary)
+        }
+    }
+
+    private var resetSection: some View {
+        Section {
+            deletionButton(resetRow)
+        } header: {
+            Text("重設資料")
+                .foregroundStyle(ThemeColor.sakura)
+        } footer: {
+            Text("一次移除收藏與進度、播出提醒、系統通知及搜尋紀錄。")
                 .foregroundStyle(ThemeColor.textSecondary)
         }
     }
@@ -49,6 +77,7 @@ struct SettingStorageSectionView: View {
             !presentation.cacheState.canClear
                 || presentation.isOperationInProgress
         )
+        .accessibilityHint("清除可重新下載的圖片與網路資料")
     }
 
     private func deletionButton(
@@ -60,13 +89,16 @@ struct SettingStorageSectionView: View {
             SettingActionLabel(
                 title: row.title,
                 systemImage: row.systemImage,
-                state: deletionActionState(for: row.target)
+                state: deletionActionState(for: row.target),
+                value: row.valueText
             )
         }
         .disabled(
             row.itemCount == 0
                 || presentation.isOperationInProgress
         )
+        .accessibilityValue(row.valueText)
+        .accessibilityHint(row.accessibilityHint)
     }
 
     @ViewBuilder
@@ -115,27 +147,38 @@ struct SettingStorageSectionView: View {
                 target: .searchHistory,
                 title: "清除搜尋紀錄",
                 systemImage: "clock.arrow.circlepath",
-                itemCount: userInformation.searchHistoryCount
+                itemCount: userInformation.searchHistoryCount,
+                valueText: "\(userInformation.searchHistoryCount) 筆",
+                accessibilityHint: "永久刪除此裝置上的搜尋紀錄"
             ),
             SettingStorageDeletionRow(
                 target: .broadcastReminders,
                 title: "刪除播出提醒",
                 systemImage: "calendar.badge.minus",
-                itemCount: userInformation.reminderCount
+                itemCount: userInformation.reminderCount,
+                valueText: "\(userInformation.reminderCount) 部",
+                accessibilityHint: "永久刪除提醒並移除已排程的系統通知"
             ),
             SettingStorageDeletionRow(
                 target: .favoritesAndProgress,
                 title: "刪除收藏與進度",
                 systemImage: "heart.slash",
-                itemCount: favoriteCount
-            ),
-            SettingStorageDeletionRow(
-                target: .all,
-                title: "刪除所有本機資料",
-                systemImage: "trash",
-                itemCount: localDataCount
+                itemCount: favoriteCount,
+                valueText: "\(favoriteCount) 部",
+                accessibilityHint: "永久刪除收藏、動畫觀看進度與漫畫閱讀進度"
             )
         ]
+    }
+
+    private var resetRow: SettingStorageDeletionRow {
+        SettingStorageDeletionRow(
+            target: .all,
+            title: "刪除所有本機資料",
+            systemImage: "trash",
+            itemCount: localDataCount,
+            valueText: "\(localDataCount) 項",
+            accessibilityHint: "永久刪除所有本機收藏、進度、提醒與搜尋紀錄"
+        )
     }
 
     private var favoriteCount: Int {
@@ -155,6 +198,8 @@ private struct SettingStorageDeletionRow: Identifiable {
     let title: String
     let systemImage: String
     let itemCount: Int
+    let valueText: String
+    let accessibilityHint: String
 
     var id: SettingLocalDataTarget { target }
 }

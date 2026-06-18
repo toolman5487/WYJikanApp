@@ -12,6 +12,7 @@ struct SettingNotificationSectionView: View {
     var body: some View {
         Section {
             authorizationStatusRow
+            reminderCountRow
             primaryAuthorizationButton
             refreshButton
         } header: {
@@ -20,6 +21,17 @@ struct SettingNotificationSectionView: View {
         } footer: {
             Text("播出提醒會依你在動畫詳情頁訂閱的作品安排通知。")
                 .foregroundStyle(ThemeColor.textSecondary)
+        }
+    }
+
+    private var reminderCountRow: some View {
+        LabeledContent {
+            SettingValueAccessory(
+                text: "\(presentation.reminderCount) 部"
+            )
+        } label: {
+            Label("已訂閱提醒", systemImage: "calendar.badge.clock")
+                .foregroundStyle(ThemeColor.textPrimary)
         }
     }
 
@@ -64,6 +76,7 @@ struct SettingNotificationSectionView: View {
             )
         }
         .disabled(!presentation.canRefreshReminders)
+        .accessibilityHint(refreshButtonAccessibilityHint)
     }
 
     private func actionButton(
@@ -99,9 +112,17 @@ struct SettingNotificationSectionView: View {
     private var refreshButtonTitle: String {
         switch presentation.refreshState {
         case .idle:
-            return "立即更新提醒"
+            return presentation.reminderCount == 0
+                ? "尚無可更新提醒"
+                : "立即更新提醒"
         case .processing:
             return "正在更新提醒"
         }
+    }
+
+    private var refreshButtonAccessibilityHint: String {
+        presentation.reminderCount == 0
+            ? "請先在動畫詳情頁訂閱播出提醒"
+            : "重新安排目前訂閱的播出通知"
     }
 }
