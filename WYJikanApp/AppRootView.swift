@@ -14,7 +14,6 @@ struct AppRootView: View {
     var body: some View {
         MainTabBarView()
         .preferredColorScheme(.dark)
-        .dynamicTypeSize(.medium)
         .task(priority: .utility) {
             await bootstrapViewModel.bootstrap(
                 subscriptions: broadcastReminderStatusStore.subscriptions

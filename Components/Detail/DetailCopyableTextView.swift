@@ -23,7 +23,6 @@ struct DetailCopyableText: View {
             .font(style.font)
             .foregroundStyle(style.foregroundStyle)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .frame(minHeight: 44, alignment: .leading)
             .contentShape(Rectangle())
             .overlay {
                 if viewModel.showsCopiedFeedback {
