@@ -242,7 +242,11 @@
 		16A200332FB4000000D1E001 /* AnimeDetailEpisodeRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A200322FB4000000D1E001 /* AnimeDetailEpisodeRowView.swift */; };
 		16A200342FB4000000D1E001 /* AnimeDetailEpisodesLoadMoreFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A200352FB4000000D1E001 /* AnimeDetailEpisodesLoadMoreFooterView.swift */; };
 		16AA10022FCF300000000002 /* MainNewsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AA10012FCF300000000001 /* MainNewsModel.swift */; };
+		16AA10022FE4000000000002 /* SettingUserInformationSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AA10012FE4000000000001 /* SettingUserInformationSectionView.swift */; };
 		16AA10042FCF300000000004 /* MainNewsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AA10032FCF300000000003 /* MainNewsService.swift */; };
+		16AA10042FE4000000000004 /* SettingNotificationSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AA10032FE4000000000003 /* SettingNotificationSectionView.swift */; };
+		16AA10062FE4000000000006 /* SettingStorageSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AA10052FE4000000000005 /* SettingStorageSectionView.swift */; };
+		16AA10082FE4000000000008 /* SettingAppInformationSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AA10072FE4000000000007 /* SettingAppInformationSectionView.swift */; };
 		16AA10122FCF310000000012 /* MainNewsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AA10112FCF310000000011 /* MainNewsViewModel.swift */; };
 		16AA10142FCF310000000014 /* MainNewsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AA10132FCF310000000013 /* MainNewsView.swift */; };
 		16AA10162FCF310000000016 /* MainNewsHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AA10152FCF310000000015 /* MainNewsHeaderView.swift */; };
@@ -635,7 +639,11 @@
 		16A200322FB4000000D1E001 /* AnimeDetailEpisodeRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeDetailEpisodeRowView.swift; sourceTree = "<group>"; };
 		16A200352FB4000000D1E001 /* AnimeDetailEpisodesLoadMoreFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeDetailEpisodesLoadMoreFooterView.swift; sourceTree = "<group>"; };
 		16AA10012FCF300000000001 /* MainNewsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainNewsModel.swift; sourceTree = "<group>"; };
+		16AA10012FE4000000000001 /* SettingUserInformationSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingUserInformationSectionView.swift; sourceTree = "<group>"; };
 		16AA10032FCF300000000003 /* MainNewsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainNewsService.swift; sourceTree = "<group>"; };
+		16AA10032FE4000000000003 /* SettingNotificationSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingNotificationSectionView.swift; sourceTree = "<group>"; };
+		16AA10052FE4000000000005 /* SettingStorageSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingStorageSectionView.swift; sourceTree = "<group>"; };
+		16AA10072FE4000000000007 /* SettingAppInformationSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingAppInformationSectionView.swift; sourceTree = "<group>"; };
 		16AA10112FCF310000000011 /* MainNewsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainNewsViewModel.swift; sourceTree = "<group>"; };
 		16AA10132FCF310000000013 /* MainNewsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainNewsView.swift; sourceTree = "<group>"; };
 		16AA10152FCF310000000015 /* MainNewsHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainNewsHeaderView.swift; sourceTree = "<group>"; };
@@ -957,7 +965,11 @@
 		153E21672FE2AC0300E62160 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				16AA10072FE4000000000007 /* SettingAppInformationSectionView.swift */,
+				16AA10032FE4000000000003 /* SettingNotificationSectionView.swift */,
 				1561754A2FE3A2020033D915 /* SettingSectionViews.swift */,
+				16AA10052FE4000000000005 /* SettingStorageSectionView.swift */,
+				16AA10012FE4000000000001 /* SettingUserInformationSectionView.swift */,
 				153E216A2FE2AC2F00E62160 /* SettingView.swift */,
 			);
 			path = View;
@@ -3491,6 +3503,8 @@
 				156175472FE3A1F70033D915 /* SettingViewModel.swift in Sources */,
 				156175482FE3A1F70033D915 /* SettingService.swift in Sources */,
 				156175492FE3A1F70033D915 /* SettingPresentation.swift in Sources */,
+				16AA10082FE4000000000008 /* SettingAppInformationSectionView.swift in Sources */,
+				16AA10042FE4000000000004 /* SettingNotificationSectionView.swift in Sources */,
 				1585971B2F7B614200B0BDA1 /* AnimeDetailViewModel+Presentation.swift in Sources */,
 				15FC4F6E2F752C250054153E /* HomeTrendingMangaView.swift in Sources */,
 				15AFDCAC2FA6512D00C707FD /* MangaCategoryDetailView.swift in Sources */,
@@ -3503,6 +3517,8 @@
 				1574EC432F7BCB8800E37AE8 /* AnimeReviewService.swift in Sources */,
 				15FF80172F76575F00D3241C /* HeroBannerSlideView.swift in Sources */,
 				1561754B2FE3A2020033D915 /* SettingSectionViews.swift in Sources */,
+				16AA10062FE4000000000006 /* SettingStorageSectionView.swift in Sources */,
+				16AA10022FE4000000000002 /* SettingUserInformationSectionView.swift in Sources */,
 				15FF296D2F763B4C00D3241C /* AnimeDetailService.swift in Sources */,
 				15AC997A2F87A972008EAAEE /* AnimeGenreLocalizationModel.swift in Sources */,
 				16B100022F8A000000000002 /* CharacterListView.swift in Sources */,

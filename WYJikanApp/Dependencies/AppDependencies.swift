@@ -106,7 +106,11 @@ struct AppDependencies {
     ) -> SettingViewModel {
         SettingViewModel(
             service: SettingService(
-                historyRepository: mainSearchHistoryRepository
+                historyRepository: mainSearchHistoryRepository,
+                favoriteRepository: favoriteRepository,
+                broadcastReminderRepository: broadcastReminderRepository,
+                notificationScheduler: notificationScheduler,
+                clearApplicationCache: clearCachedData
             ),
             notificationScheduler: notificationScheduler,
             broadcastReminderStatusStore: broadcastReminderStatusStore,

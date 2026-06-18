@@ -5,175 +5,9 @@
 
 import SwiftUI
 
-// MARK: - User Information
+// MARK: - Action Label
 
-struct SettingUserInformationSectionView: View {
-    let presentation: SettingUserInformationPresentation
-
-    var body: some View {
-        Section {
-            localValueRow(
-                title: "動畫收藏",
-                systemImage: "play.rectangle",
-                value: "\(presentation.animeFavoriteCount) 部"
-            )
-            localValueRow(
-                title: "漫畫收藏",
-                systemImage: "books.vertical",
-                value: "\(presentation.mangaFavoriteCount) 部"
-            )
-            localValueRow(
-                title: "播出提醒",
-                systemImage: "calendar.badge.clock",
-                value: "\(presentation.reminderCount) 部"
-            )
-            localValueRow(
-                title: "搜尋紀錄",
-                systemImage: "clock.arrow.circlepath",
-                value: "\(presentation.searchHistoryCount) 筆"
-            )
-        } header: {
-            Text("用戶資訊")
-                .foregroundStyle(ThemeColor.sakura)
-        } footer: {
-            Text("以上資料僅儲存在此裝置，不包含登入帳號或雲端個人資料。")
-                .foregroundStyle(ThemeColor.textSecondary)
-        }
-    }
-
-    private func localValueRow(
-        title: String,
-        systemImage: String,
-        value: String
-    ) -> some View {
-        LabeledContent {
-            SettingValueAccessory(text: value)
-        } label: {
-            Label(title, systemImage: systemImage)
-                .foregroundStyle(ThemeColor.textPrimary)
-        }
-    }
-}
-
-// MARK: - Notification
-
-struct SettingNotificationSectionView: View {
-    let presentation: SettingNotificationPresentation
-    let onAction: (SettingNotificationAction) -> Void
-
-    var body: some View {
-        Section {
-            LabeledContent {
-                authorizationStatusAccessory
-            } label: {
-                Label("通知權限", systemImage: "bell.badge")
-                    .foregroundStyle(ThemeColor.textPrimary)
-            }
-
-            primaryAuthorizationButton
-
-            Button {
-                onAction(.refreshReminders)
-            } label: {
-                SettingActionLabel(
-                    title: refreshButtonTitle,
-                    systemImage: "arrow.clockwise",
-                    state: presentation.refreshState
-                )
-            }
-            .disabled(!presentation.canRefreshReminders)
-        } header: {
-            Text("通知")
-                .foregroundStyle(ThemeColor.sakura)
-        } footer: {
-            Text("播出提醒會依你在動畫詳情頁訂閱的作品安排通知。")
-                .foregroundStyle(ThemeColor.textSecondary)
-        }
-    }
-
-    @ViewBuilder
-    private var primaryAuthorizationButton: some View {
-        switch presentation.authorizationStatus.primaryAction {
-        case .some(.requestAuthorization):
-            Button {
-                onAction(.requestAuthorization)
-            } label: {
-                SettingActionLabel(
-                    title: "允許通知",
-                    systemImage: "bell.badge",
-                    state: .idle
-                )
-            }
-            .disabled(presentation.refreshState == .processing)
-        case .some(.openSystemSettings):
-            Button {
-                onAction(.openSystemSettings)
-            } label: {
-                SettingActionLabel(
-                    title: "系統通知設定",
-                    systemImage: "gearshape",
-                    state: .idle
-                )
-            }
-        case .none:
-            EmptyView()
-        }
-    }
-
-    @ViewBuilder
-    private var authorizationStatusAccessory: some View {
-        switch presentation.authorizationStatus {
-        case .loading:
-            ProgressView()
-                .controlSize(.small)
-                .accessibilityLabel("正在讀取通知權限")
-        case .notDetermined, .authorized, .provisional, .ephemeral, .denied:
-            SettingValueAccessory(
-                text: presentation.authorizationStatus.title
-            )
-        }
-    }
-
-    private var refreshButtonTitle: String {
-        switch presentation.refreshState {
-        case .idle:
-            return "立即更新提醒"
-        case .processing:
-            return "正在更新提醒"
-        }
-    }
-}
-
-// MARK: - App Information
-
-struct SettingAppInformationSectionView: View {
-    let presentation: SettingAppInformationPresentation
-
-    var body: some View {
-        Section {
-            LabeledContent {
-                SettingValueAccessory(text: presentation.appName)
-            } label: {
-                Label("名稱", systemImage: "app")
-                    .foregroundStyle(ThemeColor.textPrimary)
-            }
-
-            LabeledContent {
-                SettingValueAccessory(text: presentation.versionText)
-            } label: {
-                Label("版本", systemImage: "number")
-                    .foregroundStyle(ThemeColor.textPrimary)
-            }
-        } header: {
-            Text("App 資訊")
-                .foregroundStyle(ThemeColor.sakura)
-        }
-    }
-}
-
-// MARK: - Shared Action Label
-
-private struct SettingActionLabel: View {
+struct SettingActionLabel: View {
     let title: String
     let systemImage: String
     let state: SettingActionState
@@ -183,12 +17,12 @@ private struct SettingActionLabel: View {
             Label(title, systemImage: systemImage)
                 .foregroundStyle(ThemeColor.textPrimary)
             Spacer()
-            activityIndicator
+            accessory
         }
     }
 
     @ViewBuilder
-    private var activityIndicator: some View {
+    private var accessory: some View {
         switch state {
         case .idle:
             Image(systemName: "chevron.right")
@@ -202,30 +36,13 @@ private struct SettingActionLabel: View {
     }
 }
 
-// MARK: - Shared Value Accessory
+// MARK: - Value Accessory
 
-private struct SettingValueAccessory: View {
+struct SettingValueAccessory: View {
     let text: String
-    var systemImage: String?
 
     var body: some View {
-        HStack(spacing: 8) {
-            Text(text)
-                .foregroundStyle(ThemeColor.textSecondary)
-
-            switch systemImage {
-            case .some(let systemImage):
-                Image(systemName: systemImage)
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(ThemeColor.textSecondary)
-            case .none:
-                EmptyView()
-            }
-        }
-    }
-
-    init(text: String, systemImage: String? = nil) {
-        self.text = text
-        self.systemImage = systemImage
+        Text(text)
+            .foregroundStyle(ThemeColor.textSecondary)
     }
 }

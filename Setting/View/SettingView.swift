@@ -80,6 +80,13 @@ struct SettingView: View {
             SettingUserInformationSectionView(
                 presentation: viewModel.presentation.userInformation
             )
+        case .storage:
+            SettingStorageSectionView(
+                presentation: viewModel.presentation.storage,
+                userInformation: viewModel.presentation.userInformation,
+                onClearCache: viewModel.requestCacheClearConfirmation,
+                onDeleteLocalData: viewModel.requestLocalDataDeletionConfirmation
+            )
         case .appInformation:
             SettingAppInformationSectionView(
                 presentation: viewModel.presentation.appInformation
@@ -141,6 +148,65 @@ struct SettingView: View {
                 title: "無法更新提醒",
                 message: "播出提醒暫時無法更新，請稍後再試。"
             )
+        case .confirmCacheClear(let sizeText):
+            return Alert(
+                title: Text("清除快取？"),
+                message: Text("將清除約 \(sizeText) 的圖片與網路快取，不會刪除收藏或其他本機資料。"),
+                primaryButton: .destructive(Text("清除")) {
+                    Task(priority: .userInitiated) {
+                        await viewModel.clearCache()
+                    }
+                },
+                secondaryButton: .cancel(Text("取消"))
+            )
+        case .cacheClearSucceeded:
+            return informationAlert(
+                title: "快取已清除",
+                message: "圖片與網路資料會在需要時重新下載。"
+            )
+        case .cacheClearFailed:
+            return informationAlert(
+                title: "無法清除快取",
+                message: "快取暫時無法清除，請稍後再試。"
+            )
+        case .confirmLocalDataDeletion(let target, let message):
+            return Alert(
+                title: Text("刪除\(target.title)？"),
+                message: Text(message),
+                primaryButton: .destructive(Text("刪除")) {
+                    Task(priority: .userInitiated) {
+                        await viewModel.deleteLocalData(target)
+                    }
+                },
+                secondaryButton: .cancel(Text("取消"))
+            )
+        case .localDataDeletionSucceeded(let target):
+            return informationAlert(
+                title: "\(target.title)已刪除",
+                message: localDataDeletionSuccessMessage(for: target)
+            )
+        case .localDataDeletionFailed(let target, let partiallyCompleted):
+            return informationAlert(
+                title: "無法刪除\(target.title)",
+                message: partiallyCompleted
+                    ? "部分資料已刪除，但操作未完整完成。請確認目前資料後再試。"
+                    : "本機資料暫時無法刪除，請稍後再試。"
+            )
+        }
+    }
+
+    private func localDataDeletionSuccessMessage(
+        for target: SettingLocalDataTarget
+    ) -> String {
+        switch target {
+        case .searchHistory:
+            return "搜尋紀錄已從此裝置移除。"
+        case .broadcastReminders:
+            return "播出提醒與 App 管理的系統通知已移除。"
+        case .favoritesAndProgress:
+            return "收藏、動畫觀看進度與漫畫閱讀進度已移除。"
+        case .all:
+            return "收藏、進度、播出提醒、系統通知與搜尋紀錄已移除。"
         }
     }
 

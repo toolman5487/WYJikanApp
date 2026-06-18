@@ -17,6 +17,8 @@ protocol AnimeBroadcastReminderRepository: AnyObject {
     func subscribe(snapshot: AnimeBroadcastReminderSnapshot) throws
 
     func unsubscribe(malId: Int) throws
+
+    func removeAllSubscriptions() throws
 }
 
 final class SwiftDataAnimeBroadcastReminderRepository: AnimeBroadcastReminderRepository {
@@ -78,6 +80,25 @@ final class SwiftDataAnimeBroadcastReminderRepository: AnimeBroadcastReminderRep
         }
 
         modelContext.delete(existing)
+
+        do {
+            try modelContext.save()
+            try publish(from: modelContext)
+        } catch {
+            modelContext.rollback()
+            throw error
+        }
+    }
+
+    func removeAllSubscriptions() throws {
+        let modelContext = try requireModelContext()
+        let subscriptions = try modelContext.fetch(
+            FetchDescriptor<AnimeBroadcastReminderSubscription>()
+        )
+
+        for subscription in subscriptions {
+            modelContext.delete(subscription)
+        }
 
         do {
             try modelContext.save()

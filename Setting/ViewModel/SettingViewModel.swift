@@ -23,6 +23,7 @@ final class SettingViewModel: ObservableObject {
 
     private var cancellables = Set<AnyCancellable>()
     private var hasLoadedAuthorizationState = false
+    private var searchHistoryCount: Int
 
     // MARK: - Lifecycle
 
@@ -38,6 +39,7 @@ final class SettingViewModel: ObservableObject {
         self.broadcastReminderStatusStore = broadcastReminderStatusStore
         self.favoriteStatusStore = favoriteStatusStore
         let searchHistoryCount = service.searchHistoryCount()
+        self.searchHistoryCount = searchHistoryCount
         self.presentation = SettingPresentation(
             userInformation: SettingUserInformationPresentation(
                 animeFavoriteCount: favoriteStatusStore.animeFavoriteIDs.count,
@@ -49,6 +51,10 @@ final class SettingViewModel: ObservableObject {
                 authorizationStatus: .loading,
                 reminderCount: broadcastReminderStatusStore.subscriptions.count,
                 refreshState: Self.actionState(from: notificationScheduler.state)
+            ),
+            storage: SettingStoragePresentation(
+                cacheState: .loading,
+                localDataOperationState: .idle
             ),
             appInformation: appInformation
         )
@@ -65,6 +71,7 @@ final class SettingViewModel: ObservableObject {
         await notificationScheduler.refreshAuthorizationState()
         hasLoadedAuthorizationState = true
         rebuildNotificationPresentation()
+        await refreshCacheSize()
     }
 
     func performNotificationAction(_ action: SettingNotificationAction) async {
@@ -80,6 +87,60 @@ final class SettingViewModel: ObservableObject {
 
     func dismissPresentedAlert() {
         presentedAlert = nil
+    }
+
+    func requestCacheClearConfirmation() {
+        guard !presentation.storage.isOperationInProgress else { return }
+        presentedAlert = .confirmCacheClear(
+            sizeText: presentation.storage.cacheState.sizeText
+        )
+    }
+
+    func clearCache() async {
+        guard !presentation.storage.isOperationInProgress else { return }
+        updateCacheState(.clearing)
+
+        do {
+            try await service.clearCache()
+            updateCacheState(.available(byteCount: 0))
+            presentedAlert = .cacheClearSucceeded
+        } catch {
+            await refreshCacheSize()
+            presentedAlert = .cacheClearFailed
+        }
+    }
+
+    func requestLocalDataDeletionConfirmation(
+        _ target: SettingLocalDataTarget
+    ) {
+        guard !presentation.storage.isOperationInProgress else { return }
+        presentedAlert = .confirmLocalDataDeletion(
+            target: target,
+            message: localDataDeletionConfirmationMessage(for: target)
+        )
+    }
+
+    func deleteLocalData(_ target: SettingLocalDataTarget) async {
+        guard !presentation.storage.isOperationInProgress else { return }
+        updateLocalDataOperationState(.deleting(target))
+
+        do {
+            try await service.deleteLocalData(target)
+            updateLocalDataOperationState(.idle)
+            presentedAlert = .localDataDeletionSucceeded(target)
+        } catch let failure as SettingLocalDataDeletionFailure {
+            updateLocalDataOperationState(.idle)
+            presentedAlert = .localDataDeletionFailed(
+                target: target,
+                partiallyCompleted: failure.isPartiallyCompleted
+            )
+        } catch {
+            updateLocalDataOperationState(.idle)
+            presentedAlert = .localDataDeletionFailed(
+                target: target,
+                partiallyCompleted: false
+            )
+        }
     }
 
     // MARK: - Binding
@@ -103,7 +164,7 @@ final class SettingViewModel: ObservableObject {
             favoriteStatusStore.$mangaFavoriteIDs
         )
         .sink { [weak self] animeIDs, mangaIDs in
-            self?.updateFavoriteCounts(
+            self?.rebuildUserInformationPresentation(
                 animeCount: animeIDs.count,
                 mangaCount: mangaIDs.count
             )
@@ -114,9 +175,56 @@ final class SettingViewModel: ObservableObject {
     private func bindSearchHistoryState() {
         service.searchHistoryCountPublisher
             .sink { [weak self] count in
-                self?.updateSearchHistoryCount(count)
+                self?.searchHistoryCount = count
+                self?.rebuildUserInformationPresentation()
             }
             .store(in: &cancellables)
+    }
+
+    // MARK: - Storage
+
+    private func refreshCacheSize() async {
+        guard presentation.storage.cacheState != .clearing else { return }
+
+        updateCacheState(.loading)
+        let byteCount = await service.cacheSize()
+        updateCacheState(.available(byteCount: byteCount))
+    }
+
+    private func updateCacheState(_ state: SettingCacheState) {
+        presentation.storage = SettingStoragePresentation(
+            cacheState: state,
+            localDataOperationState: presentation.storage.localDataOperationState
+        )
+    }
+
+    private func updateLocalDataOperationState(
+        _ state: SettingLocalDataOperationState
+    ) {
+        presentation.storage = SettingStoragePresentation(
+            cacheState: presentation.storage.cacheState,
+            localDataOperationState: state
+        )
+    }
+
+    private var totalFavoriteCount: Int {
+        presentation.userInformation.animeFavoriteCount
+            + presentation.userInformation.mangaFavoriteCount
+    }
+
+    private func localDataDeletionConfirmationMessage(
+        for target: SettingLocalDataTarget
+    ) -> String {
+        switch target {
+        case .searchHistory:
+            return "將永久刪除 \(presentation.userInformation.searchHistoryCount) 筆搜尋紀錄。"
+        case .broadcastReminders:
+            return "將永久刪除 \(presentation.userInformation.reminderCount) 部播出提醒，並移除已排程的系統通知。"
+        case .favoritesAndProgress:
+            return "將永久刪除 \(totalFavoriteCount) 部收藏，以及所有動畫觀看與漫畫閱讀進度。"
+        case .all:
+            return "將永久刪除收藏與進度、播出提醒、已排程系統通知及搜尋紀錄。此操作無法復原。"
+        }
     }
 
     // MARK: - Notification
@@ -183,33 +291,21 @@ final class SettingViewModel: ObservableObject {
     }
 
     private func updateSearchHistoryCount() {
-        updateSearchHistoryCount(service.searchHistoryCount())
+        searchHistoryCount = service.searchHistoryCount()
+        rebuildUserInformationPresentation()
     }
 
-    private func updateSearchHistoryCount(_ searchHistoryCount: Int) {
+    private func rebuildUserInformationPresentation(
+        animeCount: Int? = nil,
+        mangaCount: Int? = nil
+    ) {
         presentation.userInformation = SettingUserInformationPresentation(
-            animeFavoriteCount: presentation.userInformation.animeFavoriteCount,
-            mangaFavoriteCount: presentation.userInformation.mangaFavoriteCount,
-            reminderCount: presentation.userInformation.reminderCount,
-            searchHistoryCount: searchHistoryCount
-        )
-    }
-
-    private func updateFavoriteCounts(animeCount: Int, mangaCount: Int) {
-        presentation.userInformation = SettingUserInformationPresentation(
-            animeFavoriteCount: animeCount,
-            mangaFavoriteCount: mangaCount,
-            reminderCount: presentation.userInformation.reminderCount,
-            searchHistoryCount: presentation.userInformation.searchHistoryCount
-        )
-    }
-
-    private func rebuildUserInformationPresentation() {
-        presentation.userInformation = SettingUserInformationPresentation(
-            animeFavoriteCount: favoriteStatusStore.animeFavoriteIDs.count,
-            mangaFavoriteCount: favoriteStatusStore.mangaFavoriteIDs.count,
+            animeFavoriteCount: animeCount
+                ?? favoriteStatusStore.animeFavoriteIDs.count,
+            mangaFavoriteCount: mangaCount
+                ?? favoriteStatusStore.mangaFavoriteIDs.count,
             reminderCount: broadcastReminderStatusStore.subscriptions.count,
-            searchHistoryCount: presentation.userInformation.searchHistoryCount
+            searchHistoryCount: searchHistoryCount
         )
     }
 }

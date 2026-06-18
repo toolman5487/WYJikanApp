@@ -10,6 +10,7 @@ import Foundation
 nonisolated enum SettingSection: CaseIterable, Identifiable, Sendable {
     case notification
     case userInformation
+    case storage
     case appInformation
 
     var id: Self { self }
@@ -102,6 +103,91 @@ nonisolated enum SettingActionState: Equatable, Sendable {
     case processing
 }
 
+// MARK: - Storage
+
+nonisolated enum SettingCacheState: Equatable, Sendable {
+    case loading
+    case available(byteCount: Int64)
+    case clearing
+
+    var sizeText: String {
+        switch self {
+        case .loading:
+            return "計算中"
+        case .available(let byteCount):
+            return ByteCountFormatter.string(
+                fromByteCount: byteCount,
+                countStyle: .file
+            )
+        case .clearing:
+            return "清除中"
+        }
+    }
+
+    var canClear: Bool {
+        switch self {
+        case .available:
+            return true
+        case .loading, .clearing:
+            return false
+        }
+    }
+}
+
+nonisolated enum SettingLocalDataTarget: String, Equatable, Sendable {
+    case searchHistory
+    case broadcastReminders
+    case favoritesAndProgress
+    case all
+
+    var title: String {
+        switch self {
+        case .searchHistory:
+            return "搜尋紀錄"
+        case .broadcastReminders:
+            return "播出提醒"
+        case .favoritesAndProgress:
+            return "收藏與進度"
+        case .all:
+            return "所有本機資料"
+        }
+    }
+}
+
+nonisolated enum SettingLocalDataOperationState: Equatable, Sendable {
+    case idle
+    case deleting(SettingLocalDataTarget)
+
+    var activeTarget: SettingLocalDataTarget? {
+        switch self {
+        case .idle:
+            return nil
+        case .deleting(let target):
+            return target
+        }
+    }
+}
+
+nonisolated struct SettingLocalDataDeletionFailure: Error, Sendable {
+    let isPartiallyCompleted: Bool
+}
+
+nonisolated struct SettingStoragePresentation: Equatable, Sendable {
+    let cacheState: SettingCacheState
+    let localDataOperationState: SettingLocalDataOperationState
+
+    var isOperationInProgress: Bool {
+        switch (cacheState, localDataOperationState) {
+        case (.clearing, _), (_, .deleting):
+            return true
+        case (.loading, .idle), (.available, .idle):
+            return false
+        }
+    }
+}
+
+// MARK: - App Information
+
 nonisolated struct SettingAppInformationPresentation: Sendable {
     let appName: String
     let versionText: String
@@ -145,6 +231,7 @@ nonisolated struct SettingAppInformationPresentation: Sendable {
 nonisolated struct SettingPresentation: Sendable {
     var userInformation: SettingUserInformationPresentation
     var notification: SettingNotificationPresentation
+    var storage: SettingStoragePresentation
     let appInformation: SettingAppInformationPresentation
 }
 
@@ -154,6 +241,18 @@ nonisolated enum SettingAlertMessage: Identifiable, Sendable {
     case notificationAuthorizationFailed
     case reminderRefreshSucceeded(count: Int)
     case reminderRefreshFailed
+    case confirmCacheClear(sizeText: String)
+    case cacheClearSucceeded
+    case cacheClearFailed
+    case confirmLocalDataDeletion(
+        target: SettingLocalDataTarget,
+        message: String
+    )
+    case localDataDeletionSucceeded(SettingLocalDataTarget)
+    case localDataDeletionFailed(
+        target: SettingLocalDataTarget,
+        partiallyCompleted: Bool
+    )
 
     var id: String {
         switch self {
@@ -163,6 +262,18 @@ nonisolated enum SettingAlertMessage: Identifiable, Sendable {
             return "reminderRefreshSucceeded"
         case .reminderRefreshFailed:
             return "reminderRefreshFailed"
+        case .confirmCacheClear:
+            return "confirmCacheClear"
+        case .cacheClearSucceeded:
+            return "cacheClearSucceeded"
+        case .cacheClearFailed:
+            return "cacheClearFailed"
+        case .confirmLocalDataDeletion(let target, _):
+            return "confirmLocalDataDeletion.\(target.rawValue)"
+        case .localDataDeletionSucceeded(let target):
+            return "localDataDeletionSucceeded.\(target.rawValue)"
+        case .localDataDeletionFailed(let target, let partiallyCompleted):
+            return "localDataDeletionFailed.\(target.rawValue).\(partiallyCompleted)"
         }
     }
 }

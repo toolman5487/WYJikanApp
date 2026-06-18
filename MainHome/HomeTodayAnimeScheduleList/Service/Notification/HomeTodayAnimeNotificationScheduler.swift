@@ -120,9 +120,10 @@ final class HomeTodayAnimeNotificationScheduler: BaseUserNotificationManager {
     }
 
     func handleSubscriptionsEmptied() async {
-        await removeManagedPendingNotificationRequests()
+        _ = await removeManagedNotifications { _ in true }
         setState(.disabled)
         clearLastRefreshDate()
+        clearLastRefreshAttemptDate()
     }
 
     // MARK: - Private Methods
