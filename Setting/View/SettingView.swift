@@ -63,7 +63,7 @@ struct SettingView: View {
         .onChange(of: scenePhase) { _, phase in
             handleScenePhaseChange(phase)
         }
-        .alert(item: $viewModel.presentedAlert, content: makeAlert)
+        .alert(item: $viewModel.presentedAlert, content: messageAlert)
     }
 
     // MARK: - Section Routing
@@ -75,11 +75,6 @@ struct SettingView: View {
             SettingNotificationSectionView(
                 presentation: viewModel.presentation.notification,
                 onAction: handleNotificationAction
-            )
-        case .dataManagement:
-            SettingDataManagementSectionView(
-                presentation: viewModel.presentation.dataManagement,
-                onAction: viewModel.requestDataAction
             )
         case .userInformation:
             SettingUserInformationSectionView(
@@ -129,38 +124,6 @@ struct SettingView: View {
 
     // MARK: - Alert
 
-    private func makeAlert(_ alert: SettingAlert) -> Alert {
-        switch alert {
-        case .confirmation(let action, let count):
-            return confirmationAlert(for: action, count: count)
-        case .message(let message):
-            return messageAlert(for: message)
-        }
-    }
-
-    private func confirmationAlert(
-        for action: SettingDataAction,
-        count: Int
-    ) -> Alert {
-        switch action {
-        case .clearSearchHistory:
-            return destructiveAlert(
-                title: "清除搜尋紀錄？",
-                message: "將刪除 \(count) 筆搜尋紀錄。"
-            )
-        case .clearFavorites:
-            return destructiveAlert(
-                title: "清除全部收藏？",
-                message: "將永久刪除 \(count) 個收藏與相關觀看或閱讀進度。"
-            )
-        case .clearCache:
-            return destructiveAlert(
-                title: "清除網路快取？",
-                message: "已載入的網路資料將在下次使用時重新下載。"
-            )
-        }
-    }
-
     private func messageAlert(for message: SettingAlertMessage) -> Alert {
         switch message {
         case .notificationAuthorizationFailed:
@@ -168,32 +131,7 @@ struct SettingView: View {
                 title: "無法開啟通知",
                 message: "請前往系統設定允許通知後再試。"
             )
-        case .favoriteRemovalFailed(let message):
-            return informationAlert(
-                title: "無法清除收藏",
-                message: message
-            )
-        case .cacheCleared:
-            return informationAlert(
-                title: "快取已清除",
-                message: "下次載入內容時會重新取得最新資料。"
-            )
         }
-    }
-
-    private func destructiveAlert(title: String, message: String) -> Alert {
-        Alert(
-            title: Text(title),
-            message: Text(message),
-            primaryButton: .destructive(
-                Text("清除"),
-                action: viewModel.confirmPresentedAlert
-            ),
-            secondaryButton: .cancel(
-                Text("取消"),
-                action: viewModel.dismissPresentedAlert
-            )
-        )
     }
 
     private func informationAlert(title: String, message: String) -> Alert {

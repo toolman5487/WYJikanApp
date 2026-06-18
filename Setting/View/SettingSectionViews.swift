@@ -132,65 +132,6 @@ struct SettingNotificationSectionView: View {
     }
 }
 
-// MARK: - Data Management
-
-struct SettingDataManagementSectionView: View {
-    let presentation: SettingDataManagementPresentation
-    let onAction: (SettingDataAction) -> Void
-
-    var body: some View {
-        Section {
-            Button {
-                onAction(.clearSearchHistory)
-            } label: {
-                SettingActionLabel(
-                    title: "清除搜尋紀錄",
-                    systemImage: "trash",
-                    state: .idle
-                )
-            }
-            .disabled(!presentation.canClearSearchHistory)
-
-            Button {
-                onAction(.clearFavorites)
-            } label: {
-                SettingActionLabel(
-                    title: "清除全部收藏",
-                    systemImage: "heart.slash",
-                    state: .idle
-                )
-            }
-            .disabled(!presentation.canClearFavorites)
-
-            Button {
-                onAction(.clearCache)
-            } label: {
-                SettingActionLabel(
-                    title: cacheButtonTitle,
-                    systemImage: "externaldrive.badge.xmark",
-                    state: presentation.cacheState
-                )
-            }
-            .disabled(presentation.cacheState == .processing)
-        } header: {
-            Text("資料管理")
-                .foregroundStyle(ThemeColor.sakura)
-        } footer: {
-            Text("清除網路快取不會刪除收藏、觀看進度或播出提醒。")
-                .foregroundStyle(ThemeColor.textSecondary)
-        }
-    }
-
-    private var cacheButtonTitle: String {
-        switch presentation.cacheState {
-        case .idle:
-            return "清除網路快取"
-        case .processing:
-            return "正在清除快取"
-        }
-    }
-}
-
 // MARK: - App Information
 
 struct SettingAppInformationSectionView: View {

@@ -8,9 +8,6 @@ import Foundation
 @MainActor
 protocol SettingServicing: AnyObject {
     func searchHistoryCount() -> Int
-    func clearSearchHistory()
-    func clearFavorites() throws
-    func clearCachedData() async
 }
 
 @MainActor
@@ -30,17 +27,5 @@ final class SettingService: SettingServicing {
 
     func searchHistoryCount() -> Int {
         dependencies.mainSearchHistoryRepository.loadHistory().count
-    }
-
-    func clearSearchHistory() {
-        _ = dependencies.mainSearchHistoryRepository.clearHistory()
-    }
-
-    func clearFavorites() throws {
-        try dependencies.favoriteRepository.removeAllFavorites()
-    }
-
-    func clearCachedData() async {
-        await dependencies.clearCachedData()
     }
 }

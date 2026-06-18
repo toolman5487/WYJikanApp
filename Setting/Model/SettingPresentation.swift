@@ -11,7 +11,6 @@ nonisolated enum SettingSection: CaseIterable, Identifiable, Sendable {
     case appInformation
     case userInformation
     case notification
-    case dataManagement
 
     var id: Self { self }
 }
@@ -86,28 +85,6 @@ nonisolated struct SettingNotificationPresentation: Equatable, Sendable {
     }
 }
 
-// MARK: - Data Management
-
-nonisolated enum SettingDataAction: Sendable {
-    case clearSearchHistory
-    case clearFavorites
-    case clearCache
-}
-
-nonisolated struct SettingDataManagementPresentation: Equatable, Sendable {
-    let searchHistoryCount: Int
-    let favoriteCount: Int
-    let cacheState: SettingActionState
-
-    var canClearSearchHistory: Bool {
-        searchHistoryCount > 0
-    }
-
-    var canClearFavorites: Bool {
-        favoriteCount > 0
-    }
-}
-
 nonisolated enum SettingActionState: Equatable, Sendable {
     case idle
     case processing
@@ -156,52 +133,18 @@ nonisolated struct SettingAppInformationPresentation: Sendable {
 nonisolated struct SettingPresentation: Sendable {
     var userInformation: SettingUserInformationPresentation
     var notification: SettingNotificationPresentation
-    var dataManagement: SettingDataManagementPresentation
     let appInformation: SettingAppInformationPresentation
 }
 
 // MARK: - Alert
 
-nonisolated enum SettingAlert: Identifiable, Sendable {
-    case confirmation(action: SettingDataAction, count: Int)
-    case message(SettingAlertMessage)
-
-    var id: String {
-        switch self {
-        case .confirmation(let action, _):
-            return "confirmation-\(action.id)"
-        case .message(let message):
-            return "message-\(message.id)"
-        }
-    }
-}
-
-nonisolated enum SettingAlertMessage: Sendable {
+nonisolated enum SettingAlertMessage: Identifiable, Sendable {
     case notificationAuthorizationFailed
-    case favoriteRemovalFailed(message: String)
-    case cacheCleared
 
     var id: String {
         switch self {
         case .notificationAuthorizationFailed:
             return "notificationAuthorizationFailed"
-        case .favoriteRemovalFailed:
-            return "favoriteRemovalFailed"
-        case .cacheCleared:
-            return "cacheCleared"
-        }
-    }
-}
-
-private nonisolated extension SettingDataAction {
-    var id: String {
-        switch self {
-        case .clearSearchHistory:
-            return "clearSearchHistory"
-        case .clearFavorites:
-            return "clearFavorites"
-        case .clearCache:
-            return "clearCache"
         }
     }
 }

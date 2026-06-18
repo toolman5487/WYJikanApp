@@ -12,7 +12,7 @@ final class SettingViewModel: ObservableObject {
     // MARK: - Published State
 
     @Published private(set) var presentation: SettingPresentation
-    @Published var presentedAlert: SettingAlert?
+    @Published var presentedAlert: SettingAlertMessage?
 
     // MARK: - Dependencies
 
@@ -51,11 +51,6 @@ final class SettingViewModel: ObservableObject {
                 reminderCount: broadcastReminderStatusStore.subscriptions.count,
                 refreshState: Self.actionState(from: notificationScheduler.state)
             ),
-            dataManagement: SettingDataManagementPresentation(
-                searchHistoryCount: searchHistoryCount,
-                favoriteCount: favoriteStatusStore.totalFavoriteCount,
-                cacheState: .idle
-            ),
             appInformation: appInformation
         )
 
@@ -79,35 +74,6 @@ final class SettingViewModel: ObservableObject {
             break
         case .refreshReminders:
             await notificationScheduler.refreshScheduledNotificationsImmediately()
-        }
-    }
-
-    func requestDataAction(_ action: SettingDataAction) {
-        switch action {
-        case .clearSearchHistory:
-            presentedAlert = .confirmation(
-                action: action,
-                count: presentation.dataManagement.searchHistoryCount
-            )
-        case .clearFavorites:
-            presentedAlert = .confirmation(
-                action: action,
-                count: presentation.dataManagement.favoriteCount
-            )
-        case .clearCache:
-            presentedAlert = .confirmation(action: action, count: 0)
-        }
-    }
-
-    func confirmPresentedAlert() {
-        guard let presentedAlert else { return }
-        self.presentedAlert = nil
-
-        switch presentedAlert {
-        case .confirmation(let action, _):
-            performConfirmedDataAction(action)
-        case .message:
-            break
         }
     }
 
@@ -151,7 +117,7 @@ final class SettingViewModel: ObservableObject {
             try await notificationScheduler.ensureAuthorization()
             await notificationScheduler.refreshScheduledNotificationsImmediately()
         } catch {
-            presentedAlert = .message(.notificationAuthorizationFailed)
+            presentedAlert = .notificationAuthorizationFailed
         }
     }
 
@@ -193,49 +159,8 @@ final class SettingViewModel: ObservableObject {
         }
     }
 
-    // MARK: - Data Management
-
-    private func performConfirmedDataAction(_ action: SettingDataAction) {
-        switch action {
-        case .clearSearchHistory:
-            service.clearSearchHistory()
-            updateSearchHistoryCount()
-        case .clearFavorites:
-            clearFavorites()
-        case .clearCache:
-            clearCache()
-        }
-    }
-
-    private func clearFavorites() {
-        do {
-            try service.clearFavorites()
-        } catch {
-            presentedAlert = .message(
-                .favoriteRemovalFailed(message: error.localizedDescription)
-            )
-        }
-    }
-
-    private func clearCache() {
-        updateCacheState(.processing)
-
-        Task(priority: .utility) { [weak self] in
-            guard let self else { return }
-
-            await service.clearCachedData()
-            updateCacheState(.idle)
-            presentedAlert = .message(.cacheCleared)
-        }
-    }
-
     private func updateSearchHistoryCount() {
         let searchHistoryCount = service.searchHistoryCount()
-        presentation.dataManagement = SettingDataManagementPresentation(
-            searchHistoryCount: searchHistoryCount,
-            favoriteCount: presentation.dataManagement.favoriteCount,
-            cacheState: presentation.dataManagement.cacheState
-        )
         presentation.userInformation = SettingUserInformationPresentation(
             animeFavoriteCount: presentation.userInformation.animeFavoriteCount,
             mangaFavoriteCount: presentation.userInformation.mangaFavoriteCount,
@@ -245,11 +170,6 @@ final class SettingViewModel: ObservableObject {
     }
 
     private func updateFavoriteCounts(animeCount: Int, mangaCount: Int) {
-        presentation.dataManagement = SettingDataManagementPresentation(
-            searchHistoryCount: presentation.dataManagement.searchHistoryCount,
-            favoriteCount: animeCount + mangaCount,
-            cacheState: presentation.dataManagement.cacheState
-        )
         presentation.userInformation = SettingUserInformationPresentation(
             animeFavoriteCount: animeCount,
             mangaFavoriteCount: mangaCount,
@@ -258,20 +178,12 @@ final class SettingViewModel: ObservableObject {
         )
     }
 
-    private func updateCacheState(_ state: SettingActionState) {
-        presentation.dataManagement = SettingDataManagementPresentation(
-            searchHistoryCount: presentation.dataManagement.searchHistoryCount,
-            favoriteCount: presentation.dataManagement.favoriteCount,
-            cacheState: state
-        )
-    }
-
     private func rebuildUserInformationPresentation() {
         presentation.userInformation = SettingUserInformationPresentation(
             animeFavoriteCount: favoriteStatusStore.animeFavoriteIDs.count,
             mangaFavoriteCount: favoriteStatusStore.mangaFavoriteIDs.count,
             reminderCount: broadcastReminderStatusStore.subscriptions.count,
-            searchHistoryCount: presentation.dataManagement.searchHistoryCount
+            searchHistoryCount: presentation.userInformation.searchHistoryCount
         )
     }
 }
