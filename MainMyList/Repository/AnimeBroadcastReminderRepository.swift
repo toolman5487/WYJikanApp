@@ -10,6 +10,7 @@ import SwiftData
 protocol AnimeBroadcastReminderRepository: AnyObject {
     func connect(modelContext: ModelContext)
 
+    var currentSnapshot: AnimeBroadcastReminderSnapshotSet { get }
     var snapshotPublisher: AnyPublisher<AnimeBroadcastReminderSnapshotSet, Never> { get }
 
     func reload() throws
@@ -22,6 +23,10 @@ protocol AnimeBroadcastReminderRepository: AnyObject {
 }
 
 final class SwiftDataAnimeBroadcastReminderRepository: AnimeBroadcastReminderRepository {
+    var currentSnapshot: AnimeBroadcastReminderSnapshotSet {
+        snapshotSubject.value
+    }
+
     var snapshotPublisher: AnyPublisher<AnimeBroadcastReminderSnapshotSet, Never> {
         snapshotSubject
             .removeDuplicates()

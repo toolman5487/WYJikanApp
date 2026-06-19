@@ -21,10 +21,9 @@ struct MainHomeView: View {
     @StateObject private var trendingMangaViewModel: HomeTrendingMangaViewModel
     @StateObject private var trendingAnimeViewModel: HomeTrendingAnimeViewModel
     @StateObject private var recommendedAnimeViewModel: HomeRecommendedAnimeViewModel
-    @State private var feedCoordinator: HomeFeedCoordinator?
+    @State private var feedCoordinator: HomeFeedCoordinator
     @State private var loadMoreBounceProgress: CGFloat = 0
     private let dependencies: AppDependencies
-    private let watchService: any HomeWatchServicing
 
     enum HomeSection: Identifiable {
         case watchPromos
@@ -71,18 +70,36 @@ struct MainHomeView: View {
     init(dependencies: AppDependencies) {
         let service = dependencies.mainHomeService
         let watchService = dependencies.homeWatchService
+        let heroBannerViewModel = HeroBannerViewModel(service: service)
+        let watchPromosViewModel = HomeWatchPromosViewModel(service: watchService)
+        let todayAnimeViewModel = HomeTodayAnimeViewModel(service: service)
+        let watchEpisodesViewModel = HomeWatchEpisodesViewModel(service: watchService)
+        let trendingMangaViewModel = HomeTrendingMangaViewModel(service: service)
+        let trendingAnimeViewModel = HomeTrendingAnimeViewModel(service: service)
+        let recommendedAnimeViewModel = HomeRecommendedAnimeViewModel(
+            service: service,
+            animeDetailService: dependencies.animeDetailService
+        )
+
         self.dependencies = dependencies
-        self.watchService = watchService
-        _heroBannerViewModel = StateObject(wrappedValue: HeroBannerViewModel(service: service))
-        _watchPromosViewModel = StateObject(wrappedValue: HomeWatchPromosViewModel(service: watchService))
-        _todayAnimeViewModel = StateObject(wrappedValue: HomeTodayAnimeViewModel(service: service))
-        _watchEpisodesViewModel = StateObject(wrappedValue: HomeWatchEpisodesViewModel(service: watchService))
-        _trendingAnimeViewModel = StateObject(wrappedValue: HomeTrendingAnimeViewModel(service: service))
-        _trendingMangaViewModel = StateObject(wrappedValue: HomeTrendingMangaViewModel(service: service))
-        _recommendedAnimeViewModel = StateObject(
-            wrappedValue: HomeRecommendedAnimeViewModel(
-                service: service,
-                animeDetailService: dependencies.animeDetailService
+        _heroBannerViewModel = StateObject(wrappedValue: heroBannerViewModel)
+        _watchPromosViewModel = StateObject(wrappedValue: watchPromosViewModel)
+        _todayAnimeViewModel = StateObject(wrappedValue: todayAnimeViewModel)
+        _watchEpisodesViewModel = StateObject(wrappedValue: watchEpisodesViewModel)
+        _trendingAnimeViewModel = StateObject(wrappedValue: trendingAnimeViewModel)
+        _trendingMangaViewModel = StateObject(wrappedValue: trendingMangaViewModel)
+        _recommendedAnimeViewModel = StateObject(wrappedValue: recommendedAnimeViewModel)
+        _feedCoordinator = State(
+            initialValue: HomeFeedCoordinator(
+                viewModels: HomeFeedViewModels(
+                    heroBanner: heroBannerViewModel,
+                    todayAnime: todayAnimeViewModel,
+                    trendingAnime: trendingAnimeViewModel,
+                    trendingManga: trendingMangaViewModel,
+                    watchPromos: watchPromosViewModel,
+                    watchEpisodes: watchEpisodesViewModel,
+                    recommendedAnime: recommendedAnimeViewModel
+                )
             )
         )
     }
@@ -127,16 +144,11 @@ struct MainHomeView: View {
             ) {
                 recommendedAnimeViewModel.loadMore()
             }
-            .onAppear {
-                if feedCoordinator == nil {
-                    feedCoordinator = makeFeedCoordinator()
-                }
-            }
             .refreshable {
                 await refreshAllContent()
             }
             .task(priority: .userInitiated) {
-                await feedCoordinator?.loadInitial()
+                await feedCoordinator.loadInitial()
             }
             .toolbarBackground(.hidden, for: .navigationBar)
             .navigationDestination(for: MainHomeRoute.self) { route in
@@ -207,12 +219,8 @@ struct MainHomeView: View {
             }
         }
         .task(priority: .utility) {
-            if feedCoordinator == nil {
-                feedCoordinator = makeFeedCoordinator()
-            }
-            guard let feedSection = homeFeedSection(for: section),
-                  let coordinator = feedCoordinator else { return }
-            await coordinator.loadSectionIfNeeded(feedSection)
+            guard let feedSection = homeFeedSection(for: section) else { return }
+            await feedCoordinator.loadSectionIfNeeded(feedSection)
         }
     }
 
@@ -239,20 +247,6 @@ struct MainHomeView: View {
         }
     }
 
-    private func makeFeedCoordinator() -> HomeFeedCoordinator {
-        HomeFeedCoordinator(
-            viewModels: HomeFeedViewModels(
-                heroBanner: heroBannerViewModel,
-                todayAnime: todayAnimeViewModel,
-                trendingAnime: trendingAnimeViewModel,
-                trendingManga: trendingMangaViewModel,
-                watchPromos: watchPromosViewModel,
-                watchEpisodes: watchEpisodesViewModel,
-                recommendedAnime: recommendedAnimeViewModel
-            )
-        )
-    }
-
     private func homeFeedSection(for section: HomeSection) -> HomeFeedSection? {
         switch section {
         case .watchPromos:
@@ -271,10 +265,7 @@ struct MainHomeView: View {
     }
 
     private func refreshAllContent() async {
-        if feedCoordinator == nil {
-            feedCoordinator = makeFeedCoordinator()
-        }
-        await feedCoordinator?.refreshAll()
+        await feedCoordinator.refreshAll()
     }
 }
 

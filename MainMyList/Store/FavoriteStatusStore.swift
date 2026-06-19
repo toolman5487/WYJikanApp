@@ -19,11 +19,7 @@ final class FavoriteStatusStore: ObservableObject {
 
         snapshotCancellable = favoriteRepository.favoriteSnapshotPublisher
             .sink { [weak self] snapshot in
-                Task(priority: .utility) { [weak self] in
-                    await MainActor.run {
-                        self?.apply(snapshot: snapshot)
-                    }
-                }
+                self?.apply(snapshot: snapshot)
             }
 
         do {
@@ -78,9 +74,7 @@ final class AnimeBroadcastReminderStatusStore: ObservableObject {
 
         snapshotCancellable = repository.snapshotPublisher
             .sink { [weak self] snapshotSet in
-                Task(priority: .utility) { @MainActor [weak self] in
-                    self?.apply(snapshotSet: snapshotSet)
-                }
+                self?.apply(snapshotSet: snapshotSet)
             }
 
         do {

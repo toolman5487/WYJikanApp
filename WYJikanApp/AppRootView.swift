@@ -8,16 +8,13 @@
 import SwiftUI
 
 struct AppRootView: View {
-    @EnvironmentObject private var broadcastReminderStatusStore: AnimeBroadcastReminderStatusStore
     @EnvironmentObject private var bootstrapViewModel: AppBootstrapViewModel
 
     var body: some View {
         MainTabBarView()
         .preferredColorScheme(.dark)
         .task(priority: .utility) {
-            await bootstrapViewModel.bootstrap(
-                subscriptions: broadcastReminderStatusStore.subscriptions
-            )
+            await bootstrapViewModel.bootstrap()
         }
     }
 }

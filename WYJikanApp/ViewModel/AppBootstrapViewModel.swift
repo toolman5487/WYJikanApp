@@ -8,11 +8,23 @@ import Combine
 @MainActor
 final class AppBootstrapViewModel: ObservableObject {
 
+    // MARK: - Types
+
+    private enum BootstrapState {
+        case idle
+        case running
+        case completed
+    }
+
     // MARK: - Dependencies
 
     private let animeDetailService: AnimeDetailServicing
     private let broadcastReminderRepository: any AnimeBroadcastReminderRepository
     private let notificationScheduler: HomeTodayAnimeNotificationScheduler
+
+    // MARK: - Properties
+
+    private var bootstrapState: BootstrapState = .idle
 
     // MARK: - Lifecycle
 
@@ -28,15 +40,25 @@ final class AppBootstrapViewModel: ObservableObject {
 
     // MARK: - Public Methods
 
-    func bootstrap(subscriptions: [AnimeBroadcastReminderSnapshot]) async {
-        await Task(priority: .utility) {
-            await AnimeBroadcastReminderReconciler.reconcileAll(
-                subscriptions: subscriptions,
-                service: animeDetailService,
-                repository: broadcastReminderRepository,
-                scheduler: notificationScheduler
-            )
-            await notificationScheduler.refreshScheduledNotificationIfNeeded()
-        }.value
+    func bootstrap() async {
+        guard bootstrapState == .idle else { return }
+        bootstrapState = .running
+
+        let subscriptions = broadcastReminderRepository.currentSnapshot.subscriptions
+
+        await AnimeBroadcastReminderReconciler.reconcileAll(
+            subscriptions: subscriptions,
+            service: animeDetailService,
+            repository: broadcastReminderRepository,
+            scheduler: notificationScheduler
+        )
+
+        guard !Task.isCancelled else {
+            bootstrapState = .idle
+            return
+        }
+
+        await notificationScheduler.refreshScheduledNotificationIfNeeded()
+        bootstrapState = .completed
     }
 }
