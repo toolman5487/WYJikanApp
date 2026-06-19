@@ -96,6 +96,11 @@ final class HomeFeedCoordinator {
     // MARK: - Public Methods
 
     func loadInitial() async {
+        AppLaunchSignposter.beginHomeInitialLoad()
+        defer {
+            AppLaunchSignposter.endHomeInitialLoad()
+        }
+
         await loadPhase(.heroBanner, .todayAnime, priority: .userInitiated)
         await loadPhase(.trendingAnime, .trendingManga, priority: .userInitiated)
     }

@@ -13,6 +13,9 @@ struct AppRootView: View {
     var body: some View {
         MainTabBarView()
         .preferredColorScheme(.dark)
+        .onAppear {
+            AppLaunchSignposter.markAppRootVisible()
+        }
         .task(priority: .utility) {
             await bootstrapViewModel.bootstrap()
         }

@@ -43,6 +43,10 @@ final class AppBootstrapViewModel: ObservableObject {
     func bootstrap() async {
         guard bootstrapState == .idle else { return }
         bootstrapState = .running
+        AppLaunchSignposter.beginBootstrap()
+        defer {
+            AppLaunchSignposter.endBootstrap()
+        }
 
         let subscriptions = broadcastReminderRepository.currentSnapshot.subscriptions
 

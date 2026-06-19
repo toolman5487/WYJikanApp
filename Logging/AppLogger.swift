@@ -69,3 +69,85 @@ nonisolated enum AppLogger {
     static let search = AppLogCategory.search.logger
     static let configuration = AppLogCategory.configuration.logger
 }
+
+// MARK: - AppLaunchSignposter
+
+@MainActor
+enum AppLaunchSignposter {
+
+    // MARK: - Properties
+
+    private static let signposter = OSSignposter(
+        subsystem: AppLogger.subsystem,
+        category: .pointsOfInterest
+    )
+
+    private static var coldLaunchState: OSSignpostIntervalState?
+    private static var persistenceState: OSSignpostIntervalState?
+    private static var bootstrapState: OSSignpostIntervalState?
+    private static var homeInitialLoadState: OSSignpostIntervalState?
+
+    // MARK: - Cold Launch
+
+    static func beginColdLaunch() {
+        guard coldLaunchState == nil else { return }
+        coldLaunchState = signposter.beginInterval("ColdLaunch")
+    }
+
+    static func markAppRootVisible() {
+        signposter.emitEvent("AppRootVisible")
+        endColdLaunch()
+    }
+
+    static func markLaunchFailureVisible() {
+        signposter.emitEvent("LaunchFailureVisible")
+        endColdLaunch()
+    }
+
+    // MARK: - Persistence
+
+    static func beginPersistenceInitialization() {
+        guard persistenceState == nil else { return }
+        persistenceState = signposter.beginInterval("PersistenceInitialization")
+    }
+
+    static func endPersistenceInitialization() {
+        guard let persistenceState else { return }
+        signposter.endInterval("PersistenceInitialization", persistenceState)
+        self.persistenceState = nil
+    }
+
+    // MARK: - Bootstrap
+
+    static func beginBootstrap() {
+        guard bootstrapState == nil else { return }
+        bootstrapState = signposter.beginInterval("AppBootstrap")
+    }
+
+    static func endBootstrap() {
+        guard let bootstrapState else { return }
+        signposter.endInterval("AppBootstrap", bootstrapState)
+        self.bootstrapState = nil
+    }
+
+    // MARK: - Home
+
+    static func beginHomeInitialLoad() {
+        guard homeInitialLoadState == nil else { return }
+        homeInitialLoadState = signposter.beginInterval("HomeInitialLoad")
+    }
+
+    static func endHomeInitialLoad() {
+        guard let homeInitialLoadState else { return }
+        signposter.endInterval("HomeInitialLoad", homeInitialLoadState)
+        self.homeInitialLoadState = nil
+    }
+
+    // MARK: - Private Methods
+
+    private static func endColdLaunch() {
+        guard let coldLaunchState else { return }
+        signposter.endInterval("ColdLaunch", coldLaunchState)
+        self.coldLaunchState = nil
+    }
+}

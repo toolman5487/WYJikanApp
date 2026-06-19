@@ -36,6 +36,8 @@ struct WYJikanAppApp: App {
     // MARK: - Lifecycle
 
     init() {
+        AppLaunchSignposter.beginColdLaunch()
+
         let favoriteStatusStore = FavoriteStatusStore()
         let broadcastReminderStatusStore = AnimeBroadcastReminderStatusStore()
         let todayAnimeNotificationScheduler = HomeTodayAnimeNotificationScheduler(
@@ -117,6 +119,11 @@ struct WYJikanAppApp: App {
         await Task.yield()
         guard !Task.isCancelled else { return }
 
+        AppLaunchSignposter.beginPersistenceInitialization()
+        defer {
+            AppLaunchSignposter.endPersistenceInitialization()
+        }
+
         do {
             let modelContainer = try ModelContainer(
                 for: MyListCollectionItem.self,
@@ -140,6 +147,7 @@ struct WYJikanAppApp: App {
     }
 
     private func retryStartup() {
+        AppLaunchSignposter.beginColdLaunch()
         startupState = .loading
         startupAttempt += 1
     }
@@ -194,5 +202,8 @@ private struct AppLaunchFailureView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(24)
         .background(Color(.systemBackground))
+        .onAppear {
+            AppLaunchSignposter.markLaunchFailureVisible()
+        }
     }
 }
