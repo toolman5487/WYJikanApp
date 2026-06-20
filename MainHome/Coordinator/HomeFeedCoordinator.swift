@@ -207,7 +207,7 @@ final class HomeFeedSectionLoader {
     // MARK: - Properties
 
     private(set) var state: State = .idle
-    private nonisolated(unsafe) var activeTask: Task<Void, Never>?
+    private var activeTask: Task<Void, Never>?
 
     var isLoading: Bool { state.isLoading }
 
@@ -266,7 +266,7 @@ final class HomeFeedSectionLoader {
 
     // MARK: - Cancellation
 
-    nonisolated func cancel() {
+    func cancel() {
         activeTask?.cancel()
     }
 }

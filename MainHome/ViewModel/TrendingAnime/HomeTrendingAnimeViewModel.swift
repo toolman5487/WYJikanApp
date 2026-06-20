@@ -30,7 +30,7 @@ final class HomeTrendingAnimeViewModel: ObservableObject {
         self.service = service
     }
 
-    deinit {
+    isolated deinit {
         sectionLoader.cancel()
     }
 

@@ -30,7 +30,7 @@ final class HomeTrendingMangaViewModel: ObservableObject {
         self.service = service
     }
 
-    deinit {
+    isolated deinit {
         sectionLoader.cancel()
     }
 

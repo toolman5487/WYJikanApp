@@ -31,7 +31,7 @@ final class HomeTodayAnimeViewModel: ObservableObject {
         self.service = service
     }
 
-    deinit {
+    isolated deinit {
         sectionLoader.cancel()
     }
 

@@ -364,8 +364,8 @@ private actor JikanAPITransientFailureBackoffStore {
 
 // MARK: - JikanAPIService
 
-// Shared mutable state is actor-isolated; the remaining stored references are immutable.
-nonisolated final class JikanAPIService: @unchecked Sendable {
+// Shared mutable state is actor-isolated; immutable dependencies are Sendable.
+nonisolated final class JikanAPIService: Sendable {
     
     static let shared = JikanAPIService()
 

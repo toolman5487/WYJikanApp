@@ -45,7 +45,7 @@ final class HomeRecommendedAnimeViewModel: ObservableObject {
         self.titleEnricher = HomeRecommendedAnimeTitleEnricher(service: animeDetailService)
     }
 
-    deinit {
+    isolated deinit {
         sectionLoader.cancel()
         titleEnrichmentTask?.cancel()
     }

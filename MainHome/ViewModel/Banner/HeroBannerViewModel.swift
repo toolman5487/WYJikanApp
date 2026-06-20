@@ -38,7 +38,7 @@ final class HeroBannerViewModel: ObservableObject {
         self.emptyStateMessage = emptyStateMessage
     }
 
-    deinit {
+    isolated deinit {
         sectionLoader.cancel()
         autoScrollTask?.cancel()
     }

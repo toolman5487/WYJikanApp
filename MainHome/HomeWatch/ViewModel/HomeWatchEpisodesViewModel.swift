@@ -28,7 +28,7 @@ final class HomeWatchEpisodesViewModel: ObservableObject {
         self.service = service
     }
 
-    deinit {
+    isolated deinit {
         sectionLoader.cancel()
     }
 
