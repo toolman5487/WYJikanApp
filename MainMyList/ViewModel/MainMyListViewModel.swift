@@ -81,14 +81,6 @@ final class MainMyListViewModel: ObservableObject {
             .sink { [weak self] items in
                 self?.applyItems(items)
             }
-
-        do {
-            try favoriteRepository.reloadFavorites()
-        } catch {
-            AppLogger.persistence.error(
-                "MyList reload failed: \(error.localizedDescription, privacy: .public)"
-            )
-        }
     }
 
     private func applyItems(_ items: [MyListCollectionItem]) {
