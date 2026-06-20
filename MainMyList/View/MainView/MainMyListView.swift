@@ -29,6 +29,7 @@ struct MainMyListView: View {
     @EnvironmentObject private var broadcastReminderStatusStore: AnimeBroadcastReminderStatusStore
     @EnvironmentObject private var favoriteStatusStore: FavoriteStatusStore
     @EnvironmentObject private var notificationScheduler: HomeTodayAnimeNotificationScheduler
+    @EnvironmentObject private var appPersistenceStore: AppPersistenceStore
 
     private let dependencies: MyListDependencies
 
@@ -50,27 +51,25 @@ struct MainMyListView: View {
     // MARK: - Body
 
     var body: some View {
-        let presentation = viewModel.presentation
-
         NavigationStack {
-            ScrollView {
-                LazyVStack(alignment: .leading, spacing: Layout.sectionSpacing) {
-                    headerView
-                    filterView
-                    summaryView(presentation: presentation)
-                    progressStatusSectionView(presentation: presentation)
-                    contentView(presentation: presentation)
+            Group {
+                switch appPersistenceStore.state {
+                case .initializing:
+                    loadingView
+                case .ready:
+                    loadedView
+                case .failed(let failure):
+                    persistenceFailureView(failure)
                 }
-                .padding(.horizontal, Layout.horizontalPadding)
-                .padding(.top, Layout.topPadding)
-                .padding(.bottom, Layout.bottomPadding)
             }
             .background(Color(.systemBackground))
             .navigationTitle("我的收藏")
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    settingsButton
+                if appPersistenceStore.isReady {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        settingsButton
+                    }
                 }
             }
             .navigationDestination(isPresented: $isShowingSettings) {
@@ -97,6 +96,51 @@ struct MainMyListView: View {
     }
 
     // MARK: - Private Views
+
+    private var loadedView: some View {
+        let presentation = viewModel.presentation
+
+        return ScrollView {
+            LazyVStack(alignment: .leading, spacing: Layout.sectionSpacing) {
+                headerView
+                filterView
+                summaryView(presentation: presentation)
+                progressStatusSectionView(presentation: presentation)
+                contentView(presentation: presentation)
+            }
+            .padding(.horizontal, Layout.horizontalPadding)
+            .padding(.top, Layout.topPadding)
+            .padding(.bottom, Layout.bottomPadding)
+        }
+    }
+
+    private var loadingView: some View {
+        ScrollView {
+            LazyVStack(alignment: .leading, spacing: Layout.sectionSpacing) {
+                SkeletonBar(width: 224, height: 16, cornerRadius: 8)
+                MyListCategorySkeletonView()
+                MyListSummarySkeletonView()
+                MyListFavoritesSkeletonView()
+            }
+            .padding(.horizontal, Layout.horizontalPadding)
+            .padding(.top, Layout.topPadding)
+            .padding(.bottom, Layout.bottomPadding)
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("正在載入收藏")
+    }
+
+    private func persistenceFailureView(_ failure: FeatureLoadFailure) -> some View {
+        ScrollView {
+            ErrorMessageRetryCardView(
+                state: ErrorMessageView.State(failure: failure),
+                title: "收藏資料暫時無法使用",
+                retryTitle: "重新連線",
+                onRetry: appPersistenceStore.retryInitialization
+            )
+            .padding(Layout.horizontalPadding)
+        }
+    }
 
     private var settingsButton: some View {
         Button {
@@ -266,4 +310,5 @@ struct MainMyListView: View {
 
 #Preview {
     MainMyListView(dependencies: AppDependencies.live.myList)
+        .environmentObject(AppPersistenceStore())
 }

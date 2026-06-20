@@ -98,6 +98,7 @@ private struct MainTabBarConfiguredView: View {
 
 #Preview {
     MainTabBarView()
+        .environmentObject(AppPersistenceStore())
         .environmentObject(MainTabBarViewModel())
         .environmentObject(FavoriteStatusStore())
         .environmentObject(MainHomeRouter.shared)

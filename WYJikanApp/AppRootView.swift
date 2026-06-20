@@ -9,6 +9,7 @@ import SwiftUI
 
 struct AppRootView: View {
     @EnvironmentObject private var bootstrapViewModel: AppBootstrapViewModel
+    @EnvironmentObject private var appPersistenceStore: AppPersistenceStore
 
     var body: some View {
         MainTabBarView()
@@ -16,7 +17,8 @@ struct AppRootView: View {
         .onAppear {
             AppLaunchSignposter.markAppRootVisible()
         }
-        .task(priority: .utility) {
+        .task(id: appPersistenceStore.isReady, priority: .utility) {
+            guard appPersistenceStore.isReady else { return }
             await bootstrapViewModel.bootstrap()
         }
     }
@@ -25,6 +27,7 @@ struct AppRootView: View {
 #Preview {
     AppRootView()
         .environment(\.appDependencies, .live)
+        .environmentObject(AppPersistenceStore())
         .environmentObject(FavoriteStatusStore())
         .environmentObject(AnimeBroadcastReminderStatusStore())
         .environmentObject(HomeTodayAnimeNotificationScheduler())
