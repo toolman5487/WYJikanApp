@@ -30,7 +30,7 @@ struct MainMyListView: View {
     @EnvironmentObject private var favoriteStatusStore: FavoriteStatusStore
     @EnvironmentObject private var notificationScheduler: HomeTodayAnimeNotificationScheduler
 
-    private let dependencies: AppDependencies
+    private let dependencies: MyListDependencies
 
     @StateObject private var viewModel: MainMyListViewModel
 
@@ -42,9 +42,9 @@ struct MainMyListView: View {
 
     // MARK: - Lifecycle
 
-    init(dependencies: AppDependencies) {
+    init(dependencies: MyListDependencies) {
         self.dependencies = dependencies
-        _viewModel = StateObject(wrappedValue: dependencies.makeMainMyListViewModel())
+        _viewModel = StateObject(wrappedValue: dependencies.makeMainViewModel())
     }
 
     // MARK: - Body
@@ -265,5 +265,5 @@ struct MainMyListView: View {
 }
 
 #Preview {
-    MainMyListView(dependencies: .live)
+    MainMyListView(dependencies: AppDependencies.live.myList)
 }

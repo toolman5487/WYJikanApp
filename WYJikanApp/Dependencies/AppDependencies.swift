@@ -33,6 +33,10 @@ struct AppDependencies {
     let broadcastReminderRepository: any AnimeBroadcastReminderRepository
     let mainSearchHistoryRepository: any MainSearchHistoryRepository
 
+    // MARK: - Feature Dependencies
+
+    let myList: MyListDependencies
+
     // MARK: - Live
 
     func connectRepositories(modelContext: ModelContext) {
@@ -40,23 +44,28 @@ struct AppDependencies {
         broadcastReminderRepository.connect(modelContext: modelContext)
     }
 
-    func clearCachedData() async {
-        await JikanAPIService.shared.clearCache()
-        await mainNewsService.clearCache()
-        URLCache.shared.removeAllCachedResponses()
-    }
-
     static let live: AppDependencies = {
         let favoriteRepository = SwiftDataFavoriteRepository()
         let broadcastReminderRepository = SwiftDataAnimeBroadcastReminderRepository()
         let mainSearchHistoryRepository = UserDefaultsMainSearchHistoryRepository()
+        let mainNewsService = MainNewsService()
+        let myListDependencies = MyListDependencies(
+            favoriteRepository: favoriteRepository,
+            broadcastReminderRepository: broadcastReminderRepository,
+            searchHistoryRepository: mainSearchHistoryRepository,
+            clearApplicationCache: {
+                await JikanAPIService.shared.clearCache()
+                await mainNewsService.clearCache()
+                URLCache.shared.removeAllCachedResponses()
+            }
+        )
 
         return AppDependencies(
             mainHomeService: MainHomeService(),
             homeWatchService: HomeWatchService(),
             mainCategoryListService: MainCategoryListService(),
             mainSearchService: MainSearchService(),
-            mainNewsService: MainNewsService(),
+            mainNewsService: mainNewsService,
             animeDetailService: AnimeDetailService(),
             mangaDetailService: MangaDetailService(),
             animeReviewService: AnimeReviewService(),
@@ -70,7 +79,8 @@ struct AppDependencies {
             homeTrendingMangaListService: HomeTrendingMangaListService(),
             favoriteRepository: favoriteRepository,
             broadcastReminderRepository: broadcastReminderRepository,
-            mainSearchHistoryRepository: mainSearchHistoryRepository
+            mainSearchHistoryRepository: mainSearchHistoryRepository,
+            myList: myListDependencies
         )
     }()
 
@@ -92,38 +102,6 @@ struct AppDependencies {
 
     func makeMainNewsViewModel() -> MainNewsViewModel {
         MainNewsViewModel(service: mainNewsService)
-    }
-
-    func makeMainMyListViewModel() -> MainMyListViewModel {
-        MainMyListViewModel(favoriteRepository: favoriteRepository)
-    }
-
-    @MainActor
-    func makeSettingViewModel(
-        notificationScheduler: HomeTodayAnimeNotificationScheduler,
-        broadcastReminderStatusStore: AnimeBroadcastReminderStatusStore,
-        favoriteStatusStore: FavoriteStatusStore
-    ) -> SettingViewModel {
-        SettingViewModel(
-            service: SettingService(
-                historyRepository: mainSearchHistoryRepository,
-                favoriteRepository: favoriteRepository,
-                broadcastReminderRepository: broadcastReminderRepository,
-                notificationScheduler: notificationScheduler,
-                clearApplicationCache: clearCachedData
-            ),
-            notificationScheduler: notificationScheduler,
-            broadcastReminderStatusStore: broadcastReminderStatusStore,
-            favoriteStatusStore: favoriteStatusStore
-        )
-    }
-
-    func makeMangaReadingStatusQueryViewModel() -> MangaReadingStatusQueryViewModel {
-        MangaReadingStatusQueryViewModel(favoriteRepository: favoriteRepository)
-    }
-
-    func makeAnimeWatchStatusQueryViewModel() -> AnimeWatchStatusQueryViewModel {
-        AnimeWatchStatusQueryViewModel(favoriteRepository: favoriteRepository)
     }
 
     func makeMainCategoryListViewModel() -> MainCategoryListViewModel {

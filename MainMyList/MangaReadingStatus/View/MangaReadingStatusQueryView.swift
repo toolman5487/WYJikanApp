@@ -23,7 +23,7 @@ struct MangaReadingStatusQueryView: View {
 
     // MARK: - Lifecycle
 
-    init(dependencies: AppDependencies) {
+    init(dependencies: MyListDependencies) {
         _viewModel = StateObject(
             wrappedValue: dependencies.makeMangaReadingStatusQueryViewModel()
         )

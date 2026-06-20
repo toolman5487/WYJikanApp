@@ -57,7 +57,7 @@ private struct MainTabBarConfiguredView: View {
                 }
 
                 Tab(value: AppTab.myList) {
-                    MainMyListView(dependencies: dependencies)
+                    MainMyListView(dependencies: dependencies.myList)
                 } label: {
                     Image(systemName: viewModel.selectedTab == .myList ? "heart.fill" : "heart")
                 }

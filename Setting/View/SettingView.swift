@@ -22,7 +22,7 @@ struct SettingView: View {
     // MARK: - Lifecycle
 
     init(
-        dependencies: AppDependencies,
+        dependencies: MyListDependencies,
         notificationScheduler: HomeTodayAnimeNotificationScheduler,
         broadcastReminderStatusStore: AnimeBroadcastReminderStatusStore,
         favoriteStatusStore: FavoriteStatusStore
@@ -229,7 +229,7 @@ struct SettingView: View {
 
     NavigationStack {
         SettingView(
-            dependencies: .live,
+            dependencies: AppDependencies.live.myList,
             notificationScheduler: notificationScheduler,
             broadcastReminderStatusStore: broadcastReminderStatusStore,
             favoriteStatusStore: favoriteStatusStore
