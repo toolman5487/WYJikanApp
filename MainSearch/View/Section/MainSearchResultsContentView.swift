@@ -13,7 +13,8 @@ struct MainSearchResultsContentView<FilterHeader: View>: View {
 
     let screenState: MainSearchScreenState
     let loadMoreState: MainSearchLoadMoreState
-    let loadMoreProgress: CGFloat
+    let isLoadMoreEnabled: Bool
+    @Binding var loadMoreProgress: CGFloat
     let searchHistory: [MainSearchHistoryItem]
     @ViewBuilder let filterHeader: () -> FilterHeader
     let onRowAppear: (MainSearchResultRow) -> Void
@@ -126,6 +127,14 @@ struct MainSearchResultsContentView<FilterHeader: View>: View {
             }
         }
         .listStyle(.plain)
+        .onEndBounce(
+            axis: .vertical,
+            isEnabled: isLoadMoreEnabled,
+            threshold: 16,
+            revealDistance: 220,
+            progress: $loadMoreProgress,
+            perform: onLoadMore
+        )
     }
 
     @ViewBuilder

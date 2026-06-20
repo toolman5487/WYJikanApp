@@ -76,7 +76,6 @@ struct SettingNotificationSectionView: View {
             )
         }
         .disabled(!presentation.canRefreshReminders)
-        .accessibilityHint(refreshButtonAccessibilityHint)
     }
 
     private func actionButton(
@@ -101,7 +100,6 @@ struct SettingNotificationSectionView: View {
         case .loading:
             ProgressView()
                 .controlSize(.small)
-                .accessibilityLabel("正在讀取通知權限")
         case .notDetermined, .authorized, .provisional, .ephemeral, .denied:
             SettingValueAccessory(
                 text: presentation.authorizationStatus.title
@@ -120,9 +118,4 @@ struct SettingNotificationSectionView: View {
         }
     }
 
-    private var refreshButtonAccessibilityHint: String {
-        presentation.reminderCount == 0
-            ? "請先在動畫詳情頁訂閱播出提醒"
-            : "重新安排目前訂閱的播出通知"
-    }
 }

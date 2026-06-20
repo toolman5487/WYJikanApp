@@ -77,7 +77,6 @@ struct SettingStorageSectionView: View {
             !presentation.cacheState.canClear
                 || presentation.isOperationInProgress
         )
-        .accessibilityHint("清除可重新下載的圖片與網路資料")
     }
 
     private func deletionButton(
@@ -97,8 +96,6 @@ struct SettingStorageSectionView: View {
             row.itemCount == 0
                 || presentation.isOperationInProgress
         )
-        .accessibilityValue(row.valueText)
-        .accessibilityHint(row.accessibilityHint)
     }
 
     @ViewBuilder
@@ -107,7 +104,6 @@ struct SettingStorageSectionView: View {
         case .loading:
             ProgressView()
                 .controlSize(.small)
-                .accessibilityLabel("正在計算快取大小")
         case .available, .clearing:
             SettingValueAccessory(
                 text: presentation.cacheState.sizeText
@@ -148,24 +144,21 @@ struct SettingStorageSectionView: View {
                 title: "清除搜尋紀錄",
                 systemImage: "clock.arrow.circlepath",
                 itemCount: userInformation.searchHistoryCount,
-                valueText: "\(userInformation.searchHistoryCount) 筆",
-                accessibilityHint: "永久刪除此裝置上的搜尋紀錄"
+                valueText: "\(userInformation.searchHistoryCount) 筆"
             ),
             SettingStorageDeletionRow(
                 target: .broadcastReminders,
                 title: "刪除播出提醒",
                 systemImage: "calendar.badge.minus",
                 itemCount: userInformation.reminderCount,
-                valueText: "\(userInformation.reminderCount) 部",
-                accessibilityHint: "永久刪除提醒並移除已排程的系統通知"
+                valueText: "\(userInformation.reminderCount) 部"
             ),
             SettingStorageDeletionRow(
                 target: .favoritesAndProgress,
                 title: "刪除收藏與進度",
                 systemImage: "heart.slash",
                 itemCount: favoriteCount,
-                valueText: "\(favoriteCount) 部",
-                accessibilityHint: "永久刪除收藏、動畫觀看進度與漫畫閱讀進度"
+                valueText: "\(favoriteCount) 部"
             )
         ]
     }
@@ -176,8 +169,7 @@ struct SettingStorageSectionView: View {
             title: "刪除所有本機資料",
             systemImage: "trash",
             itemCount: localDataCount,
-            valueText: "\(localDataCount) 項",
-            accessibilityHint: "永久刪除所有本機收藏、進度、提醒與搜尋紀錄"
+            valueText: "\(localDataCount) 項"
         )
     }
 
@@ -199,7 +191,6 @@ private struct SettingStorageDeletionRow: Identifiable {
     let systemImage: String
     let itemCount: Int
     let valueText: String
-    let accessibilityHint: String
 
     var id: SettingLocalDataTarget { target }
 }

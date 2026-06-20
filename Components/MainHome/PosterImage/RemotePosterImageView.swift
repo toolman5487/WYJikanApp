@@ -17,7 +17,6 @@ struct RemotePosterImageView: View {
     let url: URL
     let contentMode: ContentMode
     let fixedSize: CGSize?
-    let onImageSizeChange: ((CGSize) -> Void)?
 
     @Environment(\.displayScale) private var displayScale
     @State private var didFail = false
@@ -27,13 +26,11 @@ struct RemotePosterImageView: View {
     init(
         url: URL,
         contentMode: ContentMode = .fill,
-        fixedSize: CGSize? = nil,
-        onImageSizeChange: ((CGSize) -> Void)? = nil
+        fixedSize: CGSize? = nil
     ) {
         self.url = url
         self.contentMode = contentMode
         self.fixedSize = fixedSize
-        self.onImageSizeChange = onImageSizeChange
     }
 
     // MARK: - Body
@@ -51,9 +48,8 @@ struct RemotePosterImageView: View {
         .onFailure { _ in
             setDidFail(true)
         }
-        .onSuccess { image, _, _ in
+        .onSuccess { _, _, _ in
             setDidFail(false)
-            notifyImageSizeChange(image.size)
         }
         .overlay {
             if didFail {
@@ -82,8 +78,8 @@ struct RemotePosterImageView: View {
             .resizable()
             .aspectRatio(contentMode: contentMode)
             .frame(
-                width: fixedSize?.width,
-                height: fixedSize?.height
+                width: validFixedSize?.width,
+                height: validFixedSize?.height
             )
             .clipped()
     }
@@ -91,27 +87,18 @@ struct RemotePosterImageView: View {
     // MARK: - Private Methods
 
     private func setDidFail(_ value: Bool) {
-        guard !Thread.isMainThread else {
-            didFail = value
-            return
-        }
-
-        Task(priority: .utility) { @MainActor in
+        Task { @MainActor in
+            await Task.yield()
+            guard didFail != value else { return }
             didFail = value
         }
     }
 
-    private func notifyImageSizeChange(_ size: CGSize) {
-        guard let onImageSizeChange else { return }
-
-        guard !Thread.isMainThread else {
-            onImageSizeChange(size)
-            return
+    private var validFixedSize: CGSize? {
+        guard let fixedSize, fixedSize.width > 0, fixedSize.height > 0 else {
+            return nil
         }
-
-        Task(priority: .utility) { @MainActor in
-            onImageSizeChange(size)
-        }
+        return fixedSize
     }
 
     // MARK: - SDWebImage Configuration
@@ -121,7 +108,7 @@ struct RemotePosterImageView: View {
     }
 
     private var imageContext: [SDWebImageContextOption: Any]? {
-        guard let fixedSize, !usesWebPImage else { return nil }
+        guard let fixedSize = validFixedSize, !usesWebPImage else { return nil }
 
         return [
             .imageThumbnailPixelSize: CGSize(

@@ -71,8 +71,6 @@ struct ErrorMessageView: View {
 
 private struct ErrorMessageIconView: View {
 
-    @Environment(\.accessibilityReduceMotion) private var accessibilityReduceMotion
-
     let systemName: String
     let color: Color
     let effect: ErrorMessageIconEffect
@@ -87,7 +85,6 @@ private struct ErrorMessageIconView: View {
                 .font(.system(size: 24, weight: .semibold))
                 .foregroundStyle(color)
         }
-        .accessibilityHidden(true)
     }
 
     @ViewBuilder
@@ -101,78 +98,67 @@ private struct ErrorMessageIconView: View {
         case .pulse:
             symbol.symbolEffect(
                 .pulse,
-                options: .repeating,
-                isActive: !accessibilityReduceMotion
+                options: .repeating
             )
 
         case .bounce:
             symbol.symbolEffect(
                 .bounce,
-                options: .repeating,
-                isActive: !accessibilityReduceMotion
+                options: .repeating
             )
 
         case .variableColor:
             symbol.symbolEffect(
                 .variableColor,
-                options: .repeating,
-                isActive: !accessibilityReduceMotion
+                options: .repeating
             )
 
         case .scale:
             symbol.symbolEffect(
                 .scale,
-                options: .repeating,
-                isActive: !accessibilityReduceMotion
+                options: .repeating
             )
 
         case .appear:
             symbol.symbolEffect(
                 .appear,
-                options: .repeating,
-                isActive: !accessibilityReduceMotion
+                options: .repeating
             )
 
         case .disappear:
             symbol.symbolEffect(
                 .disappear,
-                options: .repeating,
-                isActive: !accessibilityReduceMotion
+                options: .repeating
             )
 
         case .wiggle:
             symbol.symbolEffect(
                 .wiggle,
-                options: .repeating,
-                isActive: !accessibilityReduceMotion
+                options: .repeating
             )
 
         case .rotate:
             symbol.symbolEffect(
                 .rotate,
-                options: .repeating,
-                isActive: !accessibilityReduceMotion
+                options: .repeating
             )
 
         case .breathe:
             symbol.symbolEffect(
                 .breathe,
-                options: .repeating,
-                isActive: !accessibilityReduceMotion
+                options: .repeating
             )
 
         case .drawOn:
             symbol.symbolEffect(
                 .drawOn,
-                options: .repeating,
-                isActive: !accessibilityReduceMotion
+                options: .repeating
             )
 
         case .drawOff:
             symbol.symbolEffect(
                 .drawOff,
-                options: .repeating,
-                isActive: !accessibilityReduceMotion
+                options: .repeating
             )
         }
     }

@@ -31,7 +31,8 @@ struct MainSearchView: View {
             MainSearchResultsContentView(
                 screenState: viewModel.screenState,
                 loadMoreState: viewModel.loadMoreState,
-                loadMoreProgress: loadMoreBounceProgress,
+                isLoadMoreEnabled: viewModel.canLoadMoreFromEndBounce,
+                loadMoreProgress: $loadMoreBounceProgress,
                 searchHistory: viewModel.searchHistory,
                 filterHeader: { filterHeader },
                 onRowAppear: { _ in },
@@ -41,15 +42,6 @@ struct MainSearchView: View {
                 onRemoveHistory: viewModel.removeHistoryItem,
                 onClearHistory: viewModel.clearSearchHistory
             )
-            .onEndBounce(
-                axis: .vertical,
-                isEnabled: viewModel.canLoadMoreFromEndBounce,
-                threshold: 16,
-                revealDistance: 220,
-                progress: $loadMoreBounceProgress
-            ) {
-                viewModel.loadMoreFromEndBounce()
-            }
             .navigationDestination(for: MainSearchResultRow.self) { row in
                 MainSearchRouter.destination(for: row)
             }

@@ -126,8 +126,6 @@ struct MainMyListView: View {
             .padding(.top, Layout.topPadding)
             .padding(.bottom, Layout.bottomPadding)
         }
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel("正在載入收藏")
     }
 
     private func persistenceFailureView(_ failure: FeatureLoadFailure) -> some View {
