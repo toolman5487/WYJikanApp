@@ -39,10 +39,12 @@ private struct MangaDetailBodyView: View {
     let malId: Int
     @StateObject private var viewModel: MangaDetailViewModel
     @EnvironmentObject private var favoriteStatusStore: FavoriteStatusStore
+    @EnvironmentObject private var appPersistenceStore: AppPersistenceStore
     @State private var imagePreviewSession: ImagePreviewSession?
     @State private var progressEditorDraft: MangaReadingProgressEditorDraft?
     @State private var isShowingCharacterList = false
     @State private var isShowingRecommendationList = false
+    @State private var persistenceAlertMessage: String?
 
     // MARK: - Lifecycle
 
@@ -107,12 +109,12 @@ private struct MangaDetailBodyView: View {
         .toolbar {
             DetailNavigationToolbar(
                 isFavorite: isFavorite,
-                isFavoriteActionEnabled: viewModel.isFavoriteActionEnabled,
+                favoriteActionState: favoriteActionState,
                 shareState: viewModel.shareNavigationState(),
                 reviewState: viewModel.reviewNavigationState(),
                 isRefreshing: viewModel.isRefreshing,
                 onFavoriteTap: {
-                    viewModel.toggleFavorite(isFavorite: isFavorite)
+                    handleFavoriteTap()
                 },
                 onRefreshTap: {
                     Task(priority: .userInitiated) {
@@ -126,6 +128,23 @@ private struct MangaDetailBodyView: View {
                     )
                 }
             )
+        }
+        .alert(
+            "收藏功能",
+            isPresented: Binding(
+                get: { persistenceAlertMessage != nil },
+                set: { isPresented in
+                    if !isPresented {
+                        persistenceAlertMessage = nil
+                    }
+                }
+            )
+        ) {
+            Button("好", role: .cancel) {
+                persistenceAlertMessage = nil
+            }
+        } message: {
+            Text(persistenceAlertMessage ?? "")
         }
         .fullScreenCover(item: $imagePreviewSession) { session in
             ImagePreviewViewer(
@@ -155,6 +174,19 @@ private struct MangaDetailBodyView: View {
         favoriteStatusStore.isFavorite(malId: malId, mediaKind: .manga)
     }
 
+    private var favoriteActionState: DetailNavigationToolbarPersistenceActionState {
+        guard viewModel.isFavoriteActionEnabled else { return .loading }
+
+        switch appPersistenceStore.state {
+        case .initializing:
+            return .loading
+        case .ready:
+            return .available
+        case .failed:
+            return .unavailable
+        }
+    }
+
     private var currentManga: MangaDetailDTO? {
         switch viewModel.screenState {
         case let .loaded(manga), let .refreshing(manga):
@@ -179,6 +211,17 @@ private struct MangaDetailBodyView: View {
             get: { imagePreviewSession?.selectedIndex ?? session.selectedIndex },
             set: { imagePreviewSession?.selectedIndex = $0 }
         )
+    }
+
+    private func handleFavoriteTap() {
+        switch appPersistenceStore.state {
+        case .initializing:
+            return
+        case .ready:
+            viewModel.toggleFavorite(isFavorite: isFavorite)
+        case .failed(let failure):
+            persistenceAlertMessage = failure.message
+        }
     }
 
     @ViewBuilder
@@ -307,5 +350,6 @@ private struct MangaDetailBodyView: View {
     NavigationStack {
         MangaDetailView(malId: 1)
             .environmentObject(FavoriteStatusStore())
+            .environmentObject(AppPersistenceStore())
     }
 }

@@ -95,7 +95,7 @@ final class AnimeDetailViewModel: ObservableObject {
             let resolvedDetail = try await service.fetchAnimeDetail(malId: malId)
             let detail = resolvedDetail.data
             screenState = .loaded(detail)
-            resetSynopsisTranslationIfNeeded(for: detail)
+            resetSynopsisTranslation()
             await loadSupplementaryContent(resetOnFailure: existingDetail == nil)
         } catch is CancellationError {
             return
@@ -137,9 +137,8 @@ final class AnimeDetailViewModel: ObservableObject {
         )
     }
 
-    private func resetSynopsisTranslationIfNeeded(for anime: AnimeDetailDTO) {
+    private func resetSynopsisTranslation() {
         synopsisTranslationViewModel.reset()
-        synopsisTranslationViewModel.prepareTranslation(for: synopsisDisplayText(for: anime))
     }
 
     private func loadPictures(resetOnFailure: Bool) async {

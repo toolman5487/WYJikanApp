@@ -31,6 +31,25 @@ enum DetailNavigationToolbarLayoutStyle: Equatable {
     case compact
 }
 
+enum DetailNavigationToolbarPersistenceActionState: Equatable {
+    case loading
+    case available
+    case unavailable
+
+    var isEnabled: Bool {
+        self != .loading
+    }
+
+    var tintColor: Color {
+        switch self {
+        case .available:
+            return ThemeColor.sakura
+        case .loading, .unavailable:
+            return ThemeColor.textSecondary
+        }
+    }
+}
+
 struct DetailNavigationToolbarConfiguration: Equatable {
     let broadcastReminderState: DetailNavigationToolbarBroadcastReminderState
     let layoutStyle: DetailNavigationToolbarLayoutStyle
@@ -43,7 +62,8 @@ struct DetailNavigationToolbarConfiguration: Equatable {
 
 struct DetailNavigationToolbar<ReviewDestination: View>: ToolbarContent {
     let isFavorite: Bool
-    let isFavoriteActionEnabled: Bool
+    let favoriteActionState: DetailNavigationToolbarPersistenceActionState
+    let broadcastReminderActionState: DetailNavigationToolbarPersistenceActionState
     let configuration: DetailNavigationToolbarConfiguration
     let shareState: DetailNavigationToolbarShareState
     let reviewState: DetailNavigationToolbarReviewState
@@ -55,7 +75,8 @@ struct DetailNavigationToolbar<ReviewDestination: View>: ToolbarContent {
 
     init(
         isFavorite: Bool,
-        isFavoriteActionEnabled: Bool,
+        favoriteActionState: DetailNavigationToolbarPersistenceActionState,
+        broadcastReminderActionState: DetailNavigationToolbarPersistenceActionState = .available,
         configuration: DetailNavigationToolbarConfiguration = .standardExpanded,
         shareState: DetailNavigationToolbarShareState,
         reviewState: DetailNavigationToolbarReviewState,
@@ -66,7 +87,8 @@ struct DetailNavigationToolbar<ReviewDestination: View>: ToolbarContent {
         @ViewBuilder reviewDestination: @escaping (String) -> ReviewDestination
     ) {
         self.isFavorite = isFavorite
-        self.isFavoriteActionEnabled = isFavoriteActionEnabled
+        self.favoriteActionState = favoriteActionState
+        self.broadcastReminderActionState = broadcastReminderActionState
         self.configuration = configuration
         self.shareState = shareState
         self.reviewState = reviewState
@@ -98,11 +120,11 @@ struct DetailNavigationToolbar<ReviewDestination: View>: ToolbarContent {
         Button(action: onFavoriteTap) {
             DetailNavigationToolbarIcon(
                 systemName: isFavorite ? "heart.fill" : "heart",
-                tintColor: isFavoriteActionEnabled ? ThemeColor.sakura : ThemeColor.textSecondary
+                tintColor: favoriteActionState.tintColor
             )
             .frame(minWidth: 44, minHeight: 44)
         }
-        .disabled(!isFavoriteActionEnabled)
+        .disabled(!favoriteActionState.isEnabled)
     }
 
     @ViewBuilder
@@ -114,18 +136,20 @@ struct DetailNavigationToolbar<ReviewDestination: View>: ToolbarContent {
             Button(action: onBroadcastReminderTap) {
                 DetailNavigationToolbarIcon(
                     systemName: "bell",
-                    tintColor: ThemeColor.sakura
+                    tintColor: broadcastReminderActionState.tintColor
                 )
                 .frame(minWidth: 44, minHeight: 44)
             }
+            .disabled(!broadcastReminderActionState.isEnabled)
         case .on:
             Button(action: onBroadcastReminderTap) {
                 DetailNavigationToolbarIcon(
                     systemName: "bell.fill",
-                    tintColor: ThemeColor.sakura
+                    tintColor: broadcastReminderActionState.tintColor
                 )
                 .frame(minWidth: 44, minHeight: 44)
             }
+            .disabled(!broadcastReminderActionState.isEnabled)
         }
     }
 

@@ -101,7 +101,7 @@ final class MangaDetailViewModel: ObservableObject {
             let response = try await service.fetchMangaDetail(malId: malId)
             let detail = response.data
             screenState = .loaded(detail)
-            resetSynopsisTranslationIfNeeded(for: detail)
+            resetSynopsisTranslation()
             await loadSupplementaryContent(resetOnFailure: existingDetail == nil)
         } catch is CancellationError {
             return
@@ -143,9 +143,8 @@ final class MangaDetailViewModel: ObservableObject {
         )
     }
 
-    private func resetSynopsisTranslationIfNeeded(for manga: MangaDetailDTO) {
+    private func resetSynopsisTranslation() {
         synopsisTranslationViewModel.reset()
-        synopsisTranslationViewModel.prepareTranslation(for: synopsisDisplayText(for: manga))
     }
 
     // MARK: - Supplementary Content

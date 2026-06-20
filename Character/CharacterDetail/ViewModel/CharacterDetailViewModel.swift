@@ -67,7 +67,7 @@ final class CharacterDetailViewModel: ObservableObject {
         do {
             let response = try await service.fetchCharacterDetail(malId: malId)
             screenState = .loaded(response.data)
-            resetSynopsisTranslationIfNeeded(for: response.data)
+            resetSynopsisTranslation()
         } catch is CancellationError {
             return
         } catch {
@@ -84,8 +84,7 @@ final class CharacterDetailViewModel: ObservableObject {
         )
     }
 
-    private func resetSynopsisTranslationIfNeeded(for character: CharacterDetailDTO) {
+    private func resetSynopsisTranslation() {
         synopsisTranslationViewModel.reset()
-        synopsisTranslationViewModel.prepareTranslation(for: aboutText(for: character) ?? "")
     }
 }

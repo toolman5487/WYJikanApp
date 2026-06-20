@@ -41,10 +41,12 @@ private struct AnimeDetailBodyView: View {
     @EnvironmentObject private var favoriteStatusStore: FavoriteStatusStore
     @EnvironmentObject private var broadcastReminderStatusStore: AnimeBroadcastReminderStatusStore
     @EnvironmentObject private var todayAnimeNotificationScheduler: HomeTodayAnimeNotificationScheduler
+    @EnvironmentObject private var appPersistenceStore: AppPersistenceStore
     @State private var imagePreviewSession: ImagePreviewSession?
     @State private var isShowingCharacterList = false
     @State private var isShowingRecommendationList = false
     @State private var broadcastReminderAlertMessage: String?
+    @State private var persistenceAlertMessage: String?
     @State private var watchProgressEditorDraft: AnimeWatchProgressEditorDraft?
 
     // MARK: - Lifecycle
@@ -112,27 +114,22 @@ private struct AnimeDetailBodyView: View {
         .toolbar {
             DetailNavigationToolbar(
                 isFavorite: isFavorite,
-                isFavoriteActionEnabled: viewModel.isFavoriteActionEnabled,
+                favoriteActionState: favoriteActionState,
+                broadcastReminderActionState: persistenceActionState,
                 configuration: navigationToolbarConfiguration,
                 shareState: viewModel.shareNavigationState(),
                 reviewState: viewModel.reviewNavigationState(),
                 isRefreshing: viewModel.isRefreshing,
                 onFavoriteTap: {
-                    viewModel.toggleFavorite(isFavorite: isFavorite)
+                    handleFavoriteTap()
                 },
                 onBroadcastReminderTap: {
-                    Task(priority: .userInitiated) {
-                        await toggleBroadcastReminder()
-                    }
+                    handleBroadcastReminderTap()
                 },
                 onRefreshTap: {
                     Task(priority: .userInitiated) {
                         await viewModel.load(forceRefresh: true)
-                        await viewModel.syncBroadcastReminderIfNeeded(
-                            isSubscribed: broadcastReminderStatusStore.isSubscribed(malId: malId),
-                            subscribedCount: broadcastReminderStatusStore.subscriptions.count,
-                            notificationScheduler: todayAnimeNotificationScheduler
-                        )
+                        await syncBroadcastReminderIfAvailable()
                     }
                 },
                 reviewDestination: { title in
@@ -160,6 +157,23 @@ private struct AnimeDetailBodyView: View {
         } message: {
             Text(broadcastReminderAlertMessage ?? "")
         }
+        .alert(
+            "收藏與提醒",
+            isPresented: Binding(
+                get: { persistenceAlertMessage != nil },
+                set: { isPresented in
+                    if !isPresented {
+                        persistenceAlertMessage = nil
+                    }
+                }
+            )
+        ) {
+            Button("好", role: .cancel) {
+                persistenceAlertMessage = nil
+            }
+        } message: {
+            Text(persistenceAlertMessage ?? "")
+        }
         .fullScreenCover(item: $imagePreviewSession) { session in
             ImagePreviewViewer(
                 items: session.items,
@@ -179,11 +193,10 @@ private struct AnimeDetailBodyView: View {
         }
         .task(id: malId, priority: .userInitiated) {
             await viewModel.load()
-            await viewModel.syncBroadcastReminderIfNeeded(
-                isSubscribed: broadcastReminderStatusStore.isSubscribed(malId: malId),
-                subscribedCount: broadcastReminderStatusStore.subscriptions.count,
-                notificationScheduler: todayAnimeNotificationScheduler
-            )
+        }
+        .task(id: broadcastReminderSyncTrigger, priority: .utility) {
+            guard appPersistenceStore.isReady, currentAnime != nil else { return }
+            await syncBroadcastReminderIfAvailable()
         }
     }
 
@@ -191,6 +204,26 @@ private struct AnimeDetailBodyView: View {
 
     private var isFavorite: Bool {
         favoriteStatusStore.isFavorite(malId: malId, mediaKind: .anime)
+    }
+
+    private var favoriteActionState: DetailNavigationToolbarPersistenceActionState {
+        guard viewModel.isFavoriteActionEnabled else { return .loading }
+        return persistenceActionState
+    }
+
+    private var persistenceActionState: DetailNavigationToolbarPersistenceActionState {
+        switch appPersistenceStore.state {
+        case .initializing:
+            return .loading
+        case .ready:
+            return .available
+        case .failed:
+            return .unavailable
+        }
+    }
+
+    private var broadcastReminderSyncTrigger: String {
+        "\(malId)-\(appPersistenceStore.isReady)-\(currentAnime != nil)"
     }
 
     private var navigationToolbarConfiguration: DetailNavigationToolbarConfiguration {
@@ -353,6 +386,41 @@ private struct AnimeDetailBodyView: View {
         }
     }
 
+    private func handleFavoriteTap() {
+        guard canPerformPersistenceAction() else { return }
+        viewModel.toggleFavorite(isFavorite: isFavorite)
+    }
+
+    private func handleBroadcastReminderTap() {
+        guard canPerformPersistenceAction() else { return }
+
+        Task(priority: .userInitiated) {
+            await toggleBroadcastReminder()
+        }
+    }
+
+    private func canPerformPersistenceAction() -> Bool {
+        switch appPersistenceStore.state {
+        case .initializing:
+            return false
+        case .ready:
+            return true
+        case .failed(let failure):
+            persistenceAlertMessage = failure.message
+            return false
+        }
+    }
+
+    private func syncBroadcastReminderIfAvailable() async {
+        guard appPersistenceStore.isReady else { return }
+
+        await viewModel.syncBroadcastReminderIfNeeded(
+            isSubscribed: broadcastReminderStatusStore.isSubscribed(malId: malId),
+            subscribedCount: broadcastReminderStatusStore.subscriptions.count,
+            notificationScheduler: todayAnimeNotificationScheduler
+        )
+    }
+
     private func showImagePreview(for anime: AnimeDetailDTO, selectedPictureIndex: Int) {
         let items = viewModel.imagePreviewItems(for: anime)
         guard !items.isEmpty else { return }
@@ -371,5 +439,6 @@ private struct AnimeDetailBodyView: View {
             .environmentObject(FavoriteStatusStore())
             .environmentObject(AnimeBroadcastReminderStatusStore())
             .environmentObject(HomeTodayAnimeNotificationScheduler())
+            .environmentObject(AppPersistenceStore())
     }
 }
