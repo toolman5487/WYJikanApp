@@ -103,8 +103,8 @@ extension MangaDetailViewModel {
         return "\(title)\n\n\(details)"
     }
 
-    func favoriteItem(for manga: MangaDetailDTO) -> MyListCollectionItem {
-        MyListCollectionItem(
+    func favoriteDraft(for manga: MangaDetailDTO) -> MyListItemDraft {
+        MyListItemDraft(
             malId: manga.malId,
             mediaKind: .manga,
             title: displayTitle(for: manga),
@@ -115,7 +115,7 @@ extension MangaDetailViewModel {
             year: manga.published?.prop?.from?.year,
             addedAt: Date(),
             mangaReadingStatus: .planned,
-            totalChaptersSnapshot: manga.chapters
+            totalChapters: manga.chapters
         )
     }
 

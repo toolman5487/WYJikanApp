@@ -5,7 +5,6 @@
 //  Created by Willy Hsu on 2026/4/21.
 //
 
-import SwiftData
 import SwiftUI
 
 struct MainMyListView: View {
@@ -207,7 +206,7 @@ struct MainMyListView: View {
 
         case .populated:
             LazyVStack(spacing: Layout.rowSpacing) {
-                ForEach(presentation.filteredItems, id: \.persistentModelID) { item in
+                ForEach(presentation.filteredItems) { item in
                     NavigationLink {
                         destinationView(for: item)
                     } label: {
@@ -227,7 +226,7 @@ struct MainMyListView: View {
     }
 
     @ViewBuilder
-    private func destinationView(for item: MyListCollectionItem) -> some View {
+    private func destinationView(for item: MyListItemSnapshot) -> some View {
         switch item.mediaKind {
         case .anime:
             AnimeDetailView(malId: item.malId)

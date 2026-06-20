@@ -12,10 +12,10 @@ struct AnimeWatchProgressEditorDraft: Identifiable {
     var currentEpisode: Int
 
     init(
-        item: MyListCollectionItem,
+        item: MyListItemSnapshot,
         totalEpisodes: Int?
     ) {
-        self.totalEpisodes = totalEpisodes ?? item.totalEpisodesSnapshot
+        self.totalEpisodes = totalEpisodes ?? item.totalEpisodes
         self.status = item.animeWatchStatus
         self.currentEpisode = item.currentEpisode ?? 0
     }

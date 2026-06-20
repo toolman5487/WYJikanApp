@@ -31,7 +31,7 @@ final class MangaDetailViewModel: ObservableObject {
     @Published private(set) var charactersFailure: FeatureLoadFailure?
     @Published private(set) var picturesFailure: FeatureLoadFailure?
     @Published private(set) var recommendationsFailure: FeatureLoadFailure?
-    @Published private(set) var favoriteCollectionItem: MyListCollectionItem?
+    @Published private(set) var favoriteCollectionItem: MyListItemSnapshot?
     let synopsisTranslationViewModel: SynopsisTranslationViewModel
 
     // MARK: - Dependencies
@@ -244,13 +244,13 @@ final class MangaDetailViewModel: ObservableObject {
                 _ = try favoriteRepository.toggleFavorite(
                     malId: malId,
                     mediaKind: .manga,
-                    makeItem: nil
+                    draft: nil
                 )
             } else if let detail {
                 _ = try favoriteRepository.toggleFavorite(
                     malId: malId,
                     mediaKind: .manga,
-                    makeItem: { self.favoriteItem(for: detail) }
+                    draft: favoriteDraft(for: detail)
                 )
             }
         } catch {
@@ -259,33 +259,32 @@ final class MangaDetailViewModel: ObservableObject {
     }
 
     func updateReadingProgress(
-        for item: MyListCollectionItem,
+        for item: MyListItemSnapshot,
         status: MangaReadingStatus,
         currentChapter: Int?,
         totalChapters: Int?
     ) {
-        item.updateMangaReadingProgress(
-            status: status,
-            currentChapter: currentChapter,
-            totalChapters: totalChapters
-        )
-
         do {
-            try favoriteRepository.saveChanges()
+            try favoriteRepository.updateMangaReadingProgress(
+                malId: item.malId,
+                status: status,
+                currentChapter: currentChapter,
+                totalChapters: totalChapters
+            )
         } catch {
             AppLogger.persistence.error("Manga reading progress update failed: \(error.localizedDescription, privacy: .public)")
         }
     }
 
     func readingProgressEditorDraft(
-        for item: MyListCollectionItem,
+        for item: MyListItemSnapshot,
         manga: MangaDetailDTO
     ) -> MangaReadingProgressEditorDraft {
         readingProgressController.editorDraft(for: item, manga: manga)
     }
 
     func incrementReadingProgress(
-        for item: MyListCollectionItem,
+        for item: MyListItemSnapshot,
         manga: MangaDetailDTO
     ) {
         let update = readingProgressController.incrementUpdate(for: item, manga: manga)
@@ -299,7 +298,7 @@ final class MangaDetailViewModel: ObservableObject {
     }
 
     func decrementReadingProgress(
-        for item: MyListCollectionItem,
+        for item: MyListItemSnapshot,
         manga: MangaDetailDTO
     ) {
         let update = readingProgressController.decrementUpdate(for: item, manga: manga)

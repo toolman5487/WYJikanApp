@@ -81,5 +81,5 @@ struct AnimeWatchStatusSummary: Sendable {
 
 struct AnimeWatchStatusPresentation {
     let summary: AnimeWatchStatusSummary
-    let filteredItems: [MyListCollectionItem]
+    let filteredItems: [MyListItemSnapshot]
 }

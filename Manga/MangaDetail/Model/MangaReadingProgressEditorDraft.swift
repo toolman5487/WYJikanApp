@@ -14,10 +14,10 @@ struct MangaReadingProgressEditorDraft: Identifiable {
     var currentChapter: Int
 
     init(
-        item: MyListCollectionItem,
+        item: MyListItemSnapshot,
         totalChapters: Int?
     ) {
-        self.totalChapters = totalChapters ?? item.totalChaptersSnapshot
+        self.totalChapters = totalChapters ?? item.totalChapters
         self.status = item.mangaReadingStatus
         self.currentChapter = item.currentChapter ?? 0
     }

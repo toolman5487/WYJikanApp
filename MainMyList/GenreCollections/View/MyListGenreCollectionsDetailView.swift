@@ -5,7 +5,6 @@
 //  Created by Codex on 2026/6/10.
 //
 
-import SwiftData
 import SwiftUI
 
 struct MyListGenreCollectionsDetailView: View {
@@ -55,7 +54,7 @@ struct MyListGenreCollectionsDetailView: View {
 
                 if let selectedSection = viewModel.selectedSection {
                     LazyVStack(spacing: Layout.rowSpacing) {
-                        ForEach(selectedSection.items, id: \.persistentModelID) { item in
+                        ForEach(selectedSection.items) { item in
                             NavigationLink {
                                 destinationView(for: item)
                             } label: {
@@ -97,7 +96,7 @@ struct MyListGenreCollectionsDetailView: View {
     // MARK: - Private Methods
 
     @ViewBuilder
-    private func destinationView(for item: MyListCollectionItem) -> some View {
+    private func destinationView(for item: MyListItemSnapshot) -> some View {
         switch item.mediaKind {
         case .anime:
             AnimeDetailView(malId: item.malId)

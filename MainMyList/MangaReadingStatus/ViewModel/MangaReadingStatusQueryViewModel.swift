@@ -26,7 +26,7 @@ final class MangaReadingStatusQueryViewModel: ObservableObject {
     // MARK: - Dependencies
 
     private let favoriteRepository: any FavoriteRepository
-    private var cachedMangaItems: [MyListCollectionItem] = []
+    private var cachedMangaItems: [MyListItemSnapshot] = []
     private var myListCancellable: AnyCancellable?
 
     // MARK: - Lifecycle
@@ -55,7 +55,7 @@ final class MangaReadingStatusQueryViewModel: ObservableObject {
         }
     }
 
-    private func apply(items: [MyListCollectionItem]) {
+    private func apply(items: [MyListItemSnapshot]) {
         cachedMangaItems = items
             .filter { $0.mediaKind == .manga }
             .sorted(by: compareMangaItems)
@@ -71,7 +71,7 @@ final class MangaReadingStatusQueryViewModel: ObservableObject {
         )
     }
 
-    private func makeSummary(from items: [MyListCollectionItem]) -> MangaReadingStatusSummary {
+    private func makeSummary(from items: [MyListItemSnapshot]) -> MangaReadingStatusSummary {
         var countsByStatus: [MangaReadingStatus: Int] = [:]
 
         for item in items {
@@ -94,7 +94,7 @@ final class MangaReadingStatusQueryViewModel: ObservableObject {
         )
     }
 
-    private func filteredItems(from items: [MyListCollectionItem]) -> [MyListCollectionItem] {
+    private func filteredItems(from items: [MyListItemSnapshot]) -> [MyListItemSnapshot] {
         switch selectedFilter {
         case .all:
             return items
@@ -105,7 +105,7 @@ final class MangaReadingStatusQueryViewModel: ObservableObject {
 
     private func count(
         for filter: MangaReadingStatusFilter,
-        in items: [MyListCollectionItem],
+        in items: [MyListItemSnapshot],
         countsByStatus: [MangaReadingStatus: Int]
     ) -> Int {
         switch filter {
@@ -118,7 +118,7 @@ final class MangaReadingStatusQueryViewModel: ObservableObject {
 
     // MARK: - Sorting
 
-    private func compareMangaItems(_ lhs: MyListCollectionItem, _ rhs: MyListCollectionItem) -> Bool {
+    private func compareMangaItems(_ lhs: MyListItemSnapshot, _ rhs: MyListItemSnapshot) -> Bool {
         switch (lhs.progressUpdatedAt, rhs.progressUpdatedAt) {
         case let (left?, right?):
             if left == right {

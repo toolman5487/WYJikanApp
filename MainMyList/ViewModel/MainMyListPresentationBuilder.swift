@@ -25,7 +25,7 @@ struct MainMyListPresentationBuilder {
     // MARK: - Build
 
     func makePresentation(
-        from items: [MyListCollectionItem],
+        from items: [MyListItemSnapshot],
         selectedFilter: MyListFilter
     ) -> MyListPresentation {
         let statisticsResult = statisticsBuilder.build(

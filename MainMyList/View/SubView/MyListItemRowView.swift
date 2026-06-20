@@ -11,7 +11,7 @@ struct MyListItemRowView: View {
 
     // MARK: - Properties
 
-    let item: MyListCollectionItem
+    let item: MyListItemSnapshot
 
     // MARK: - Body
 

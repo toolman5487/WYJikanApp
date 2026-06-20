@@ -9,7 +9,7 @@ import Foundation
 
 struct MyListGenreCollectionSection: Identifiable {
     let genreName: String
-    let items: [MyListCollectionItem]
+    let items: [MyListItemSnapshot]
 
     var id: String { genreName }
     var count: Int { items.count }

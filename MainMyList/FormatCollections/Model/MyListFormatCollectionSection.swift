@@ -10,7 +10,7 @@ import Foundation
 struct MyListFormatCollectionSection: Identifiable {
     let title: String
     let iconName: String
-    let items: [MyListCollectionItem]
+    let items: [MyListItemSnapshot]
 
     var id: String { title }
     var count: Int { items.count }

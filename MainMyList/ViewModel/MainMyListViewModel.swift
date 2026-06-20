@@ -26,7 +26,7 @@ final class MainMyListViewModel: ObservableObject {
 
     private let favoriteRepository: any FavoriteRepository
     private let presentationBuilder: MainMyListPresentationBuilder
-    private var cachedItems: [MyListCollectionItem] = []
+    private var cachedItems: [MyListItemSnapshot] = []
     private var myListCancellable: AnyCancellable?
 
     // MARK: - Lifecycle
@@ -43,9 +43,12 @@ final class MainMyListViewModel: ObservableObject {
 
     // MARK: - Actions
 
-    func remove(_ item: MyListCollectionItem) {
+    func remove(_ item: MyListItemSnapshot) {
         do {
-            try favoriteRepository.remove(item)
+            try favoriteRepository.remove(
+                malId: item.malId,
+                mediaKind: item.mediaKind
+            )
         } catch {
             AppLogger.persistence.error("MyList delete failed: \(error.localizedDescription, privacy: .public)")
         }
@@ -83,7 +86,7 @@ final class MainMyListViewModel: ObservableObject {
             }
     }
 
-    private func applyItems(_ items: [MyListCollectionItem]) {
+    private func applyItems(_ items: [MyListItemSnapshot]) {
         cachedItems = items
         rebuildPresentationFromCachedItems()
     }

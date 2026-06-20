@@ -26,7 +26,7 @@ final class AnimeWatchStatusQueryViewModel: ObservableObject {
     // MARK: - Dependencies
 
     private let favoriteRepository: any FavoriteRepository
-    private var cachedAnimeItems: [MyListCollectionItem] = []
+    private var cachedAnimeItems: [MyListItemSnapshot] = []
     private var myListCancellable: AnyCancellable?
 
     // MARK: - Lifecycle
@@ -55,7 +55,7 @@ final class AnimeWatchStatusQueryViewModel: ObservableObject {
         }
     }
 
-    private func apply(items: [MyListCollectionItem]) {
+    private func apply(items: [MyListItemSnapshot]) {
         cachedAnimeItems = items
             .filter { $0.mediaKind == .anime }
             .sorted(by: compareAnimeItems)
@@ -71,7 +71,7 @@ final class AnimeWatchStatusQueryViewModel: ObservableObject {
         )
     }
 
-    private func makeSummary(from items: [MyListCollectionItem]) -> AnimeWatchStatusSummary {
+    private func makeSummary(from items: [MyListItemSnapshot]) -> AnimeWatchStatusSummary {
         var countsByStatus: [AnimeWatchStatus: Int] = [:]
 
         for item in items {
@@ -94,7 +94,7 @@ final class AnimeWatchStatusQueryViewModel: ObservableObject {
         )
     }
 
-    private func filteredItems(from items: [MyListCollectionItem]) -> [MyListCollectionItem] {
+    private func filteredItems(from items: [MyListItemSnapshot]) -> [MyListItemSnapshot] {
         switch selectedFilter {
         case .all:
             return items
@@ -105,7 +105,7 @@ final class AnimeWatchStatusQueryViewModel: ObservableObject {
 
     private func count(
         for filter: AnimeWatchStatusFilter,
-        in items: [MyListCollectionItem],
+        in items: [MyListItemSnapshot],
         countsByStatus: [AnimeWatchStatus: Int]
     ) -> Int {
         switch filter {
@@ -118,7 +118,7 @@ final class AnimeWatchStatusQueryViewModel: ObservableObject {
 
     // MARK: - Sorting
 
-    private func compareAnimeItems(_ lhs: MyListCollectionItem, _ rhs: MyListCollectionItem) -> Bool {
+    private func compareAnimeItems(_ lhs: MyListItemSnapshot, _ rhs: MyListItemSnapshot) -> Bool {
         switch (lhs.progressUpdatedAt, rhs.progressUpdatedAt) {
         case let (left?, right?):
             if left == right {

@@ -9,11 +9,11 @@ struct AnimeWatchProgressSectionView: View {
 
     // MARK: - Properties
 
-    let item: MyListCollectionItem
+    let item: MyListItemSnapshot
     let anime: AnimeDetailDTO
-    let onIncrement: (MyListCollectionItem) -> Void
-    let onDecrement: (MyListCollectionItem) -> Void
-    let onEdit: (MyListCollectionItem) -> Void
+    let onIncrement: (MyListItemSnapshot) -> Void
+    let onDecrement: (MyListItemSnapshot) -> Void
+    let onEdit: (MyListItemSnapshot) -> Void
 
     // MARK: - Body
 
@@ -44,7 +44,7 @@ struct AnimeWatchProgressSectionView: View {
         }
     }
 
-    private func episodeStepperView(for item: MyListCollectionItem) -> some View {
+    private func episodeStepperView(for item: MyListItemSnapshot) -> some View {
         HStack(spacing: 8) {
             Button {
                 onDecrement(item)
@@ -96,11 +96,11 @@ struct AnimeWatchProgressSectionView: View {
 
     // MARK: - Private Methods
 
-    private func episodeButtonText(for item: MyListCollectionItem) -> String {
+    private func episodeButtonText(for item: MyListItemSnapshot) -> String {
         item.watchProgressSummary(totalEpisodes: totalEpisodes)
     }
 
-    private func isAtLastEpisode(_ item: MyListCollectionItem) -> Bool {
+    private func isAtLastEpisode(_ item: MyListItemSnapshot) -> Bool {
         guard let totalEpisodes else { return false }
         return (item.currentEpisode ?? 0) >= totalEpisodes
     }

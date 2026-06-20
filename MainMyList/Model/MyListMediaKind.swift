@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum MyListMediaKind: String, Codable, CaseIterable, Identifiable {
+nonisolated enum MyListMediaKind: String, Codable, CaseIterable, Identifiable, Sendable {
     case anime
     case manga
 

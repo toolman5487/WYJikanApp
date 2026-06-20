@@ -13,6 +13,8 @@ import SwiftData
 @Model
 final class MyListCollectionItem {
 
+    #Unique<MyListCollectionItem>([\.malId, \.mediaKindRawValue])
+
     // MARK: - Stored Properties
 
     var malId: Int
@@ -155,19 +157,195 @@ nonisolated enum MangaReadingStatus: String, Codable, CaseIterable, Identifiable
     }
 }
 
-// MARK: - MyListCollectionItem Helpers
+// MARK: - MyListItemDraft
 
-extension MyListCollectionItem {
+nonisolated struct MyListItemDraft: Sendable {
+    let malId: Int
+    let mediaKind: MyListMediaKind
+    let title: String
+    let subtitle: String?
+    let imageURLString: String?
+    let genreNames: [String]
+    let type: String?
+    let year: Int?
+    let addedAt: Date
+    let animeWatchStatus: AnimeWatchStatus?
+    let currentEpisode: Int?
+    let totalEpisodes: Int?
+    let mangaReadingStatus: MangaReadingStatus?
+    let currentChapter: Int?
+    let totalChapters: Int?
+    let progressUpdatedAt: Date?
 
-    // MARK: - Computed Properties
+    init(
+        malId: Int,
+        mediaKind: MyListMediaKind,
+        title: String,
+        subtitle: String?,
+        imageURLString: String?,
+        genreNames: [String] = [],
+        type: String? = nil,
+        year: Int? = nil,
+        addedAt: Date,
+        animeWatchStatus: AnimeWatchStatus? = nil,
+        currentEpisode: Int? = nil,
+        totalEpisodes: Int? = nil,
+        mangaReadingStatus: MangaReadingStatus? = nil,
+        currentChapter: Int? = nil,
+        totalChapters: Int? = nil,
+        progressUpdatedAt: Date? = nil
+    ) {
+        self.malId = malId
+        self.mediaKind = mediaKind
+        self.title = title
+        self.subtitle = subtitle
+        self.imageURLString = imageURLString
+        self.genreNames = genreNames
+        self.type = type
+        self.year = year
+        self.addedAt = addedAt
+        self.animeWatchStatus = animeWatchStatus
+        self.currentEpisode = currentEpisode
+        self.totalEpisodes = totalEpisodes
+        self.mangaReadingStatus = mangaReadingStatus
+        self.currentChapter = currentChapter
+        self.totalChapters = totalChapters
+        self.progressUpdatedAt = progressUpdatedAt
+    }
+}
 
-    var mediaKind: MyListMediaKind {
-        MyListMediaKind(rawValue: mediaKindRawValue) ?? .anime
+// MARK: - MyListItemSnapshot
+
+nonisolated struct MyListItemSnapshot: Identifiable, Hashable, Sendable {
+    let malId: Int
+    let mediaKind: MyListMediaKind
+    let title: String
+    let subtitle: String?
+    let imageURLString: String?
+    let genreNames: [String]
+    let type: String?
+    let year: Int?
+    let addedAt: Date
+    let animeWatchStatus: AnimeWatchStatus
+    let currentEpisode: Int?
+    let totalEpisodes: Int?
+    let mangaReadingStatus: MangaReadingStatus
+    let currentChapter: Int?
+    let totalChapters: Int?
+    let progressUpdatedAt: Date?
+
+    var id: String {
+        "\(mediaKind.rawValue)-\(malId)"
     }
 
     var imageURL: URL? {
         guard let imageURLString else { return nil }
         return URL(string: imageURLString)
+    }
+
+    func watchProgressFraction(totalEpisodes: Int? = nil) -> Double? {
+        let resolvedTotalEpisodes = Self.normalizedProgressValue(totalEpisodes) ?? self.totalEpisodes
+        guard
+            let currentEpisode,
+            let resolvedTotalEpisodes,
+            resolvedTotalEpisodes > 0
+        else {
+            return nil
+        }
+
+        return min(Double(currentEpisode) / Double(resolvedTotalEpisodes), 1)
+    }
+
+    func watchProgressSummary(totalEpisodes: Int? = nil) -> String {
+        let resolvedTotalEpisodes = Self.normalizedProgressValue(totalEpisodes) ?? self.totalEpisodes
+
+        switch (animeWatchStatus, currentEpisode, resolvedTotalEpisodes) {
+        case (.planned, nil, _):
+            return "尚未開始"
+        case (.completed, _, let totalEpisodes?):
+            return "已看完 \(totalEpisodes) 集"
+        case (.completed, let currentEpisode?, nil):
+            return "已看完 \(currentEpisode) 集"
+        case (.completed, nil, nil):
+            return "已看完"
+        case let (status, currentEpisode?, totalEpisodes?):
+            return "\(status.title) \(currentEpisode) / \(totalEpisodes) 集"
+        case let (status, currentEpisode?, nil):
+            return "\(status.title)到第 \(currentEpisode) 集"
+        case let (status, nil, _):
+            return status.title
+        }
+    }
+
+    func readingProgressFraction(totalChapters: Int? = nil) -> Double? {
+        let resolvedTotalChapters = Self.normalizedProgressValue(totalChapters) ?? self.totalChapters
+        guard
+            let currentChapter,
+            let resolvedTotalChapters,
+            resolvedTotalChapters > 0
+        else {
+            return nil
+        }
+
+        return min(Double(currentChapter) / Double(resolvedTotalChapters), 1)
+    }
+
+    func readingProgressSummary(totalChapters: Int? = nil) -> String {
+        let resolvedTotalChapters = Self.normalizedProgressValue(totalChapters) ?? self.totalChapters
+
+        switch (mangaReadingStatus, currentChapter, resolvedTotalChapters) {
+        case (.planned, nil, _):
+            return "尚未開始"
+        case (.completed, _, let totalChapters?):
+            return "已讀完 \(totalChapters) 話"
+        case (.completed, let currentChapter?, nil):
+            return "已讀完 \(currentChapter) 話"
+        case (.completed, nil, nil):
+            return "已完成"
+        case let (status, currentChapter?, totalChapters?):
+            return "\(status.title) \(currentChapter) / \(totalChapters) 話"
+        case let (status, currentChapter?, nil):
+            return "\(status.title)到 \(currentChapter) 話"
+        case let (status, nil, _):
+            return status.title
+        }
+    }
+
+    private static func normalizedProgressValue(_ value: Int?) -> Int? {
+        guard let value, value > 0 else { return nil }
+        return value
+    }
+}
+
+// MARK: - MyListCollectionItem Helpers
+
+extension MyListCollectionItem {
+
+    convenience init(draft: MyListItemDraft) {
+        self.init(
+            malId: draft.malId,
+            mediaKind: draft.mediaKind,
+            title: draft.title,
+            subtitle: draft.subtitle,
+            imageURLString: draft.imageURLString,
+            genreNames: draft.genreNames,
+            type: draft.type,
+            year: draft.year,
+            addedAt: draft.addedAt,
+            animeWatchStatus: draft.animeWatchStatus,
+            currentEpisode: draft.currentEpisode,
+            totalEpisodesSnapshot: draft.totalEpisodes,
+            mangaReadingStatus: draft.mangaReadingStatus,
+            currentChapter: draft.currentChapter,
+            totalChaptersSnapshot: draft.totalChapters,
+            progressUpdatedAt: draft.progressUpdatedAt
+        )
+    }
+
+    // MARK: - Computed Properties
+
+    var mediaKind: MyListMediaKind {
+        MyListMediaKind(rawValue: mediaKindRawValue) ?? .anime
     }
 
     var genreNames: [String] {
@@ -202,84 +380,25 @@ extension MyListCollectionItem {
         }
     }
 
-    var hasAnimeWatchProgress: Bool {
-        animeWatchStatusRawValue != nil || currentEpisode != nil
-    }
-
-    var hasMangaReadingProgress: Bool {
-        mangaReadingStatusRawValue != nil || currentChapter != nil
-    }
-
-    // MARK: - Progress Presentation
-
-    func watchProgressFraction(totalEpisodes: Int? = nil) -> Double? {
-        let resolvedTotalEpisodes = Self.normalizedProgressValue(totalEpisodes) ?? totalEpisodesSnapshot
-        guard
-            let currentEpisode,
-            let resolvedTotalEpisodes,
-            resolvedTotalEpisodes > 0
-        else {
-            return nil
-        }
-
-        return min(Double(currentEpisode) / Double(resolvedTotalEpisodes), 1)
-    }
-
-    func watchProgressSummary(totalEpisodes: Int? = nil) -> String {
-        let status = animeWatchStatus
-        let resolvedTotalEpisodes = Self.normalizedProgressValue(totalEpisodes) ?? totalEpisodesSnapshot
-
-        switch (status, currentEpisode, resolvedTotalEpisodes) {
-        case (.planned, nil, _):
-            return "尚未開始"
-        case (.completed, _, let totalEpisodes?):
-            return "已看完 \(totalEpisodes) 集"
-        case (.completed, let currentEpisode?, nil):
-            return "已看完 \(currentEpisode) 集"
-        case (.completed, nil, nil):
-            return "已看完"
-        case let (status, currentEpisode?, totalEpisodes?):
-            return "\(status.title) \(currentEpisode) / \(totalEpisodes) 集"
-        case let (status, currentEpisode?, nil):
-            return "\(status.title)到第 \(currentEpisode) 集"
-        case let (status, nil, _):
-            return status.title
-        }
-    }
-
-    func readingProgressFraction(totalChapters: Int? = nil) -> Double? {
-        let resolvedTotalChapters = Self.normalizedProgressValue(totalChapters) ?? totalChaptersSnapshot
-        guard
-            let currentChapter,
-            let resolvedTotalChapters,
-            resolvedTotalChapters > 0
-        else {
-            return nil
-        }
-
-        return min(Double(currentChapter) / Double(resolvedTotalChapters), 1)
-    }
-
-    func readingProgressSummary(totalChapters: Int? = nil) -> String {
-        let status = mangaReadingStatus
-        let resolvedTotalChapters = Self.normalizedProgressValue(totalChapters) ?? totalChaptersSnapshot
-
-        switch (status, currentChapter, resolvedTotalChapters) {
-        case (.planned, nil, _):
-            return "尚未開始"
-        case (.completed, _, let totalChapters?):
-            return "已讀完 \(totalChapters) 話"
-        case (.completed, let currentChapter?, nil):
-            return "已讀完 \(currentChapter) 話"
-        case (.completed, nil, nil):
-            return "已完成"
-        case let (status, currentChapter?, totalChapters?):
-            return "\(status.title) \(currentChapter) / \(totalChapters) 話"
-        case let (status, currentChapter?, nil):
-            return "\(status.title)到 \(currentChapter) 話"
-        case let (status, nil, _):
-            return status.title
-        }
+    var snapshot: MyListItemSnapshot {
+        MyListItemSnapshot(
+            malId: malId,
+            mediaKind: mediaKind,
+            title: title,
+            subtitle: subtitle,
+            imageURLString: imageURLString,
+            genreNames: genreNames,
+            type: type,
+            year: year,
+            addedAt: addedAt,
+            animeWatchStatus: animeWatchStatus,
+            currentEpisode: currentEpisode,
+            totalEpisodes: totalEpisodesSnapshot,
+            mangaReadingStatus: mangaReadingStatus,
+            currentChapter: currentChapter,
+            totalChapters: totalChaptersSnapshot,
+            progressUpdatedAt: progressUpdatedAt
+        )
     }
 
     // MARK: - Progress Mutation

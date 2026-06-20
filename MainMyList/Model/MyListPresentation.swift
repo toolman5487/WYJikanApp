@@ -8,7 +8,7 @@
 import Foundation
 
 struct MyListPresentation {
-    let filteredItems: [MyListCollectionItem]
+    let filteredItems: [MyListItemSnapshot]
     let genreSections: [MyListGenreCollectionSection]
     let formatSections: [MyListFormatCollectionSection]
     let statistics: MyListStatistics

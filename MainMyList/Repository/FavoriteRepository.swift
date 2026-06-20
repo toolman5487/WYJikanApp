@@ -29,21 +29,33 @@ protocol FavoriteRepository: AnyObject {
     func connect(modelContext: ModelContext)
 
     var favoriteSnapshotPublisher: AnyPublisher<FavoriteSnapshot, Never> { get }
-    var myListPublisher: AnyPublisher<[MyListCollectionItem], Never> { get }
+    var myListPublisher: AnyPublisher<[MyListItemSnapshot], Never> { get }
 
     func reloadFavorites() throws
 
     func toggleFavorite(
         malId: Int,
         mediaKind: MyListMediaKind,
-        makeItem: (() -> MyListCollectionItem)?
+        draft: MyListItemDraft?
     ) throws -> Bool
 
-    func remove(_ item: MyListCollectionItem) throws
+    func remove(malId: Int, mediaKind: MyListMediaKind) throws
 
     func removeAllFavorites() throws
 
-    func saveChanges() throws
+    func updateAnimeWatchProgress(
+        malId: Int,
+        status: AnimeWatchStatus,
+        currentEpisode: Int?,
+        totalEpisodes: Int?
+    ) throws
+
+    func updateMangaReadingProgress(
+        malId: Int,
+        status: MangaReadingStatus,
+        currentChapter: Int?,
+        totalChapters: Int?
+    ) throws
 }
 
 final class SwiftDataFavoriteRepository: FavoriteRepository {
@@ -53,14 +65,14 @@ final class SwiftDataFavoriteRepository: FavoriteRepository {
             .eraseToAnyPublisher()
     }
 
-    var myListPublisher: AnyPublisher<[MyListCollectionItem], Never> {
+    var myListPublisher: AnyPublisher<[MyListItemSnapshot], Never> {
         myListSubject.eraseToAnyPublisher()
     }
 
     private let snapshotSubject = CurrentValueSubject<FavoriteSnapshot, Never>(
         FavoriteSnapshot(animeIDs: [], mangaIDs: [])
     )
-    private let myListSubject = CurrentValueSubject<[MyListCollectionItem], Never>([])
+    private let myListSubject = CurrentValueSubject<[MyListItemSnapshot], Never>([])
 
     private var modelContext: ModelContext?
 
@@ -78,7 +90,7 @@ final class SwiftDataFavoriteRepository: FavoriteRepository {
     func toggleFavorite(
         malId: Int,
         mediaKind: MyListMediaKind,
-        makeItem: (() -> MyListCollectionItem)? = nil
+        draft: MyListItemDraft? = nil
     ) throws -> Bool {
         let modelContext = try requireModelContext()
 
@@ -99,11 +111,11 @@ final class SwiftDataFavoriteRepository: FavoriteRepository {
             }
         }
 
-        guard let makeItem else {
+        guard let draft else {
             return false
         }
 
-        modelContext.insert(makeItem())
+        modelContext.insert(MyListCollectionItem(draft: draft))
 
         do {
             try modelContext.save()
@@ -115,8 +127,15 @@ final class SwiftDataFavoriteRepository: FavoriteRepository {
         }
     }
 
-    func remove(_ item: MyListCollectionItem) throws {
+    func remove(malId: Int, mediaKind: MyListMediaKind) throws {
         let modelContext = try requireModelContext()
+        guard let item = try fetchFavoriteItem(
+            malId: malId,
+            mediaKind: mediaKind,
+            modelContext: modelContext
+        ) else {
+            return
+        }
         modelContext.delete(item)
 
         do {
@@ -145,16 +164,48 @@ final class SwiftDataFavoriteRepository: FavoriteRepository {
         }
     }
 
-    func saveChanges() throws {
+    func updateAnimeWatchProgress(
+        malId: Int,
+        status: AnimeWatchStatus,
+        currentEpisode: Int?,
+        totalEpisodes: Int?
+    ) throws {
         let modelContext = try requireModelContext()
-
-        do {
-            try modelContext.save()
-            try publish(from: modelContext)
-        } catch {
-            modelContext.rollback()
-            throw error
+        guard let item = try fetchFavoriteItem(
+            malId: malId,
+            mediaKind: .anime,
+            modelContext: modelContext
+        ) else {
+            return
         }
+        item.updateAnimeWatchProgress(
+            status: status,
+            currentEpisode: currentEpisode,
+            totalEpisodes: totalEpisodes
+        )
+        try saveAndPublish(modelContext)
+    }
+
+    func updateMangaReadingProgress(
+        malId: Int,
+        status: MangaReadingStatus,
+        currentChapter: Int?,
+        totalChapters: Int?
+    ) throws {
+        let modelContext = try requireModelContext()
+        guard let item = try fetchFavoriteItem(
+            malId: malId,
+            mediaKind: .manga,
+            modelContext: modelContext
+        ) else {
+            return
+        }
+        item.updateMangaReadingProgress(
+            status: status,
+            currentChapter: currentChapter,
+            totalChapters: totalChapters
+        )
+        try saveAndPublish(modelContext)
     }
 
     private func requireModelContext() throws -> ModelContext {
@@ -166,8 +217,18 @@ final class SwiftDataFavoriteRepository: FavoriteRepository {
 
     private func publish(from modelContext: ModelContext) throws {
         let items = try fetchAllItems(from: modelContext)
-        myListSubject.send(items)
+        myListSubject.send(items.map(\.snapshot))
         snapshotSubject.send(makeSnapshot(from: items))
+    }
+
+    private func saveAndPublish(_ modelContext: ModelContext) throws {
+        do {
+            try modelContext.save()
+            try publish(from: modelContext)
+        } catch {
+            modelContext.rollback()
+            throw error
+        }
     }
 
     private func fetchAllItems(from modelContext: ModelContext) throws -> [MyListCollectionItem] {

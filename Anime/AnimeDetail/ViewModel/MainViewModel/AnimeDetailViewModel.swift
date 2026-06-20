@@ -28,7 +28,7 @@ final class AnimeDetailViewModel: ObservableObject {
     @Published private(set) var charactersFailure: FeatureLoadFailure?
     @Published private(set) var picturesFailure: FeatureLoadFailure?
     @Published private(set) var recommendationsFailure: FeatureLoadFailure?
-    @Published private(set) var favoriteCollectionItem: MyListCollectionItem?
+    @Published private(set) var favoriteCollectionItem: MyListItemSnapshot?
     let synopsisTranslationViewModel: SynopsisTranslationViewModel
 
     private let malId: Int
@@ -236,13 +236,13 @@ final class AnimeDetailViewModel: ObservableObject {
                 _ = try favoriteRepository.toggleFavorite(
                     malId: malId,
                     mediaKind: .anime,
-                    makeItem: nil
+                    draft: nil
                 )
             } else if let detail {
                 _ = try favoriteRepository.toggleFavorite(
                     malId: malId,
                     mediaKind: .anime,
-                    makeItem: { self.favoriteItem(for: detail) }
+                    draft: favoriteDraft(for: detail)
                 )
             }
         } catch {
@@ -251,33 +251,32 @@ final class AnimeDetailViewModel: ObservableObject {
     }
 
     func updateWatchProgress(
-        for item: MyListCollectionItem,
+        for item: MyListItemSnapshot,
         status: AnimeWatchStatus,
         currentEpisode: Int?,
         totalEpisodes: Int?
     ) {
-        item.updateAnimeWatchProgress(
-            status: status,
-            currentEpisode: currentEpisode,
-            totalEpisodes: totalEpisodes
-        )
-
         do {
-            try favoriteRepository.saveChanges()
+            try favoriteRepository.updateAnimeWatchProgress(
+                malId: item.malId,
+                status: status,
+                currentEpisode: currentEpisode,
+                totalEpisodes: totalEpisodes
+            )
         } catch {
             AppLogger.persistence.error("Anime watch progress update failed: \(error.localizedDescription, privacy: .public)")
         }
     }
 
     func watchProgressEditorDraft(
-        for item: MyListCollectionItem,
+        for item: MyListItemSnapshot,
         anime: AnimeDetailDTO
     ) -> AnimeWatchProgressEditorDraft {
         watchProgressController.editorDraft(for: item, anime: anime)
     }
 
     func incrementWatchProgress(
-        for item: MyListCollectionItem,
+        for item: MyListItemSnapshot,
         anime: AnimeDetailDTO
     ) {
         let update = watchProgressController.incrementUpdate(for: item, anime: anime)
@@ -291,7 +290,7 @@ final class AnimeDetailViewModel: ObservableObject {
     }
 
     func decrementWatchProgress(
-        for item: MyListCollectionItem,
+        for item: MyListItemSnapshot,
         anime: AnimeDetailDTO
     ) {
         let update = watchProgressController.decrementUpdate(for: item, anime: anime)

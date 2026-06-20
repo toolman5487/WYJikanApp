@@ -10,7 +10,7 @@ struct MyListProgressStatusSummaryBuilder {
     // MARK: - Anime
 
     func makeAnimeWatchStatusSummary(
-        from items: [MyListCollectionItem]
+        from items: [MyListItemSnapshot]
     ) -> AnimeWatchStatusSummary {
         let animeItems = items.filter { $0.mediaKind == .anime }
         var countsByStatus: [AnimeWatchStatus: Int] = [:]
@@ -41,7 +41,7 @@ struct MyListProgressStatusSummaryBuilder {
 
     private func animeWatchStatusCount(
         for filter: AnimeWatchStatusFilter,
-        in animeItems: [MyListCollectionItem],
+        in animeItems: [MyListItemSnapshot],
         countsByStatus: [AnimeWatchStatus: Int]
     ) -> Int {
         switch filter {
@@ -55,7 +55,7 @@ struct MyListProgressStatusSummaryBuilder {
     // MARK: - Manga
 
     func makeMangaReadingStatusSummary(
-        from items: [MyListCollectionItem]
+        from items: [MyListItemSnapshot]
     ) -> MangaReadingStatusSummary {
         let mangaItems = items.filter { $0.mediaKind == .manga }
         var countsByStatus: [MangaReadingStatus: Int] = [:]
@@ -86,7 +86,7 @@ struct MyListProgressStatusSummaryBuilder {
 
     private func mangaReadingStatusCount(
         for filter: MangaReadingStatusFilter,
-        in mangaItems: [MyListCollectionItem],
+        in mangaItems: [MyListItemSnapshot],
         countsByStatus: [MangaReadingStatus: Int]
     ) -> Int {
         switch filter {

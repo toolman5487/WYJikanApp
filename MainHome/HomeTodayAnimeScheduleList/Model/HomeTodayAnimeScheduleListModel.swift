@@ -110,6 +110,9 @@ nonisolated struct HomeTodayAnimeTimeSection: Identifiable, Hashable, Sendable {
 
 @Model
 final class AnimeBroadcastReminderSubscription {
+
+    #Unique<AnimeBroadcastReminderSubscription>([\.malId])
+
     var malId: Int
     var title: String
     var broadcastDay: String?

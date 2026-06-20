@@ -9,7 +9,7 @@ import Foundation
 
 struct MyListStatisticsBuildResult {
     let statistics: MyListStatistics
-    let filteredItems: [MyListCollectionItem]
+    let filteredItems: [MyListItemSnapshot]
     let animeCount: Int
     let mangaCount: Int
     let weeklyAddedCount: Int
@@ -24,7 +24,7 @@ struct MyListStatisticsBuilder {
     // MARK: - Build
 
     func build(
-        from items: [MyListCollectionItem],
+        from items: [MyListItemSnapshot],
         selectedFilter: MyListFilter
     ) -> MyListStatisticsBuildResult {
         let weekStartDate = weekStartDate()
@@ -34,7 +34,7 @@ struct MyListStatisticsBuilder {
         var weeklyAddedCount = 0
         var weeklyAnimeAddedCount = 0
         var weeklyMangaAddedCount = 0
-        var filteredItems: [MyListCollectionItem] = []
+        var filteredItems: [MyListItemSnapshot] = []
         filteredItems.reserveCapacity(items.count)
 
         for item in items {
@@ -151,7 +151,7 @@ struct MyListStatisticsBuilder {
     // MARK: - Genre Analysis
 
     private func makeGenreAnalysis(
-        from items: [MyListCollectionItem],
+        from items: [MyListItemSnapshot],
         scope: MyListStatisticsScope
     ) -> MyListGenreAnalysis {
         var genreCounts: [String: Int] = [:]
@@ -206,7 +206,7 @@ struct MyListStatisticsBuilder {
     // MARK: - Format Analysis
 
     private func makeFormatAnalysis(
-        from items: [MyListCollectionItem],
+        from items: [MyListItemSnapshot],
         scope: MyListStatisticsScope
     ) -> MyListFormatAnalysis {
         var formatCounts: [String: Int] = [:]

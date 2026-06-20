@@ -11,9 +11,9 @@ import Foundation
 
 enum MyListFormatCollectionsSectionBuilder {
     static func makeSections(
-        from items: [MyListCollectionItem]
+        from items: [MyListItemSnapshot]
     ) -> [MyListFormatCollectionSection] {
-        var groupedItems: [String: [MyListCollectionItem]] = [:]
+        var groupedItems: [String: [MyListItemSnapshot]] = [:]
 
         for item in items {
             guard let format = MyListFormatDisplay.displayItem(

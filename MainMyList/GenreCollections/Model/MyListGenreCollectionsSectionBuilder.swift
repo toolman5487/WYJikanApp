@@ -11,9 +11,9 @@ import Foundation
 
 enum MyListGenreCollectionsSectionBuilder {
     static func makeSections(
-        from items: [MyListCollectionItem]
+        from items: [MyListItemSnapshot]
     ) -> [MyListGenreCollectionSection] {
-        var groupedItems: [String: [MyListCollectionItem]] = [:]
+        var groupedItems: [String: [MyListItemSnapshot]] = [:]
 
         for item in items {
             for genreName in item.genreNames {

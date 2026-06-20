@@ -7,7 +7,6 @@
 
 import Foundation
 import OSLog
-import SwiftData
 
 extension AnimeDetailViewModel {
 
@@ -96,8 +95,8 @@ extension AnimeDetailViewModel {
         return "\(title)\n\n\(details)"
     }
 
-    func favoriteItem(for anime: AnimeDetailDTO) -> MyListCollectionItem {
-        MyListCollectionItem(
+    func favoriteDraft(for anime: AnimeDetailDTO) -> MyListItemDraft {
+        MyListItemDraft(
             malId: anime.malId,
             mediaKind: .anime,
             title: displayTitle(for: anime),
@@ -113,7 +112,7 @@ extension AnimeDetailViewModel {
             year: anime.year,
             addedAt: Date(),
             animeWatchStatus: .planned,
-            totalEpisodesSnapshot: anime.episodes
+            totalEpisodes: anime.episodes
         )
     }
 

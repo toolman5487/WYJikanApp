@@ -3,7 +3,6 @@
 //  WYJikanApp
 //
 
-import SwiftData
 import SwiftUI
 
 struct MangaReadingStatusQueryView: View {
@@ -96,10 +95,7 @@ struct MangaReadingStatusQueryView: View {
             )
         } else {
             LazyVStack(spacing: Layout.rowSpacing) {
-                ForEach(
-                    viewModel.presentation.filteredItems,
-                    id: \.persistentModelID
-                ) { item in
+                ForEach(viewModel.presentation.filteredItems) { item in
                     NavigationLink {
                         MangaDetailView(malId: item.malId)
                     } label: {

@@ -22,7 +22,7 @@ struct MangaReadingProgressController {
     // MARK: - Draft
 
     func editorDraft(
-        for item: MyListCollectionItem,
+        for item: MyListItemSnapshot,
         manga: MangaDetailDTO
     ) -> MangaReadingProgressEditorDraft {
         MangaReadingProgressEditorDraft(
@@ -34,7 +34,7 @@ struct MangaReadingProgressController {
     // MARK: - Progress Update
 
     func incrementUpdate(
-        for item: MyListCollectionItem,
+        for item: MyListItemSnapshot,
         manga: MangaDetailDTO
     ) -> MangaReadingProgressUpdate {
         let resolvedTotalChapters = totalChapters(for: manga)
@@ -57,7 +57,7 @@ struct MangaReadingProgressController {
     }
 
     func decrementUpdate(
-        for item: MyListCollectionItem,
+        for item: MyListItemSnapshot,
         manga: MangaDetailDTO
     ) -> MangaReadingProgressUpdate {
         let resolvedTotalChapters = totalChapters(for: manga)

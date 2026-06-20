@@ -11,11 +11,11 @@ struct MangaReadingProgressSectionView: View {
 
     // MARK: - Properties
 
-    let item: MyListCollectionItem
+    let item: MyListItemSnapshot
     let manga: MangaDetailDTO
-    let onIncrement: (MyListCollectionItem) -> Void
-    let onDecrement: (MyListCollectionItem) -> Void
-    let onEdit: (MyListCollectionItem) -> Void
+    let onIncrement: (MyListItemSnapshot) -> Void
+    let onDecrement: (MyListItemSnapshot) -> Void
+    let onEdit: (MyListItemSnapshot) -> Void
 
     // MARK: - Body
 
@@ -46,7 +46,7 @@ struct MangaReadingProgressSectionView: View {
         }
     }
 
-    private func chapterStepperView(for item: MyListCollectionItem) -> some View {
+    private func chapterStepperView(for item: MyListItemSnapshot) -> some View {
         HStack(spacing: 8) {
             Button {
                 onDecrement(item)
@@ -98,11 +98,11 @@ struct MangaReadingProgressSectionView: View {
 
     // MARK: - Private Methods
 
-    private func chapterButtonText(for item: MyListCollectionItem) -> String {
+    private func chapterButtonText(for item: MyListItemSnapshot) -> String {
         item.readingProgressSummary(totalChapters: totalChapters)
     }
 
-    private func isAtLastChapter(_ item: MyListCollectionItem) -> Bool {
+    private func isAtLastChapter(_ item: MyListItemSnapshot) -> Bool {
         guard let totalChapters else { return false }
         return (item.currentChapter ?? 0) >= totalChapters
     }

@@ -18,7 +18,7 @@ struct AnimeWatchProgressController {
     // MARK: - Draft
 
     func editorDraft(
-        for item: MyListCollectionItem,
+        for item: MyListItemSnapshot,
         anime: AnimeDetailDTO
     ) -> AnimeWatchProgressEditorDraft {
         AnimeWatchProgressEditorDraft(
@@ -30,7 +30,7 @@ struct AnimeWatchProgressController {
     // MARK: - Progress Update
 
     func incrementUpdate(
-        for item: MyListCollectionItem,
+        for item: MyListItemSnapshot,
         anime: AnimeDetailDTO
     ) -> AnimeWatchProgressUpdate {
         let resolvedTotalEpisodes = totalEpisodes(for: anime)
@@ -53,7 +53,7 @@ struct AnimeWatchProgressController {
     }
 
     func decrementUpdate(
-        for item: MyListCollectionItem,
+        for item: MyListItemSnapshot,
         anime: AnimeDetailDTO
     ) -> AnimeWatchProgressUpdate {
         let resolvedTotalEpisodes = totalEpisodes(for: anime)

@@ -81,5 +81,5 @@ struct MangaReadingStatusSummary: Sendable {
 
 struct MangaReadingStatusPresentation {
     let summary: MangaReadingStatusSummary
-    let filteredItems: [MyListCollectionItem]
+    let filteredItems: [MyListItemSnapshot]
 }
