@@ -165,13 +165,14 @@ struct EndBounceHintView: View {
 
 private struct EndBounceScrollSample: Equatable {
     let pullProgress: CGFloat
-    let overscroll: CGFloat
 }
 
 // MARK: - EndBounceTriggerModifier
 
 struct EndBounceTriggerModifier: ViewModifier {
     // MARK: - Properties
+
+    private static let progressIncrement: CGFloat = 0.02
 
     let axis: EndBounceAxis
     let isEnabled: Bool
@@ -182,7 +183,6 @@ struct EndBounceTriggerModifier: ViewModifier {
 
     @State private var canTrigger = true
     @State private var feedbackTriggerCount = 0
-    @State private var maximumOverscroll: CGFloat = 0
 
     // MARK: - Body
 
@@ -195,19 +195,15 @@ struct EndBounceTriggerModifier: ViewModifier {
             .onScrollGeometryChange(for: EndBounceScrollSample.self) { geometry in
                 scrollSample(from: geometry)
             } action: { _, sample in
-                DispatchQueue.main.async {
-                    let transaction = Transaction(animation: nil)
-                    withTransaction(transaction) {
-                        handleScrollChange(sample)
-                    }
+                let transaction = Transaction(animation: nil)
+                withTransaction(transaction) {
+                    handleScrollChange(sample)
                 }
             }
             .onChange(of: isEnabled) { _, _ in
-                DispatchQueue.main.async {
-                    let transaction = Transaction(animation: nil)
-                    withTransaction(transaction) {
-                        resetTrigger()
-                    }
+                let transaction = Transaction(animation: nil)
+                withTransaction(transaction) {
+                    resetTrigger()
                 }
             }
     }
@@ -230,8 +226,7 @@ struct EndBounceTriggerModifier: ViewModifier {
             )
 
             return EndBounceScrollSample(
-                pullProgress: pullProgress,
-                overscroll: overscroll
+                pullProgress: quantizedProgress(pullProgress)
             )
 
         case .vertical:
@@ -248,8 +243,7 @@ struct EndBounceTriggerModifier: ViewModifier {
             )
 
             return EndBounceScrollSample(
-                pullProgress: pullProgress,
-                overscroll: overscroll
+                pullProgress: quantizedProgress(pullProgress)
             )
         }
     }
@@ -276,21 +270,28 @@ struct EndBounceTriggerModifier: ViewModifier {
         return min(overscroll / threshold, 1)
     }
 
+    private func quantizedProgress(_ progress: CGFloat) -> CGFloat {
+        let clampedProgress = min(max(progress, 0), 1)
+        guard clampedProgress > 0 else { return 0 }
+        guard clampedProgress < 1 else { return 1 }
+
+        return floor(clampedProgress / Self.progressIncrement) * Self.progressIncrement
+    }
+
     private func handleScrollChange(_ sample: EndBounceScrollSample) {
         guard isEnabled else {
             resetTrigger()
             return
         }
 
-        guard sample.pullProgress > 0 || sample.overscroll > 0 else {
+        guard sample.pullProgress > 0 else {
             resetTrigger()
             return
         }
 
-        progress.wrappedValue = sample.pullProgress
+        updateProgress(sample.pullProgress)
 
         guard canTrigger else { return }
-        maximumOverscroll = max(maximumOverscroll, sample.overscroll)
 
         if sample.pullProgress >= 1 {
             canTrigger = false
@@ -300,9 +301,15 @@ struct EndBounceTriggerModifier: ViewModifier {
     }
 
     private func resetTrigger() {
-        canTrigger = true
-        maximumOverscroll = 0
-        progress.wrappedValue = 0
+        if !canTrigger {
+            canTrigger = true
+        }
+        updateProgress(0)
+    }
+
+    private func updateProgress(_ newProgress: CGFloat) {
+        guard progress.wrappedValue != newProgress else { return }
+        progress.wrappedValue = newProgress
     }
 }
 
