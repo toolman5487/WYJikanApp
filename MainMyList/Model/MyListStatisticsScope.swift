@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum MyListStatisticsScope: String, CaseIterable, Identifiable {
+nonisolated enum MyListStatisticsScope: String, CaseIterable, Identifiable, Sendable {
     case all
     case anime
     case manga

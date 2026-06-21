@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct MyListGenreSlice: Identifiable {
+nonisolated struct MyListGenreSlice: Identifiable, Sendable {
     let genreName: String
     let count: Int
 

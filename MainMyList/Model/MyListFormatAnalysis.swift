@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct MyListFormatAnalysis {
+nonisolated struct MyListFormatAnalysis: Sendable {
     let scope: MyListStatisticsScope
     let itemCount: Int
     let formatSlices: [MyListFormatSlice]

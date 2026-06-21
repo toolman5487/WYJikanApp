@@ -7,7 +7,7 @@ import Foundation
 
 // MARK: - AnimeWatchStatusFilter
 
-enum AnimeWatchStatusFilter: Hashable, Identifiable, Sendable {
+nonisolated enum AnimeWatchStatusFilter: Hashable, Identifiable, Sendable {
     case all
     case status(AnimeWatchStatus)
 
@@ -50,7 +50,7 @@ enum AnimeWatchStatusFilter: Hashable, Identifiable, Sendable {
 
 // MARK: - AnimeWatchStatusCount
 
-struct AnimeWatchStatusCount: Identifiable, Sendable {
+nonisolated struct AnimeWatchStatusCount: Identifiable, Sendable {
     let filter: AnimeWatchStatusFilter
     let count: Int
 
@@ -59,7 +59,7 @@ struct AnimeWatchStatusCount: Identifiable, Sendable {
 
 // MARK: - AnimeWatchStatusSummary
 
-struct AnimeWatchStatusSummary: Sendable {
+nonisolated struct AnimeWatchStatusSummary: Sendable {
     let totalCount: Int
     let watchingCount: Int
     let plannedCount: Int
@@ -79,7 +79,7 @@ struct AnimeWatchStatusSummary: Sendable {
 
 // MARK: - AnimeWatchStatusPresentation
 
-struct AnimeWatchStatusPresentation {
+nonisolated struct AnimeWatchStatusPresentation: Sendable {
     let summary: AnimeWatchStatusSummary
     let filteredItems: [MyListItemSnapshot]
 }

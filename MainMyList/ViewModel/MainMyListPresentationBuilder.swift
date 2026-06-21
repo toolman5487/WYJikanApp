@@ -5,7 +5,7 @@
 
 import Foundation
 
-struct MainMyListPresentationBuilder {
+nonisolated struct MainMyListPresentationBuilder: Sendable {
 
     // MARK: - Dependencies
 

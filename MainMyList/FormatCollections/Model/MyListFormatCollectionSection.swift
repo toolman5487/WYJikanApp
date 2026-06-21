@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct MyListFormatCollectionSection: Identifiable {
+nonisolated struct MyListFormatCollectionSection: Identifiable, Sendable {
     let title: String
     let iconName: String
     let items: [MyListItemSnapshot]

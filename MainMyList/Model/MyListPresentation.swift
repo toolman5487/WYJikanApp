@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct MyListPresentation {
+nonisolated struct MyListPresentation: Sendable {
     let filteredItems: [MyListItemSnapshot]
     let genreSections: [MyListGenreCollectionSection]
     let formatSections: [MyListFormatCollectionSection]

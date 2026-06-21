@@ -7,7 +7,7 @@ import Foundation
 
 // MARK: - MyListStatisticsBuildResult
 
-struct MyListStatisticsBuildResult {
+nonisolated struct MyListStatisticsBuildResult: Sendable {
     let statistics: MyListStatistics
     let filteredItems: [MyListItemSnapshot]
     let animeCount: Int
@@ -19,7 +19,7 @@ struct MyListStatisticsBuildResult {
 
 // MARK: - MyListStatisticsBuilder
 
-struct MyListStatisticsBuilder {
+nonisolated struct MyListStatisticsBuilder: Sendable {
 
     // MARK: - Build
 

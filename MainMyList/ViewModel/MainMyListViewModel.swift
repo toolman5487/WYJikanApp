@@ -7,7 +7,6 @@
 
 import Combine
 import Foundation
-import OSLog
 
 @MainActor
 final class MainMyListViewModel: ObservableObject {
@@ -15,6 +14,7 @@ final class MainMyListViewModel: ObservableObject {
     // MARK: - Published State
 
     @Published private(set) var presentation: MyListPresentation
+    @Published private(set) var persistenceMutationState: PersistenceMutationState = .idle
     @Published var selectedFilter: MyListFilter = .all {
         didSet {
             guard selectedFilter != oldValue else { return }
@@ -26,8 +26,11 @@ final class MainMyListViewModel: ObservableObject {
 
     private let favoriteRepository: any FavoriteRepository
     private let presentationBuilder: MainMyListPresentationBuilder
+    private let persistenceMutationController = PersistenceMutationController()
     private var cachedItems: [MyListItemSnapshot] = []
     private var myListCancellable: AnyCancellable?
+    private var presentationTask: Task<Void, Never>?
+    private var presentationGeneration = 0
 
     // MARK: - Lifecycle
 
@@ -41,17 +44,30 @@ final class MainMyListViewModel: ObservableObject {
         connectToRepository()
     }
 
+    isolated deinit {
+        presentationTask?.cancel()
+    }
+
     // MARK: - Actions
 
     func remove(_ item: MyListItemSnapshot) {
-        do {
+        guard !persistenceMutationState.isProcessing else { return }
+        persistenceMutationState = .processing
+
+        persistenceMutationState = persistenceMutationController.perform(
+            failureMessage: "無法移除收藏，請稍後再試。",
+            logPrefix: "MyList delete failed"
+        ) {
             try favoriteRepository.remove(
                 malId: item.malId,
                 mediaKind: item.mediaKind
             )
-        } catch {
-            AppLogger.persistence.error("MyList delete failed: \(error.localizedDescription, privacy: .public)")
         }
+    }
+
+    func dismissPersistenceMutationFailure() {
+        guard case .failed = persistenceMutationState else { return }
+        persistenceMutationState = .idle
     }
 
     // MARK: - Empty State
@@ -94,9 +110,30 @@ final class MainMyListViewModel: ObservableObject {
     // MARK: - Presentation
 
     private func rebuildPresentationFromCachedItems() {
-        presentation = presentationBuilder.makePresentation(
-            from: cachedItems,
-            selectedFilter: selectedFilter
-        )
+        presentationTask?.cancel()
+        presentationGeneration += 1
+
+        let generation = presentationGeneration
+        let items = cachedItems
+        let filter = selectedFilter
+        let builder = presentationBuilder
+        let computation = Task.detached(priority: .utility) {
+            builder.makePresentation(
+                from: items,
+                selectedFilter: filter
+            )
+        }
+
+        presentationTask = Task(priority: .utility) { [weak self] in
+            let updatedPresentation = await withTaskCancellationHandler {
+                await computation.value
+            } onCancel: {
+                computation.cancel()
+            }
+
+            guard !Task.isCancelled, let self else { return }
+            guard presentationGeneration == generation else { return }
+            presentation = updatedPresentation
+        }
     }
 }

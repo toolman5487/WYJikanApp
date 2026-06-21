@@ -7,7 +7,7 @@
 
 import Combine
 import Foundation
-import OSLog
+
 @MainActor
 final class MangaDetailViewModel: ObservableObject {
 
@@ -32,6 +32,7 @@ final class MangaDetailViewModel: ObservableObject {
     @Published private(set) var picturesFailure: FeatureLoadFailure?
     @Published private(set) var recommendationsFailure: FeatureLoadFailure?
     @Published private(set) var favoriteCollectionItem: MyListItemSnapshot?
+    @Published private(set) var persistenceMutationState: PersistenceMutationState = .idle
     let synopsisTranslationViewModel: SynopsisTranslationViewModel
 
     // MARK: - Dependencies
@@ -40,6 +41,8 @@ final class MangaDetailViewModel: ObservableObject {
     private let service: MangaDetailServicing
     private let favoriteRepository: any FavoriteRepository
     private let readingProgressController: MangaReadingProgressController
+    private let persistenceMutationController = PersistenceMutationController()
+    private let supplementaryLoadingController = DetailSupplementaryLoadingController()
     private var myListCancellable: AnyCancellable?
 
     // MARK: - Lifecycle
@@ -150,63 +153,43 @@ final class MangaDetailViewModel: ObservableObject {
     // MARK: - Supplementary Content
 
     private func loadPictures(resetOnFailure: Bool) async {
-        isLoadingPictures = true
-        if resetOnFailure {
-            picturesFailure = nil
-        }
-        defer { isLoadingPictures = false }
-
-        do {
-            let resolvedPictures = try await service.fetchMangaPictures(malId: malId)
-            pictureItems = MangaDetailPictureMapping.items(from: resolvedPictures)
-            picturesFailure = nil
-        } catch is CancellationError {
-        } catch {
-            picturesFailure = FeatureLoadFailure(error)
-            if resetOnFailure {
-                pictureItems = []
-            }
-        }
+        await supplementaryLoadingController.load(
+            resetOnFailure: resetOnFailure,
+            setLoading: { isLoadingPictures = $0 },
+            setFailure: { picturesFailure = $0 },
+            fetch: {
+                let response = try await service.fetchMangaPictures(malId: malId)
+                return MangaDetailPictureMapping.items(from: response)
+            },
+            applyValue: { pictureItems = $0 },
+            resetValue: { pictureItems = [] }
+        )
     }
 
     private func loadCharacters(resetOnFailure: Bool) async {
-        isLoadingCharacters = true
-        if resetOnFailure {
-            charactersFailure = nil
-        }
-        defer { isLoadingCharacters = false }
-
-        do {
-            let resolvedCharacters = try await service.fetchMangaCharacters(malId: malId)
-            characterRoles = resolvedCharacters.data
-            charactersFailure = nil
-        } catch is CancellationError {
-        } catch {
-            charactersFailure = FeatureLoadFailure(error)
-            if resetOnFailure {
-                characterRoles = []
-            }
-        }
+        await supplementaryLoadingController.load(
+            resetOnFailure: resetOnFailure,
+            setLoading: { isLoadingCharacters = $0 },
+            setFailure: { charactersFailure = $0 },
+            fetch: {
+                try await service.fetchMangaCharacters(malId: malId).data
+            },
+            applyValue: { characterRoles = $0 },
+            resetValue: { characterRoles = [] }
+        )
     }
 
     private func loadRecommendations(resetOnFailure: Bool) async {
-        isLoadingRecommendations = true
-        if resetOnFailure {
-            recommendationsFailure = nil
-        }
-        defer { isLoadingRecommendations = false }
-
-        do {
-            let resolvedRecommendations = try await service.fetchMangaRecommendations(malId: malId)
-            recommendationItems = resolvedRecommendations.data
-            recommendationsFailure = nil
-        } catch is CancellationError {
-        } catch {
-            recommendationsFailure = FeatureLoadFailure(error)
-            if resetOnFailure {
-                recommendationItems = []
-            }
-        }
+        await supplementaryLoadingController.load(
+            resetOnFailure: resetOnFailure,
+            setLoading: { isLoadingRecommendations = $0 },
+            setFailure: { recommendationsFailure = $0 },
+            fetch: {
+                try await service.fetchMangaRecommendations(malId: malId).data
+            },
+            applyValue: { recommendationItems = $0 },
+            resetValue: { recommendationItems = [] }
+        )
     }
 
     private func resetSupplementaryContent() {
@@ -238,7 +221,10 @@ final class MangaDetailViewModel: ObservableObject {
     }
 
     func toggleFavorite(isFavorite: Bool) {
-        do {
+        performPersistenceMutation(
+            failureMessage: "無法更新收藏，請稍後再試。",
+            logPrefix: "Manga favorite update failed"
+        ) {
             if isFavorite {
                 _ = try favoriteRepository.toggleFavorite(
                     malId: malId,
@@ -252,8 +238,6 @@ final class MangaDetailViewModel: ObservableObject {
                     draft: favoriteDraft(for: detail)
                 )
             }
-        } catch {
-            AppLogger.persistence.error("Manga favorite update failed: \(error.localizedDescription, privacy: .public)")
         }
     }
 
@@ -263,16 +247,36 @@ final class MangaDetailViewModel: ObservableObject {
         currentChapter: Int?,
         totalChapters: Int?
     ) {
-        do {
+        performPersistenceMutation(
+            failureMessage: "無法更新閱讀進度，請稍後再試。",
+            logPrefix: "Manga reading progress update failed"
+        ) {
             try favoriteRepository.updateMangaReadingProgress(
                 malId: item.malId,
                 status: status,
                 currentChapter: currentChapter,
                 totalChapters: totalChapters
             )
-        } catch {
-            AppLogger.persistence.error("Manga reading progress update failed: \(error.localizedDescription, privacy: .public)")
         }
+    }
+
+    func dismissPersistenceMutationFailure() {
+        guard case .failed = persistenceMutationState else { return }
+        persistenceMutationState = .idle
+    }
+
+    private func performPersistenceMutation(
+        failureMessage: String,
+        logPrefix: String,
+        operation: () throws -> Void
+    ) {
+        guard !persistenceMutationState.isProcessing else { return }
+        persistenceMutationState = .processing
+        persistenceMutationState = persistenceMutationController.perform(
+            failureMessage: failureMessage,
+            logPrefix: logPrefix,
+            operation: operation
+        )
     }
 
     func readingProgressEditorDraft(

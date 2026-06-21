@@ -8,6 +8,7 @@
 import Combine
 import Foundation
 import OSLog
+
 @MainActor
 final class AnimeDetailViewModel: ObservableObject {
     enum ScreenState {
@@ -29,6 +30,7 @@ final class AnimeDetailViewModel: ObservableObject {
     @Published private(set) var picturesFailure: FeatureLoadFailure?
     @Published private(set) var recommendationsFailure: FeatureLoadFailure?
     @Published private(set) var favoriteCollectionItem: MyListItemSnapshot?
+    @Published private(set) var persistenceMutationState: PersistenceMutationState = .idle
     let synopsisTranslationViewModel: SynopsisTranslationViewModel
 
     private let malId: Int
@@ -36,6 +38,8 @@ final class AnimeDetailViewModel: ObservableObject {
     private let favoriteRepository: any FavoriteRepository
     private let broadcastReminderRepository: any AnimeBroadcastReminderRepository
     private let watchProgressController: AnimeWatchProgressController
+    private let persistenceMutationController = PersistenceMutationController()
+    private let supplementaryLoadingController = DetailSupplementaryLoadingController()
     private var myListCancellable: AnyCancellable?
 
     init(
@@ -142,63 +146,43 @@ final class AnimeDetailViewModel: ObservableObject {
     }
 
     private func loadPictures(resetOnFailure: Bool) async {
-        isLoadingPictures = true
-        if resetOnFailure {
-            picturesFailure = nil
-        }
-        defer { isLoadingPictures = false }
-
-        do {
-            let resolvedPictures = try await service.fetchAnimePictures(malId: malId)
-            pictureItems = AnimeDetailPictureMapping.items(from: resolvedPictures)
-            picturesFailure = nil
-        } catch is CancellationError {
-        } catch {
-            picturesFailure = FeatureLoadFailure(error)
-            if resetOnFailure {
-                pictureItems = []
-            }
-        }
+        await supplementaryLoadingController.load(
+            resetOnFailure: resetOnFailure,
+            setLoading: { isLoadingPictures = $0 },
+            setFailure: { picturesFailure = $0 },
+            fetch: {
+                let response = try await service.fetchAnimePictures(malId: malId)
+                return AnimeDetailPictureMapping.items(from: response)
+            },
+            applyValue: { pictureItems = $0 },
+            resetValue: { pictureItems = [] }
+        )
     }
 
     private func loadCharacters(resetOnFailure: Bool) async {
-        isLoadingCharacters = true
-        if resetOnFailure {
-            charactersFailure = nil
-        }
-        defer { isLoadingCharacters = false }
-
-        do {
-            let resolvedCharacters = try await service.fetchAnimeCharacters(malId: malId)
-            characterRoles = resolvedCharacters.data
-            charactersFailure = nil
-        } catch is CancellationError {
-        } catch {
-            charactersFailure = FeatureLoadFailure(error)
-            if resetOnFailure {
-                characterRoles = []
-            }
-        }
+        await supplementaryLoadingController.load(
+            resetOnFailure: resetOnFailure,
+            setLoading: { isLoadingCharacters = $0 },
+            setFailure: { charactersFailure = $0 },
+            fetch: {
+                try await service.fetchAnimeCharacters(malId: malId).data
+            },
+            applyValue: { characterRoles = $0 },
+            resetValue: { characterRoles = [] }
+        )
     }
 
     private func loadRecommendations(resetOnFailure: Bool) async {
-        isLoadingRecommendations = true
-        if resetOnFailure {
-            recommendationsFailure = nil
-        }
-        defer { isLoadingRecommendations = false }
-
-        do {
-            let resolvedRecommendations = try await service.fetchAnimeRecommendations(malId: malId)
-            recommendationItems = resolvedRecommendations.data
-            recommendationsFailure = nil
-        } catch is CancellationError {
-        } catch {
-            recommendationsFailure = FeatureLoadFailure(error)
-            if resetOnFailure {
-                recommendationItems = []
-            }
-        }
+        await supplementaryLoadingController.load(
+            resetOnFailure: resetOnFailure,
+            setLoading: { isLoadingRecommendations = $0 },
+            setFailure: { recommendationsFailure = $0 },
+            fetch: {
+                try await service.fetchAnimeRecommendations(malId: malId).data
+            },
+            applyValue: { recommendationItems = $0 },
+            resetValue: { recommendationItems = [] }
+        )
     }
 
     private func resetSupplementaryContent() {
@@ -230,7 +214,10 @@ final class AnimeDetailViewModel: ObservableObject {
     }
 
     func toggleFavorite(isFavorite: Bool) {
-        do {
+        performPersistenceMutation(
+            failureMessage: "無法更新收藏，請稍後再試。",
+            logPrefix: "Anime favorite update failed"
+        ) {
             if isFavorite {
                 _ = try favoriteRepository.toggleFavorite(
                     malId: malId,
@@ -244,8 +231,6 @@ final class AnimeDetailViewModel: ObservableObject {
                     draft: favoriteDraft(for: detail)
                 )
             }
-        } catch {
-            AppLogger.persistence.error("Anime favorite update failed: \(error.localizedDescription, privacy: .public)")
         }
     }
 
@@ -255,16 +240,36 @@ final class AnimeDetailViewModel: ObservableObject {
         currentEpisode: Int?,
         totalEpisodes: Int?
     ) {
-        do {
+        performPersistenceMutation(
+            failureMessage: "無法更新觀看進度，請稍後再試。",
+            logPrefix: "Anime watch progress update failed"
+        ) {
             try favoriteRepository.updateAnimeWatchProgress(
                 malId: item.malId,
                 status: status,
                 currentEpisode: currentEpisode,
                 totalEpisodes: totalEpisodes
             )
-        } catch {
-            AppLogger.persistence.error("Anime watch progress update failed: \(error.localizedDescription, privacy: .public)")
         }
+    }
+
+    func dismissPersistenceMutationFailure() {
+        guard case .failed = persistenceMutationState else { return }
+        persistenceMutationState = .idle
+    }
+
+    private func performPersistenceMutation(
+        failureMessage: String,
+        logPrefix: String,
+        operation: () throws -> Void
+    ) {
+        guard !persistenceMutationState.isProcessing else { return }
+        persistenceMutationState = .processing
+        persistenceMutationState = persistenceMutationController.perform(
+            failureMessage: failureMessage,
+            logPrefix: logPrefix,
+            operation: operation
+        )
     }
 
     func watchProgressEditorDraft(

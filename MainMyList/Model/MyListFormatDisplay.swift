@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum MyListFormatDisplay {
+nonisolated enum MyListFormatDisplay {
     static func displayItem(
         type: String?,
         mediaKind: MyListMediaKind

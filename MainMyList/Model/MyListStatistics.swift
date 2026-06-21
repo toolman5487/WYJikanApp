@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct MyListStatistics {
+nonisolated struct MyListStatistics: Sendable {
     let totalCount: Int
     let animeCount: Int
     let mangaCount: Int

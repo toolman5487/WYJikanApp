@@ -130,21 +130,23 @@ private struct MangaDetailBodyView: View {
             )
         }
         .alert(
-            "收藏功能",
+            "收藏與進度",
             isPresented: Binding(
-                get: { persistenceAlertMessage != nil },
+                get: { persistenceAlertText != nil },
                 set: { isPresented in
                     if !isPresented {
                         persistenceAlertMessage = nil
+                        viewModel.dismissPersistenceMutationFailure()
                     }
                 }
             )
         ) {
             Button("好", role: .cancel) {
                 persistenceAlertMessage = nil
+                viewModel.dismissPersistenceMutationFailure()
             }
         } message: {
-            Text(persistenceAlertMessage ?? "")
+            Text(persistenceAlertText ?? "")
         }
         .fullScreenCover(item: $imagePreviewSession) { session in
             ImagePreviewViewer(
@@ -176,6 +178,9 @@ private struct MangaDetailBodyView: View {
 
     private var favoriteActionState: DetailNavigationToolbarPersistenceActionState {
         guard viewModel.isFavoriteActionEnabled else { return .loading }
+        if viewModel.persistenceMutationState.isProcessing {
+            return .loading
+        }
 
         switch appPersistenceStore.state {
         case .initializing:
@@ -196,6 +201,10 @@ private struct MangaDetailBodyView: View {
         }
     }
 
+    private var persistenceAlertText: String? {
+        persistenceAlertMessage ?? viewModel.persistenceMutationState.failureMessage
+    }
+
     private func detailScroll<Content: View>(@ViewBuilder content: () -> Content) -> some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 20) {
@@ -214,6 +223,8 @@ private struct MangaDetailBodyView: View {
     }
 
     private func handleFavoriteTap() {
+        guard !viewModel.persistenceMutationState.isProcessing else { return }
+
         switch appPersistenceStore.state {
         case .initializing:
             return
@@ -257,6 +268,7 @@ private struct MangaDetailBodyView: View {
                             )
                         }
                     )
+                    .disabled(viewModel.persistenceMutationState.isProcessing)
                 }
             }
         case .highlights:

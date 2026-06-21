@@ -160,19 +160,21 @@ private struct AnimeDetailBodyView: View {
         .alert(
             "收藏與提醒",
             isPresented: Binding(
-                get: { persistenceAlertMessage != nil },
+                get: { persistenceAlertText != nil },
                 set: { isPresented in
                     if !isPresented {
                         persistenceAlertMessage = nil
+                        viewModel.dismissPersistenceMutationFailure()
                     }
                 }
             )
         ) {
             Button("好", role: .cancel) {
                 persistenceAlertMessage = nil
+                viewModel.dismissPersistenceMutationFailure()
             }
         } message: {
-            Text(persistenceAlertMessage ?? "")
+            Text(persistenceAlertText ?? "")
         }
         .fullScreenCover(item: $imagePreviewSession) { session in
             ImagePreviewViewer(
@@ -212,6 +214,10 @@ private struct AnimeDetailBodyView: View {
     }
 
     private var persistenceActionState: DetailNavigationToolbarPersistenceActionState {
+        if viewModel.persistenceMutationState.isProcessing {
+            return .loading
+        }
+
         switch appPersistenceStore.state {
         case .initializing:
             return .loading
@@ -224,6 +230,10 @@ private struct AnimeDetailBodyView: View {
 
     private var broadcastReminderSyncTrigger: String {
         "\(malId)-\(appPersistenceStore.isReady)-\(currentAnime != nil)"
+    }
+
+    private var persistenceAlertText: String? {
+        persistenceAlertMessage ?? viewModel.persistenceMutationState.failureMessage
     }
 
     private var navigationToolbarConfiguration: DetailNavigationToolbarConfiguration {
@@ -292,6 +302,7 @@ private struct AnimeDetailBodyView: View {
                             )
                         }
                     )
+                    .disabled(viewModel.persistenceMutationState.isProcessing)
                 }
             }
         case .highlights:
@@ -400,6 +411,8 @@ private struct AnimeDetailBodyView: View {
     }
 
     private func canPerformPersistenceAction() -> Bool {
+        guard !viewModel.persistenceMutationState.isProcessing else { return false }
+
         switch appPersistenceStore.state {
         case .initializing:
             return false

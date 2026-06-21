@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct MyListGenreAnalysis: Identifiable {
+nonisolated struct MyListGenreAnalysis: Identifiable, Sendable {
     let scope: MyListStatisticsScope
     let itemCount: Int
     let genreSlices: [MyListGenreSlice]

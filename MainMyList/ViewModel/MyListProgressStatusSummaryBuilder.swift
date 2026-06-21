@@ -5,7 +5,7 @@
 
 import Foundation
 
-struct MyListProgressStatusSummaryBuilder {
+nonisolated struct MyListProgressStatusSummaryBuilder: Sendable {
 
     // MARK: - Anime
 

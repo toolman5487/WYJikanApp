@@ -120,7 +120,7 @@ private struct HomeRecommendedAnimeCardView: View {
                 }
                 .overlay(alignment: .bottomLeading) {
                     PosterCardMetadataOverlayView(
-                        title: "",
+                        title: item.recommendedTitle,
                         type: item.username.map { "@\($0)" },
                         score: nil
                     )

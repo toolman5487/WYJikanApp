@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct MyListGenreCollectionSection: Identifiable {
+nonisolated struct MyListGenreCollectionSection: Identifiable, Sendable {
     let genreName: String
     let items: [MyListItemSnapshot]
 

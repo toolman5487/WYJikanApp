@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct MyListFormatSlice: Identifiable {
+nonisolated struct MyListFormatSlice: Identifiable, Sendable {
     let title: String
     let iconName: String
     let count: Int

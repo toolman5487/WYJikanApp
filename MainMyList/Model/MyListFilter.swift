@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum MyListFilter: String, CaseIterable, Identifiable {
+nonisolated enum MyListFilter: String, CaseIterable, Identifiable, Sendable {
     case all
     case anime
     case manga

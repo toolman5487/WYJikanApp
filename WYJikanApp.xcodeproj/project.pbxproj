@@ -308,6 +308,7 @@
 		16E7000F2FE100000000000E /* LoadMoreErrorFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E7000E2FE100000000000E /* LoadMoreErrorFooterView.swift */; };
 		16E700112FE1000000000011 /* JikanImageURLResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E700102FE1000000000010 /* JikanImageURLResolver.swift */; };
 		16E700132FE1000000000013 /* DetailSupplementarySectionErrorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E700122FE1000000000012 /* DetailSupplementarySectionErrorView.swift */; };
+		16E700152FE1000000000015 /* DetailStateControllers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16E700142FE1000000000014 /* DetailStateControllers.swift */; };
 		16F100042FAB300000000004 /* HomeRecommendedAnimeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F100032FAB300000000003 /* HomeRecommendedAnimeModel.swift */; };
 		16F100052FAB300000000005 /* HomeRecommendedAnimeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F100022FAB300000000002 /* HomeRecommendedAnimeViewModel.swift */; };
 		16F100062FAB300000000006 /* HomeRecommendedAnimeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F100012FAB300000000001 /* HomeRecommendedAnimeView.swift */; };
@@ -705,6 +706,7 @@
 		16E7000E2FE100000000000E /* LoadMoreErrorFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadMoreErrorFooterView.swift; sourceTree = "<group>"; };
 		16E700102FE1000000000010 /* JikanImageURLResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JikanImageURLResolver.swift; sourceTree = "<group>"; };
 		16E700122FE1000000000012 /* DetailSupplementarySectionErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailSupplementarySectionErrorView.swift; sourceTree = "<group>"; };
+		16E700142FE1000000000014 /* DetailStateControllers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailStateControllers.swift; sourceTree = "<group>"; };
 		16F100012FAB300000000001 /* HomeRecommendedAnimeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeRecommendedAnimeView.swift; sourceTree = "<group>"; };
 		16F100022FAB300000000002 /* HomeRecommendedAnimeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeRecommendedAnimeViewModel.swift; sourceTree = "<group>"; };
 		16F100032FAB300000000003 /* HomeRecommendedAnimeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeRecommendedAnimeModel.swift; sourceTree = "<group>"; };
@@ -1958,6 +1960,7 @@
 				15B3C76D2FDA91E10021D375 /* DetailCopySuccessIndicator.swift */,
 				15B3C7792FDA91E10021D377 /* DetailNavigationToolbar.swift */,
 				15B3C4662FDBECD40021D375 /* DetailPosterGridListLayout.swift */,
+				16E700142FE1000000000014 /* DetailStateControllers.swift */,
 				16E700122FE1000000000012 /* DetailSupplementarySectionErrorView.swift */,
 				15B3C77A2FDA91E10021D377 /* DetailToolbarPresentation.swift */,
 				15B3C7642FDA85530021D375 /* DetailRecommendationPresentation.swift */,
@@ -3464,6 +3467,7 @@
 				16E7000D2FE100000000000C /* FeatureEmptyStateCardView.swift in Sources */,
 				16E7000F2FE100000000000E /* LoadMoreErrorFooterView.swift in Sources */,
 				16E700132FE1000000000013 /* DetailSupplementarySectionErrorView.swift in Sources */,
+				16E700152FE1000000000015 /* DetailStateControllers.swift in Sources */,
 				16E700112FE1000000000011 /* JikanImageURLResolver.swift in Sources */,
 				159667F42F8659AD0033410A /* PosterTextGradientOverlayView.swift in Sources */,
 				159667F52F8659AD0033410A /* RemotePosterImageView.swift in Sources */,

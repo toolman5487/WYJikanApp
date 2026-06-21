@@ -92,6 +92,23 @@ struct MainMyListView: View {
             .navigationDestination(isPresented: $isShowingMangaReadingStatusQuery) {
                 MangaReadingStatusQueryView(dependencies: dependencies)
             }
+            .alert(
+                "收藏功能",
+                isPresented: Binding(
+                    get: { viewModel.persistenceMutationState.failureMessage != nil },
+                    set: { isPresented in
+                        if !isPresented {
+                            viewModel.dismissPersistenceMutationFailure()
+                        }
+                    }
+                )
+            ) {
+                Button("好", role: .cancel) {
+                    viewModel.dismissPersistenceMutationFailure()
+                }
+            } message: {
+                Text(viewModel.persistenceMutationState.failureMessage ?? "")
+            }
         }
     }
 
@@ -261,6 +278,7 @@ struct MainMyListView: View {
                         } label: {
                             Label("移除收藏", systemImage: "heart.slash")
                         }
+                        .disabled(viewModel.persistenceMutationState.isProcessing)
                     }
                 }
             }

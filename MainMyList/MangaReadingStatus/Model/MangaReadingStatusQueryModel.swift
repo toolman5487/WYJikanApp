@@ -7,7 +7,7 @@ import Foundation
 
 // MARK: - MangaReadingStatusFilter
 
-enum MangaReadingStatusFilter: Hashable, Identifiable, Sendable {
+nonisolated enum MangaReadingStatusFilter: Hashable, Identifiable, Sendable {
     case all
     case status(MangaReadingStatus)
 
@@ -50,7 +50,7 @@ enum MangaReadingStatusFilter: Hashable, Identifiable, Sendable {
 
 // MARK: - MangaReadingStatusCount
 
-struct MangaReadingStatusCount: Identifiable, Sendable {
+nonisolated struct MangaReadingStatusCount: Identifiable, Sendable {
     let filter: MangaReadingStatusFilter
     let count: Int
 
@@ -59,7 +59,7 @@ struct MangaReadingStatusCount: Identifiable, Sendable {
 
 // MARK: - MangaReadingStatusSummary
 
-struct MangaReadingStatusSummary: Sendable {
+nonisolated struct MangaReadingStatusSummary: Sendable {
     let totalCount: Int
     let readingCount: Int
     let plannedCount: Int
@@ -79,7 +79,7 @@ struct MangaReadingStatusSummary: Sendable {
 
 // MARK: - MangaReadingStatusPresentation
 
-struct MangaReadingStatusPresentation {
+nonisolated struct MangaReadingStatusPresentation: Sendable {
     let summary: MangaReadingStatusSummary
     let filteredItems: [MyListItemSnapshot]
 }

@@ -48,7 +48,7 @@ struct GenreMangaListContainerView: View {
                 LazyVStack(alignment: .leading, spacing: 0, pinnedViews: [.sectionHeaders]) {
                     if let failure = inlineError {
                         LoadMoreErrorFooterView(failure: failure) {
-                            viewModel.loadMoreSections()
+                            viewModel.retryLoading()
                         }
                         .padding(.horizontal, 8)
                         .padding(.bottom, 8)

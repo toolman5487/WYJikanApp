@@ -31,8 +31,6 @@ final class GenreAnimeViewModel: ObservableObject {
 
     // MARK: - Constants
 
-    private static let maxRetryCount = 2
-    private static let retryBackoff: Duration = .milliseconds(800)
     private static let genreErrorMessage = "目前無法載入分類資料，請稍後再試"
 
     // MARK: - Published State
@@ -123,6 +121,15 @@ final class GenreAnimeViewModel: ObservableObject {
         }
         guard canLoadMore else { return }
         runLoadTask { await $0.startGenreBatch(.loadMore) }
+    }
+
+    func retryLoading() {
+        guard batchLoader.hasPendingBatch else {
+            loadSections()
+            return
+        }
+
+        runLoadTask { await $0.continuePendingGenreBatch() }
     }
 
     func stop() {
@@ -246,7 +253,7 @@ private extension GenreAnimeViewModel {
             onPhaseChange: applyBatchPhase,
             fetchItems: { [weak self] genre in
                 guard let self else { return [] }
-                return await self.fetchGenreItemsWithRetry(genreId: genre.id)
+                return try await self.fetchGenreItems(genreId: genre.id)
             },
             didLoadGenreItems: { [weak self] genre, items in
                 self?.updateGenreSection(genreId: genre.id, items: items)
@@ -261,7 +268,7 @@ private extension GenreAnimeViewModel {
             onPhaseChange: applyBatchPhase,
             fetchItems: { [weak self] genre in
                 guard let self else { return [] }
-                return await self.fetchGenreItemsWithRetry(genreId: genre.id)
+                return try await self.fetchGenreItems(genreId: genre.id)
             },
             didLoadGenreItems: { [weak self] genre, items in
                 self?.updateGenreSection(genreId: genre.id, items: items)
@@ -287,6 +294,8 @@ private extension GenreAnimeViewModel {
         case .empty:
             canLoadMore = false
             loadState = genreSections.isEmpty ? .error(FeatureLoadFailure(message: Self.genreErrorMessage)) : .loaded
+        case .failed(let failure):
+            loadState = .error(failure)
         case .cancelled:
             break
         }
@@ -348,22 +357,11 @@ private extension GenreAnimeViewModel {
 // MARK: - Item Fetching
 
 private extension GenreAnimeViewModel {
-    func fetchGenreItemsWithRetry(genreId: Int) async -> [AnimeListRandomDTO] {
-        var attempt = 0
-        while attempt <= Self.maxRetryCount {
-            guard !Task.isCancelled else { return [] }
-            do {
-                let response = try await service.fetchAnimeByGenre(
-                    genreId: genreId,
-                    limit: itemRequestLimit
-                )
-                return response.data
-            } catch {
-                attempt += 1
-                guard attempt <= Self.maxRetryCount else { return [] }
-                try? await Task.sleep(for: Self.retryBackoff * attempt)
-            }
-        }
-        return []
+    func fetchGenreItems(genreId: Int) async throws -> [AnimeListRandomDTO] {
+        let response = try await service.fetchAnimeByGenre(
+            genreId: genreId,
+            limit: itemRequestLimit
+        )
+        return response.data
     }
 }

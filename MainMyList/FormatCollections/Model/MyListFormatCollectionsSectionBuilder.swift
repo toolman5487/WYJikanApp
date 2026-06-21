@@ -9,7 +9,7 @@ import Foundation
 
 // MARK: - MyListFormatCollectionsSectionBuilder
 
-enum MyListFormatCollectionsSectionBuilder {
+nonisolated enum MyListFormatCollectionsSectionBuilder {
     static func makeSections(
         from items: [MyListItemSnapshot]
     ) -> [MyListFormatCollectionSection] {

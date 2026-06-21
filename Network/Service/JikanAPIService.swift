@@ -75,6 +75,7 @@ nonisolated enum JikanCacheDuration {
     static let search: TimeInterval = 45
     static let paging: TimeInterval = 120
     static let feed: TimeInterval = 300
+    static let genreItems: TimeInterval = 300
     static let detail: TimeInterval = 600
     static let genreList: TimeInterval = 86_400
 }
@@ -314,9 +315,17 @@ private actor JikanAPITransientFailureBackoffStore {
     }
 
     private var storage: [String: Entry] = [:]
+    private var globalRateLimitEntry: Entry?
     private var nextCleanupDate = Date.distantPast
 
     func statusCode(for key: String, now: Date = Date()) -> Int? {
+        if let globalRateLimitEntry {
+            guard globalRateLimitEntry.expirationDate <= now else {
+                return globalRateLimitEntry.statusCode
+            }
+            self.globalRateLimitEntry = nil
+        }
+
         switch storage[key] {
         case .some(let entry) where entry.expirationDate > now:
             return entry.statusCode
@@ -337,10 +346,16 @@ private actor JikanAPITransientFailureBackoffStore {
     ) {
         removeExpiredEntriesIfNeeded(now: now, cleanupInterval: cleanupInterval)
 
-        storage[key] = Entry(
+        let entry = Entry(
             statusCode: statusCode,
             expirationDate: now.addingTimeInterval(cooldown)
         )
+
+        if statusCode == 429 {
+            globalRateLimitEntry = entry
+        } else {
+            storage[key] = entry
+        }
     }
 
     func remove(for key: String) {
@@ -349,6 +364,7 @@ private actor JikanAPITransientFailureBackoffStore {
 
     func removeAll() {
         storage.removeAll()
+        globalRateLimitEntry = nil
         nextCleanupDate = .distantPast
     }
 
@@ -543,6 +559,7 @@ nonisolated final class JikanAPIService: Sendable {
 
         switch cachePolicy {
         case .remoteOnly:
+            try await throwIfTransientFailureBackoffIsActive(for: key)
             return try await sharedDataTask(for: urlRequest, key: key)
         case .cacheFirst(let ttl):
             if let cachedData = await responseCache.data(for: key) {
@@ -562,6 +579,7 @@ nonisolated final class JikanAPIService: Sendable {
                 ttl: ttl
             )
         case .reloadIgnoringCache(let ttl):
+            try await throwIfTransientFailureBackoffIsActive(for: key)
             AppLogger.cache.debug("cache reload \(key, privacy: .public)")
             return try await loadRemoteCachingResponse(
                 for: urlRequest,
@@ -569,6 +587,15 @@ nonisolated final class JikanAPIService: Sendable {
                 ttl: ttl
             )
         }
+    }
+
+    private func throwIfTransientFailureBackoffIsActive(for key: String) async throws {
+        guard let statusCode = await transientFailureBackoffStore.statusCode(for: key) else {
+            return
+        }
+
+        AppLogger.cache.debug("transient failure backoff \(key, privacy: .public)")
+        throw JikanAPIError.serverError(statusCode: statusCode)
     }
 
     private func loadRemoteCachingResponse(
@@ -588,12 +615,6 @@ nonisolated final class JikanAPIService: Sendable {
             await transientFailureBackoffStore.remove(for: key)
             return freshData
         } catch JikanAPIError.serverError(let statusCode) where isTransientStatusCode(statusCode) {
-            await transientFailureBackoffStore.record(
-                statusCode: statusCode,
-                for: key,
-                cooldown: Self.transientFailureCooldown,
-                cleanupInterval: Self.storeCleanupInterval
-            )
             if let staleData = await responseCache.staleData(for: key) {
                 AppLogger.cache.debug("cache stale fallback HTTP \(statusCode) \(key, privacy: .public)")
                 return staleData
@@ -628,6 +649,19 @@ nonisolated final class JikanAPIService: Sendable {
                 id: taskState.id
             )
             return data
+        } catch JikanAPIError.serverError(let statusCode) where isTransientStatusCode(statusCode) {
+            await transientFailureBackoffStore.record(
+                statusCode: statusCode,
+                for: key,
+                cooldown: Self.transientFailureCooldown,
+                cleanupInterval: Self.storeCleanupInterval
+            )
+            await removeSharedDataTaskIfNeeded(
+                isNew: taskState.isNew,
+                key: key,
+                id: taskState.id
+            )
+            throw JikanAPIError.serverError(statusCode: statusCode)
         } catch {
             await removeSharedDataTaskIfNeeded(
                 isNew: taskState.isNew,

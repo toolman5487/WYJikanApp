@@ -56,6 +56,7 @@ struct MainCategoryGenreBatchConfiguration: Sendable {
 enum MainCategoryGenreBatchResult: Equatable, Sendable {
     case empty
     case cancelled
+    case failed(FeatureLoadFailure)
     case finished(canLoadMore: Bool)
 }
 
@@ -68,7 +69,7 @@ final class MainCategoryGenreBatchLoader<Genre: Identifiable, Item> where Genre.
 
     typealias BatchStartHandler = (MainCategoryGenreBatchPhase, [Genre]) -> Void
     typealias PhaseChangeHandler = (MainCategoryGenreBatchPhase) -> Void
-    typealias ItemFetcher = (Genre) async -> [Item]
+    typealias ItemFetcher = (Genre) async throws -> [Item]
     typealias GenreItemsHandler = (Genre, [Item]) -> Void
 
     private struct PendingBatch {
@@ -147,7 +148,18 @@ final class MainCategoryGenreBatchLoader<Genre: Identifiable, Item> where Genre.
 
         while batch.nextGenreIndex < batch.endIndex {
             let genre = genres[batch.nextGenreIndex]
-            let items = await fetchItems(genre)
+            let items: [Item]
+
+            do {
+                items = try await fetchItems(genre)
+            } catch is CancellationError {
+                pendingBatch = batch
+                return .cancelled
+            } catch {
+                pendingBatch = batch
+                return .failed(FeatureLoadFailure(error))
+            }
+
             guard !Task.isCancelled else {
                 pendingBatch = batch
                 return .cancelled

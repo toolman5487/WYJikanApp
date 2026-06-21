@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct MyListSummaryContent {
+nonisolated struct MyListSummaryContent: Sendable {
     let title: String
     let value: Int
     let iconName: String

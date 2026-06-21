@@ -101,6 +101,7 @@ nonisolated final class MainCategoryListService: MainCategoryListServicing {
         ]
         return try await apiService.fetch(
             endpoint: APIConfig.Anime.list,
+            cachePolicy: .cacheFirst(ttl: JikanCacheDuration.genreItems),
             queryItems: queryItems
         )
     }
@@ -112,6 +113,7 @@ nonisolated final class MainCategoryListService: MainCategoryListServicing {
         ]
         return try await apiService.fetch(
             endpoint: APIConfig.Manga.list,
+            cachePolicy: .cacheFirst(ttl: JikanCacheDuration.genreItems),
             queryItems: queryItems
         )
     }
