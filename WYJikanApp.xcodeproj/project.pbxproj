@@ -184,6 +184,8 @@
 		15D80E982F8E301400DDB201 /* MainSearchRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15D80E992F8E301400DDB201 /* MainSearchRouter.swift */; };
 		15DE55A02F723A9C00B292AD /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 15DE559F2F723A9C00B292AD /* SDWebImageSwiftUI */; };
 		15DE55A42F723C0000B292AD /* JikanAPIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15DE55A52F723C0000B292AD /* JikanAPIService.swift */; };
+		16AC10012FF5000000000001 /* JikanAPIContracts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AC10032FF5000000000003 /* JikanAPIContracts.swift */; };
+		16AC10022FF5000000000002 /* JikanAPIRequestState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AC10042FF5000000000004 /* JikanAPIRequestState.swift */; };
 		15DE55B72F723F2800B292AD /* APIConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15DE55B62F723F2800B292AD /* APIConfig.swift */; };
 		15FA4A002F97C81700EC4C09 /* MainMyListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FA49FF2F97C81700EC4C09 /* MainMyListView.swift */; };
 		15FA4A122F97D00000EC4C09 /* MyListHeaderSkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FA4A112F97D00000EC4C09 /* MyListHeaderSkeletonView.swift */; };
@@ -582,6 +584,8 @@
 		15D80E992F8E301400DDB201 /* MainSearchRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainSearchRouter.swift; sourceTree = "<group>"; };
 		15DE55902F723A1700B292AD /* WYJikanApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WYJikanApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		15DE55A52F723C0000B292AD /* JikanAPIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JikanAPIService.swift; sourceTree = "<group>"; };
+		16AC10032FF5000000000003 /* JikanAPIContracts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JikanAPIContracts.swift; sourceTree = "<group>"; };
+		16AC10042FF5000000000004 /* JikanAPIRequestState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JikanAPIRequestState.swift; sourceTree = "<group>"; };
 		15DE55B62F723F2800B292AD /* APIConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIConfig.swift; sourceTree = "<group>"; };
 		15FA49FF2F97C81700EC4C09 /* MainMyListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMyListView.swift; sourceTree = "<group>"; };
 		15FA4A112F97D00000EC4C09 /* MyListHeaderSkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyListHeaderSkeletonView.swift; sourceTree = "<group>"; };
@@ -2174,6 +2178,8 @@
 		15DE55A32F723B6600B292AD /* Service */ = {
 			isa = PBXGroup;
 			children = (
+				16AC10032FF5000000000003 /* JikanAPIContracts.swift */,
+				16AC10042FF5000000000004 /* JikanAPIRequestState.swift */,
 				15DE55A52F723C0000B292AD /* JikanAPIService.swift */,
 			);
 			path = Service;
@@ -3442,6 +3448,8 @@
 				15FC4F3A2F73E7340054153E /* HeroBannerView.swift in Sources */,
 				15FC4F5A2F750B760054153E /* UIColorExtension.swift in Sources */,
 				15A295632F8631F00056071F /* MainCategoryListModel.swift in Sources */,
+				16AC10012FF5000000000001 /* JikanAPIContracts.swift in Sources */,
+				16AC10022FF5000000000002 /* JikanAPIRequestState.swift in Sources */,
 				15DE55A42F723C0000B292AD /* JikanAPIService.swift in Sources */,
 				16A001062F89000000A1B2C3 /* GenreMangaViewModel.swift in Sources */,
 				15750AFF2F7285520037E8A5 /* PlaceholderView.swift in Sources */,

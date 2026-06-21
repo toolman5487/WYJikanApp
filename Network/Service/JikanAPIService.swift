@@ -7,375 +7,12 @@
 import Foundation
 import OSLog
 
-// MARK: - JikanAPIError
-
-nonisolated enum JikanAPIError: LocalizedError, AppUserFacingError {
-    case invalidURL
-    case noData
-    case decodingError(Error)
-    case networkError(Error)
-    case serverError(statusCode: Int)
-    
-    nonisolated var errorDescription: String? {
-        switch self {
-        case .invalidURL:
-            return "The URL is invalid and the request could not be created."
-        case .noData:
-            return "The server returned no data."
-        case .decodingError(let error):
-            return "Failed to decode JSON: \(error.localizedDescription)"
-        case .networkError(let error):
-            return "Network error: \(error.localizedDescription)"
-        case .serverError(let statusCode):
-            return "Server error (HTTP \(statusCode))."
-        }
-    }
-
-    nonisolated var userMessage: String {
-        switch self {
-        case .invalidURL:
-            return "資料來源設定暫時異常，請稍後再試。"
-        case .noData:
-            return "目前沒有可顯示的資料。"
-        case .decodingError:
-            return "資料格式暫時無法讀取，請稍後再試。"
-        case .networkError(let error):
-            return error.userFacingMessage
-        case .serverError(let statusCode):
-            switch statusCode {
-            case 429:
-                return "請求太頻繁，請稍候再試。"
-            case 500...599:
-                return "伺服器暫時無法回應，請稍後再試。"
-            default:
-                return "目前無法載入資料，請稍後再試。"
-            }
-        }
-    }
-}
-
-// MARK: - JikanAPIRequestTarget
-
-nonisolated enum JikanAPIRequestTarget: Sendable {
-    case path(String)
-    case absoluteURL(String)
-}
-
-// MARK: - JikanAPICachePolicy
-
-nonisolated enum JikanAPICachePolicy: Sendable {
-    case remoteOnly
-    case cacheFirst(ttl: TimeInterval)
-    case reloadIgnoringCache(ttl: TimeInterval)
-}
-
-// MARK: - JikanCacheDuration
-
-nonisolated enum JikanCacheDuration {
-    static let search: TimeInterval = 45
-    static let paging: TimeInterval = 120
-    static let feed: TimeInterval = 300
-    static let genreItems: TimeInterval = 300
-    static let detail: TimeInterval = 600
-    static let genreList: TimeInterval = 86_400
-}
-
-nonisolated extension JikanAPICachePolicy {
-    static func resolved(forceRefresh: Bool, ttl: TimeInterval) -> JikanAPICachePolicy {
-        forceRefresh ? .reloadIgnoringCache(ttl: ttl) : .cacheFirst(ttl: ttl)
-    }
-
-    static func search(forceRefresh: Bool = false) -> JikanAPICachePolicy {
-        resolved(forceRefresh: forceRefresh, ttl: JikanCacheDuration.search)
-    }
-
-    static func paging(page: Int, forceRefresh: Bool = false) -> JikanAPICachePolicy {
-        let ttl = page == 1 ? JikanCacheDuration.feed : JikanCacheDuration.paging
-        return resolved(forceRefresh: forceRefresh, ttl: ttl)
-    }
-
-    static func feed(forceRefresh: Bool = false) -> JikanAPICachePolicy {
-        resolved(forceRefresh: forceRefresh, ttl: JikanCacheDuration.feed)
-    }
-
-    static func detail(forceRefresh: Bool = false) -> JikanAPICachePolicy {
-        resolved(forceRefresh: forceRefresh, ttl: JikanCacheDuration.detail)
-    }
-
-    static func genreList(forceRefresh: Bool = false) -> JikanAPICachePolicy {
-        resolved(forceRefresh: forceRefresh, ttl: JikanCacheDuration.genreList)
-    }
-}
-
 // MARK: - JikanAPIResponseState
 
-nonisolated enum JikanAPIResponseState: Sendable {
+private enum JikanAPIResponseState: Sendable {
     case success
     case emptyBody
     case serverError(statusCode: Int)
-}
-
-// MARK: - JikanAPIRequest
-
-nonisolated struct JikanAPIRequest: Sendable {
-    let target: JikanAPIRequestTarget
-    let queryItems: [URLQueryItem]
-    let method: String
-    let cachePolicy: JikanAPICachePolicy
-
-    init(
-        path: String,
-        queryItems: [URLQueryItem] = [],
-        method: String = "GET",
-        cachePolicy: JikanAPICachePolicy = .remoteOnly
-    ) {
-        self.target = .path(path)
-        self.queryItems = queryItems
-        self.method = method
-        self.cachePolicy = cachePolicy
-    }
-
-    init(
-        absoluteURL: String,
-        queryItems: [URLQueryItem] = [],
-        method: String = "GET",
-        cachePolicy: JikanAPICachePolicy = .remoteOnly
-    ) {
-        self.target = .absoluteURL(absoluteURL)
-        self.queryItems = queryItems
-        self.method = method
-        self.cachePolicy = cachePolicy
-    }
-}
-
-// MARK: - JikanAPIServicing
-
-nonisolated protocol JikanAPIServicing: Sendable {
-    func send<T: Decodable & Sendable>(_ request: JikanAPIRequest) async throws -> T
-    func fetch<T: Decodable & Sendable>(
-        endpoint: String,
-        cachePolicy: JikanAPICachePolicy,
-        queryItems: [URLQueryItem]?
-    ) async throws -> T
-    func fetchFromURL<T: Decodable & Sendable>(_ urlString: String, cachePolicy: JikanAPICachePolicy) async throws -> T
-    func clearCache() async
-}
-
-// MARK: - JikanAPIServicing Convenience
-
-nonisolated extension JikanAPIServicing {
-    func fetch<T: Decodable & Sendable>(
-        endpoint: String,
-        queryItems: [URLQueryItem]? = nil
-    ) async throws -> T {
-        try await fetch(
-            endpoint: endpoint,
-            cachePolicy: .remoteOnly,
-            queryItems: queryItems
-        )
-    }
-
-    func fetch<T: Decodable & Sendable>(endpoint: String) async throws -> T {
-        try await fetch(
-            endpoint: endpoint,
-            cachePolicy: .remoteOnly,
-            queryItems: nil
-        )
-    }
-
-    func fetch<T: Decodable & Sendable>(
-        endpoint: String,
-        cachePolicy: JikanAPICachePolicy
-    ) async throws -> T {
-        try await fetch(
-            endpoint: endpoint,
-            cachePolicy: cachePolicy,
-            queryItems: nil
-        )
-    }
-
-    func fetchFromURL<T: Decodable & Sendable>(_ urlString: String) async throws -> T {
-        try await fetchFromURL(urlString, cachePolicy: .remoteOnly)
-    }
-}
-
-// MARK: - JikanAPIResponseCache
-
-private actor JikanAPIResponseCache {
-    private struct Entry: Sendable {
-        let data: Data
-        let expirationDate: Date
-        let staleFallbackExpirationDate: Date
-    }
-
-    private var storage: [String: Entry] = [:]
-    private var nextCleanupDate = Date.distantPast
-
-    func data(for key: String, now: Date = Date()) -> Data? {
-        guard let entry = storage[key] else { return nil }
-
-        if entry.expirationDate > now {
-            return entry.data
-        }
-
-        removeIfStaleFallbackExpired(for: key, entry: entry, now: now)
-        return nil
-    }
-
-    func staleData(for key: String, now: Date = Date()) -> Data? {
-        guard let entry = storage[key] else { return nil }
-
-        guard entry.staleFallbackExpirationDate > now else {
-            storage.removeValue(forKey: key)
-            return nil
-        }
-
-        return entry.data
-    }
-
-    func insert(
-        _ data: Data,
-        for key: String,
-        ttl: TimeInterval,
-        staleFallbackRetention: TimeInterval,
-        cleanupInterval: TimeInterval,
-        now: Date = Date()
-    ) {
-        removeExpiredStaleFallbacksIfNeeded(now: now, cleanupInterval: cleanupInterval)
-
-        storage[key] = Entry(
-            data: data,
-            expirationDate: now.addingTimeInterval(ttl),
-            staleFallbackExpirationDate: now.addingTimeInterval(ttl + staleFallbackRetention)
-        )
-    }
-
-    func removeAll() {
-        storage.removeAll()
-        nextCleanupDate = .distantPast
-    }
-
-    private func removeIfStaleFallbackExpired(for key: String, entry: Entry, now: Date) {
-        guard entry.staleFallbackExpirationDate <= now else { return }
-        storage.removeValue(forKey: key)
-    }
-
-    private func removeExpiredStaleFallbacksIfNeeded(now: Date, cleanupInterval: TimeInterval) {
-        guard now >= nextCleanupDate else { return }
-
-        storage = storage.filter { _, entry in
-            entry.staleFallbackExpirationDate > now
-        }
-        nextCleanupDate = now.addingTimeInterval(cleanupInterval)
-    }
-}
-
-// MARK: - JikanAPIInFlightRequestStore
-
-private actor JikanAPIInFlightRequestStore {
-    private struct Entry {
-        let id: UUID
-        let task: Task<Data, Error>
-        let priority: TaskPriority
-    }
-
-    private var entries: [String: Entry] = [:]
-
-    func task(
-        for key: String,
-        priority: TaskPriority,
-        create: @escaping @Sendable () -> Task<Data, Error>
-    ) -> (id: UUID, task: Task<Data, Error>, isNew: Bool) {
-        if let existingEntry = entries[key],
-           existingEntry.priority >= priority {
-            return (existingEntry.id, existingEntry.task, false)
-        }
-
-        let entry = Entry(
-            id: UUID(),
-            task: create(),
-            priority: priority
-        )
-        entries[key] = entry
-        return (entry.id, entry.task, true)
-    }
-
-    func removeTask(for key: String, id: UUID) {
-        guard entries[key]?.id == id else { return }
-        entries.removeValue(forKey: key)
-    }
-}
-
-// MARK: - JikanAPITransientFailureBackoffStore
-
-private actor JikanAPITransientFailureBackoffStore {
-    private struct Entry: Sendable {
-        let statusCode: Int
-        let expirationDate: Date
-    }
-
-    private var storage: [String: Entry] = [:]
-    private var globalRateLimitEntry: Entry?
-    private var nextCleanupDate = Date.distantPast
-
-    func statusCode(for key: String, now: Date = Date()) -> Int? {
-        if let globalRateLimitEntry {
-            guard globalRateLimitEntry.expirationDate <= now else {
-                return globalRateLimitEntry.statusCode
-            }
-            self.globalRateLimitEntry = nil
-        }
-
-        switch storage[key] {
-        case .some(let entry) where entry.expirationDate > now:
-            return entry.statusCode
-        case .some:
-            storage.removeValue(forKey: key)
-            return nil
-        case .none:
-            return nil
-        }
-    }
-
-    func record(
-        statusCode: Int,
-        for key: String,
-        cooldown: TimeInterval,
-        cleanupInterval: TimeInterval,
-        now: Date = Date()
-    ) {
-        removeExpiredEntriesIfNeeded(now: now, cleanupInterval: cleanupInterval)
-
-        let entry = Entry(
-            statusCode: statusCode,
-            expirationDate: now.addingTimeInterval(cooldown)
-        )
-
-        if statusCode == 429 {
-            globalRateLimitEntry = entry
-        } else {
-            storage[key] = entry
-        }
-    }
-
-    func remove(for key: String) {
-        storage.removeValue(forKey: key)
-    }
-
-    func removeAll() {
-        storage.removeAll()
-        globalRateLimitEntry = nil
-        nextCleanupDate = .distantPast
-    }
-
-    private func removeExpiredEntriesIfNeeded(now: Date, cleanupInterval: TimeInterval) {
-        guard now >= nextCleanupDate else { return }
-
-        storage = storage.filter { _, entry in
-            entry.expirationDate > now
-        }
-        nextCleanupDate = now.addingTimeInterval(cleanupInterval)
-    }
 }
 
 // MARK: - JikanAPIService
@@ -385,7 +22,8 @@ nonisolated final class JikanAPIService: Sendable {
     
     static let shared = JikanAPIService()
 
-    private static let transientFailureCooldown: TimeInterval = 60
+    private static let defaultRateLimitCooldown: TimeInterval = 60
+    private static let serverFailureCooldown: TimeInterval = 60
     private static let staleResponseFallbackRetention: TimeInterval = 3_600
     private static let storeCleanupInterval: TimeInterval = 300
     private static let transientRetryDelays: [UInt64] = [
@@ -398,6 +36,7 @@ nonisolated final class JikanAPIService: Sendable {
     private let decoder: JSONDecoder
     private let responseCache = JikanAPIResponseCache()
     private let inFlightRequestStore = JikanAPIInFlightRequestStore()
+    private let requestGovernor = JikanAPIRequestGovernor()
     private let transientFailureBackoffStore = JikanAPITransientFailureBackoffStore()
     
     init(
@@ -489,13 +128,48 @@ nonisolated final class JikanAPIService: Sendable {
 
     // MARK: - Retry Policy
 
-    private func isTransientStatusCode(_ statusCode: Int) -> Bool {
-        statusCode == 429 || (500...599).contains(statusCode)
+    private func isRetriableServerStatusCode(_ statusCode: Int) -> Bool {
+        (500...599).contains(statusCode)
     }
 
     private func retryDelayNanoseconds(for attempt: Int) -> UInt64? {
         guard attempt < Self.transientRetryDelays.count else { return nil }
         return Self.transientRetryDelays[attempt]
+    }
+
+    private func retryAfterInterval(
+        from response: URLResponse,
+        now: Date = Date()
+    ) -> TimeInterval? {
+        guard let httpResponse = response as? HTTPURLResponse,
+              let headerValue = httpResponse.value(forHTTPHeaderField: "Retry-After")?
+                .trimmingCharacters(in: .whitespacesAndNewlines),
+              !headerValue.isEmpty else {
+            return nil
+        }
+
+        if let seconds = TimeInterval(headerValue) {
+            return max(0, seconds)
+        }
+
+        let dateFormats = [
+            "EEE',' dd MMM yyyy HH':'mm':'ss zzz",
+            "EEEE',' dd-MMM-yy HH':'mm':'ss zzz",
+            "EEE MMM d HH':'mm':'ss yyyy"
+        ]
+
+        for dateFormat in dateFormats {
+            let formatter = DateFormatter()
+            formatter.locale = Locale(identifier: "en_US_POSIX")
+            formatter.timeZone = TimeZone(secondsFromGMT: 0)
+            formatter.dateFormat = dateFormat
+
+            if let retryDate = formatter.date(from: headerValue) {
+                return max(0, retryDate.timeIntervalSince(now))
+            }
+        }
+
+        return nil
     }
 
     // MARK: - Remote Execution
@@ -508,6 +182,7 @@ nonisolated final class JikanAPIService: Sendable {
         var attempt = 0
 
         while true {
+            try await requestGovernor.waitForPermit()
             AppLogger.network.debug("\(urlRequest.httpMethod ?? "GET") \(url.absoluteString, privacy: .public)")
 
             do {
@@ -525,7 +200,19 @@ nonisolated final class JikanAPIService: Sendable {
                     AppLogger.network.error("empty body \(url.absoluteString, privacy: .public)")
                     throw JikanAPIError.noData
                 case .serverError(let statusCode):
-                    if isTransientStatusCode(statusCode),
+                    if statusCode == 429 {
+                        let retryAfter = max(
+                            retryAfterInterval(from: response) ?? Self.defaultRateLimitCooldown,
+                            1
+                        )
+                        await requestGovernor.recordRateLimit(retryAfter: retryAfter)
+                        AppLogger.network.warning(
+                            "rate limited HTTP 429 retry after \(retryAfter, format: .fixed(precision: 1)) seconds \(url.absoluteString, privacy: .public)"
+                        )
+                        throw JikanAPIError.rateLimited(retryAfter: retryAfter)
+                    }
+
+                    if isRetriableServerStatusCode(statusCode),
                        let delay = retryDelayNanoseconds(for: attempt) {
                         attempt += 1
                         AppLogger.network.warning(
@@ -614,7 +301,13 @@ nonisolated final class JikanAPIService: Sendable {
             )
             await transientFailureBackoffStore.remove(for: key)
             return freshData
-        } catch JikanAPIError.serverError(let statusCode) where isTransientStatusCode(statusCode) {
+        } catch JikanAPIError.rateLimited(let retryAfter) {
+            if let staleData = await responseCache.staleData(for: key) {
+                AppLogger.cache.debug("cache stale fallback HTTP 429 \(key, privacy: .public)")
+                return staleData
+            }
+            throw JikanAPIError.rateLimited(retryAfter: retryAfter)
+        } catch JikanAPIError.serverError(let statusCode) where isRetriableServerStatusCode(statusCode) {
             if let staleData = await responseCache.staleData(for: key) {
                 AppLogger.cache.debug("cache stale fallback HTTP \(statusCode) \(key, privacy: .public)")
                 return staleData
@@ -649,11 +342,18 @@ nonisolated final class JikanAPIService: Sendable {
                 id: taskState.id
             )
             return data
-        } catch JikanAPIError.serverError(let statusCode) where isTransientStatusCode(statusCode) {
+        } catch JikanAPIError.rateLimited(let retryAfter) {
+            await removeSharedDataTaskIfNeeded(
+                isNew: taskState.isNew,
+                key: key,
+                id: taskState.id
+            )
+            throw JikanAPIError.rateLimited(retryAfter: retryAfter)
+        } catch JikanAPIError.serverError(let statusCode) where isRetriableServerStatusCode(statusCode) {
             await transientFailureBackoffStore.record(
                 statusCode: statusCode,
                 for: key,
-                cooldown: Self.transientFailureCooldown,
+                cooldown: Self.serverFailureCooldown,
                 cleanupInterval: Self.storeCleanupInterval
             )
             await removeSharedDataTaskIfNeeded(

@@ -41,7 +41,7 @@ nonisolated enum ErrorMessageKind: Equatable, Sendable {
 
         if let jikanError = error as? JikanAPIError {
             switch jikanError {
-            case .serverError(let statusCode) where statusCode == 429:
+            case .rateLimited:
                 return .rateLimited
             case .serverError:
                 return .serverError
