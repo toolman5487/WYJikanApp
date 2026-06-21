@@ -42,7 +42,7 @@ private struct MainView: View {
     // MARK: - Body
 
     var body: some View {
-        LazyVStack(alignment: .leading, spacing: 20, pinnedViews: [.sectionHeaders]) {
+        LazyVStack(alignment: .leading, spacing: 4, pinnedViews: [.sectionHeaders]) {
             RandomHeroSectionView(
                 viewModel: viewModel.randomHeroViewModel,
                 favoriteIDs: favoriteIDs

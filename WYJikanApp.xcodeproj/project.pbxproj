@@ -1213,8 +1213,8 @@
 		1577799C2F88915400F6FFD1 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				1577799E2F88916600F6FFD1 /* SubView */,
 				1577799D2F88916100F6FFD1 /* MainView */,
+				1577799E2F88916600F6FFD1 /* SubView */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -1430,8 +1430,8 @@
 		159667F62F865A190033410A /* View */ = {
 			isa = PBXGroup;
 			children = (
-				159667FA2F865A3C0033410A /* SubView */,
 				159667F92F865A340033410A /* MainView */,
+				159667FA2F865A3C0033410A /* SubView */,
 			);
 			path = View;
 			sourceTree = "<group>";
