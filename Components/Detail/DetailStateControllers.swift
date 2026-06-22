@@ -5,6 +5,7 @@
 //  Created by Codex on 2026/6/21.
 //
 
+import Combine
 import Foundation
 import OSLog
 
@@ -50,34 +51,75 @@ final class PersistenceMutationController {
 // MARK: - DetailSupplementaryLoadingController
 
 @MainActor
+final class DetailSupplementaryState<Value>: ObservableObject {
+
+    @Published private(set) var value: Value
+    @Published private(set) var isLoading = false
+    @Published private(set) var failure: FeatureLoadFailure?
+
+    init(initialValue: Value) {
+        self.value = initialValue
+    }
+
+    func beginLoading(resetOnFailure: Bool) {
+        isLoading = true
+        if resetOnFailure {
+            failure = nil
+        }
+    }
+
+    func finishLoading(with value: Value) {
+        self.value = value
+        failure = nil
+        isLoading = false
+    }
+
+    func finishLoading(
+        with failure: FeatureLoadFailure,
+        resetValueTo value: Value?
+    ) {
+        self.failure = failure
+        if let value {
+            self.value = value
+        }
+        isLoading = false
+    }
+
+    func finishCancelledLoading() {
+        isLoading = false
+    }
+
+    func reset(to value: Value) {
+        self.value = value
+        isLoading = false
+        failure = nil
+    }
+}
+
+@MainActor
 final class DetailSupplementaryLoadingController {
 
     func load<Value: Sendable>(
+        state: DetailSupplementaryState<Value>,
         resetOnFailure: Bool,
-        setLoading: (Bool) -> Void,
-        setFailure: (FeatureLoadFailure?) -> Void,
-        fetch: () async throws -> Value,
-        applyValue: (Value) -> Void,
-        resetValue: () -> Void
+        startsLoading: Bool = true,
+        resetValue: @autoclosure () -> Value,
+        fetch: () async throws -> Value
     ) async {
-        setLoading(true)
-        if resetOnFailure {
-            setFailure(nil)
-        }
-        defer {
-            setLoading(false)
+        if startsLoading {
+            state.beginLoading(resetOnFailure: resetOnFailure)
         }
 
         do {
-            applyValue(try await fetch())
-            setFailure(nil)
+            state.finishLoading(with: try await fetch())
         } catch is CancellationError {
+            state.finishCancelledLoading()
             return
         } catch {
-            setFailure(FeatureLoadFailure(error))
-            if resetOnFailure {
-                resetValue()
-            }
+            state.finishLoading(
+                with: FeatureLoadFailure(error),
+                resetValueTo: resetOnFailure ? resetValue() : nil
+            )
         }
     }
 }

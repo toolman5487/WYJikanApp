@@ -280,62 +280,71 @@ private struct MangaDetailBodyView: View {
         case .synopsis:
             MangaDetailSynopsisSectionView(viewModel: viewModel, manga: manga)
         case .characters:
-            if viewModel.isLoadingCharacters {
-                MangaDetailCharactersSectionSkeletonView()
-            } else if let failure = viewModel.charactersFailure {
-                DetailSupplementarySectionErrorView(
-                    title: "角色",
-                    failure: failure,
-                    retryTitle: "重試"
-                ) {
-                    Task(priority: .userInitiated) { await viewModel.reloadCharacters() }
+            DetailSupplementarySectionStateView(
+                state: viewModel.charactersState,
+                title: "角色",
+                isEmpty: { _ in viewModel.allCharacterRoles.isEmpty },
+                onRetry: {
+                    Task(priority: .userInitiated) {
+                        await viewModel.reloadCharacters()
+                    }
+                },
+                loading: {
+                    MangaDetailCharactersSectionSkeletonView()
+                },
+                content: { _ in
+                    MangaDetailCharactersSectionView(
+                        viewModel: viewModel,
+                        mangaTitle: viewModel.displayTitle(for: manga),
+                        isShowingCharacterList: $isShowingCharacterList
+                    )
                 }
-            } else {
-                MangaDetailCharactersSectionView(
-                    viewModel: viewModel,
-                    mangaTitle: viewModel.displayTitle(for: manga),
-                    isShowingCharacterList: $isShowingCharacterList
-                )
-            }
+            )
         case .publication:
             MangaDetailPublicationSectionView(viewModel: viewModel, manga: manga)
         case .pictures:
-            if viewModel.isLoadingPictures {
-                AnimeDetailPicturesSectionSkeletonView()
-            } else if let failure = viewModel.picturesFailure {
-                DetailSupplementarySectionErrorView(
-                    title: "圖片",
-                    failure: failure,
-                    retryTitle: "重試"
-                ) {
-                    Task(priority: .userInitiated) { await viewModel.reloadPictures() }
-                }
-            } else {
-                MangaDetailPicturesSectionView(
-                    viewModel: viewModel,
-                    onTapImage: { index in
-                        showImagePreview(for: manga, selectedPictureIndex: index)
+            DetailSupplementarySectionStateView(
+                state: viewModel.picturesState,
+                title: "圖片",
+                isEmpty: \.isEmpty,
+                onRetry: {
+                    Task(priority: .userInitiated) {
+                        await viewModel.reloadPictures()
                     }
-                )
-            }
-        case .recommendations:
-            if viewModel.isLoadingRecommendations {
-                MangaDetailRecommendationsSectionSkeletonView()
-            } else if let failure = viewModel.recommendationsFailure {
-                DetailSupplementarySectionErrorView(
-                    title: "你可能也喜歡",
-                    failure: failure,
-                    retryTitle: "重試"
-                ) {
-                    Task(priority: .userInitiated) { await viewModel.reloadRecommendations() }
+                },
+                loading: {
+                    AnimeDetailPicturesSectionSkeletonView()
+                },
+                content: { _ in
+                    MangaDetailPicturesSectionView(
+                        viewModel: viewModel,
+                        onTapImage: { index in
+                            showImagePreview(for: manga, selectedPictureIndex: index)
+                        }
+                    )
                 }
-            } else {
-                MangaDetailRecommendationsSectionView(
-                    viewModel: viewModel,
-                    mangaTitle: viewModel.displayTitle(for: manga),
-                    isShowingRecommendationList: $isShowingRecommendationList
-                )
-            }
+            )
+        case .recommendations:
+            DetailSupplementarySectionStateView(
+                state: viewModel.recommendationsState,
+                title: "你可能也喜歡",
+                isEmpty: { _ in viewModel.allRecommendations.isEmpty },
+                onRetry: {
+                    Task(priority: .userInitiated) {
+                        await viewModel.reloadRecommendations()
+                    }
+                },
+                loading: {
+                    MangaDetailRecommendationsSectionSkeletonView()
+                },
+                content: { _ in
+                    MangaDetailRecommendationsSectionView(
+                        viewModel: viewModel,
+                        mangaTitle: viewModel.displayTitle(for: manga),
+                        isShowingRecommendationList: $isShowingRecommendationList
+                    )
+                }
+            )
         }
     }
 

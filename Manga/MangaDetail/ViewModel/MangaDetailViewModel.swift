@@ -22,17 +22,11 @@ final class MangaDetailViewModel: ObservableObject {
     }
 
     @Published private(set) var screenState: ScreenState = .idle
-    @Published private(set) var pictureItems: [MangaDetailPictureItem] = []
-    @Published private(set) var characterRoles: [MangaCharacterRoleDTO] = []
-    @Published private(set) var recommendationItems: [MangaRecommendationDTO] = []
-    @Published private(set) var isLoadingCharacters = false
-    @Published private(set) var isLoadingPictures = false
-    @Published private(set) var isLoadingRecommendations = false
-    @Published private(set) var charactersFailure: FeatureLoadFailure?
-    @Published private(set) var picturesFailure: FeatureLoadFailure?
-    @Published private(set) var recommendationsFailure: FeatureLoadFailure?
     @Published private(set) var favoriteCollectionItem: MyListItemSnapshot?
     @Published private(set) var persistenceMutationState: PersistenceMutationState = .idle
+    let picturesState = DetailSupplementaryState<[MangaDetailPictureItem]>(initialValue: [])
+    let charactersState = DetailSupplementaryState<[MangaCharacterRoleDTO]>(initialValue: [])
+    let recommendationsState = DetailSupplementaryState<[MangaRecommendationDTO]>(initialValue: [])
     let synopsisTranslationViewModel: SynopsisTranslationViewModel
 
     // MARK: - Dependencies
@@ -86,6 +80,42 @@ final class MangaDetailViewModel: ObservableObject {
         return false
     }
 
+    var pictureItems: [MangaDetailPictureItem] {
+        picturesState.value
+    }
+
+    var characterRoles: [MangaCharacterRoleDTO] {
+        charactersState.value
+    }
+
+    var recommendationItems: [MangaRecommendationDTO] {
+        recommendationsState.value
+    }
+
+    var isLoadingCharacters: Bool {
+        charactersState.isLoading
+    }
+
+    var isLoadingPictures: Bool {
+        picturesState.isLoading
+    }
+
+    var isLoadingRecommendations: Bool {
+        recommendationsState.isLoading
+    }
+
+    var charactersFailure: FeatureLoadFailure? {
+        charactersState.failure
+    }
+
+    var picturesFailure: FeatureLoadFailure? {
+        picturesState.failure
+    }
+
+    var recommendationsFailure: FeatureLoadFailure? {
+        recommendationsState.failure
+    }
+
     // MARK: - Load
 
     func load(forceRefresh: Bool = false) async {
@@ -103,9 +133,13 @@ final class MangaDetailViewModel: ObservableObject {
         do {
             let response = try await service.fetchMangaDetail(malId: malId)
             let detail = response.data
+            prepareSupplementaryLoading(resetOnFailure: existingDetail == nil)
             screenState = .loaded(detail)
             resetSynopsisTranslation()
-            await loadSupplementaryContent(resetOnFailure: existingDetail == nil)
+            await loadSupplementaryContent(
+                resetOnFailure: existingDetail == nil,
+                loadingPrepared: true
+            )
         } catch is CancellationError {
             return
         } catch {
@@ -118,10 +152,22 @@ final class MangaDetailViewModel: ObservableObject {
         }
     }
 
-    private func loadSupplementaryContent(resetOnFailure: Bool) async {
-        await loadCharacters(resetOnFailure: resetOnFailure)
-        async let pictures: Void = loadPictures(resetOnFailure: resetOnFailure)
-        async let recommendations: Void = loadRecommendations(resetOnFailure: resetOnFailure)
+    private func loadSupplementaryContent(
+        resetOnFailure: Bool,
+        loadingPrepared: Bool = false
+    ) async {
+        await loadCharacters(
+            resetOnFailure: resetOnFailure,
+            startsLoading: !loadingPrepared
+        )
+        async let pictures: Void = loadPictures(
+            resetOnFailure: resetOnFailure,
+            startsLoading: !loadingPrepared
+        )
+        async let recommendations: Void = loadRecommendations(
+            resetOnFailure: resetOnFailure,
+            startsLoading: !loadingPrepared
+        )
         _ = await (pictures, recommendations)
     }
 
@@ -152,56 +198,62 @@ final class MangaDetailViewModel: ObservableObject {
 
     // MARK: - Supplementary Content
 
-    private func loadPictures(resetOnFailure: Bool) async {
+    private func loadPictures(
+        resetOnFailure: Bool,
+        startsLoading: Bool = true
+    ) async {
         await supplementaryLoadingController.load(
+            state: picturesState,
             resetOnFailure: resetOnFailure,
-            setLoading: { isLoadingPictures = $0 },
-            setFailure: { picturesFailure = $0 },
+            startsLoading: startsLoading,
+            resetValue: [],
             fetch: {
                 let response = try await service.fetchMangaPictures(malId: malId)
                 return MangaDetailPictureMapping.items(from: response)
-            },
-            applyValue: { pictureItems = $0 },
-            resetValue: { pictureItems = [] }
+            }
         )
     }
 
-    private func loadCharacters(resetOnFailure: Bool) async {
+    private func loadCharacters(
+        resetOnFailure: Bool,
+        startsLoading: Bool = true
+    ) async {
         await supplementaryLoadingController.load(
+            state: charactersState,
             resetOnFailure: resetOnFailure,
-            setLoading: { isLoadingCharacters = $0 },
-            setFailure: { charactersFailure = $0 },
+            startsLoading: startsLoading,
+            resetValue: [],
             fetch: {
                 try await service.fetchMangaCharacters(malId: malId).data
-            },
-            applyValue: { characterRoles = $0 },
-            resetValue: { characterRoles = [] }
+            }
         )
     }
 
-    private func loadRecommendations(resetOnFailure: Bool) async {
+    private func loadRecommendations(
+        resetOnFailure: Bool,
+        startsLoading: Bool = true
+    ) async {
         await supplementaryLoadingController.load(
+            state: recommendationsState,
             resetOnFailure: resetOnFailure,
-            setLoading: { isLoadingRecommendations = $0 },
-            setFailure: { recommendationsFailure = $0 },
+            startsLoading: startsLoading,
+            resetValue: [],
             fetch: {
                 try await service.fetchMangaRecommendations(malId: malId).data
-            },
-            applyValue: { recommendationItems = $0 },
-            resetValue: { recommendationItems = [] }
+            }
         )
+    }
+
+    private func prepareSupplementaryLoading(resetOnFailure: Bool) {
+        charactersState.beginLoading(resetOnFailure: resetOnFailure)
+        picturesState.beginLoading(resetOnFailure: resetOnFailure)
+        recommendationsState.beginLoading(resetOnFailure: resetOnFailure)
     }
 
     private func resetSupplementaryContent() {
-        pictureItems = []
-        characterRoles = []
-        recommendationItems = []
-        isLoadingCharacters = false
-        isLoadingPictures = false
-        isLoadingRecommendations = false
-        charactersFailure = nil
-        picturesFailure = nil
-        recommendationsFailure = nil
+        picturesState.reset(to: [])
+        charactersState.reset(to: [])
+        recommendationsState.reset(to: [])
     }
 
     var isFavoriteActionEnabled: Bool {

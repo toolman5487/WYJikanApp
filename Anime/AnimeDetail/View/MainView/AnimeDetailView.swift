@@ -321,62 +321,71 @@ private struct AnimeDetailBodyView: View {
         case .synopsis:
             AnimeDetailSynopsisSectionView(viewModel: viewModel, anime: anime)
         case .characters:
-            if viewModel.isLoadingCharacters {
-                AnimeDetailCharactersSectionSkeletonView()
-            } else if let failure = viewModel.charactersFailure {
-                DetailSupplementarySectionErrorView(
-                    title: "角色與聲優",
-                    failure: failure,
-                    retryTitle: "重試"
-                ) {
-                    Task(priority: .userInitiated) { await viewModel.reloadCharacters() }
+            DetailSupplementarySectionStateView(
+                state: viewModel.charactersState,
+                title: "角色與聲優",
+                isEmpty: { _ in viewModel.allCharacterRoles.isEmpty },
+                onRetry: {
+                    Task(priority: .userInitiated) {
+                        await viewModel.reloadCharacters()
+                    }
+                },
+                loading: {
+                    AnimeDetailCharactersSectionSkeletonView()
+                },
+                content: { _ in
+                    AnimeDetailCharactersSectionView(
+                        viewModel: viewModel,
+                        animeTitle: viewModel.displayTitle(for: anime),
+                        isShowingCharacterList: $isShowingCharacterList
+                    )
                 }
-            } else {
-                AnimeDetailCharactersSectionView(
-                    viewModel: viewModel,
-                    animeTitle: viewModel.displayTitle(for: anime),
-                    isShowingCharacterList: $isShowingCharacterList
-                )
-            }
+            )
         case .staff:
             AnimeDetailStaffSectionView(viewModel: viewModel, anime: anime)
         case .pictures:
-            if viewModel.isLoadingPictures {
-                AnimeDetailPicturesSectionSkeletonView()
-            } else if let failure = viewModel.picturesFailure {
-                DetailSupplementarySectionErrorView(
-                    title: "劇照",
-                    failure: failure,
-                    retryTitle: "重試"
-                ) {
-                    Task(priority: .userInitiated) { await viewModel.reloadPictures() }
-                }
-            } else {
-                AnimeDetailPicturesSectionView(
-                    viewModel: viewModel,
-                    onTapImage: { index in
-                        showImagePreview(for: anime, selectedPictureIndex: index)
+            DetailSupplementarySectionStateView(
+                state: viewModel.picturesState,
+                title: "劇照",
+                isEmpty: \.isEmpty,
+                onRetry: {
+                    Task(priority: .userInitiated) {
+                        await viewModel.reloadPictures()
                     }
-                )
-            }
-        case .recommendations:
-            if viewModel.isLoadingRecommendations {
-                AnimeDetailRecommendationsSectionSkeletonView()
-            } else if let failure = viewModel.recommendationsFailure {
-                DetailSupplementarySectionErrorView(
-                    title: "你可能也喜歡",
-                    failure: failure,
-                    retryTitle: "重試"
-                ) {
-                    Task(priority: .userInitiated) { await viewModel.reloadRecommendations() }
+                },
+                loading: {
+                    AnimeDetailPicturesSectionSkeletonView()
+                },
+                content: { _ in
+                    AnimeDetailPicturesSectionView(
+                        viewModel: viewModel,
+                        onTapImage: { index in
+                            showImagePreview(for: anime, selectedPictureIndex: index)
+                        }
+                    )
                 }
-            } else {
-                AnimeDetailRecommendationsSectionView(
-                    viewModel: viewModel,
-                    animeTitle: viewModel.displayTitle(for: anime),
-                    isShowingRecommendationList: $isShowingRecommendationList
-                )
-            }
+            )
+        case .recommendations:
+            DetailSupplementarySectionStateView(
+                state: viewModel.recommendationsState,
+                title: "你可能也喜歡",
+                isEmpty: { _ in viewModel.allRecommendations.isEmpty },
+                onRetry: {
+                    Task(priority: .userInitiated) {
+                        await viewModel.reloadRecommendations()
+                    }
+                },
+                loading: {
+                    AnimeDetailRecommendationsSectionSkeletonView()
+                },
+                content: { _ in
+                    AnimeDetailRecommendationsSectionView(
+                        viewModel: viewModel,
+                        animeTitle: viewModel.displayTitle(for: anime),
+                        isShowingRecommendationList: $isShowingRecommendationList
+                    )
+                }
+            )
         }
     }
 
