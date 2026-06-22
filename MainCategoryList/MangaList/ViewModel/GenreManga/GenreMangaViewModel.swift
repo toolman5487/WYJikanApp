@@ -51,7 +51,7 @@ final class GenreMangaViewModel: ObservableObject {
         switch loadState {
         case .loadingInitial where genreSections.isEmpty:
             return .loading
-        case .error(let failure) where genreSections.isEmpty:
+        case .error(let failure) where !hasDisplayableSections:
             return .error(failure)
         case .idle, .loadingInitial, .loadingMore, .paused, .loaded, .error:
             if genreSections.isEmpty {
@@ -59,7 +59,7 @@ final class GenreMangaViewModel: ObservableObject {
             }
 
             return .content(
-                sections: genreSections,
+                sections: sectionsForDisplay,
                 inlineError: inlineErrorMessage
             )
         }
@@ -148,6 +148,19 @@ final class GenreMangaViewModel: ObservableObject {
 // MARK: - Screen State
 
 private extension GenreMangaViewModel {
+    var hasDisplayableSections: Bool {
+        genreSections.contains { !$0.items.isEmpty }
+    }
+
+    var sectionsForDisplay: [MangaGenreSection] {
+        switch loadState {
+        case .error:
+            return genreSections.filter { !$0.items.isEmpty }
+        case .idle, .loadingInitial, .loadingMore, .paused, .loaded:
+            return genreSections
+        }
+    }
+
     var canReplaceBatchConfiguration: Bool {
         switch loadState {
         case .idle where genreSections.isEmpty:
