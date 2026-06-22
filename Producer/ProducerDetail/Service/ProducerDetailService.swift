@@ -27,7 +27,7 @@ nonisolated final class ProducerDetailService: ProducerDetailServicing {
 
     func fetchProducerDetail(malId: Int) async throws -> ProducerDetailResponse {
         try await apiService.fetch(
-            endpoint: APIConfig.Producers.detail(id: malId),
+            endpoint: APIConfig.Producers.full(id: malId),
             cachePolicy: .cacheFirst(ttl: 600)
         )
     }

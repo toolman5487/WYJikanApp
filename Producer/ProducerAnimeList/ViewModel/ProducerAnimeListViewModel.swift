@@ -22,7 +22,7 @@ final class ProducerAnimeListViewModel: ObservableObject {
 
     // MARK: - Published State
 
-    @Published var selectedSort: AnimeCategoryFilter.Sort = .score
+    @Published var selectedSort: AnimeCategoryFilter.Sort = .defaultSort
     @Published var selectedFormat: AnimeCategoryFilter.Format = .all
     @Published private(set) var screenState: ScreenState = .loading
     @Published private(set) var loadMoreState: LoadMoreState = .hidden

@@ -144,6 +144,52 @@ struct ProducerDetailAboutSectionView: View {
     }
 }
 
+// MARK: - External Links
+
+struct ProducerDetailExternalLinksSectionView: View {
+    let viewModel: ProducerDetailViewModel
+    let producer: ProducerDetailDTO
+
+    var body: some View {
+        AnimeDetailSectionCard("相關連結") {
+            LazyVGrid(
+                columns: [
+                    GridItem(.adaptive(minimum: 144), spacing: 12)
+                ],
+                alignment: .leading,
+                spacing: 12
+            ) {
+                ForEach(viewModel.externalLinks(for: producer)) { link in
+                    NavigationLink {
+                        NavigationWebPageView(
+                            title: link.title,
+                            url: link.url
+                        )
+                    } label: {
+                        Label(
+                            link.title,
+                            systemImage: viewModel.externalLinkSystemImage(for: link)
+                        )
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(ThemeColor.textPrimary)
+                        .lineLimit(1)
+                        .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                        .padding(.horizontal, 12)
+                        .background(Color(.secondarySystemBackground))
+                        .clipShape(
+                            RoundedRectangle(
+                                cornerRadius: 12,
+                                style: .continuous
+                            )
+                        )
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+    }
+}
+
 // MARK: - Metric
 
 private struct ProducerDetailMetricView: View {

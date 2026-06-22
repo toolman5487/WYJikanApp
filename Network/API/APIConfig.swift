@@ -107,6 +107,7 @@ nonisolated enum APIConfig {
     enum Producers {
         static let list = "/producers"
         static func detail(id: Int) -> String { "/producers/\(id)" }
+        static func full(id: Int) -> String { "/producers/\(id)/full" }
     }
 
     enum Magazines {

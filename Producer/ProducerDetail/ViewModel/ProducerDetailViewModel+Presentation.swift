@@ -13,6 +13,7 @@ extension ProducerDetailViewModel {
         case header
         case info
         case about
+        case links
         case anime
 
         var id: String {
@@ -20,6 +21,7 @@ extension ProducerDetailViewModel {
             case .header: return "header"
             case .info: return "info"
             case .about: return "about"
+            case .links: return "links"
             case .anime: return "anime"
             }
         }
@@ -29,6 +31,9 @@ extension ProducerDetailViewModel {
         var sections: [Section] = [.header, .info]
         if aboutText(for: producer) != nil {
             sections.append(.about)
+        }
+        if !externalLinks(for: producer).isEmpty {
+            sections.append(.links)
         }
         sections.append(.anime)
         return sections
@@ -91,6 +96,48 @@ extension ProducerDetailViewModel {
 
     func aboutText(for producer: ProducerDetailDTO) -> String? {
         DisplayTextFormatting.nonEmpty(producer.about)
+    }
+
+    func externalLinks(
+        for producer: ProducerDetailDTO
+    ) -> [ProducerExternalLinkItem] {
+        var seenURLs: Set<String> = []
+
+        return (producer.external ?? []).compactMap { link in
+            guard let rawURL = DisplayTextFormatting.nonEmpty(link.url),
+                  let url = URL(string: rawURL),
+                  let scheme = url.scheme?.lowercased(),
+                  scheme == "https" || scheme == "http",
+                  seenURLs.insert(url.absoluteString).inserted else {
+                return nil
+            }
+
+            return ProducerExternalLinkItem(
+                title: externalLinkTitle(link.name, url: url),
+                url: url,
+                kind: externalLinkKind(name: link.name, url: url)
+            )
+        }
+        .sorted {
+            externalLinkSortOrder($0.kind) < externalLinkSortOrder($1.kind)
+        }
+    }
+
+    func externalLinkSystemImage(
+        for link: ProducerExternalLinkItem
+    ) -> String {
+        switch link.kind {
+        case .official:
+            return "globe"
+        case .youtube:
+            return "play.rectangle.fill"
+        case .social:
+            return "person.2.fill"
+        case .reference:
+            return "book.closed.fill"
+        case .other:
+            return "link"
+        }
     }
 
     func malPageURL(for producer: ProducerDetailDTO) -> URL? {
@@ -158,5 +205,72 @@ extension ProducerDetailViewModel {
             return nil
         }
         return "\(title)：\(value)"
+    }
+
+    private func externalLinkTitle(_ name: String?, url: URL) -> String {
+        let normalizedName = DisplayTextFormatting.nonEmpty(name)
+        let host = url.host?.lowercased() ?? ""
+
+        if YouTubeVideoURLResolver.isYouTubeURL(url) {
+            return "YouTube"
+        }
+        if host.contains("twitter.com") || host.contains("x.com") {
+            return normalizedName?.hasPrefix("@") == true
+                ? normalizedName ?? "X"
+                : "X"
+        }
+        if host.contains("facebook.com") {
+            return "Facebook"
+        }
+        if host.contains("instagram.com") {
+            return "Instagram"
+        }
+        if host.contains("wikipedia.org") || host.contains("wikiwand.com") {
+            return normalizedName ?? "百科資料"
+        }
+        return normalizedName ?? url.host ?? "外部連結"
+    }
+
+    private func externalLinkKind(
+        name: String?,
+        url: URL
+    ) -> ProducerExternalLinkItem.Kind {
+        let host = url.host?.lowercased() ?? ""
+        let normalizedName = DisplayTextFormatting.nonEmpty(name)?.lowercased() ?? ""
+
+        if YouTubeVideoURLResolver.isYouTubeURL(url) {
+            return .youtube
+        }
+        if host.contains("twitter.com")
+            || host.contains("x.com")
+            || host.contains("facebook.com")
+            || host.contains("instagram.com") {
+            return .social
+        }
+        if host.contains("wikipedia.org")
+            || host.contains("wikiwand.com")
+            || host.contains("bangumi.tv")
+            || host.contains("anisearch.com") {
+            return .reference
+        }
+        if normalizedName.contains("official")
+            || host.hasSuffix(".jp")
+            || host.hasSuffix(".com")
+            || host.hasSuffix(".co.jp") {
+            return .official
+        }
+        return .other
+    }
+
+    private func externalLinkSortOrder(
+        _ kind: ProducerExternalLinkItem.Kind
+    ) -> Int {
+        switch kind {
+        case .official: return 0
+        case .youtube: return 1
+        case .social: return 2
+        case .reference: return 3
+        case .other: return 4
+        }
     }
 }

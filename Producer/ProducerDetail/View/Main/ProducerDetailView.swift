@@ -117,6 +117,11 @@ private struct ProducerDetailBodyView: View {
                 viewModel: viewModel,
                 producer: producer
             )
+        case .links:
+            ProducerDetailExternalLinksSectionView(
+                viewModel: viewModel,
+                producer: producer
+            )
         case .anime:
             ProducerRelatedAnimeSectionView(
                 state: viewModel.relatedAnimeState,
