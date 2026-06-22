@@ -34,6 +34,10 @@ nonisolated enum MediaTypeFormatting {
                 return "特別篇"
             case "MUSIC":
                 return "音樂"
+            case "CM":
+                return "廣告"
+            case "PV":
+                return "宣傳片"
             default:
                 return trimmedValue
             }

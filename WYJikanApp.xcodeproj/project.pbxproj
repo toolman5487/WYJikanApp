@@ -65,6 +65,9 @@
 		158EFF2C2FE90E2D00B7BA9F /* DisplayDateFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 158EFF2A2FE90E2D00B7BA9F /* DisplayDateFormatting.swift */; };
 		16FA10022FFF000000000002 /* DisplayNumberFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FA10012FFF000000000001 /* DisplayNumberFormatting.swift */; };
 		16FA10042FFF000000000004 /* DisplayTextFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FA10032FFF000000000003 /* DisplayTextFormatting.swift */; };
+		16FA10122FFF000000000012 /* CharacterRoleFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FA10112FFF000000000011 /* CharacterRoleFormatting.swift */; };
+		16FA10142FFF000000000014 /* PeoplePositionFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FA10132FFF000000000013 /* PeoplePositionFormatting.swift */; };
+		16FA10162FFF000000000016 /* VoiceLanguageFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FA10152FFF000000000015 /* VoiceLanguageFormatting.swift */; };
 		15963B872FA5E1FA00DB516B /* AnimeCategoryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15963B862FA5E1FA00DB516B /* AnimeCategoryDetailView.swift */; };
 		15963B8B2FA5E6EF00DB516B /* AnimeCategoryDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15963B892FA5E6EF00DB516B /* AnimeCategoryDetailViewModel.swift */; };
 		15963B912FA5EBD800DB516B /* AnimeCategoryDetailService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15963B8F2FA5EBD800DB516B /* AnimeCategoryDetailService.swift */; };
@@ -469,6 +472,9 @@
 		158EFF2A2FE90E2D00B7BA9F /* DisplayDateFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayDateFormatting.swift; sourceTree = "<group>"; };
 		16FA10012FFF000000000001 /* DisplayNumberFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayNumberFormatting.swift; sourceTree = "<group>"; };
 		16FA10032FFF000000000003 /* DisplayTextFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayTextFormatting.swift; sourceTree = "<group>"; };
+		16FA10112FFF000000000011 /* CharacterRoleFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterRoleFormatting.swift; sourceTree = "<group>"; };
+		16FA10132FFF000000000013 /* PeoplePositionFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeoplePositionFormatting.swift; sourceTree = "<group>"; };
+		16FA10152FFF000000000015 /* VoiceLanguageFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceLanguageFormatting.swift; sourceTree = "<group>"; };
 		15963B862FA5E1FA00DB516B /* AnimeCategoryDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeCategoryDetailView.swift; sourceTree = "<group>"; };
 		15963B892FA5E6EF00DB516B /* AnimeCategoryDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeCategoryDetailViewModel.swift; sourceTree = "<group>"; };
 		15963B8F2FA5EBD800DB516B /* AnimeCategoryDetailService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeCategoryDetailService.swift; sourceTree = "<group>"; };
@@ -1298,10 +1304,13 @@
 		158EFF2B2FE90E2D00B7BA9F /* Formatter */ = {
 			isa = PBXGroup;
 			children = (
+				16FA10112FFF000000000011 /* CharacterRoleFormatting.swift */,
 				158EFF2A2FE90E2D00B7BA9F /* DisplayDateFormatting.swift */,
 				16FA10012FFF000000000001 /* DisplayNumberFormatting.swift */,
 				16FA10032FFF000000000003 /* DisplayTextFormatting.swift */,
 				16F1000D2FF400000000000D /* MediaTypeFormatting.swift */,
+				16FA10132FFF000000000013 /* PeoplePositionFormatting.swift */,
+				16FA10152FFF000000000015 /* VoiceLanguageFormatting.swift */,
 			);
 			path = Formatter;
 			sourceTree = "<group>";
@@ -3438,6 +3447,9 @@
 				158EFF2C2FE90E2D00B7BA9F /* DisplayDateFormatting.swift in Sources */,
 				16FA10022FFF000000000002 /* DisplayNumberFormatting.swift in Sources */,
 				16FA10042FFF000000000004 /* DisplayTextFormatting.swift in Sources */,
+				16FA10122FFF000000000012 /* CharacterRoleFormatting.swift in Sources */,
+				16FA10142FFF000000000014 /* PeoplePositionFormatting.swift in Sources */,
+				16FA10162FFF000000000016 /* VoiceLanguageFormatting.swift in Sources */,
 				16F2001A2FAB40000000001A /* HomeTodayAnimeScheduleListLoadingView.swift in Sources */,
 				16F200202FAB400000000020 /* HomeTodayAnimeScheduleListLoadMoreFooterView.swift in Sources */,
 				16F300022FAB500000000002 /* HomeTrendingAnimeListModel.swift in Sources */,

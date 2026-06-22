@@ -168,11 +168,11 @@ extension PeopleDetailViewModel {
     }
 
     func roleText(_ role: String?) -> String {
-        guard var text = DisplayTextFormatting.nonEmpty(role) else { return "-" }
-        if text.lowercased().hasPrefix("add ") {
-            text.removeFirst(4)
-        }
-        return text
+        CharacterRoleFormatting.localizedName(for: role) ?? "-"
+    }
+
+    func positionText(_ position: String?) -> String {
+        PeoplePositionFormatting.localizedName(for: position) ?? "-"
     }
 
     func formatNumber(_ value: Int) -> String {

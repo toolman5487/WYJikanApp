@@ -278,7 +278,7 @@ extension MangaDetailViewModel {
     }
 
     func characterRoleText(_ role: MangaCharacterRoleDTO) -> String {
-        trimmedText(role.role) ?? "未標示定位"
+        CharacterRoleFormatting.localizedName(for: role.role) ?? "未標示定位"
     }
 
     func characterFavoriteText(_ role: MangaCharacterRoleDTO) -> String {

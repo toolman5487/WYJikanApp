@@ -15,6 +15,8 @@ enum AnimeDetailMediaKind: Equatable {
     case ona
     case special
     case music
+    case cm
+    case pv
     case other(raw: String)
 
     init(anime: AnimeDetailDTO) {
@@ -35,6 +37,10 @@ enum AnimeDetailMediaKind: Equatable {
             self = .special
         case "MUSIC":
             self = .music
+        case "CM":
+            self = .cm
+        case "PV":
+            self = .pv
         default:
             self = .other(raw: raw)
         }
@@ -54,6 +60,10 @@ enum AnimeDetailMediaKind: Equatable {
             return MediaTypeFormatting.localizedName(for: "SPECIAL", kind: .anime) ?? "-"
         case .music:
             return MediaTypeFormatting.localizedName(for: "MUSIC", kind: .anime) ?? "-"
+        case .cm:
+            return MediaTypeFormatting.localizedName(for: "CM", kind: .anime) ?? "-"
+        case .pv:
+            return MediaTypeFormatting.localizedName(for: "PV", kind: .anime) ?? "-"
         case .other(let raw):
             return raw.isEmpty ? "-" : raw
         }

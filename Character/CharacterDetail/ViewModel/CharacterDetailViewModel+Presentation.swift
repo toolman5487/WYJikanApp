@@ -155,7 +155,7 @@ extension CharacterDetailViewModel {
     }
 
     func roleText(_ role: String?) -> String {
-        DisplayTextFormatting.nonEmpty(role) ?? "-"
+        CharacterRoleFormatting.localizedName(for: role) ?? "-"
     }
 
     func personName(_ person: CharacterPersonDTO) -> String {
@@ -163,7 +163,7 @@ extension CharacterDetailViewModel {
     }
 
     func languageText(_ language: String?) -> String {
-        DisplayTextFormatting.nonEmpty(language) ?? "-"
+        VoiceLanguageFormatting.localizedName(for: language) ?? "-"
     }
 
     func formatNumber(_ value: Int) -> String {

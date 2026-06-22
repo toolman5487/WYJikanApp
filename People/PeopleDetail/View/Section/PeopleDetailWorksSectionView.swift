@@ -30,7 +30,7 @@ struct PeopleDetailAnimeStaffSectionView: View {
                             } label: {
                                 PeopleDetailWorkCardView(
                                     title: viewModel.workTitle(anime),
-                                    subtitle: viewModel.roleText(position.position),
+                                    subtitle: viewModel.positionText(position.position),
                                     imageURL: viewModel.imageURL(from: anime.images),
                                     cardWidth: 160,
                                     cardHeight: 240,
@@ -102,7 +102,7 @@ struct PeopleDetailMangaStaffSectionView: View {
                             } label: {
                                 PeopleDetailWorkCardView(
                                     title: viewModel.workTitle(manga),
-                                    subtitle: viewModel.roleText(position.position),
+                                    subtitle: viewModel.positionText(position.position),
                                     imageURL: viewModel.imageURL(from: manga.images),
                                     cardWidth: 160,
                                     cardHeight: 240,
@@ -165,7 +165,7 @@ struct PeopleDetailAnimeStaffListView: View {
                     } label: {
                         PeopleDetailWorkGridCardView(
                             title: viewModel.workTitle(anime),
-                            subtitle: viewModel.roleText(position.position),
+                            subtitle: viewModel.positionText(position.position),
                             imageURL: viewModel.imageURL(from: anime.images)
                         )
                     }
@@ -192,7 +192,7 @@ struct PeopleDetailMangaStaffListView: View {
                     } label: {
                         PeopleDetailWorkGridCardView(
                             title: viewModel.workTitle(manga),
-                            subtitle: viewModel.roleText(position.position),
+                            subtitle: viewModel.positionText(position.position),
                             imageURL: viewModel.imageURL(from: manga.images)
                         )
                     }

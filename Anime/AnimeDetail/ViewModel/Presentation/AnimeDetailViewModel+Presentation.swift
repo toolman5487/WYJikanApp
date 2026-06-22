@@ -506,11 +506,7 @@ extension AnimeDetailViewModel {
     }
 
     func characterRoleText(_ role: AnimeCharacterRoleDTO) -> String {
-        guard let trimmed = role.role?.trimmingCharacters(in: .whitespacesAndNewlines),
-              !trimmed.isEmpty else {
-            return "未標示定位"
-        }
-        return trimmed
+        CharacterRoleFormatting.localizedName(for: role.role) ?? "未標示定位"
     }
 
     func voiceActorSummary(for role: AnimeCharacterRoleDTO) -> String {
@@ -524,8 +520,7 @@ extension AnimeDetailViewModel {
             fallbackName: person.name,
             emptyFallback: "未命名聲優"
         )
-        let language = trimmedText(voiceActor.language)
-        guard let language, !language.isEmpty else {
+        guard let language = VoiceLanguageFormatting.localizedName(for: voiceActor.language) else {
             return resolvedName
         }
         return "\(resolvedName) · \(language)"
