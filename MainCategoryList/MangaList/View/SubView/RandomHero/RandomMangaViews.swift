@@ -175,7 +175,9 @@ private extension RandomPickHeroItem {
             texts.append(type)
         }
         if let score = manga.score {
-            texts.append(String(format: "★ %.1f", score))
+            texts.append(
+                "★ \(DisplayNumberFormatting.fixed(score, fractionDigits: 1))"
+            )
         }
         if let chapters = manga.chapters {
             texts.append("\(chapters) 話")

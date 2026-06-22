@@ -338,14 +338,14 @@ extension AnimeDetailViewModel {
     }
 
     func formatNumber(_ value: Int) -> String {
-        DisplayFormatters.Number.decimalString(for: value)
+        DisplayNumberFormatting.decimal(value)
     }
 
     // MARK: - Score & Visibility
 
     func scoreDisplayText(for anime: AnimeDetailDTO) -> String {
         guard let score = anime.score else { return "-" }
-        return String(format: "%.2f", score) + " / 10.0"
+        return DisplayNumberFormatting.fixed(score, fractionDigits: 2) + " / 10.0"
     }
 
     private func shareDetailsText(for anime: AnimeDetailDTO) -> String {
@@ -545,7 +545,10 @@ extension AnimeDetailViewModel {
         fallbackName: String?,
         emptyFallback: String
     ) -> String {
-        trimmedText(kanjiName) ?? trimmedText(fallbackName) ?? emptyFallback
+        DisplayTextFormatting.preferred(
+            [kanjiName, fallbackName],
+            fallback: emptyFallback
+        )
     }
 
     private func preferredTitle(
@@ -554,7 +557,10 @@ extension AnimeDetailViewModel {
         fallbackTitle: String?,
         emptyFallback: String
     ) -> String {
-        trimmedText(japaneseTitle) ?? trimmedText(englishTitle) ?? trimmedText(fallbackTitle) ?? emptyFallback
+        DisplayTextFormatting.preferred(
+            [japaneseTitle, englishTitle, fallbackTitle],
+            fallback: emptyFallback
+        )
     }
 
     private func preferredSecondaryTitle(
@@ -579,11 +585,7 @@ extension AnimeDetailViewModel {
     }
 
     private func trimmedText(_ value: String?) -> String? {
-        guard let value = value?.trimmingCharacters(in: .whitespacesAndNewlines),
-              !value.isEmpty else {
-            return nil
-        }
-        return value
+        DisplayTextFormatting.nonEmpty(value)
     }
 
     func recommendationTitle(_ recommendation: AnimeRecommendationDTO) -> String {

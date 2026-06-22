@@ -14,16 +14,14 @@ nonisolated struct MainHomeMediaTextFormatter: Sendable {
         fallback: String?,
         defaultTitle: String = "未命名作品"
     ) -> String {
-        normalizedText(japanese) ??
-            normalizedText(english) ??
-            normalizedText(fallback) ??
-            defaultTitle
+        DisplayTextFormatting.preferred(
+            [japanese, english, fallback],
+            fallback: defaultTitle
+        )
     }
 
     func normalizedText(_ value: String?) -> String? {
-        guard let value else { return nil }
-        let trimmedValue = value.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmedValue.isEmpty ? nil : trimmedValue
+        DisplayTextFormatting.nonEmpty(value)
     }
 
     func animeTypeText(_ raw: String?) -> String? {
@@ -32,7 +30,7 @@ nonisolated struct MainHomeMediaTextFormatter: Sendable {
 
     func scoreText(_ score: Double?, precision: Int) -> String? {
         guard let score else { return nil }
-        return String(format: "%.\(precision)f", score)
+        return DisplayNumberFormatting.fixed(score, fractionDigits: precision)
     }
 
     func episodeText(_ episodes: Int?) -> String? {
@@ -45,16 +43,11 @@ nonisolated struct MainHomeMediaTextFormatter: Sendable {
 
     func memberCountText(_ members: Int?) -> String? {
         guard let members else { return nil }
-
-        if members >= 1_000_000 {
-            return String(format: "%.1fM 收藏", Double(members) / 1_000_000)
-        }
-
-        if members >= 1_000 {
-            return String(format: "%.1fK 收藏", Double(members) / 1_000)
-        }
-
-        return "\(members) 收藏"
+        let count = DisplayNumberFormatting.compact(
+            members,
+            locale: Locale(identifier: "en_US_POSIX")
+        )
+        return "\(count) 收藏"
     }
 
     func animeStatusText(_ raw: String?) -> String? {

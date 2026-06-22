@@ -145,8 +145,8 @@ private extension AnimeDetailEpisodeRowPresenter {
 
     func airedDisplayText(for episode: AnimeEpisodeDTO) -> String? {
         guard let aired = trimmed(episode.aired) else { return nil }
-        guard let date = DisplayFormatters.DateParsing.date(fromISO8601: aired) else { return aired }
-        return DisplayFormatters.DateDisplay.mediumDateString(from: date)
+        guard let date = DisplayDateFormatting.date(fromISO8601: aired) else { return aired }
+        return DisplayDateFormatting.mediumDateString(from: date)
     }
 
     func durationDisplayText(for episode: AnimeEpisodeDTO) -> String? {

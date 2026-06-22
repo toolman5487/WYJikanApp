@@ -50,7 +50,9 @@ struct HeroBannerSlideView: View {
                         }
 
                         if let score = item.score {
-                            badge(text: String(format: "★ %.2f", score))
+                            badge(
+                                text: "★ \(DisplayNumberFormatting.fixed(score, fractionDigits: 2))"
+                            )
                         }
 
                         Spacer(minLength: 12)

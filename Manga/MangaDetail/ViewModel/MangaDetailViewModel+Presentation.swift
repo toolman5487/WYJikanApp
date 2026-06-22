@@ -185,7 +185,7 @@ extension MangaDetailViewModel {
     }
 
     func formatNumber(_ value: Int) -> String {
-        DisplayFormatters.Number.decimalString(for: value)
+        DisplayNumberFormatting.decimal(value)
     }
 
     // MARK: - Supplementary Content
@@ -357,7 +357,7 @@ extension MangaDetailViewModel {
 
     func scoreDisplayText(for manga: MangaDetailDTO) -> String {
         guard let score = manga.score else { return "-" }
-        return String(format: "%.2f", score) + " / 10.0"
+        return DisplayNumberFormatting.fixed(score, fractionDigits: 2) + " / 10.0"
     }
 
     private func shareDetailsText(for manga: MangaDetailDTO) -> String {
@@ -435,7 +435,10 @@ extension MangaDetailViewModel {
         fallbackName: String?,
         emptyFallback: String
     ) -> String {
-        trimmedText(kanjiName) ?? trimmedText(fallbackName) ?? emptyFallback
+        DisplayTextFormatting.preferred(
+            [kanjiName, fallbackName],
+            fallback: emptyFallback
+        )
     }
 
     private func preferredTitle(
@@ -444,15 +447,14 @@ extension MangaDetailViewModel {
         fallbackTitle: String?,
         emptyFallback: String
     ) -> String {
-        trimmedText(japaneseTitle) ?? trimmedText(englishTitle) ?? trimmedText(fallbackTitle) ?? emptyFallback
+        DisplayTextFormatting.preferred(
+            [japaneseTitle, englishTitle, fallbackTitle],
+            fallback: emptyFallback
+        )
     }
 
     private func trimmedText(_ value: String?) -> String? {
-        guard let value = value?.trimmingCharacters(in: .whitespacesAndNewlines),
-              !value.isEmpty else {
-            return nil
-        }
-        return value
+        DisplayTextFormatting.nonEmpty(value)
     }
 
     private func cleanedSynopsis(for manga: MangaDetailDTO) -> String? {

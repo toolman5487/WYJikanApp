@@ -26,7 +26,7 @@ extension AnimeReviewViewModel {
     }
 
     func dateDisplayText(for entry: AnimeReviewEntryDTO) -> String? {
-        DisplayFormatters.DateDisplay.displayDateString(
+        DisplayDateFormatting.displayDateString(
             fromISO8601: entry.date
         )
     }

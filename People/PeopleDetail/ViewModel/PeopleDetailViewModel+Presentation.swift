@@ -72,14 +72,14 @@ extension PeopleDetailViewModel {
 
     func displayName(for person: PeopleDetailDTO) -> String {
         let localName = [person.familyName, person.givenName]
-            .compactMap(nonEmpty)
+            .compactMap(DisplayTextFormatting.nonEmpty)
             .joined(separator: " ")
-        return firstNonEmpty(localName, person.name) ?? "-"
+        return DisplayTextFormatting.firstNonEmpty(localName, person.name) ?? "-"
     }
 
     func englishName(for person: PeopleDetailDTO) -> String? {
         guard person.name != displayName(for: person) else { return nil }
-        return nonEmpty(person.name)
+        return DisplayTextFormatting.nonEmpty(person.name)
     }
 
     func posterURL(for person: PeopleDetailDTO) -> URL? {
@@ -87,7 +87,7 @@ extension PeopleDetailViewModel {
     }
 
     func malPageURL(for person: PeopleDetailDTO) -> URL? {
-        if let raw = nonEmpty(person.url), let url = URL(string: raw) {
+        if let raw = DisplayTextFormatting.nonEmpty(person.url), let url = URL(string: raw) {
             return url
         }
         return URL(string: "https://myanimelist.net/people/\(person.malId)")
@@ -99,20 +99,20 @@ extension PeopleDetailViewModel {
     }
 
     func birthdayText(for person: PeopleDetailDTO) -> String? {
-        DisplayFormatters.DateDisplay.displayDateString(
+        DisplayDateFormatting.displayDateString(
             fromISO8601: person.birthday
         )
     }
 
     func alternateNamesText(for person: PeopleDetailDTO) -> String? {
         let names = (person.alternateNames ?? [])
-            .compactMap(nonEmpty)
+            .compactMap(DisplayTextFormatting.nonEmpty)
         guard !names.isEmpty else { return nil }
         return names.joined(separator: "、")
     }
 
     func aboutText(for person: PeopleDetailDTO) -> String? {
-        nonEmpty(person.about)
+        DisplayTextFormatting.nonEmpty(person.about)
     }
 
     func voiceRoles(for person: PeopleDetailDTO) -> [PeopleVoiceRoleDTO] {
@@ -160,15 +160,15 @@ extension PeopleDetailViewModel {
     }
 
     func workTitle(_ work: PeopleRelatedWorkDTO) -> String {
-        nonEmpty(work.title) ?? "-"
+        DisplayTextFormatting.nonEmpty(work.title) ?? "-"
     }
 
     func characterName(_ character: PeopleRelatedCharacterDTO) -> String {
-        nonEmpty(character.name) ?? "-"
+        DisplayTextFormatting.nonEmpty(character.name) ?? "-"
     }
 
     func roleText(_ role: String?) -> String {
-        guard var text = nonEmpty(role) else { return "-" }
+        guard var text = DisplayTextFormatting.nonEmpty(role) else { return "-" }
         if text.lowercased().hasPrefix("add ") {
             text.removeFirst(4)
         }
@@ -176,7 +176,7 @@ extension PeopleDetailViewModel {
     }
 
     func formatNumber(_ value: Int) -> String {
-        DisplayFormatters.Number.decimalString(for: value)
+        DisplayNumberFormatting.decimal(value)
     }
 
     private func shareDetailsText(for person: PeopleDetailDTO) -> String {
@@ -203,21 +203,10 @@ extension PeopleDetailViewModel {
     }
 
     private func shareValue(_ value: String?) -> String? {
-        guard let value = nonEmpty(value),
+        guard let value = DisplayTextFormatting.nonEmpty(value),
               value != "-" else {
             return nil
         }
         return value
-    }
-
-    private func firstNonEmpty(_ values: String?...) -> String? {
-        values.compactMap(nonEmpty).first
-    }
-
-    private func nonEmpty(_ value: String?) -> String? {
-        guard let text = value?.trimmingCharacters(in: .whitespacesAndNewlines), !text.isEmpty else {
-            return nil
-        }
-        return text
     }
 }

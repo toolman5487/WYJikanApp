@@ -195,10 +195,7 @@ nonisolated enum JikanImageURLResolver {
     // MARK: - Helpers
 
     private static func nonEmpty(_ value: String?) -> String? {
-        guard let text = value?.trimmingCharacters(in: .whitespacesAndNewlines), !text.isEmpty else {
-            return nil
-        }
-        return text
+        DisplayTextFormatting.nonEmpty(value)
     }
 }
 

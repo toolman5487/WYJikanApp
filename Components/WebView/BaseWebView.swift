@@ -233,12 +233,7 @@ nonisolated enum YouTubeVideoURLResolver {
     }
 
     private static func normalizedText(_ value: String?) -> String? {
-        guard let text = value?.trimmingCharacters(in: .whitespacesAndNewlines),
-              !text.isEmpty else {
-            return nil
-        }
-
-        return text
+        DisplayTextFormatting.nonEmpty(value)
     }
 }
 

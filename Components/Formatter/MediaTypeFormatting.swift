@@ -2,8 +2,6 @@
 //  MediaTypeFormatting.swift
 //  WYJikanApp
 //
-//  Created by Codex on 2026/6/17.
-//
 
 import Foundation
 
@@ -17,9 +15,9 @@ nonisolated enum MediaTypeFormatting {
         for rawValue: String?,
         kind: MediaKind
     ) -> String? {
-        guard let rawValue else { return nil }
-        let trimmedValue = rawValue.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmedValue.isEmpty else { return nil }
+        guard let trimmedValue = DisplayTextFormatting.nonEmpty(rawValue) else {
+            return nil
+        }
 
         switch kind {
         case .anime:

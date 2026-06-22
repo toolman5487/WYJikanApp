@@ -109,7 +109,9 @@ struct PosterCardMetadataOverlayView: View {
                     chip(text: type)
                 }
                 if let score {
-                    chip(text: String(format: "★ %.2f", score))
+                    chip(
+                        text: "★ \(DisplayNumberFormatting.fixed(score, fractionDigits: 2))"
+                    )
                 }
             }
         }

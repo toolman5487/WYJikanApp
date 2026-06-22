@@ -26,7 +26,7 @@ extension MangaReviewViewModel {
     }
 
     func dateDisplayText(for entry: MangaReviewEntryDTO) -> String? {
-        DisplayFormatters.DateDisplay.displayDateString(
+        DisplayDateFormatting.displayDateString(
             fromISO8601: entry.date
         )
     }

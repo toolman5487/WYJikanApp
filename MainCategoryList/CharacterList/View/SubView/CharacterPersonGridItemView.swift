@@ -76,6 +76,6 @@ struct CharacterPersonGridItemView: View {
 
     private var favoritesText: String? {
         guard let favorites = row.favorites, favorites > 0 else { return nil }
-        return favorites.formatted(.number.notation(.compactName))
+        return DisplayNumberFormatting.compact(favorites)
     }
 }

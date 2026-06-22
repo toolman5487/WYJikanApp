@@ -72,7 +72,9 @@ private extension RandomPickHeroItem {
             texts.append(type)
         }
         if let score = anime.score {
-            texts.append(String(format: "★ %.1f", score))
+            texts.append(
+                "★ \(DisplayNumberFormatting.fixed(score, fractionDigits: 1))"
+            )
         }
         if let episodes = anime.episodes {
             texts.append("\(episodes) 話")

@@ -454,9 +454,7 @@ extension MyListCollectionItem {
     }
 
     private static func normalizedText(_ text: String?) -> String? {
-        guard let text else { return nil }
-        let trimmedText = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmedText.isEmpty ? nil : trimmedText
+        DisplayTextFormatting.nonEmpty(text)
     }
 
     private static func normalizedProgressValue(_ value: Int?) -> Int? {

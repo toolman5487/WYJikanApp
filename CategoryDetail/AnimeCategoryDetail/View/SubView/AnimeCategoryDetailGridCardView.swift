@@ -135,7 +135,9 @@ struct AnimeCategoryDetailGridCardView: View {
     }
 
     private var scoreText: String? {
-        item.score.map { String(format: "%.1f", $0) }
+        item.score.map {
+            DisplayNumberFormatting.fixed($0, fractionDigits: 1)
+        }
     }
 
     private var episodeText: String? {
@@ -147,7 +149,9 @@ struct AnimeCategoryDetailGridCardView: View {
     }
 
     private var membersText: String? {
-        item.members.map { "\($0.formatted()) 位會員" }
+        item.members.map {
+            "\(DisplayNumberFormatting.decimal($0)) 位會員"
+        }
     }
 
     private var popularityText: String? {
@@ -155,9 +159,7 @@ struct AnimeCategoryDetailGridCardView: View {
     }
 
     private func trimmedText(_ text: String?) -> String? {
-        guard let text else { return nil }
-        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.isEmpty ? nil : trimmed
+        DisplayTextFormatting.nonEmpty(text)
     }
 
     private func chip(_ text: String) -> some View {

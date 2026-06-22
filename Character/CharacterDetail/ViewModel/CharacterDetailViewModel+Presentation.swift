@@ -71,12 +71,12 @@ extension CharacterDetailViewModel {
     }
 
     func displayName(for character: CharacterDetailDTO) -> String {
-        firstNonEmpty(character.nameKanji, character.name) ?? "—"
+        DisplayTextFormatting.firstNonEmpty(character.nameKanji, character.name) ?? "—"
     }
 
     func englishName(for character: CharacterDetailDTO) -> String? {
         guard character.name != displayName(for: character) else { return nil }
-        return nonEmpty(character.name)
+        return DisplayTextFormatting.nonEmpty(character.name)
     }
 
     func posterURL(for character: CharacterDetailDTO) -> URL? {
@@ -84,7 +84,7 @@ extension CharacterDetailViewModel {
     }
 
     func malPageURL(for character: CharacterDetailDTO) -> URL? {
-        if let raw = nonEmpty(character.url), let url = URL(string: raw) {
+        if let raw = DisplayTextFormatting.nonEmpty(character.url), let url = URL(string: raw) {
             return url
         }
         return URL(string: "https://myanimelist.net/character/\(character.malId)")
@@ -97,13 +97,13 @@ extension CharacterDetailViewModel {
 
     func nicknamesText(for character: CharacterDetailDTO) -> String? {
         let names = (character.nicknames ?? [])
-            .compactMap(nonEmpty)
+            .compactMap(DisplayTextFormatting.nonEmpty)
         guard !names.isEmpty else { return nil }
         return names.joined(separator: "、")
     }
 
     func aboutText(for character: CharacterDetailDTO) -> String? {
-        nonEmpty(character.about)
+        DisplayTextFormatting.nonEmpty(character.about)
     }
 
     func animeRoles(for character: CharacterDetailDTO) -> [CharacterAnimeRoleDTO] {
@@ -151,23 +151,23 @@ extension CharacterDetailViewModel {
     }
 
     func workTitle(_ work: CharacterRelatedWorkDTO) -> String {
-        nonEmpty(work.title) ?? "—"
+        DisplayTextFormatting.nonEmpty(work.title) ?? "—"
     }
 
     func roleText(_ role: String?) -> String {
-        nonEmpty(role) ?? "-"
+        DisplayTextFormatting.nonEmpty(role) ?? "-"
     }
 
     func personName(_ person: CharacterPersonDTO) -> String {
-        nonEmpty(person.name) ?? "—"
+        DisplayTextFormatting.nonEmpty(person.name) ?? "—"
     }
 
     func languageText(_ language: String?) -> String {
-        nonEmpty(language) ?? "-"
+        DisplayTextFormatting.nonEmpty(language) ?? "-"
     }
 
     func formatNumber(_ value: Int) -> String {
-        DisplayFormatters.Number.decimalString(for: value)
+        DisplayNumberFormatting.decimal(value)
     }
 
     private func shareDetailsText(for character: CharacterDetailDTO) -> String {
@@ -193,21 +193,10 @@ extension CharacterDetailViewModel {
     }
 
     private func shareValue(_ value: String?) -> String? {
-        guard let value = nonEmpty(value),
+        guard let value = DisplayTextFormatting.nonEmpty(value),
               value != "-" else {
             return nil
         }
         return value
-    }
-
-    private func firstNonEmpty(_ values: String?...) -> String? {
-        values.compactMap(nonEmpty).first
-    }
-
-    private func nonEmpty(_ value: String?) -> String? {
-        guard let text = value?.trimmingCharacters(in: .whitespacesAndNewlines), !text.isEmpty else {
-            return nil
-        }
-        return text
     }
 }

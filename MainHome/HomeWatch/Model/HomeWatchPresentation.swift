@@ -63,10 +63,10 @@ nonisolated struct HomeWatchListItem: Identifiable, Equatable, Hashable, Sendabl
 
 nonisolated enum HomeWatchPresentationText {
     static func title(from entry: HomeWatchEntryDTO) -> String {
-        normalizedText(entry.titleJapanese) ??
-        normalizedText(entry.titleEnglish) ??
-        normalizedText(entry.title) ??
-        "未命名作品"
+        DisplayTextFormatting.preferred(
+            [entry.titleJapanese, entry.titleEnglish, entry.title],
+            fallback: "未命名作品"
+        )
     }
 
     static func episodeText(title: String?, episodeID: Int?, fallback: String) -> String {
@@ -82,11 +82,7 @@ nonisolated enum HomeWatchPresentationText {
     }
 
     static func normalizedText(_ value: String?) -> String? {
-        guard let text = value?.trimmingCharacters(in: .whitespacesAndNewlines),
-              !text.isEmpty else {
-            return nil
-        }
-        return text
+        DisplayTextFormatting.nonEmpty(value)
     }
 
     private static func localizedEpisodeTitle(from title: String) -> String {
