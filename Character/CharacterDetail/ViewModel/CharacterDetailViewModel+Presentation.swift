@@ -167,9 +167,7 @@ extension CharacterDetailViewModel {
     }
 
     func formatNumber(_ value: Int) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        return formatter.string(from: NSNumber(value: value)) ?? "\(value)"
+        DisplayFormatters.Number.decimalString(for: value)
     }
 
     private func shareDetailsText(for character: CharacterDetailDTO) -> String {

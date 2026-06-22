@@ -41,11 +41,23 @@ extension UserInterfacePlatform {
 
 nonisolated extension UserInterfacePlatform {
     var categoryGenreInitialBatchCount: Int {
-        isPad ? 4 : 3
+        3
+    }
+
+    var categoryGenreLoadMoreBatchCount: Int {
+        5
     }
 
     var categoryGenreItemRequestLimit: Int {
-        isPad ? 8 : 5
+        5
+    }
+
+    var categoryGenreInitialRequestDelay: Duration {
+        isPad ? .milliseconds(1800) : .milliseconds(1200)
+    }
+
+    var categoryGenreRequestInterval: Duration {
+        isPad ? .seconds(2) : .seconds(1)
     }
 }
 
@@ -54,6 +66,14 @@ nonisolated extension UserInterfacePlatform {
 nonisolated extension UserInterfacePlatform {
     var loadsHomeDeferredSectionsWhenVisible: Bool {
         isPhone
+    }
+
+    var shouldPreloadHomeDeferredSections: Bool {
+        isPad
+    }
+
+    var homeDeferredSectionLoadDelay: Duration {
+        isPad ? .milliseconds(500) : .zero
     }
 }
 

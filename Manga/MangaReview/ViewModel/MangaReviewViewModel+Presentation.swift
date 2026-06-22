@@ -26,22 +26,9 @@ extension MangaReviewViewModel {
     }
 
     func dateDisplayText(for entry: MangaReviewEntryDTO) -> String? {
-        guard let raw = entry.date?.trimmingCharacters(in: .whitespacesAndNewlines), !raw.isEmpty else {
-            return nil
-        }
-        let iso = ISO8601DateFormatter()
-        iso.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        var date = iso.date(from: raw)
-        if date == nil {
-            iso.formatOptions = [.withInternetDateTime]
-            date = iso.date(from: raw)
-        }
-        guard let date else { return raw }
-        let out = DateFormatter()
-        out.locale = Locale(identifier: "zh_TW")
-        out.dateStyle = .medium
-        out.timeStyle = .none
-        return out.string(from: date)
+        DisplayFormatters.DateDisplay.displayDateString(
+            fromISO8601: entry.date
+        )
     }
 
     func bodyDisplayText(for entry: MangaReviewEntryDTO) -> String {

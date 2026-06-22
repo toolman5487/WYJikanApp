@@ -145,8 +145,8 @@ private extension AnimeDetailEpisodeRowPresenter {
 
     func airedDisplayText(for episode: AnimeEpisodeDTO) -> String? {
         guard let aired = trimmed(episode.aired) else { return nil }
-        guard let date = dateFromISOString(aired) else { return aired }
-        return airedDateFormatter().string(from: date)
+        guard let date = DisplayFormatters.DateParsing.date(fromISO8601: aired) else { return aired }
+        return DisplayFormatters.DateDisplay.mediumDateString(from: date)
     }
 
     func durationDisplayText(for episode: AnimeEpisodeDTO) -> String? {
@@ -201,38 +201,4 @@ private extension AnimeDetailEpisodeRowPresenter {
         return URL(string: rawValue)
     }
 
-    func dateFromISOString(_ raw: String) -> Date? {
-        if let date = iso8601Formatter(withFractionalSeconds: true).date(from: raw) {
-            return date
-        }
-
-        if let date = iso8601Formatter(withFractionalSeconds: false).date(from: raw) {
-            return date
-        }
-
-        return fullDateFormatter().date(from: raw)
-    }
-
-    func iso8601Formatter(withFractionalSeconds: Bool) -> ISO8601DateFormatter {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = withFractionalSeconds
-            ? [.withInternetDateTime, .withFractionalSeconds]
-            : [.withInternetDateTime]
-        return formatter
-    }
-
-    func fullDateFormatter() -> ISO8601DateFormatter {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withFullDate]
-        return formatter
-    }
-
-    func airedDateFormatter() -> DateFormatter {
-        let formatter = DateFormatter()
-        formatter.locale = .autoupdatingCurrent
-        formatter.timeZone = .autoupdatingCurrent
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .none
-        return formatter
-    }
 }

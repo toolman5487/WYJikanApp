@@ -238,20 +238,7 @@ nonisolated enum AnimeDetailDateFormatting {
     }
 
     private static func dateFromISOString(_ raw: String?) -> Date? {
-        guard let raw = raw?.trimmingCharacters(in: .whitespacesAndNewlines), !raw.isEmpty else {
-            return nil
-        }
-        let iso = ISO8601DateFormatter()
-        iso.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        if let d = iso.date(from: raw) {
-            return d
-        }
-        iso.formatOptions = [.withInternetDateTime]
-        if let d = iso.date(from: raw) {
-            return d
-        }
-        iso.formatOptions = [.withFullDate]
-        return iso.date(from: raw)
+        DisplayFormatters.DateParsing.date(fromISO8601: raw)
     }
 
     private static func parseEnglishMalAiredString(_ raw: String) -> String? {
@@ -260,12 +247,7 @@ nonisolated enum AnimeDetailDateFormatting {
         let head = first.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !head.isEmpty else { return nil }
 
-        let inputFormatter = DateFormatter()
-        inputFormatter.locale = Locale(identifier: "en_US_POSIX")
-        inputFormatter.timeZone = TimeZone(secondsFromGMT: 0)
-        inputFormatter.dateFormat = "MMM d, yyyy"
-
-        guard let startDate = inputFormatter.date(from: head) else { return nil }
+        guard let startDate = DisplayFormatters.DateParsing.parseEnglishMalDate(head) else { return nil }
         let start = chineseDateStringFromUTC(startDate)
 
         guard segments.count >= 2 else { return start }
@@ -274,7 +256,7 @@ nonisolated enum AnimeDetailDateFormatting {
         if tailLower == "?" || tailLower.hasPrefix("?") {
             return start
         }
-        if let endDate = inputFormatter.date(from: tail) {
+        if let endDate = DisplayFormatters.DateParsing.parseEnglishMalDate(tail) {
             let end = chineseDateStringFromUTC(endDate)
             return "\(start) 至 \(end)"
         }
@@ -287,12 +269,7 @@ nonisolated enum AnimeDetailDateFormatting {
         let head = first.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !head.isEmpty else { return nil }
 
-        let inputFormatter = DateFormatter()
-        inputFormatter.locale = Locale(identifier: "en_US_POSIX")
-        inputFormatter.timeZone = TimeZone(secondsFromGMT: 0)
-        inputFormatter.dateFormat = "MMM d, yyyy"
-
-        guard let startDate = inputFormatter.date(from: head) else { return nil }
+        guard let startDate = DisplayFormatters.DateParsing.parseEnglishMalDate(head) else { return nil }
         let start = slashDateStringFromUTC(startDate)
 
         guard segments.count >= 2 else { return start }
@@ -301,7 +278,7 @@ nonisolated enum AnimeDetailDateFormatting {
         if tailLower == "?" || tailLower.hasPrefix("?") {
             return start
         }
-        if let endDate = inputFormatter.date(from: tail) {
+        if let endDate = DisplayFormatters.DateParsing.parseEnglishMalDate(tail) {
             let end = slashDateStringFromUTC(endDate)
             return "\(start) ~ \(end)"
         }
@@ -344,12 +321,7 @@ nonisolated enum AnimeDetailDateFormatting {
             weekdayPart = ""
         }
 
-        let timeFormatter = DateFormatter()
-        timeFormatter.locale = Locale.current
-        timeFormatter.timeZone = TimeZone.current
-        timeFormatter.dateFormat = "HH:mm"
-
-        let timePart = timeFormatter.string(from: date)
+        let timePart = DisplayFormatters.DateDisplay.localHourMinuteString(from: date)
         if weekdayPart.isEmpty {
             return timePart
         }
@@ -357,11 +329,7 @@ nonisolated enum AnimeDetailDateFormatting {
     }
 
     private static func localTimeString(from date: Date) -> String {
-        let timeFormatter = DateFormatter()
-        timeFormatter.locale = Locale.current
-        timeFormatter.timeZone = TimeZone.current
-        timeFormatter.dateFormat = "HH:mm"
-        return timeFormatter.string(from: date)
+        DisplayFormatters.DateDisplay.localHourMinuteString(from: date)
     }
 
     private static func makeLocalBroadcastPresentation(from date: Date) -> AnimeLocalBroadcastPresentation {

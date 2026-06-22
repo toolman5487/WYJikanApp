@@ -40,13 +40,13 @@ struct MainCategoryGenreBatchConfiguration: Sendable {
         requestInterval: .seconds(1)
     )
 
-    static func platformAdaptive(initialBatchSize: Int, itemRequestLimit: Int) -> Self {
+    static func platformAdaptive(_ platform: UserInterfacePlatform) -> Self {
         MainCategoryGenreBatchConfiguration(
-            initialBatchSize: initialBatchSize,
-            loadMoreBatchSize: 5,
-            itemRequestLimit: itemRequestLimit,
-            initialItemRequestDelay: .milliseconds(1200),
-            requestInterval: .seconds(1)
+            initialBatchSize: platform.categoryGenreInitialBatchCount,
+            loadMoreBatchSize: platform.categoryGenreLoadMoreBatchCount,
+            itemRequestLimit: platform.categoryGenreItemRequestLimit,
+            initialItemRequestDelay: platform.categoryGenreInitialRequestDelay,
+            requestInterval: platform.categoryGenreRequestInterval
         )
     }
 }

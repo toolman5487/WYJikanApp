@@ -185,9 +185,7 @@ extension MangaDetailViewModel {
     }
 
     func formatNumber(_ value: Int) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        return formatter.string(from: NSNumber(value: value)) ?? "\(value)"
+        DisplayFormatters.Number.decimalString(for: value)
     }
 
     // MARK: - Supplementary Content

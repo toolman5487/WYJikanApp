@@ -47,10 +47,7 @@ final class MainCategoryListViewModel: ObservableObject {
     // MARK: - Preparation
 
     func prepareSelectedKind(platform: UserInterfacePlatform) {
-        configureGenreBatch(
-            initialBatchSize: platform.categoryGenreInitialBatchCount,
-            itemRequestLimit: platform.categoryGenreItemRequestLimit
-        )
+        configureGenreBatch(platform: platform)
         activateKind(selectedKind)
     }
 
@@ -195,11 +192,8 @@ private extension MainCategoryListViewModel {
         }
     }
 
-    func configureGenreBatch(initialBatchSize: Int, itemRequestLimit: Int) {
-        let configuration = MainCategoryGenreBatchConfiguration.platformAdaptive(
-            initialBatchSize: initialBatchSize,
-            itemRequestLimit: itemRequestLimit
-        )
+    func configureGenreBatch(platform: UserInterfacePlatform) {
+        let configuration = MainCategoryGenreBatchConfiguration.platformAdaptive(platform)
         animeListViewModel.configureGenreBatchIfNeeded(configuration)
         mangaListViewModel.configureGenreBatchIfNeeded(configuration)
     }

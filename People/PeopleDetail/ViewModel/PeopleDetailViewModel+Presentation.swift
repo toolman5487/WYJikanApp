@@ -99,20 +99,9 @@ extension PeopleDetailViewModel {
     }
 
     func birthdayText(for person: PeopleDetailDTO) -> String? {
-        guard let birthday = nonEmpty(person.birthday) else { return nil }
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-
-        if let date = formatter.date(from: birthday) {
-            return dateFormatter.string(from: date)
-        }
-
-        formatter.formatOptions = [.withInternetDateTime]
-        if let date = formatter.date(from: birthday) {
-            return dateFormatter.string(from: date)
-        }
-
-        return birthday
+        DisplayFormatters.DateDisplay.displayDateString(
+            fromISO8601: person.birthday
+        )
     }
 
     func alternateNamesText(for person: PeopleDetailDTO) -> String? {
@@ -187,9 +176,7 @@ extension PeopleDetailViewModel {
     }
 
     func formatNumber(_ value: Int) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        return formatter.string(from: NSNumber(value: value)) ?? "\(value)"
+        DisplayFormatters.Number.decimalString(for: value)
     }
 
     private func shareDetailsText(for person: PeopleDetailDTO) -> String {
@@ -221,14 +208,6 @@ extension PeopleDetailViewModel {
             return nil
         }
         return value
-    }
-
-    private var dateFormatter: DateFormatter {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "zh_Hant_TW")
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .none
-        return formatter
     }
 
     private func firstNonEmpty(_ values: String?...) -> String? {

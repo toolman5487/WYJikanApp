@@ -110,9 +110,22 @@ final class HomeFeedCoordinator {
         await load(section, priority: .utility)
     }
 
-    func loadDeferredSections(priority: TaskPriority) async {
+    func loadDeferredSections(
+        priority: TaskPriority,
+        sectionDelay: Duration = .zero
+    ) async {
         await load(.watchPromos, priority: priority)
+
+        if sectionDelay > .zero {
+            try? await Task.sleep(for: sectionDelay)
+        }
+
         await load(.watchEpisodes, priority: priority)
+
+        if sectionDelay > .zero {
+            try? await Task.sleep(for: sectionDelay)
+        }
+
         await load(.recommendedAnime, priority: priority)
     }
 
