@@ -156,31 +156,60 @@ final class MangaDetailViewModel: ObservableObject {
         resetOnFailure: Bool,
         loadingPrepared: Bool = false
     ) async {
-        await loadCharacters(
+        let charactersResult = await loadCharacters(
             resetOnFailure: resetOnFailure,
             startsLoading: !loadingPrepared
         )
-        async let pictures: Void = loadPictures(
+        switch charactersResult {
+        case .cancelled:
+            finishCancelledSupplementaryLoading(states: picturesState, recommendationsState)
+            return
+        case .failed(let failure) where failure.kind == .rateLimited:
+            finishRateLimitedSupplementaryLoading(
+                failure,
+                resetOnFailure: resetOnFailure,
+                states: picturesState,
+                recommendationsState
+            )
+            return
+        case .completed, .failed:
+            break
+        }
+
+        let picturesResult = await loadPictures(
             resetOnFailure: resetOnFailure,
             startsLoading: !loadingPrepared
         )
-        async let recommendations: Void = loadRecommendations(
+        switch picturesResult {
+        case .cancelled:
+            recommendationsState.finishCancelledLoading()
+            return
+        case .failed(let failure) where failure.kind == .rateLimited:
+            recommendationsState.finishLoading(
+                with: failure,
+                resetValueTo: resetOnFailure ? [] : nil
+            )
+            return
+        case .completed, .failed:
+            break
+        }
+
+        _ = await loadRecommendations(
             resetOnFailure: resetOnFailure,
             startsLoading: !loadingPrepared
         )
-        _ = await (pictures, recommendations)
     }
 
     func reloadCharacters() async {
-        await loadCharacters(resetOnFailure: false)
+        _ = await loadCharacters(resetOnFailure: false)
     }
 
     func reloadPictures() async {
-        await loadPictures(resetOnFailure: false)
+        _ = await loadPictures(resetOnFailure: false)
     }
 
     func reloadRecommendations() async {
-        await loadRecommendations(resetOnFailure: false)
+        _ = await loadRecommendations(resetOnFailure: false)
     }
 
     // MARK: - Synopsis Translation
@@ -201,7 +230,7 @@ final class MangaDetailViewModel: ObservableObject {
     private func loadPictures(
         resetOnFailure: Bool,
         startsLoading: Bool = true
-    ) async {
+    ) async -> DetailSupplementaryLoadResult {
         await supplementaryLoadingController.load(
             state: picturesState,
             resetOnFailure: resetOnFailure,
@@ -217,7 +246,7 @@ final class MangaDetailViewModel: ObservableObject {
     private func loadCharacters(
         resetOnFailure: Bool,
         startsLoading: Bool = true
-    ) async {
+    ) async -> DetailSupplementaryLoadResult {
         await supplementaryLoadingController.load(
             state: charactersState,
             resetOnFailure: resetOnFailure,
@@ -232,7 +261,7 @@ final class MangaDetailViewModel: ObservableObject {
     private func loadRecommendations(
         resetOnFailure: Bool,
         startsLoading: Bool = true
-    ) async {
+    ) async -> DetailSupplementaryLoadResult {
         await supplementaryLoadingController.load(
             state: recommendationsState,
             resetOnFailure: resetOnFailure,
@@ -241,6 +270,30 @@ final class MangaDetailViewModel: ObservableObject {
             fetch: {
                 try await service.fetchMangaRecommendations(malId: malId).data
             }
+        )
+    }
+
+    private func finishCancelledSupplementaryLoading<Value, OtherValue>(
+        states firstState: DetailSupplementaryState<Value>,
+        _ secondState: DetailSupplementaryState<OtherValue>
+    ) {
+        firstState.finishCancelledLoading()
+        secondState.finishCancelledLoading()
+    }
+
+    private func finishRateLimitedSupplementaryLoading<Value, OtherValue>(
+        _ failure: FeatureLoadFailure,
+        resetOnFailure: Bool,
+        states firstState: DetailSupplementaryState<Value>,
+        _ secondState: DetailSupplementaryState<OtherValue>
+    ) where Value: RangeReplaceableCollection, OtherValue: RangeReplaceableCollection {
+        firstState.finishLoading(
+            with: failure,
+            resetValueTo: resetOnFailure ? Value() : nil
+        )
+        secondState.finishLoading(
+            with: failure,
+            resetValueTo: resetOnFailure ? OtherValue() : nil
         )
     }
 

@@ -50,6 +50,12 @@ final class PersistenceMutationController {
 
 // MARK: - DetailSupplementaryLoadingController
 
+nonisolated enum DetailSupplementaryLoadResult: Sendable {
+    case completed
+    case cancelled
+    case failed(FeatureLoadFailure)
+}
+
 @MainActor
 final class DetailSupplementaryState<Value>: ObservableObject {
 
@@ -105,21 +111,24 @@ final class DetailSupplementaryLoadingController {
         startsLoading: Bool = true,
         resetValue: @autoclosure () -> Value,
         fetch: () async throws -> Value
-    ) async {
+    ) async -> DetailSupplementaryLoadResult {
         if startsLoading {
             state.beginLoading(resetOnFailure: resetOnFailure)
         }
 
         do {
             state.finishLoading(with: try await fetch())
+            return .completed
         } catch is CancellationError {
             state.finishCancelledLoading()
-            return
+            return .cancelled
         } catch {
+            let failure = FeatureLoadFailure(error)
             state.finishLoading(
-                with: FeatureLoadFailure(error),
+                with: failure,
                 resetValueTo: resetOnFailure ? resetValue() : nil
             )
+            return .failed(failure)
         }
     }
 }
