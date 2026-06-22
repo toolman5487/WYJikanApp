@@ -76,10 +76,7 @@ private final class HomeFeedRuntime {
         let watchEpisodesViewModel = HomeWatchEpisodesViewModel(service: watchService)
         let trendingMangaViewModel = HomeTrendingMangaViewModel(service: service)
         let trendingAnimeViewModel = HomeTrendingAnimeViewModel(service: service)
-        let recommendedAnimeViewModel = HomeRecommendedAnimeViewModel(
-            service: service,
-            animeDetailService: dependencies.animeDetailService
-        )
+        let recommendedAnimeViewModel = HomeRecommendedAnimeViewModel(service: service)
 
         self.heroBannerViewModel = heroBannerViewModel
         self.watchPromosViewModel = watchPromosViewModel

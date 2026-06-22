@@ -32,6 +32,7 @@ final class AnimeListViewModel: ObservableObject {
     }
 
     func loadIfNeeded() {
+        randomHeroViewModel.loadIfNeeded()
         genreAnimeViewModel.loadIfNeeded()
     }
 

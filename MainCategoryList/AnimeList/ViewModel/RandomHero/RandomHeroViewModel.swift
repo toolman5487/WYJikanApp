@@ -97,6 +97,7 @@ final class RandomHeroViewModel: ObservableObject {
 
     private var drawTask: Task<Void, Never>?
     private var cooldownCancellable: AnyCancellable?
+    private var hasAttemptedAutomaticDraw = false
 
     // MARK: - Lifecycle
 
@@ -118,13 +119,15 @@ final class RandomHeroViewModel: ObservableObject {
             .sink { [weak self] seconds in
                 self?.updateCooldownState(seconds: seconds)
             }
-
-        if persistedPick == nil {
-            drawRandomAnime(isAutomatic: true)
-        }
     }
 
     // MARK: - Public Methods
+
+    func loadIfNeeded() {
+        guard randomPick == nil, !hasAttemptedAutomaticDraw else { return }
+        hasAttemptedAutomaticDraw = true
+        drawRandomAnime(isAutomatic: true)
+    }
 
     func drawRandomAnime() {
         drawRandomAnime(isAutomatic: false)
@@ -165,9 +168,13 @@ final class RandomHeroViewModel: ObservableObject {
     }
 
     func stop() {
+        let wasDrawing = isDrawing
         drawTask?.cancel()
         drawTask = nil
-        if isDrawing {
+        if wasDrawing {
+            if randomPick == nil {
+                hasAttemptedAutomaticDraw = false
+            }
             let seconds = drawCooldownTimer.remainingSeconds
             if seconds > 0 {
                 drawState = .cooldown(remainingSeconds: seconds)

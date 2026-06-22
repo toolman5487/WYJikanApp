@@ -322,59 +322,59 @@ nonisolated final class JikanAPIService: Sendable {
 
     private func sharedDataTask(for urlRequest: URLRequest, key: String) async throws -> Data {
         let priority = Task.currentPriority
-        let taskState = await inFlightRequestStore.task(for: key, priority: priority) {
+        let lease = await inFlightRequestStore.acquireTask(for: key) {
             Task(priority: priority) {
                 try await self.execute(urlRequest)
             }
         }
 
-        if taskState.isNew {
+        if lease.isNewRequest {
             AppLogger.performance.debug("in-flight create \(key, privacy: .public)")
         } else {
             AppLogger.performance.debug("in-flight join \(key, privacy: .public)")
         }
 
-        do {
-            let data = try await taskState.task.value
-            await removeSharedDataTaskIfNeeded(
-                isNew: taskState.isNew,
-                key: key,
-                id: taskState.id
-            )
-            return data
-        } catch JikanAPIError.rateLimited(let retryAfter) {
-            await removeSharedDataTaskIfNeeded(
-                isNew: taskState.isNew,
-                key: key,
-                id: taskState.id
-            )
-            throw JikanAPIError.rateLimited(retryAfter: retryAfter)
-        } catch JikanAPIError.serverError(let statusCode) where isRetriableServerStatusCode(statusCode) {
-            await transientFailureBackoffStore.record(
-                statusCode: statusCode,
-                for: key,
-                cooldown: Self.serverFailureCooldown,
-                cleanupInterval: Self.storeCleanupInterval
-            )
-            await removeSharedDataTaskIfNeeded(
-                isNew: taskState.isNew,
-                key: key,
-                id: taskState.id
-            )
-            throw JikanAPIError.serverError(statusCode: statusCode)
-        } catch {
-            await removeSharedDataTaskIfNeeded(
-                isNew: taskState.isNew,
-                key: key,
-                id: taskState.id
-            )
-            throw error
+        return try await withTaskCancellationHandler {
+            do {
+                let data = try await lease.task.value
+                try Task.checkCancellation()
+                await releaseInFlightWaiter(for: key, lease: lease)
+                return data
+            } catch JikanAPIError.serverError(let statusCode) where isRetriableServerStatusCode(statusCode) {
+                await transientFailureBackoffStore.record(
+                    statusCode: statusCode,
+                    for: key,
+                    cooldown: Self.serverFailureCooldown,
+                    cleanupInterval: Self.storeCleanupInterval
+                )
+                await releaseInFlightWaiter(for: key, lease: lease)
+                throw JikanAPIError.serverError(statusCode: statusCode)
+            } catch {
+                await releaseInFlightWaiter(for: key, lease: lease)
+                throw error
+            }
+        } onCancel: {
+            Task {
+                await self.inFlightRequestStore.releaseWaiter(
+                    for: key,
+                    requestID: lease.requestID,
+                    waiterID: lease.waiterID,
+                    cancelTaskIfUnused: true
+                )
+            }
         }
     }
 
-    private func removeSharedDataTaskIfNeeded(isNew: Bool, key: String, id: UUID) async {
-        guard isNew else { return }
-        await inFlightRequestStore.removeTask(for: key, id: id)
+    private func releaseInFlightWaiter(
+        for key: String,
+        lease: JikanAPIInFlightRequestStore.Lease
+    ) async {
+        await inFlightRequestStore.releaseWaiter(
+            for: key,
+            requestID: lease.requestID,
+            waiterID: lease.waiterID,
+            cancelTaskIfUnused: false
+        )
     }
 
     // MARK: - Public API

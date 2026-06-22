@@ -85,6 +85,7 @@ final class RandomMangaViewModel: ObservableObject {
 
     private var drawTask: Task<Void, Never>?
     private var cooldownCancellable: AnyCancellable?
+    private var hasAttemptedAutomaticDraw = false
 
     init(
         service: MainCategoryListServicing,
@@ -105,10 +106,12 @@ final class RandomMangaViewModel: ObservableObject {
             .sink { [weak self] seconds in
                 self?.updateCooldownState(seconds: seconds)
             }
+    }
 
-        if persistedPick == nil {
-            drawRandomManga(isAutomatic: true)
-        }
+    func loadIfNeeded() {
+        guard randomPick == nil, !hasAttemptedAutomaticDraw else { return }
+        hasAttemptedAutomaticDraw = true
+        drawRandomManga(isAutomatic: true)
     }
 
     func drawRandomManga() {
@@ -151,9 +154,13 @@ final class RandomMangaViewModel: ObservableObject {
     }
 
     func stop() {
+        let wasDrawing = isDrawing
         drawTask?.cancel()
         drawTask = nil
-        if isDrawing {
+        if wasDrawing {
+            if randomPick == nil {
+                hasAttemptedAutomaticDraw = false
+            }
             let seconds = drawCooldownTimer.remainingSeconds
             if seconds > 0 {
                 drawState = .cooldown(remainingSeconds: seconds)

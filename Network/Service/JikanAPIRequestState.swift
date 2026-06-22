@@ -83,36 +83,73 @@ actor JikanAPIResponseCache {
 // MARK: - JikanAPIInFlightRequestStore
 
 actor JikanAPIInFlightRequestStore {
+    struct Lease: Sendable {
+        let requestID: UUID
+        let waiterID: UUID
+        let task: Task<Data, Error>
+        let isNewRequest: Bool
+    }
+
     private struct Entry {
         let id: UUID
         let task: Task<Data, Error>
-        let priority: TaskPriority
+        var waiterIDs: Set<UUID>
     }
 
     private var entries: [String: Entry] = [:]
 
-    func task(
+    func acquireTask(
         for key: String,
-        priority: TaskPriority,
         create: @escaping @Sendable () -> Task<Data, Error>
-    ) -> (id: UUID, task: Task<Data, Error>, isNew: Bool) {
-        if let existingEntry = entries[key],
-           existingEntry.priority >= priority {
-            return (existingEntry.id, existingEntry.task, false)
+    ) -> Lease {
+        let waiterID = UUID()
+
+        if var existingEntry = entries[key] {
+            existingEntry.waiterIDs.insert(waiterID)
+            entries[key] = existingEntry
+            return Lease(
+                requestID: existingEntry.id,
+                waiterID: waiterID,
+                task: existingEntry.task,
+                isNewRequest: false
+            )
         }
 
         let entry = Entry(
             id: UUID(),
             task: create(),
-            priority: priority
+            waiterIDs: [waiterID]
         )
         entries[key] = entry
-        return (entry.id, entry.task, true)
+        return Lease(
+            requestID: entry.id,
+            waiterID: waiterID,
+            task: entry.task,
+            isNewRequest: true
+        )
     }
 
-    func removeTask(for key: String, id: UUID) {
-        guard entries[key]?.id == id else { return }
+    func releaseWaiter(
+        for key: String,
+        requestID: UUID,
+        waiterID: UUID,
+        cancelTaskIfUnused: Bool
+    ) {
+        guard var entry = entries[key],
+              entry.id == requestID,
+              entry.waiterIDs.remove(waiterID) != nil else {
+            return
+        }
+
+        guard entry.waiterIDs.isEmpty else {
+            entries[key] = entry
+            return
+        }
+
         entries.removeValue(forKey: key)
+        if cancelTaskIfUnused {
+            entry.task.cancel()
+        }
     }
 }
 

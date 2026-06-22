@@ -85,12 +85,17 @@ final class HomeFeedCoordinator {
     // MARK: - Properties
 
     private let viewModels: HomeFeedViewModels
+    private let initialLoadGate: any HomeInitialLoadCoordinating
     private var loadedSections = Set<HomeFeedSection>()
 
     // MARK: - Lifecycle
 
-    init(viewModels: HomeFeedViewModels) {
+    init(
+        viewModels: HomeFeedViewModels,
+        initialLoadGate: any HomeInitialLoadCoordinating = HomeInitialLoadGate.shared
+    ) {
         self.viewModels = viewModels
+        self.initialLoadGate = initialLoadGate
     }
 
     // MARK: - Public Methods
@@ -103,6 +108,7 @@ final class HomeFeedCoordinator {
 
         await loadPhase(.heroBanner, .todayAnime, priority: .userInitiated)
         await loadPhase(.trendingAnime, .trendingManga, priority: .userInitiated)
+        await initialLoadGate.markCompleted()
     }
 
     func loadSectionIfNeeded(_ section: HomeFeedSection) async {

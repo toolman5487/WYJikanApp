@@ -5,6 +5,42 @@
 
 import Combine
 
+// MARK: - HomeInitialLoadCoordinating
+
+nonisolated protocol HomeInitialLoadCoordinating: Sendable {
+    func waitForCompletion() async
+    func markCompleted() async
+}
+
+// MARK: - HomeInitialLoadGate
+
+actor HomeInitialLoadGate: HomeInitialLoadCoordinating {
+
+    static let shared = HomeInitialLoadGate()
+
+    private var isCompleted = false
+    private var waiters: [CheckedContinuation<Void, Never>] = []
+
+    func waitForCompletion() async {
+        guard !isCompleted else { return }
+
+        await withCheckedContinuation { continuation in
+            waiters.append(continuation)
+        }
+    }
+
+    func markCompleted() {
+        guard !isCompleted else { return }
+        isCompleted = true
+
+        let pendingWaiters = waiters
+        waiters.removeAll()
+        pendingWaiters.forEach { $0.resume() }
+    }
+}
+
+// MARK: - AppBootstrapViewModel
+
 @MainActor
 final class AppBootstrapViewModel: ObservableObject {
 
@@ -21,6 +57,7 @@ final class AppBootstrapViewModel: ObservableObject {
     private let animeDetailService: AnimeDetailServicing
     private let broadcastReminderRepository: any AnimeBroadcastReminderRepository
     private let notificationScheduler: HomeTodayAnimeNotificationScheduler
+    private let homeInitialLoadGate: any HomeInitialLoadCoordinating
 
     // MARK: - Properties
 
@@ -31,11 +68,13 @@ final class AppBootstrapViewModel: ObservableObject {
     init(
         animeDetailService: AnimeDetailServicing,
         broadcastReminderRepository: any AnimeBroadcastReminderRepository,
-        notificationScheduler: HomeTodayAnimeNotificationScheduler
+        notificationScheduler: HomeTodayAnimeNotificationScheduler,
+        homeInitialLoadGate: any HomeInitialLoadCoordinating = HomeInitialLoadGate.shared
     ) {
         self.animeDetailService = animeDetailService
         self.broadcastReminderRepository = broadcastReminderRepository
         self.notificationScheduler = notificationScheduler
+        self.homeInitialLoadGate = homeInitialLoadGate
     }
 
     // MARK: - Public Methods
@@ -50,12 +89,21 @@ final class AppBootstrapViewModel: ObservableObject {
 
         let subscriptions = broadcastReminderRepository.currentSnapshot.subscriptions
 
-        await AnimeBroadcastReminderReconciler.reconcileAll(
-            subscriptions: subscriptions,
-            service: animeDetailService,
-            repository: broadcastReminderRepository,
-            scheduler: notificationScheduler
-        )
+        if !subscriptions.isEmpty {
+            await homeInitialLoadGate.waitForCompletion()
+
+            guard !Task.isCancelled else {
+                bootstrapState = .idle
+                return
+            }
+
+            await AnimeBroadcastReminderReconciler.reconcileAll(
+                subscriptions: subscriptions,
+                service: animeDetailService,
+                repository: broadcastReminderRepository,
+                scheduler: notificationScheduler
+            )
+        }
 
         guard !Task.isCancelled else {
             bootstrapState = .idle

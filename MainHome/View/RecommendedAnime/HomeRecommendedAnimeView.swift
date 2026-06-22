@@ -159,8 +159,7 @@ private struct HomeRecommendedAnimeSkeletonCardView: View {
 #Preview {
     HomeRecommendedAnimeView(
         viewModel: HomeRecommendedAnimeViewModel(
-            service: AppDependencies.live.mainHomeService,
-            animeDetailService: AppDependencies.live.animeDetailService
+            service: AppDependencies.live.mainHomeService
         )
     )
         .environmentObject(FavoriteStatusStore())
