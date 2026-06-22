@@ -64,7 +64,7 @@ struct MyListFormatDistributionChartCardView: View {
     // MARK: - Private Views
 
     private var chartLegendView: some View {
-        HStack(alignment: .center, spacing: 20) {
+        HStack(alignment: .center, spacing: 16) {
             chartView
 
             legendView

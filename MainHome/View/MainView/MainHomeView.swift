@@ -193,7 +193,11 @@ private struct MainHomeFeedView: View {
             await runtime.coordinator.refreshAll()
         }
         .task(priority: .userInitiated) {
+            let platform = UserInterfacePlatform.current
             await runtime.coordinator.loadInitial()
+            if platform.isPad {
+                await runtime.coordinator.loadDeferredSections(priority: .utility)
+            }
         }
     }
 
@@ -240,7 +244,8 @@ private struct MainHomeFeedView: View {
             }
         }
         .task(priority: .utility) {
-            guard let feedSection = homeFeedSection(for: section) else { return }
+            guard UserInterfacePlatform.current.isPhone,
+                  let feedSection = homeFeedSection(for: section) else { return }
             await runtime.coordinator.loadSectionIfNeeded(feedSection)
         }
     }

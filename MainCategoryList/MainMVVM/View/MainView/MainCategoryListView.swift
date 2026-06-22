@@ -11,7 +11,6 @@ struct MainCategoryListView: View {
 
     // MARK: - Properties
 
-    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @StateObject private var viewModel: MainCategoryListViewModel
 
     // MARK: - Lifecycle
@@ -30,9 +29,7 @@ struct MainCategoryListView: View {
             scrollView
                 .toolbar(.hidden, for: .navigationBar)
                 .task(priority: .userInitiated) {
-                    viewModel.prepareSelectedKind(
-                        isPadScreen: horizontalSizeClass == .regular
-                    )
+                    viewModel.prepareSelectedKind(platform: .current)
                 }
                 .onDisappear {
                     viewModel.stopLoading()

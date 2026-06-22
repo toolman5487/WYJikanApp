@@ -16,20 +16,11 @@ struct MyListStatisticsSectionView: View {
         case populated
     }
 
-    private enum ChartLayout {
-        static let iPhoneCardMinHeight: CGFloat = 280
-        static let iPadCardMinHeight: CGFloat = 340
-        static let iPhoneContentMinHeight: CGFloat = 208
-        static let iPadContentMinHeight: CGFloat = 228
-    }
-
     // MARK: - Properties
 
     let presentation: MyListPresentation
     let onSelectGenre: (String) -> Void
     let onSelectFormat: (String) -> Void
-
-    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     // MARK: - Body
 
@@ -63,34 +54,36 @@ struct MyListStatisticsSectionView: View {
 
     @ViewBuilder
     private var chartContent: some View {
-        if horizontalSizeClass == .regular {
+        let platform = UserInterfacePlatform.current
+
+        if platform.prefersSideBySideStatisticsCharts {
             HStack(alignment: .top, spacing: 16) {
-                formatChart
-                genreChart
+                formatChart(platform: platform)
+                genreChart(platform: platform)
             }
         } else {
             VStack(alignment: .leading, spacing: 16) {
-                genreChart
-                formatChart
+                genreChart(platform: platform)
+                formatChart(platform: platform)
             }
         }
     }
 
-    private var genreChart: some View {
+    private func genreChart(platform: UserInterfacePlatform) -> some View {
         MyListGenreDistributionChartCardView(
             statistics: presentation.statistics,
-            cardMinHeight: chartCardMinHeight,
-            contentMinHeight: chartContentMinHeight,
+            cardMinHeight: platform.statisticsChartCardMinHeight,
+            contentMinHeight: platform.statisticsChartContentMinHeight,
             onSelectGenre: onSelectGenre
         )
         .frame(maxWidth: .infinity, alignment: .topLeading)
     }
 
-    private var formatChart: some View {
+    private func formatChart(platform: UserInterfacePlatform) -> some View {
         MyListFormatDistributionChartCardView(
             statistics: presentation.statistics,
-            cardMinHeight: chartCardMinHeight,
-            contentMinHeight: chartContentMinHeight,
+            cardMinHeight: platform.statisticsChartCardMinHeight,
+            contentMinHeight: platform.statisticsChartContentMinHeight,
             onSelectFormat: onSelectFormat
         )
         .frame(maxWidth: .infinity, alignment: .topLeading)
@@ -100,13 +93,5 @@ struct MyListStatisticsSectionView: View {
 
     private var contentState: ContentState {
         presentation.filteredItems.isEmpty ? .empty : .populated
-    }
-
-    private var chartCardMinHeight: CGFloat? {
-        horizontalSizeClass == .regular ? ChartLayout.iPadCardMinHeight : ChartLayout.iPhoneCardMinHeight
-    }
-
-    private var chartContentMinHeight: CGFloat {
-        horizontalSizeClass == .regular ? ChartLayout.iPadContentMinHeight : ChartLayout.iPhoneContentMinHeight
     }
 }

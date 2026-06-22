@@ -22,7 +22,7 @@ struct MyListPieChartView: View {
 
     // MARK: - Constants
 
-    private static let chartSize: CGFloat = 148
+    private static let chartSize: CGFloat = 144
 
     // MARK: - Properties
 

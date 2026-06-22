@@ -11,15 +11,6 @@ import Combine
 @MainActor
 final class MainCategoryListViewModel: ObservableObject {
 
-    // MARK: - GenreBatchMetrics
-
-    private enum GenreBatchMetrics {
-        static let phoneInitialCount = 3
-        static let padInitialCount = 4
-        static let phoneItemRequestLimit = 5
-        static let padItemRequestLimit = 8
-    }
-
     // MARK: - Properties
 
     let animeListViewModel: AnimeListViewModel
@@ -55,16 +46,10 @@ final class MainCategoryListViewModel: ObservableObject {
 
     // MARK: - Preparation
 
-    func prepareSelectedKind(isPadScreen: Bool) {
-        let initialBatchSize = isPadScreen
-            ? GenreBatchMetrics.padInitialCount
-            : GenreBatchMetrics.phoneInitialCount
-        let itemRequestLimit = isPadScreen
-            ? GenreBatchMetrics.padItemRequestLimit
-            : GenreBatchMetrics.phoneItemRequestLimit
+    func prepareSelectedKind(platform: UserInterfacePlatform) {
         configureGenreBatch(
-            initialBatchSize: initialBatchSize,
-            itemRequestLimit: itemRequestLimit
+            initialBatchSize: platform.categoryGenreInitialBatchCount,
+            itemRequestLimit: platform.categoryGenreItemRequestLimit
         )
         activateKind(selectedKind)
     }

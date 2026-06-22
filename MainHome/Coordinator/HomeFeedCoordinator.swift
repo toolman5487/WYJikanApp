@@ -110,6 +110,12 @@ final class HomeFeedCoordinator {
         await load(section, priority: .utility)
     }
 
+    func loadDeferredSections(priority: TaskPriority) async {
+        await load(.watchPromos, priority: priority)
+        await load(.watchEpisodes, priority: priority)
+        await load(.recommendedAnime, priority: priority)
+    }
+
     func refreshAll() async {
         await refreshPhase(.heroBanner, .todayAnime)
         await refreshPhase(.trendingAnime, .trendingManga)
