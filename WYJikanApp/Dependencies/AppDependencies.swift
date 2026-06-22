@@ -21,6 +21,8 @@ struct AppDependencies {
     let mangaReviewService: MangaReviewServicing
     let peopleDetailService: PeopleDetailServicing
     let characterDetailService: CharacterDetailServicing
+    let producerDetailService: ProducerDetailServicing
+    let producerAnimeListService: ProducerAnimeListServicing
     let animeCategoryDetailService: AnimeCategoryDetailServicing
     let mangaCategoryDetailService: MangaCategoryDetailServicing
     let homeTodayAnimeScheduleListService: HomeTodayAnimeScheduleListServicing
@@ -72,6 +74,8 @@ struct AppDependencies {
             mangaReviewService: MangaReviewService(),
             peopleDetailService: PeopleDetailService(),
             characterDetailService: CharacterDetailService(),
+            producerDetailService: ProducerDetailService(),
+            producerAnimeListService: ProducerAnimeListService(),
             animeCategoryDetailService: AnimeCategoryDetailService(),
             mangaCategoryDetailService: MangaCategoryDetailService(),
             homeTodayAnimeScheduleListService: HomeTodayAnimeScheduleListService(),
@@ -174,6 +178,21 @@ struct AppDependencies {
 
     func makeCharacterDetailViewModel(malId: Int) -> CharacterDetailViewModel {
         CharacterDetailViewModel(malId: malId, service: characterDetailService)
+    }
+
+    func makeProducerDetailViewModel(malId: Int) -> ProducerDetailViewModel {
+        ProducerDetailViewModel(malId: malId, service: producerDetailService)
+    }
+
+    func makeProducerAnimeListViewModel(
+        producerId: Int,
+        producerName: String
+    ) -> ProducerAnimeListViewModel {
+        ProducerAnimeListViewModel(
+            producerId: producerId,
+            producerName: producerName,
+            service: producerAnimeListService
+        )
     }
 
     func makeAnimeCategoryDetailViewModel(genre: AnimeListGenreDTO) -> AnimeCategoryDetailViewModel {
