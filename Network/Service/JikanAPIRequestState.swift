@@ -156,7 +156,9 @@ actor JikanAPIInFlightRequestStore {
 // MARK: - JikanAPIRequestGovernor
 
 actor JikanAPIRequestGovernor {
-    private static let concurrencyPollInterval: TimeInterval = 0.05
+    private struct ConcurrencyWaiter {
+        let continuation: CheckedContinuation<Void, Error>
+    }
 
     private let maximumConcurrentRequests: Int
     private let tokenCapacity: Double
@@ -164,11 +166,14 @@ actor JikanAPIRequestGovernor {
     private let minimumRequestInterval: TimeInterval
 
     private var activeRequestCount = 0
+    private var pendingConcurrencyOrder: [UUID] = []
+    private var pendingConcurrencyWaiters: [UUID: ConcurrencyWaiter] = [:]
+    private var knownConcurrencyWaiterIDs = Set<UUID>()
+    private var cancelledConcurrencyWaiterIDs = Set<UUID>()
     private var availableTokens: Double
     private var lastTokenRefillDate: Date
     private var nextRequestDate = Date.distantPast
     private var rateLimitExpirationDate = Date.distantPast
-    private var activeScope: JikanAPIRequestScope = .home
 
     init(
         maximumConcurrentRequests: Int = 2,
@@ -187,28 +192,119 @@ actor JikanAPIRequestGovernor {
         self.lastTokenRefillDate = now
     }
 
-    func setActiveScope(_ scope: JikanAPIRequestScope) {
-        activeScope = scope
+    func acquirePermit() async throws {
+        try await acquireConcurrencyPermit()
+
+        do {
+            try await waitForRatePermit()
+        } catch {
+            releasePermit()
+            throw error
+        }
     }
 
-    func waitForPermit(scope: JikanAPIRequestScope?) async throws {
-        while true {
-            try Task.checkCancellation()
+    func releasePermit() {
+        while let waiterID = pendingConcurrencyOrder.first {
+            pendingConcurrencyOrder.removeFirst()
 
-            if let scope, scope != activeScope {
-                try await sleep(for: Self.concurrencyPollInterval)
+            guard let waiter = pendingConcurrencyWaiters.removeValue(
+                forKey: waiterID
+            ) else {
                 continue
             }
 
-            let now = Date()
-            if rateLimitExpirationDate > now {
-                throw JikanAPIError.rateLimited(
-                    retryAfter: rateLimitExpirationDate.timeIntervalSince(now)
+            waiter.continuation.resume()
+            return
+        }
+
+        activeRequestCount = max(0, activeRequestCount - 1)
+    }
+
+    func recordRateLimit(retryAfter: TimeInterval, now: Date = Date()) {
+        let expirationDate = now.addingTimeInterval(max(retryAfter, minimumRequestInterval))
+        guard expirationDate > rateLimitExpirationDate else { return }
+
+        rateLimitExpirationDate = expirationDate
+        availableTokens = min(1, tokenCapacity)
+        lastTokenRefillDate = expirationDate
+        nextRequestDate = max(nextRequestDate, expirationDate)
+    }
+
+    // MARK: - Concurrency
+
+    private func acquireConcurrencyPermit() async throws {
+        let waiterID = UUID()
+        knownConcurrencyWaiterIDs.insert(waiterID)
+        defer {
+            knownConcurrencyWaiterIDs.remove(waiterID)
+            cancelledConcurrencyWaiterIDs.remove(waiterID)
+        }
+
+        guard activeRequestCount >= maximumConcurrentRequests else {
+            activeRequestCount += 1
+            return
+        }
+
+        try await withTaskCancellationHandler {
+            try await withCheckedThrowingContinuation { continuation in
+                registerConcurrencyWaiter(
+                    waiterID: waiterID,
+                    continuation: continuation
                 )
             }
+        } onCancel: {
+            Task {
+                await self.cancelConcurrencyWaiter(waiterID: waiterID)
+            }
+        }
+    }
 
-            guard activeRequestCount < maximumConcurrentRequests else {
-                try await sleep(for: Self.concurrencyPollInterval)
+    private func registerConcurrencyWaiter(
+        waiterID: UUID,
+        continuation: CheckedContinuation<Void, Error>
+    ) {
+        if cancelledConcurrencyWaiterIDs.remove(waiterID) != nil {
+            continuation.resume(throwing: CancellationError())
+            return
+        }
+
+        guard activeRequestCount >= maximumConcurrentRequests else {
+            activeRequestCount += 1
+            continuation.resume()
+            return
+        }
+
+        pendingConcurrencyOrder.append(waiterID)
+        pendingConcurrencyWaiters[waiterID] = ConcurrencyWaiter(
+            continuation: continuation
+        )
+    }
+
+    private func cancelConcurrencyWaiter(waiterID: UUID) {
+        guard let waiter = pendingConcurrencyWaiters.removeValue(
+            forKey: waiterID
+        ) else {
+            if knownConcurrencyWaiterIDs.contains(waiterID) {
+                cancelledConcurrencyWaiterIDs.insert(waiterID)
+            }
+            return
+        }
+
+        pendingConcurrencyOrder.removeAll { $0 == waiterID }
+        waiter.continuation.resume(throwing: CancellationError())
+    }
+
+    // MARK: - Rate Limit
+
+    private func waitForRatePermit() async throws {
+        while true {
+            try Task.checkCancellation()
+
+            let now = Date()
+            if rateLimitExpirationDate > now {
+                try await sleep(
+                    for: rateLimitExpirationDate.timeIntervalSince(now)
+                )
                 continue
             }
 
@@ -227,23 +323,8 @@ actor JikanAPIRequestGovernor {
 
             availableTokens -= 1
             nextRequestDate = now.addingTimeInterval(minimumRequestInterval)
-            activeRequestCount += 1
             return
         }
-    }
-
-    func releasePermit() {
-        activeRequestCount = max(0, activeRequestCount - 1)
-    }
-
-    func recordRateLimit(retryAfter: TimeInterval, now: Date = Date()) {
-        let expirationDate = now.addingTimeInterval(max(retryAfter, minimumRequestInterval))
-        guard expirationDate > rateLimitExpirationDate else { return }
-
-        rateLimitExpirationDate = expirationDate
-        availableTokens = min(1, tokenCapacity)
-        lastTokenRefillDate = expirationDate
-        nextRequestDate = max(nextRequestDate, expirationDate)
     }
 
     private func refillTokens(at now: Date) {

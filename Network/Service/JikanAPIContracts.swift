@@ -125,14 +125,14 @@ nonisolated struct JikanAPIRequest: Sendable {
     let queryItems: [URLQueryItem]
     let method: String
     let cachePolicy: JikanAPICachePolicy
-    let scope: JikanAPIRequestScope?
+    let scope: RequestLifecycleScope?
 
     init(
         path: String,
         queryItems: [URLQueryItem] = [],
         method: String = "GET",
         cachePolicy: JikanAPICachePolicy = .remoteOnly,
-        scope: JikanAPIRequestScope? = nil
+        scope: RequestLifecycleScope? = nil
     ) {
         self.target = .path(path)
         self.queryItems = queryItems
@@ -146,7 +146,7 @@ nonisolated struct JikanAPIRequest: Sendable {
         queryItems: [URLQueryItem] = [],
         method: String = "GET",
         cachePolicy: JikanAPICachePolicy = .remoteOnly,
-        scope: JikanAPIRequestScope? = nil
+        scope: RequestLifecycleScope? = nil
     ) {
         self.target = .absoluteURL(absoluteURL)
         self.queryItems = queryItems
@@ -186,7 +186,23 @@ nonisolated extension JikanAPIServicing {
                 path: endpoint,
                 queryItems: queryItems ?? [],
                 cachePolicy: cachePolicy,
-                scope: scope
+                scope: .tab(scope)
+            )
+        )
+    }
+
+    func fetch<T: Decodable & Sendable>(
+        endpoint: String,
+        cachePolicy: JikanAPICachePolicy,
+        queryItems: [URLQueryItem]? = nil,
+        lifecycleScope: RequestLifecycleScope
+    ) async throws -> T {
+        try await send(
+            JikanAPIRequest(
+                path: endpoint,
+                queryItems: queryItems ?? [],
+                cachePolicy: cachePolicy,
+                scope: lifecycleScope
             )
         )
     }

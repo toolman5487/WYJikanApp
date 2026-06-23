@@ -15,6 +15,10 @@ private enum JikanAPIResponseState: Sendable {
     case serverError(statusCode: Int)
 }
 
+private enum JikanAPIExecutionControl: Error, Sendable {
+    case retryServerError(statusCode: Int, dataCount: Int)
+}
+
 // MARK: - JikanAPIService
 
 // Shared mutable state is actor-isolated; immutable dependencies are Sendable.
@@ -36,15 +40,18 @@ nonisolated final class JikanAPIService: Sendable {
     private let decoder: JSONDecoder
     private let responseCache = JikanAPIResponseCache()
     private let inFlightRequestStore = JikanAPIInFlightRequestStore()
+    private let requestLifecycleManager: RequestLifecycleManager
     private let requestGovernor = JikanAPIRequestGovernor()
     private let transientFailureBackoffStore = JikanAPITransientFailureBackoffStore()
     
     init(
         session: URLSession = .shared,
-        decoder: JSONDecoder = JikanAPIService.makeDefaultDecoder()
+        decoder: JSONDecoder = JikanAPIService.makeDefaultDecoder(),
+        requestLifecycleManager: RequestLifecycleManager = .shared
     ) {
         self.session = session
         self.decoder = decoder
+        self.requestLifecycleManager = requestLifecycleManager
     }
 
     func clearCache() async {
@@ -54,7 +61,7 @@ nonisolated final class JikanAPIService: Sendable {
     }
 
     func setActiveRequestScope(_ scope: JikanAPIRequestScope) async {
-        await requestGovernor.setActiveScope(scope)
+        await requestLifecycleManager.setActiveTabScope(scope)
     }
     
     // MARK: - Decoder
@@ -180,7 +187,7 @@ nonisolated final class JikanAPIService: Sendable {
 
     private func execute(
         _ urlRequest: URLRequest,
-        scope: JikanAPIRequestScope?
+        scope: RequestLifecycleScope?
     ) async throws -> Data {
         guard let url = urlRequest.url else {
             throw JikanAPIError.invalidURL
@@ -190,48 +197,25 @@ nonisolated final class JikanAPIService: Sendable {
 
         while true {
             do {
-                let (data, response) = try await performRequest(
+                return try await performRequest(
                     urlRequest,
-                    scope: scope
+                    scope: scope,
+                    attempt: attempt
                 )
-
-                switch responseState(for: response, data: data) {
-                case .success:
-                    if let httpResponse = response as? HTTPURLResponse {
-                        AppLogger.network.debug(
-                            "HTTP \(httpResponse.statusCode) bytes \(data.count) \(url.absoluteString, privacy: .public)"
-                        )
-                    }
-                    return data
-                case .emptyBody:
-                    AppLogger.network.error("empty body \(url.absoluteString, privacy: .public)")
-                    throw JikanAPIError.noData
-                case .serverError(let statusCode):
-                    if statusCode == 429 {
-                        let retryAfter = max(
-                            retryAfterInterval(from: response) ?? Self.defaultRateLimitCooldown,
-                            1
-                        )
-                        await requestGovernor.recordRateLimit(retryAfter: retryAfter)
-                        AppLogger.network.warning(
-                            "rate limited HTTP 429 retry after \(retryAfter, format: .fixed(precision: 1)) seconds \(url.absoluteString, privacy: .public)"
-                        )
-                        throw JikanAPIError.rateLimited(retryAfter: retryAfter)
-                    }
-
-                    if isRetriableServerStatusCode(statusCode),
-                       let delay = retryDelayNanoseconds(for: attempt) {
-                        attempt += 1
-                        AppLogger.network.warning(
-                            "transient server error HTTP \(statusCode) bytes \(data.count) retry \(attempt) \(url.absoluteString, privacy: .public)"
-                        )
-                        try await Task.sleep(nanoseconds: delay)
-                        continue
-                    }
-
-                    AppLogger.network.error("server error HTTP \(statusCode) bytes \(data.count) \(url.absoluteString, privacy: .public)")
+            } catch JikanAPIExecutionControl.retryServerError(
+                let statusCode,
+                let dataCount
+            ) {
+                guard let delay = retryDelayNanoseconds(for: attempt) else {
                     throw JikanAPIError.serverError(statusCode: statusCode)
                 }
+
+                attempt += 1
+                AppLogger.network.warning(
+                    "transient server error HTTP \(statusCode) bytes \(dataCount) retry \(attempt) \(url.absoluteString, privacy: .public)"
+                )
+                try await Task.sleep(nanoseconds: delay)
+                continue
             } catch let apiError as JikanAPIError {
                 throw apiError
             } catch is CancellationError {
@@ -247,18 +231,81 @@ nonisolated final class JikanAPIService: Sendable {
 
     private func performRequest(
         _ urlRequest: URLRequest,
-        scope: JikanAPIRequestScope?
-    ) async throws -> (Data, URLResponse) {
-        try await requestGovernor.waitForPermit(scope: scope)
+        scope: RequestLifecycleScope?,
+        attempt: Int
+    ) async throws -> Data {
+        try await requestLifecycleManager.perform(
+            scope: scope,
+            inactivePolicy: .pauseQueued
+        ) { [self] in
+            try await performGovernedRequest(
+                urlRequest,
+                attempt: attempt
+            )
+        }
+    }
+
+    private func performGovernedRequest(
+        _ urlRequest: URLRequest,
+        attempt: Int
+    ) async throws -> Data {
+        try await requestGovernor.acquirePermit()
         let urlString = urlRequest.url?.absoluteString ?? "invalid-url"
         AppLogger.network.debug(
             "\(urlRequest.httpMethod ?? "GET") \(urlString, privacy: .public)"
         )
 
         do {
-            let response = try await session.data(for: urlRequest)
-            await requestGovernor.releasePermit()
-            return response
+            let (data, response) = try await session.data(for: urlRequest)
+
+            switch responseState(for: response, data: data) {
+            case .success:
+                if let httpResponse = response as? HTTPURLResponse {
+                    AppLogger.network.debug(
+                        "HTTP \(httpResponse.statusCode) bytes \(data.count) \(urlString, privacy: .public)"
+                    )
+                }
+                await requestGovernor.releasePermit()
+                return data
+
+            case .emptyBody:
+                AppLogger.network.error(
+                    "empty body \(urlString, privacy: .public)"
+                )
+                throw JikanAPIError.noData
+
+            case .serverError(let statusCode):
+                if statusCode == 429 {
+                    let retryAfter = max(
+                        retryAfterInterval(from: response) ?? Self.defaultRateLimitCooldown,
+                        1
+                    )
+                    await requestGovernor.recordRateLimit(
+                        retryAfter: retryAfter
+                    )
+                    AppLogger.network.warning(
+                        "rate limited HTTP 429 retry after \(retryAfter, format: .fixed(precision: 1)) seconds \(urlString, privacy: .public)"
+                    )
+                    throw JikanAPIError.rateLimited(
+                        retryAfter: retryAfter
+                    )
+                }
+
+                if isRetriableServerStatusCode(statusCode),
+                   retryDelayNanoseconds(for: attempt) != nil {
+                    throw JikanAPIExecutionControl.retryServerError(
+                        statusCode: statusCode,
+                        dataCount: data.count
+                    )
+                }
+
+                AppLogger.network.error(
+                    "server error HTTP \(statusCode) bytes \(data.count) \(urlString, privacy: .public)"
+                )
+                throw JikanAPIError.serverError(
+                    statusCode: statusCode
+                )
+            }
         } catch {
             await requestGovernor.releasePermit()
             throw error
@@ -270,7 +317,7 @@ nonisolated final class JikanAPIService: Sendable {
     private func data(
         for urlRequest: URLRequest,
         cachePolicy: JikanAPICachePolicy,
-        scope: JikanAPIRequestScope?
+        scope: RequestLifecycleScope?
     ) async throws -> Data {
         let key = cacheKey(for: urlRequest)
 
@@ -321,7 +368,7 @@ nonisolated final class JikanAPIService: Sendable {
         for urlRequest: URLRequest,
         key: String,
         ttl: TimeInterval,
-        scope: JikanAPIRequestScope?
+        scope: RequestLifecycleScope?
     ) async throws -> Data {
         do {
             let freshData = try await sharedDataTask(
@@ -360,7 +407,7 @@ nonisolated final class JikanAPIService: Sendable {
     private func sharedDataTask(
         for urlRequest: URLRequest,
         key: String,
-        scope: JikanAPIRequestScope?
+        scope: RequestLifecycleScope?
     ) async throws -> Data {
         let priority = Task.currentPriority
         let lease = await inFlightRequestStore.acquireTask(for: key) {

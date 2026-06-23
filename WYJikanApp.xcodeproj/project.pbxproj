@@ -244,6 +244,8 @@
 		16A200312FB4000000D1E001 /* AnimeDetailEpisodesModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A200302FB4000000D1E001 /* AnimeDetailEpisodesModel.swift */; };
 		16A200332FB4000000D1E001 /* AnimeDetailEpisodeRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A200322FB4000000D1E001 /* AnimeDetailEpisodeRowView.swift */; };
 		16A200342FB4000000D1E001 /* AnimeDetailEpisodesLoadMoreFooterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A200352FB4000000D1E001 /* AnimeDetailEpisodesLoadMoreFooterView.swift */; };
+		16A900012FF6000000000001 /* RandomPickResponseModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A900022FF6000000000002 /* RandomPickResponseModel.swift */; };
+		16A900032FF6000000000003 /* RandomPickService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A900042FF6000000000004 /* RandomPickService.swift */; };
 		16AA10022FCF300000000002 /* MainNewsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AA10012FCF300000000001 /* MainNewsModel.swift */; };
 		16AA10022FE4000000000002 /* SettingUserInformationSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AA10012FE4000000000001 /* SettingUserInformationSectionView.swift */; };
 		16AA10042FCF300000000004 /* MainNewsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AA10032FCF300000000003 /* MainNewsService.swift */; };
@@ -259,6 +261,7 @@
 		16AA10262FCF320000000026 /* MainNewsPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AA10252FCF320000000025 /* MainNewsPresentation.swift */; };
 		16AC10012FF5000000000001 /* JikanAPIContracts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AC10032FF5000000000003 /* JikanAPIContracts.swift */; };
 		16AC10022FF5000000000002 /* JikanAPIRequestState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AC10042FF5000000000004 /* JikanAPIRequestState.swift */; };
+		16AD00023000000000000002 /* RequestLifecycleManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16AD00013000000000000001 /* RequestLifecycleManager.swift */; };
 		16B100022F8A000000000002 /* CharacterListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B100012F8A000000000001 /* CharacterListView.swift */; };
 		16B100042F8A000000000004 /* CharacterListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B100032F8A000000000003 /* CharacterListViewModel.swift */; };
 		16B100062F8A000000000006 /* CharacterListContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16B100052F8A000000000005 /* CharacterListContentView.swift */; };
@@ -370,8 +373,6 @@
 		16F800022FDB100000000002 /* RandomPickHeroItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F800012FDB100000000001 /* RandomPickHeroItem.swift */; };
 		16F800042FDB100000000004 /* RandomPickHeroCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F800032FDB100000000003 /* RandomPickHeroCardView.swift */; };
 		16F800062FDB100000000006 /* RandomPickHeroSkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F800052FDB100000000005 /* RandomPickHeroSkeletonView.swift */; };
-		16A900012FF6000000000001 /* RandomPickResponseModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A900022FF6000000000002 /* RandomPickResponseModel.swift */; };
-		16A900032FF6000000000003 /* RandomPickService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A900042FF6000000000004 /* RandomPickService.swift */; };
 		16F900022FEA000000000002 /* HomeWatchModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F900012FEA000000000001 /* HomeWatchModel.swift */; };
 		16F900042FEA000000000004 /* HomeWatchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F900032FEA000000000003 /* HomeWatchService.swift */; };
 		16F900062FEA000000000006 /* HomeWatchPromosViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F900052FEA000000000005 /* HomeWatchPromosViewModel.swift */; };
@@ -662,6 +663,8 @@
 		16A200302FB4000000D1E001 /* AnimeDetailEpisodesModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeDetailEpisodesModel.swift; sourceTree = "<group>"; };
 		16A200322FB4000000D1E001 /* AnimeDetailEpisodeRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeDetailEpisodeRowView.swift; sourceTree = "<group>"; };
 		16A200352FB4000000D1E001 /* AnimeDetailEpisodesLoadMoreFooterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimeDetailEpisodesLoadMoreFooterView.swift; sourceTree = "<group>"; };
+		16A900022FF6000000000002 /* RandomPickResponseModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomPickResponseModel.swift; sourceTree = "<group>"; };
+		16A900042FF6000000000004 /* RandomPickService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomPickService.swift; sourceTree = "<group>"; };
 		16AA10012FCF300000000001 /* MainNewsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainNewsModel.swift; sourceTree = "<group>"; };
 		16AA10012FE4000000000001 /* SettingUserInformationSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingUserInformationSectionView.swift; sourceTree = "<group>"; };
 		16AA10032FCF300000000003 /* MainNewsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainNewsService.swift; sourceTree = "<group>"; };
@@ -677,6 +680,7 @@
 		16AA10252FCF320000000025 /* MainNewsPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainNewsPresentation.swift; sourceTree = "<group>"; };
 		16AC10032FF5000000000003 /* JikanAPIContracts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JikanAPIContracts.swift; sourceTree = "<group>"; };
 		16AC10042FF5000000000004 /* JikanAPIRequestState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JikanAPIRequestState.swift; sourceTree = "<group>"; };
+		16AD00013000000000000001 /* RequestLifecycleManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RequestLifecycleManager.swift; sourceTree = "<group>"; };
 		16B100012F8A000000000001 /* CharacterListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterListView.swift; sourceTree = "<group>"; };
 		16B100032F8A000000000003 /* CharacterListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterListViewModel.swift; sourceTree = "<group>"; };
 		16B100052F8A000000000005 /* CharacterListContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterListContentView.swift; sourceTree = "<group>"; };
@@ -788,8 +792,6 @@
 		16F800012FDB100000000001 /* RandomPickHeroItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomPickHeroItem.swift; sourceTree = "<group>"; };
 		16F800032FDB100000000003 /* RandomPickHeroCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomPickHeroCardView.swift; sourceTree = "<group>"; };
 		16F800052FDB100000000005 /* RandomPickHeroSkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomPickHeroSkeletonView.swift; sourceTree = "<group>"; };
-		16A900022FF6000000000002 /* RandomPickResponseModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomPickResponseModel.swift; sourceTree = "<group>"; };
-		16A900042FF6000000000004 /* RandomPickService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomPickService.swift; sourceTree = "<group>"; };
 		16F900012FEA000000000001 /* HomeWatchModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeWatchModel.swift; sourceTree = "<group>"; };
 		16F900032FEA000000000003 /* HomeWatchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeWatchService.swift; sourceTree = "<group>"; };
 		16F900052FEA000000000005 /* HomeWatchPromosViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeWatchPromosViewModel.swift; sourceTree = "<group>"; };
@@ -1375,38 +1377,6 @@
 				16FA111C2FFF10000000001C /* ViewModel */,
 			);
 			path = ProducerAnimeList;
-			sourceTree = "<group>";
-		};
-		16FA11192FFF100000000019 /* Service */ = {
-			isa = PBXGroup;
-			children = (
-				16FA11172FFF100000000017 /* ProducerAnimeListService.swift */,
-			);
-			path = Service;
-			sourceTree = "<group>";
-		};
-		16FA111A2FFF10000000001A /* View */ = {
-			isa = PBXGroup;
-			children = (
-				16FA111B2FFF10000000001B /* Main */,
-			);
-			path = View;
-			sourceTree = "<group>";
-		};
-		16FA111B2FFF10000000001B /* Main */ = {
-			isa = PBXGroup;
-			children = (
-				16FA11132FFF100000000013 /* ProducerAnimeListView.swift */,
-			);
-			path = Main;
-			sourceTree = "<group>";
-		};
-		16FA111C2FFF10000000001C /* ViewModel */ = {
-			isa = PBXGroup;
-			children = (
-				16FA11112FFF100000000011 /* ProducerAnimeListViewModel.swift */,
-			);
-			path = ViewModel;
 			sourceTree = "<group>";
 		};
 		158EFF282FE8EBE400B7BA9F /* Device */ = {
@@ -2311,6 +2281,7 @@
 				16AC10032FF5000000000003 /* JikanAPIContracts.swift */,
 				16AC10042FF5000000000004 /* JikanAPIRequestState.swift */,
 				15DE55A52F723C0000B292AD /* JikanAPIService.swift */,
+				16AD00013000000000000001 /* RequestLifecycleManager.swift */,
 			);
 			path = Service;
 			sourceTree = "<group>";
@@ -2747,6 +2718,96 @@
 			children = (
 				16A2002A2FB4000000D1E001 /* AnimeDetailEpisodesListViewModel.swift */,
 				16F6A0012FC200000000001 /* AnimeDetailEpisodeRowPresenter.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		16A900102FF6000000000010 /* RandomPick */ = {
+			isa = PBXGroup;
+			children = (
+				16A900142FF6000000000014 /* Anime */,
+				16A900172FF6000000000017 /* Manga */,
+				16A900112FF6000000000011 /* Model */,
+				16A900122FF6000000000012 /* Service */,
+				16A900132FF6000000000013 /* Shared */,
+			);
+			path = RandomPick;
+			sourceTree = "<group>";
+		};
+		16A900112FF6000000000011 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				16A900022FF6000000000002 /* RandomPickResponseModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		16A900122FF6000000000012 /* Service */ = {
+			isa = PBXGroup;
+			children = (
+				16A900042FF6000000000004 /* RandomPickService.swift */,
+			);
+			path = Service;
+			sourceTree = "<group>";
+		};
+		16A900132FF6000000000013 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				16F800032FDB100000000003 /* RandomPickHeroCardView.swift */,
+				16F800012FDB100000000001 /* RandomPickHeroItem.swift */,
+				16F800052FDB100000000005 /* RandomPickHeroSkeletonView.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		16A900142FF6000000000014 /* Anime */ = {
+			isa = PBXGroup;
+			children = (
+				16A900152FF6000000000015 /* View */,
+				16A900162FF6000000000016 /* ViewModel */,
+			);
+			path = Anime;
+			sourceTree = "<group>";
+		};
+		16A900152FF6000000000015 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				159667FC2F865AC60033410A /* RandomHeroCardView.swift */,
+				1596680A2F865F720033410A /* RandomHeroSectionView.swift */,
+				159667FD2F865AC60033410A /* RandomHeroSkeletonView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		16A900162FF6000000000016 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				15AC99652F8797BA008EAAEE /* RandomHeroViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		16A900172FF6000000000017 /* Manga */ = {
+			isa = PBXGroup;
+			children = (
+				16A900182FF6000000000018 /* View */,
+				16A900192FF6000000000019 /* ViewModel */,
+			);
+			path = Manga;
+			sourceTree = "<group>";
+		};
+		16A900182FF6000000000018 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				16A001092F89000000A1B2C3 /* RandomMangaViews.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		16A900192FF6000000000019 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				16A001052F89000000A1B2C3 /* RandomMangaViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -3223,96 +3284,6 @@
 			path = Pagination;
 			sourceTree = "<group>";
 		};
-		16A900102FF6000000000010 /* RandomPick */ = {
-			isa = PBXGroup;
-			children = (
-				16A900142FF6000000000014 /* Anime */,
-				16A900172FF6000000000017 /* Manga */,
-				16A900112FF6000000000011 /* Model */,
-				16A900122FF6000000000012 /* Service */,
-				16A900132FF6000000000013 /* Shared */,
-			);
-			path = RandomPick;
-			sourceTree = "<group>";
-		};
-		16A900112FF6000000000011 /* Model */ = {
-			isa = PBXGroup;
-			children = (
-				16A900022FF6000000000002 /* RandomPickResponseModel.swift */,
-			);
-			path = Model;
-			sourceTree = "<group>";
-		};
-		16A900122FF6000000000012 /* Service */ = {
-			isa = PBXGroup;
-			children = (
-				16A900042FF6000000000004 /* RandomPickService.swift */,
-			);
-			path = Service;
-			sourceTree = "<group>";
-		};
-		16A900132FF6000000000013 /* Shared */ = {
-			isa = PBXGroup;
-			children = (
-				16F800032FDB100000000003 /* RandomPickHeroCardView.swift */,
-				16F800012FDB100000000001 /* RandomPickHeroItem.swift */,
-				16F800052FDB100000000005 /* RandomPickHeroSkeletonView.swift */,
-			);
-			path = Shared;
-			sourceTree = "<group>";
-		};
-		16A900142FF6000000000014 /* Anime */ = {
-			isa = PBXGroup;
-			children = (
-				16A900152FF6000000000015 /* View */,
-				16A900162FF6000000000016 /* ViewModel */,
-			);
-			path = Anime;
-			sourceTree = "<group>";
-		};
-		16A900152FF6000000000015 /* View */ = {
-			isa = PBXGroup;
-			children = (
-				159667FC2F865AC60033410A /* RandomHeroCardView.swift */,
-				1596680A2F865F720033410A /* RandomHeroSectionView.swift */,
-				159667FD2F865AC60033410A /* RandomHeroSkeletonView.swift */,
-			);
-			path = View;
-			sourceTree = "<group>";
-		};
-		16A900162FF6000000000016 /* ViewModel */ = {
-			isa = PBXGroup;
-			children = (
-				15AC99652F8797BA008EAAEE /* RandomHeroViewModel.swift */,
-			);
-			path = ViewModel;
-			sourceTree = "<group>";
-		};
-		16A900172FF6000000000017 /* Manga */ = {
-			isa = PBXGroup;
-			children = (
-				16A900182FF6000000000018 /* View */,
-				16A900192FF6000000000019 /* ViewModel */,
-			);
-			path = Manga;
-			sourceTree = "<group>";
-		};
-		16A900182FF6000000000018 /* View */ = {
-			isa = PBXGroup;
-			children = (
-				16A001092F89000000A1B2C3 /* RandomMangaViews.swift */,
-			);
-			path = View;
-			sourceTree = "<group>";
-		};
-		16A900192FF6000000000019 /* ViewModel */ = {
-			isa = PBXGroup;
-			children = (
-				16A001052F89000000A1B2C3 /* RandomMangaViewModel.swift */,
-			);
-			path = ViewModel;
-			sourceTree = "<group>";
-		};
 		16F9000D2FEA00000000000D /* HomeWatch */ = {
 			isa = PBXGroup;
 			children = (
@@ -3380,6 +3351,38 @@
 				16FA11152FFF100000000015 /* ProducerRelatedAnimeSectionView.swift */,
 			);
 			path = Section;
+			sourceTree = "<group>";
+		};
+		16FA11192FFF100000000019 /* Service */ = {
+			isa = PBXGroup;
+			children = (
+				16FA11172FFF100000000017 /* ProducerAnimeListService.swift */,
+			);
+			path = Service;
+			sourceTree = "<group>";
+		};
+		16FA111A2FFF10000000001A /* View */ = {
+			isa = PBXGroup;
+			children = (
+				16FA111B2FFF10000000001B /* Main */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		16FA111B2FFF10000000001B /* Main */ = {
+			isa = PBXGroup;
+			children = (
+				16FA11132FFF100000000013 /* ProducerAnimeListView.swift */,
+			);
+			path = Main;
+			sourceTree = "<group>";
+		};
+		16FA111C2FFF10000000001C /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				16FA11112FFF100000000011 /* ProducerAnimeListViewModel.swift */,
+			);
+			path = ViewModel;
 			sourceTree = "<group>";
 		};
 		16FB00182FF0000000000001 /* Model */ = {
@@ -3663,6 +3666,7 @@
 				15A295632F8631F00056071F /* MainCategoryListModel.swift in Sources */,
 				16AC10012FF5000000000001 /* JikanAPIContracts.swift in Sources */,
 				16AC10022FF5000000000002 /* JikanAPIRequestState.swift in Sources */,
+				16AD00023000000000000002 /* RequestLifecycleManager.swift in Sources */,
 				15DE55A42F723C0000B292AD /* JikanAPIService.swift in Sources */,
 				16A001062F89000000A1B2C3 /* GenreMangaViewModel.swift in Sources */,
 				15750AFF2F7285520037E8A5 /* PlaceholderView.swift in Sources */,
