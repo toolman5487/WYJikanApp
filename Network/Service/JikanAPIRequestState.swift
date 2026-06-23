@@ -9,14 +9,21 @@ import Foundation
 // MARK: - JikanAPIResponseCache
 
 actor JikanAPIResponseCache {
+
+    // MARK: - Types
+
     private struct Entry: Sendable {
         let data: Data
         let expirationDate: Date
         let staleFallbackExpirationDate: Date
     }
 
+    // MARK: - Properties
+
     private var storage: [String: Entry] = [:]
     private var nextCleanupDate = Date.distantPast
+
+    // MARK: - Public Methods
 
     func data(for key: String, now: Date = Date()) -> Data? {
         guard let entry = storage[key] else { return nil }
@@ -62,6 +69,8 @@ actor JikanAPIResponseCache {
         nextCleanupDate = .distantPast
     }
 
+    // MARK: - Private Methods
+
     private func removeIfStaleFallbackExpired(for key: String, entry: Entry, now: Date) {
         guard entry.staleFallbackExpirationDate <= now else { return }
         storage.removeValue(forKey: key)
@@ -83,6 +92,9 @@ actor JikanAPIResponseCache {
 // MARK: - JikanAPIInFlightRequestStore
 
 actor JikanAPIInFlightRequestStore {
+
+    // MARK: - Types
+
     struct Lease: Sendable {
         let requestID: UUID
         let waiterID: UUID
@@ -96,7 +108,11 @@ actor JikanAPIInFlightRequestStore {
         var waiterIDs: Set<UUID>
     }
 
+    // MARK: - Properties
+
     private var entries: [String: Entry] = [:]
+
+    // MARK: - Public Methods
 
     func acquireTask(
         for key: String,
@@ -156,9 +172,14 @@ actor JikanAPIInFlightRequestStore {
 // MARK: - JikanAPIRequestGovernor
 
 actor JikanAPIRequestGovernor {
+
+    // MARK: - Types
+
     private struct ConcurrencyWaiter {
         let continuation: CheckedContinuation<Void, Error>
     }
+
+    // MARK: - Properties
 
     private let maximumConcurrentRequests: Int
     private let tokenCapacity: Double
@@ -174,6 +195,8 @@ actor JikanAPIRequestGovernor {
     private var lastTokenRefillDate: Date
     private var nextRequestDate = Date.distantPast
     private var rateLimitExpirationDate = Date.distantPast
+
+    // MARK: - Lifecycle
 
     init(
         maximumConcurrentRequests: Int = 2,
@@ -191,6 +214,8 @@ actor JikanAPIRequestGovernor {
         self.availableTokens = Double(burstSize)
         self.lastTokenRefillDate = now
     }
+
+    // MARK: - Public Methods
 
     func acquirePermit() async throws {
         try await acquireConcurrencyPermit()
@@ -349,13 +374,20 @@ actor JikanAPIRequestGovernor {
 // MARK: - JikanAPITransientFailureBackoffStore
 
 actor JikanAPITransientFailureBackoffStore {
+
+    // MARK: - Types
+
     private struct Entry: Sendable {
         let statusCode: Int
         let expirationDate: Date
     }
 
+    // MARK: - Properties
+
     private var storage: [String: Entry] = [:]
     private var nextCleanupDate = Date.distantPast
+
+    // MARK: - Public Methods
 
     func statusCode(for key: String, now: Date = Date()) -> Int? {
         switch storage[key] {
@@ -392,6 +424,8 @@ actor JikanAPITransientFailureBackoffStore {
         storage.removeAll()
         nextCleanupDate = .distantPast
     }
+
+    // MARK: - Private Methods
 
     private func removeExpiredEntriesIfNeeded(
         now: Date,

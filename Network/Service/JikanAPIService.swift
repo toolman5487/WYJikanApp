@@ -15,16 +15,19 @@ private enum JikanAPIResponseState: Sendable {
     case serverError(statusCode: Int)
 }
 
+// MARK: - JikanAPIExecutionControl
+
 private enum JikanAPIExecutionControl: Error, Sendable {
     case retryServerError(statusCode: Int, dataCount: Int)
 }
 
 // MARK: - JikanAPIService
 
-// Shared mutable state is actor-isolated; immutable dependencies are Sendable.
 nonisolated final class JikanAPIService: Sendable {
-    
+
     static let shared = JikanAPIService()
+
+    // MARK: - Constants
 
     private static let defaultRateLimitCooldown: TimeInterval = 60
     private static let serverFailureCooldown: TimeInterval = 60
@@ -34,7 +37,9 @@ nonisolated final class JikanAPIService: Sendable {
         400_000_000,
         900_000_000
     ]
-    
+
+    // MARK: - Properties
+
     private var baseURL: String { APIConfig.jikanBaseURL }
     private let session: URLSession
     private let decoder: JSONDecoder
@@ -43,7 +48,9 @@ nonisolated final class JikanAPIService: Sendable {
     private let requestLifecycleManager: RequestLifecycleManager
     private let requestGovernor = JikanAPIRequestGovernor()
     private let transientFailureBackoffStore = JikanAPITransientFailureBackoffStore()
-    
+
+    // MARK: - Lifecycle
+
     init(
         session: URLSession = .shared,
         decoder: JSONDecoder = JikanAPIService.makeDefaultDecoder(),
@@ -54,6 +61,8 @@ nonisolated final class JikanAPIService: Sendable {
         self.requestLifecycleManager = requestLifecycleManager
     }
 
+    // MARK: - Cache Management
+
     func clearCache() async {
         await responseCache.removeAll()
         await transientFailureBackoffStore.removeAll()
@@ -63,18 +72,75 @@ nonisolated final class JikanAPIService: Sendable {
     func setActiveRequestScope(_ scope: JikanAPIRequestScope) async {
         await requestLifecycleManager.setActiveTabScope(scope)
     }
-    
-    // MARK: - Decoder
 
-    private static func makeDefaultDecoder() -> JSONDecoder {
+    // MARK: - Public API
+
+    func send<T: Decodable & Sendable>(_ request: JikanAPIRequest) async throws -> T {
+        let urlRequest = try makeURLRequest(for: request)
+        let data = try await data(
+            for: urlRequest,
+            cachePolicy: request.cachePolicy,
+            scope: request.scope
+        )
+
+        do {
+            return try decoder.decode(T.self, from: data)
+        } catch {
+            let urlString = urlRequest.url?.absoluteString ?? "invalid-url"
+            AppLogger.decoding.error(
+                "decode failed \(urlString, privacy: .public) \(error.localizedDescription, privacy: .public)"
+            )
+            throw JikanAPIError.decodingError(error)
+        }
+    }
+
+    func fetch<T: Decodable & Sendable>(
+        endpoint: String,
+        cachePolicy: JikanAPICachePolicy,
+        queryItems: [URLQueryItem]? = nil
+    ) async throws -> T {
+        try await send(
+            JikanAPIRequest(
+                path: endpoint,
+                queryItems: queryItems ?? [],
+                cachePolicy: cachePolicy
+            )
+        )
+    }
+
+    func fetchFromURL<T: Decodable & Sendable>(
+        _ urlString: String,
+        cachePolicy: JikanAPICachePolicy
+    ) async throws -> T {
+        try await send(
+            JikanAPIRequest(
+                absoluteURL: urlString,
+                cachePolicy: cachePolicy
+            )
+        )
+    }
+}
+
+// MARK: - JikanAPIServicing Conformance
+
+nonisolated extension JikanAPIService: JikanAPIServicing {}
+
+// MARK: - JikanAPIService Decoder
+
+private extension JikanAPIService {
+
+    nonisolated static func makeDefaultDecoder() -> JSONDecoder {
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
         return decoder
     }
+}
 
-    // MARK: - URL Building
+// MARK: - JikanAPIService URL Building
 
-    private func makeURL(for request: JikanAPIRequest) throws -> URL {
+private extension JikanAPIService {
+
+    nonisolated func makeURL(for request: JikanAPIRequest) throws -> URL {
         switch request.target {
         case .absoluteURL(let absoluteURL):
             guard var components = URLComponents(string: absoluteURL) else {
@@ -87,26 +153,22 @@ nonisolated final class JikanAPIService: Sendable {
                 throw JikanAPIError.invalidURL
             }
             return url
+
         case .path(let path):
             guard var components = URLComponents(string: baseURL + path) else {
                 throw JikanAPIError.invalidURL
             }
-
             if !request.queryItems.isEmpty {
                 components.queryItems = request.queryItems
             }
-
             guard let url = components.url else {
                 throw JikanAPIError.invalidURL
             }
-
             return url
         }
     }
 
-    // MARK: - URL Request
-
-    private func makeURLRequest(for request: JikanAPIRequest) throws -> URLRequest {
+    nonisolated func makeURLRequest(for request: JikanAPIRequest) throws -> URLRequest {
         let url = try makeURL(for: request)
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = request.method
@@ -114,9 +176,18 @@ nonisolated final class JikanAPIService: Sendable {
         return urlRequest
     }
 
-    // MARK: - Response Handling
+    nonisolated func cacheKey(for urlRequest: URLRequest) -> String {
+        let method = urlRequest.httpMethod ?? "GET"
+        let urlString = urlRequest.url?.absoluteString ?? "invalid-url"
+        return "\(method) \(urlString)"
+    }
+}
 
-    private func responseState(for response: URLResponse, data: Data) -> JikanAPIResponseState {
+// MARK: - JikanAPIService Response Handling
+
+private extension JikanAPIService {
+
+    nonisolated func responseState(for response: URLResponse, data: Data) -> JikanAPIResponseState {
         guard let httpResponse = response as? HTTPURLResponse else {
             return data.isEmpty ? .emptyBody : .success
         }
@@ -128,27 +199,22 @@ nonisolated final class JikanAPIService: Sendable {
             return .serverError(statusCode: httpResponse.statusCode)
         }
     }
+}
 
-    // MARK: - Cache Keys
+// MARK: - JikanAPIService Retry Policy
 
-    private func cacheKey(for urlRequest: URLRequest) -> String {
-        let method = urlRequest.httpMethod ?? "GET"
-        let urlString = urlRequest.url?.absoluteString ?? "invalid-url"
-        return "\(method) \(urlString)"
-    }
+private extension JikanAPIService {
 
-    // MARK: - Retry Policy
-
-    private func isRetriableServerStatusCode(_ statusCode: Int) -> Bool {
+    nonisolated func isRetriableServerStatusCode(_ statusCode: Int) -> Bool {
         (500...599).contains(statusCode)
     }
 
-    private func retryDelayNanoseconds(for attempt: Int) -> UInt64? {
+    nonisolated func retryDelayNanoseconds(for attempt: Int) -> UInt64? {
         guard attempt < Self.transientRetryDelays.count else { return nil }
         return Self.transientRetryDelays[attempt]
     }
 
-    private func retryAfterInterval(
+    nonisolated func retryAfterInterval(
         from response: URLResponse,
         now: Date = Date()
     ) -> TimeInterval? {
@@ -182,10 +248,13 @@ nonisolated final class JikanAPIService: Sendable {
 
         return nil
     }
+}
 
-    // MARK: - Remote Execution
+// MARK: - JikanAPIService Remote Execution
 
-    private func execute(
+private extension JikanAPIService {
+
+    nonisolated func execute(
         _ urlRequest: URLRequest,
         scope: RequestLifecycleScope?
     ) async throws -> Data {
@@ -223,13 +292,15 @@ nonisolated final class JikanAPIService: Sendable {
             } catch let urlError as URLError where urlError.code == .cancelled {
                 throw CancellationError()
             } catch {
-                AppLogger.network.error("request failed \(url.absoluteString, privacy: .public) \(error.localizedDescription, privacy: .public)")
+                AppLogger.network.error(
+                    "request failed \(url.absoluteString, privacy: .public) \(error.localizedDescription, privacy: .public)"
+                )
                 throw JikanAPIError.networkError(error)
             }
         }
     }
 
-    private func performRequest(
+    nonisolated func performRequest(
         _ urlRequest: URLRequest,
         scope: RequestLifecycleScope?,
         attempt: Int
@@ -245,7 +316,7 @@ nonisolated final class JikanAPIService: Sendable {
         }
     }
 
-    private func performGovernedRequest(
+    nonisolated func performGovernedRequest(
         _ urlRequest: URLRequest,
         attempt: Int
     ) async throws -> Data {
@@ -269,9 +340,7 @@ nonisolated final class JikanAPIService: Sendable {
                 return data
 
             case .emptyBody:
-                AppLogger.network.error(
-                    "empty body \(urlString, privacy: .public)"
-                )
+                AppLogger.network.error("empty body \(urlString, privacy: .public)")
                 throw JikanAPIError.noData
 
             case .serverError(let statusCode):
@@ -280,15 +349,11 @@ nonisolated final class JikanAPIService: Sendable {
                         retryAfterInterval(from: response) ?? Self.defaultRateLimitCooldown,
                         1
                     )
-                    await requestGovernor.recordRateLimit(
-                        retryAfter: retryAfter
-                    )
+                    await requestGovernor.recordRateLimit(retryAfter: retryAfter)
                     AppLogger.network.warning(
                         "rate limited HTTP 429 retry after \(retryAfter, format: .fixed(precision: 1)) seconds \(urlString, privacy: .public)"
                     )
-                    throw JikanAPIError.rateLimited(
-                        retryAfter: retryAfter
-                    )
+                    throw JikanAPIError.rateLimited(retryAfter: retryAfter)
                 }
 
                 if isRetriableServerStatusCode(statusCode),
@@ -302,19 +367,20 @@ nonisolated final class JikanAPIService: Sendable {
                 AppLogger.network.error(
                     "server error HTTP \(statusCode) bytes \(data.count) \(urlString, privacy: .public)"
                 )
-                throw JikanAPIError.serverError(
-                    statusCode: statusCode
-                )
+                throw JikanAPIError.serverError(statusCode: statusCode)
             }
         } catch {
             await requestGovernor.releasePermit()
             throw error
         }
     }
+}
 
-    // MARK: - Data Loading
+// MARK: - JikanAPIService Data Loading
 
-    private func data(
+private extension JikanAPIService {
+
+    nonisolated func data(
         for urlRequest: URLRequest,
         cachePolicy: JikanAPICachePolicy,
         scope: RequestLifecycleScope?
@@ -325,6 +391,7 @@ nonisolated final class JikanAPIService: Sendable {
         case .remoteOnly:
             try await throwIfTransientFailureBackoffIsActive(for: key)
             return try await sharedDataTask(for: urlRequest, key: key, scope: scope)
+
         case .cacheFirst(let ttl):
             if let cachedData = await responseCache.data(for: key) {
                 AppLogger.cache.debug("cache hit \(key, privacy: .public)")
@@ -343,6 +410,7 @@ nonisolated final class JikanAPIService: Sendable {
                 ttl: ttl,
                 scope: scope
             )
+
         case .reloadIgnoringCache(let ttl):
             try await throwIfTransientFailureBackoffIsActive(for: key)
             AppLogger.cache.debug("cache reload \(key, privacy: .public)")
@@ -355,7 +423,7 @@ nonisolated final class JikanAPIService: Sendable {
         }
     }
 
-    private func throwIfTransientFailureBackoffIsActive(for key: String) async throws {
+    nonisolated func throwIfTransientFailureBackoffIsActive(for key: String) async throws {
         guard let statusCode = await transientFailureBackoffStore.statusCode(for: key) else {
             return
         }
@@ -364,7 +432,7 @@ nonisolated final class JikanAPIService: Sendable {
         throw JikanAPIError.serverError(statusCode: statusCode)
     }
 
-    private func loadRemoteCachingResponse(
+    nonisolated func loadRemoteCachingResponse(
         for urlRequest: URLRequest,
         key: String,
         ttl: TimeInterval,
@@ -401,10 +469,13 @@ nonisolated final class JikanAPIService: Sendable {
             throw error
         }
     }
+}
 
-    // MARK: - In-Flight Requests
+// MARK: - JikanAPIService In-Flight Requests
 
-    private func sharedDataTask(
+private extension JikanAPIService {
+
+    nonisolated func sharedDataTask(
         for urlRequest: URLRequest,
         key: String,
         scope: RequestLifecycleScope?
@@ -453,7 +524,7 @@ nonisolated final class JikanAPIService: Sendable {
         }
     }
 
-    private func releaseInFlightWaiter(
+    nonisolated func releaseInFlightWaiter(
         for key: String,
         lease: JikanAPIInFlightRequestStore.Lease
     ) async {
@@ -464,50 +535,4 @@ nonisolated final class JikanAPIService: Sendable {
             cancelTaskIfUnused: false
         )
     }
-
-    // MARK: - Public API
-
-    func send<T: Decodable & Sendable>(_ request: JikanAPIRequest) async throws -> T {
-        let urlRequest = try makeURLRequest(for: request)
-        let data = try await data(
-            for: urlRequest,
-            cachePolicy: request.cachePolicy,
-            scope: request.scope
-        )
-
-        do {
-            return try decoder.decode(T.self, from: data)
-        } catch {
-            let urlString = urlRequest.url?.absoluteString ?? "invalid-url"
-            AppLogger.decoding.error("decode failed \(urlString, privacy: .public) \(error.localizedDescription, privacy: .public)")
-            throw JikanAPIError.decodingError(error)
-        }
-    }
-
-    func fetch<T: Decodable & Sendable>(
-        endpoint: String,
-        cachePolicy: JikanAPICachePolicy,
-        queryItems: [URLQueryItem]? = nil
-    ) async throws -> T {
-        try await send(
-            JikanAPIRequest(
-                path: endpoint,
-                queryItems: queryItems ?? [],
-                cachePolicy: cachePolicy
-            )
-        )
-    }
-
-    func fetchFromURL<T: Decodable & Sendable>(_ urlString: String, cachePolicy: JikanAPICachePolicy) async throws -> T {
-        try await send(
-            JikanAPIRequest(
-                absoluteURL: urlString,
-                cachePolicy: cachePolicy
-            )
-        )
-    }
 }
-
-// MARK: - JikanAPIServicing Conformance
-
-nonisolated extension JikanAPIService: JikanAPIServicing {}

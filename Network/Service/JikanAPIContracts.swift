@@ -15,8 +15,13 @@ nonisolated enum JikanAPIError: LocalizedError, AppUserFacingError {
     case networkError(Error)
     case rateLimited(retryAfter: TimeInterval)
     case serverError(statusCode: Int)
+}
 
-    nonisolated var errorDescription: String? {
+// MARK: - JikanAPIError Descriptions
+
+nonisolated extension JikanAPIError {
+
+    var errorDescription: String? {
         switch self {
         case .invalidURL:
             return "The URL is invalid and the request could not be created."
@@ -33,7 +38,7 @@ nonisolated enum JikanAPIError: LocalizedError, AppUserFacingError {
         }
     }
 
-    nonisolated var userMessage: String {
+    var userMessage: String {
         switch self {
         case .invalidURL:
             return "資料來源設定暫時異常，請稍後再試。"
@@ -72,6 +77,8 @@ nonisolated enum JikanAPICachePolicy: Sendable {
     case reloadIgnoringCache(ttl: TimeInterval)
 }
 
+// MARK: - JikanAPIRequestScope
+
 nonisolated enum JikanAPIRequestScope: Hashable, Sendable {
     case home
     case categoryList
@@ -91,7 +98,10 @@ nonisolated enum JikanCacheDuration {
     static let genreList: TimeInterval = 86_400
 }
 
+// MARK: - JikanAPICachePolicy Presets
+
 nonisolated extension JikanAPICachePolicy {
+
     static func resolved(forceRefresh: Bool, ttl: TimeInterval) -> JikanAPICachePolicy {
         forceRefresh ? .reloadIgnoringCache(ttl: ttl) : .cacheFirst(ttl: ttl)
     }
@@ -175,6 +185,7 @@ nonisolated protocol JikanAPIServicing: Sendable {
 // MARK: - JikanAPIServicing Convenience
 
 nonisolated extension JikanAPIServicing {
+
     func fetch<T: Decodable & Sendable>(
         endpoint: String,
         cachePolicy: JikanAPICachePolicy,

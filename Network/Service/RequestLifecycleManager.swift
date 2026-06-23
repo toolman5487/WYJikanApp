@@ -14,187 +14,129 @@ nonisolated enum RequestLifecycleScope: Hashable, Sendable {
     case independent
 }
 
+// MARK: - RequestLifecycleScope Presets
+
 nonisolated extension RequestLifecycleScope {
-    static let mainHome = RequestLifecycleScope.screen(
-        RequestScreenScope(
-            identifier: "mainHome",
-            parentTab: .home
-        )
-    )
 
-    static let mainCategoryList = RequestLifecycleScope.screen(
-        RequestScreenScope(
-            identifier: "mainCategoryList",
-            parentTab: .categoryList
-        )
-    )
+    // MARK: - Main Tabs
 
-    static let homeTodayAnimeScheduleList = RequestLifecycleScope.screen(
-        RequestScreenScope(
-            identifier: "homeTodayAnimeScheduleList",
-            parentTab: .home
-        )
-    )
+    static let mainHome = mainTabScreen("mainHome", parentTab: .home)
+    static let mainCategoryList = mainTabScreen("mainCategoryList", parentTab: .categoryList)
+    static let mainSearch = mainTabScreen("mainSearch", parentTab: .search)
+    static let mainMyListRandomAnime = mainTabScreen("mainMyListRandomAnime", parentTab: .myList)
+    static let mainMyListRandomManga = mainTabScreen("mainMyListRandomManga", parentTab: .myList)
 
-    static let homeTrendingAnimeList = RequestLifecycleScope.screen(
-        RequestScreenScope(
-            identifier: "homeTrendingAnimeList",
-            parentTab: .home
-        )
-    )
+    // MARK: - Home Sub-screens
 
-    static let homeTrendingMangaList = RequestLifecycleScope.screen(
-        RequestScreenScope(
-            identifier: "homeTrendingMangaList",
-            parentTab: .home
-        )
+    static let homeTodayAnimeScheduleList = mainTabScreen(
+        "homeTodayAnimeScheduleList",
+        parentTab: .home
     )
+    static let homeTrendingAnimeList = mainTabScreen("homeTrendingAnimeList", parentTab: .home)
+    static let homeTrendingMangaList = mainTabScreen("homeTrendingMangaList", parentTab: .home)
+    static let homeWatchList = mainTabScreen("homeWatchList", parentTab: .home)
 
-    static let homeWatchList = RequestLifecycleScope.screen(
-        RequestScreenScope(
-            identifier: "homeWatchList",
-            parentTab: .home
-        )
-    )
-
-    static let mainSearch = RequestLifecycleScope.screen(
-        RequestScreenScope(
-            identifier: "mainSearch",
-            parentTab: .search
-        )
-    )
-
-    static let mainMyListRandomAnime = RequestLifecycleScope.screen(
-        RequestScreenScope(
-            identifier: "mainMyListRandomAnime",
-            parentTab: .myList
-        )
-    )
-
-    static let mainMyListRandomManga = RequestLifecycleScope.screen(
-        RequestScreenScope(
-            identifier: "mainMyListRandomManga",
-            parentTab: .myList
-        )
-    )
+    // MARK: - Detail Screens
 
     static func animeDetail(
         malID: Int,
         instanceID: UUID = UUID()
     ) -> RequestLifecycleScope {
-        .screen(
-            RequestScreenScope(
-                identifier: "animeDetail.\(malID).\(instanceID.uuidString)"
-            )
-        )
+        detailScreen("animeDetail", resourceID: malID, instanceID: instanceID)
     }
 
     static func mangaDetail(
         malID: Int,
         instanceID: UUID = UUID()
     ) -> RequestLifecycleScope {
-        .screen(
-            RequestScreenScope(
-                identifier: "mangaDetail.\(malID).\(instanceID.uuidString)"
-            )
-        )
+        detailScreen("mangaDetail", resourceID: malID, instanceID: instanceID)
     }
 
     static func peopleDetail(
         malID: Int,
         instanceID: UUID = UUID()
     ) -> RequestLifecycleScope {
-        .screen(
-            RequestScreenScope(
-                identifier: "peopleDetail.\(malID).\(instanceID.uuidString)"
-            )
-        )
+        detailScreen("peopleDetail", resourceID: malID, instanceID: instanceID)
     }
 
     static func characterDetail(
         malID: Int,
         instanceID: UUID = UUID()
     ) -> RequestLifecycleScope {
-        .screen(
-            RequestScreenScope(
-                identifier: "characterDetail.\(malID).\(instanceID.uuidString)"
-            )
-        )
+        detailScreen("characterDetail", resourceID: malID, instanceID: instanceID)
     }
 
     static func animeReview(
         malID: Int,
         instanceID: UUID = UUID()
     ) -> RequestLifecycleScope {
-        .screen(
-            RequestScreenScope(
-                identifier: "animeReview.\(malID).\(instanceID.uuidString)"
-            )
-        )
+        detailScreen("animeReview", resourceID: malID, instanceID: instanceID)
     }
 
     static func mangaReview(
         malID: Int,
         instanceID: UUID = UUID()
     ) -> RequestLifecycleScope {
-        .screen(
-            RequestScreenScope(
-                identifier: "mangaReview.\(malID).\(instanceID.uuidString)"
-            )
-        )
+        detailScreen("mangaReview", resourceID: malID, instanceID: instanceID)
     }
 
     static func animeEpisodes(
         malID: Int,
         instanceID: UUID = UUID()
     ) -> RequestLifecycleScope {
-        .screen(
-            RequestScreenScope(
-                identifier: "animeEpisodes.\(malID).\(instanceID.uuidString)"
-            )
-        )
+        detailScreen("animeEpisodes", resourceID: malID, instanceID: instanceID)
     }
 
     static func animeCategoryDetail(
         genreID: Int,
         instanceID: UUID = UUID()
     ) -> RequestLifecycleScope {
-        .screen(
-            RequestScreenScope(
-                identifier: "animeCategoryDetail.\(genreID).\(instanceID.uuidString)"
-            )
-        )
+        detailScreen("animeCategoryDetail", resourceID: genreID, instanceID: instanceID)
     }
 
     static func mangaCategoryDetail(
         genreID: Int,
         instanceID: UUID = UUID()
     ) -> RequestLifecycleScope {
-        .screen(
-            RequestScreenScope(
-                identifier: "mangaCategoryDetail.\(genreID).\(instanceID.uuidString)"
-            )
-        )
+        detailScreen("mangaCategoryDetail", resourceID: genreID, instanceID: instanceID)
     }
 
     static func producerDetail(
         producerID: Int,
         instanceID: UUID = UUID()
     ) -> RequestLifecycleScope {
-        .screen(
-            RequestScreenScope(
-                identifier: "producerDetail.\(producerID).\(instanceID.uuidString)"
-            )
-        )
+        detailScreen("producerDetail", resourceID: producerID, instanceID: instanceID)
     }
 
     static func producerAnimeList(
         producerID: Int,
         instanceID: UUID = UUID()
     ) -> RequestLifecycleScope {
+        detailScreen("producerAnimeList", resourceID: producerID, instanceID: instanceID)
+    }
+
+    // MARK: - Private
+
+    private static func mainTabScreen(
+        _ identifier: String,
+        parentTab: JikanAPIRequestScope
+    ) -> RequestLifecycleScope {
         .screen(
             RequestScreenScope(
-                identifier: "producerAnimeList.\(producerID).\(instanceID.uuidString)"
+                identifier: identifier,
+                parentTab: parentTab
+            )
+        )
+    }
+
+    private static func detailScreen(
+        _ prefix: String,
+        resourceID: Int,
+        instanceID: UUID
+    ) -> RequestLifecycleScope {
+        .screen(
+            RequestScreenScope(
+                identifier: "\(prefix).\(resourceID).\(instanceID.uuidString)"
             )
         )
     }
@@ -247,9 +189,14 @@ nonisolated protocol RequestLifecycleManaging: Sendable {
 
 @MainActor
 final class RequestScreenLifecycleController {
+
+    // MARK: - Properties
+
     private let scope: RequestLifecycleScope
     private let requestLifecycleManager: any RequestLifecycleManaging
     private var isActive = false
+
+    // MARK: - Lifecycle
 
     init(
         scope: RequestLifecycleScope,
@@ -258,6 +205,8 @@ final class RequestScreenLifecycleController {
         self.scope = scope
         self.requestLifecycleManager = requestLifecycleManager
     }
+
+    // MARK: - Public Methods
 
     func activate() async -> Bool {
         isActive = true
@@ -286,7 +235,10 @@ final class RequestScreenLifecycleController {
 // MARK: - RequestLifecycleManager
 
 actor RequestLifecycleManager: RequestLifecycleManaging {
+
     static let shared = RequestLifecycleManager()
+
+    // MARK: - Types
 
     private struct PendingRequest {
         let scope: RequestLifecycleScope
@@ -299,6 +251,8 @@ actor RequestLifecycleManager: RequestLifecycleManaging {
         let cancel: @Sendable () -> Void
     }
 
+    // MARK: - Properties
+
     private let clock: ContinuousClock
     private let backgroundQuietPeriod: Duration
     private var activeTabScope: JikanAPIRequestScope = .home
@@ -309,6 +263,8 @@ actor RequestLifecycleManager: RequestLifecycleManaging {
     private var cancelledPendingRequestIDs = Set<UUID>()
     private var backgroundEligibleInstant: ContinuousClock.Instant
     private var backgroundResumeTask: Task<Void, Never>?
+
+    // MARK: - Lifecycle
 
     init(
         backgroundQuietPeriod: Duration = .seconds(2),
@@ -351,18 +307,6 @@ actor RequestLifecycleManager: RequestLifecycleManaging {
     func cancelRequests(in scope: RequestLifecycleScope) {
         cancelPendingRequests(in: scope)
         cancelRunningRequests(in: scope)
-    }
-
-    func snapshot() -> RequestLifecycleSnapshot {
-        RequestLifecycleSnapshot(
-            activeTabScope: activeTabScope,
-            pendingRequestCounts: requestCounts(
-                for: pendingRequests.values.map(\.scope)
-            ),
-            runningRequestCounts: requestCounts(
-                for: runningRequests.values.map(\.scope)
-            )
-        )
     }
 
     // MARK: - Request Execution
@@ -417,9 +361,26 @@ actor RequestLifecycleManager: RequestLifecycleManaging {
         }
     }
 
-    // MARK: - Waiting
+    // MARK: - Snapshot
 
-    private func waitUntilEligible(
+    func snapshot() -> RequestLifecycleSnapshot {
+        RequestLifecycleSnapshot(
+            activeTabScope: activeTabScope,
+            pendingRequestCounts: requestCounts(
+                for: pendingRequests.values.map(\.scope)
+            ),
+            runningRequestCounts: requestCounts(
+                for: runningRequests.values.map(\.scope)
+            )
+        )
+    }
+}
+
+// MARK: - RequestLifecycleManager Waiting
+
+private extension RequestLifecycleManager {
+
+    func waitUntilEligible(
         requestID: UUID,
         scope: RequestLifecycleScope,
         inactivePolicy: RequestInactivePolicy
@@ -450,7 +411,7 @@ actor RequestLifecycleManager: RequestLifecycleManaging {
         }
     }
 
-    private func registerPendingRequest(
+    func registerPendingRequest(
         requestID: UUID,
         scope: RequestLifecycleScope,
         continuation: CheckedContinuation<Void, Error>
@@ -474,7 +435,7 @@ actor RequestLifecycleManager: RequestLifecycleManaging {
         }
     }
 
-    private func cancelPendingRequest(requestID: UUID) {
+    func cancelPendingRequest(requestID: UUID) {
         guard let request = pendingRequests.removeValue(forKey: requestID) else {
             if let request = runningRequests[requestID] {
                 request.cancel()
@@ -487,7 +448,7 @@ actor RequestLifecycleManager: RequestLifecycleManaging {
         requestDidFinish(scope: request.scope)
     }
 
-    private func resumeEligiblePendingRequests() {
+    func resumeEligiblePendingRequests() {
         let eligibleRequestIDs: [UUID] = pendingRequests.compactMap { requestID, request in
             isEligible(request.scope) ? requestID : nil
         }
@@ -499,10 +460,13 @@ actor RequestLifecycleManager: RequestLifecycleManaging {
             request.continuation.resume()
         }
     }
+}
 
-    // MARK: - Cancellation
+// MARK: - RequestLifecycleManager Cancellation
 
-    private func cancelInactiveRequestsIfNeeded() {
+private extension RequestLifecycleManager {
+
+    func cancelInactiveRequestsIfNeeded() {
         let requestIDs: [UUID] = runningRequests.compactMap { requestID, request in
             guard request.inactivePolicy == .cancel,
                   !isEligible(request.scope) else {
@@ -516,7 +480,7 @@ actor RequestLifecycleManager: RequestLifecycleManaging {
         }
     }
 
-    private func cancelPendingRequests(in scope: RequestLifecycleScope) {
+    func cancelPendingRequests(in scope: RequestLifecycleScope) {
         let requestIDs: [UUID] = pendingRequests.compactMap { requestID, request in
             request.scope == scope ? requestID : nil
         }
@@ -526,34 +490,37 @@ actor RequestLifecycleManager: RequestLifecycleManaging {
         }
     }
 
-    private func cancelRunningRequests(in scope: RequestLifecycleScope) {
+    func cancelRunningRequests(in scope: RequestLifecycleScope) {
         for request in runningRequests.values where request.scope == scope {
             request.cancel()
         }
     }
+}
 
-    // MARK: - Priority
+// MARK: - RequestLifecycleManager Priority
 
-    private func prepareForForegroundRequest() {
+private extension RequestLifecycleManager {
+
+    func prepareForForegroundRequest() {
         markForegroundActivity()
         cancelRunningRequests(in: .background)
     }
 
-    private func requestDidFinish(scope: RequestLifecycleScope) {
+    func requestDidFinish(scope: RequestLifecycleScope) {
         if isForeground(scope) {
             markForegroundActivity()
         }
         resumeEligiblePendingRequests()
     }
 
-    private func markForegroundActivity() {
+    func markForegroundActivity() {
         backgroundEligibleInstant = clock.now.advanced(
             by: backgroundQuietPeriod
         )
         scheduleBackgroundResume()
     }
 
-    private func scheduleBackgroundResume() {
+    func scheduleBackgroundResume() {
         backgroundResumeTask?.cancel()
         let eligibleInstant = backgroundEligibleInstant
         let clock = clock
@@ -570,7 +537,7 @@ actor RequestLifecycleManager: RequestLifecycleManaging {
         }
     }
 
-    private func resumeBackgroundRequestsIfEligible(
+    func resumeBackgroundRequestsIfEligible(
         expectedInstant: ContinuousClock.Instant
     ) {
         guard backgroundEligibleInstant == expectedInstant else { return }
@@ -578,29 +545,31 @@ actor RequestLifecycleManager: RequestLifecycleManaging {
         resumeEligiblePendingRequests()
     }
 
-    private func hasForegroundRequests() -> Bool {
-        pendingRequests.values.contains {
+    func hasForegroundRequests() -> Bool {
+        let hasPendingForegroundRequests = pendingRequests.values.contains {
             isForeground($0.scope) && isScopeActive($0.scope)
         }
-            || runningRequests.values.contains { isForeground($0.scope) }
+        let hasRunningForegroundRequests = runningRequests.values.contains {
+            isForeground($0.scope)
+        }
+        return hasPendingForegroundRequests || hasRunningForegroundRequests
     }
 
-    private func isForeground(_ scope: RequestLifecycleScope) -> Bool {
+    func isForeground(_ scope: RequestLifecycleScope) -> Bool {
         switch scope {
         case .background:
             return false
-        case .tab:
-            return true
-        case .screen:
-            return true
-        case .independent:
+        case .tab, .screen, .independent:
             return true
         }
     }
+}
 
-    // MARK: - Eligibility
+// MARK: - RequestLifecycleManager Eligibility
 
-    private func isEligible(_ scope: RequestLifecycleScope) -> Bool {
+private extension RequestLifecycleManager {
+
+    func isEligible(_ scope: RequestLifecycleScope) -> Bool {
         guard isScopeActive(scope) else { return false }
 
         switch scope {
@@ -620,23 +589,23 @@ actor RequestLifecycleManager: RequestLifecycleManaging {
         }
     }
 
-    private func isScopeActive(_ scope: RequestLifecycleScope) -> Bool {
+    func isScopeActive(_ scope: RequestLifecycleScope) -> Bool {
         guard !inactiveScopes.contains(scope) else { return false }
 
         switch scope {
         case .tab(let tabScope):
             return tabScope == activeTabScope
+
         case .screen(let screenScope):
             guard let parentTab = screenScope.parentTab else { return true }
             return parentTab == activeTabScope
-        case .background:
-            return true
-        case .independent:
+
+        case .background, .independent:
             return true
         }
     }
 
-    private func requestCounts(
+    func requestCounts(
         for scopes: [RequestLifecycleScope]
     ) -> [RequestLifecycleScope: Int] {
         scopes.reduce(into: [:]) { counts, scope in

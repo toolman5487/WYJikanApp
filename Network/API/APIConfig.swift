@@ -7,6 +7,8 @@
 
 import Foundation
 
+// MARK: - APIConfig
+
 nonisolated enum APIConfig {
 
     static let jikanBaseURL = "https://api.jikan.moe/v4"
@@ -35,7 +37,7 @@ nonisolated enum APIConfig {
         static func pictures(id: Int) -> String { "/manga/\(id)/pictures" }
     }
 
-    // MARK: - Characters & People
+    // MARK: - Characters
 
     enum Characters {
         static let list = "/characters"
@@ -43,13 +45,15 @@ nonisolated enum APIConfig {
         static func full(id: Int) -> String { "/characters/\(id)/full" }
     }
 
+    // MARK: - People
+
     enum People {
         static let list = "/people"
         static func detail(id: Int) -> String { "/people/\(id)" }
         static func full(id: Int) -> String { "/people/\(id)/full" }
     }
 
-    // MARK: - Top, Seasons, Schedules
+    // MARK: - Top
 
     enum Top {
         static let anime = "/top/anime"
@@ -58,22 +62,28 @@ nonisolated enum APIConfig {
         static let people = "/top/people"
     }
 
+    // MARK: - Seasons
+
     enum Seasons {
         static func now() -> String { "/seasons/now" }
         static func list(year: Int, season: String) -> String { "/seasons/\(year)/\(season)" }
     }
+
+    // MARK: - Schedules
 
     enum Schedules {
         static let list = "/schedules"
         static func day(_ day: String) -> String { "/schedules/\(day)" }
     }
 
-    // MARK: - Random & Recommendations
+    // MARK: - Random
 
     enum Random {
         static let anime = "/random/anime"
         static let manga = "/random/manga"
     }
+
+    // MARK: - Recommendations
 
     enum Recommendations {
         static let anime = "/recommendations/anime"
@@ -97,18 +107,22 @@ nonisolated enum APIConfig {
         static func mangaList(username: String) -> String { "/users/\(username)/mangalist" }
     }
 
-    // MARK: - Genres, Producers, Magazines
+    // MARK: - Genres
 
     enum Genres {
         static let anime = "/genres/anime"
         static let manga = "/genres/manga"
     }
 
+    // MARK: - Producers
+
     enum Producers {
         static let list = "/producers"
         static func detail(id: Int) -> String { "/producers/\(id)" }
         static func full(id: Int) -> String { "/producers/\(id)/full" }
     }
+
+    // MARK: - Magazines
 
     enum Magazines {
         static let list = "/magazines"
