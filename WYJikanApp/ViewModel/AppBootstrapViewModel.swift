@@ -20,7 +20,7 @@ final class AppBootstrapViewModel: ObservableObject {
 
     // MARK: - Dependencies
 
-    private let animeDetailService: AnimeDetailServicing
+    private let backgroundAnimeDetailService: AnimeDetailServicing
     private let broadcastReminderRepository: any AnimeBroadcastReminderRepository
     private let notificationScheduler: HomeTodayAnimeNotificationScheduler
     private let homeLoadCoordinator: any HomeLoadCoordinating
@@ -32,12 +32,12 @@ final class AppBootstrapViewModel: ObservableObject {
     // MARK: - Lifecycle
 
     init(
-        animeDetailService: AnimeDetailServicing,
+        backgroundAnimeDetailService: AnimeDetailServicing,
         broadcastReminderRepository: any AnimeBroadcastReminderRepository,
         notificationScheduler: HomeTodayAnimeNotificationScheduler,
         homeLoadCoordinator: any HomeLoadCoordinating
     ) {
-        self.animeDetailService = animeDetailService
+        self.backgroundAnimeDetailService = backgroundAnimeDetailService
         self.broadcastReminderRepository = broadcastReminderRepository
         self.notificationScheduler = notificationScheduler
         self.homeLoadCoordinator = homeLoadCoordinator
@@ -65,7 +65,7 @@ final class AppBootstrapViewModel: ObservableObject {
 
             await AnimeBroadcastReminderReconciler.reconcileAll(
                 subscriptions: subscriptions,
-                service: animeDetailService,
+                service: backgroundAnimeDetailService,
                 repository: broadcastReminderRepository,
                 scheduler: notificationScheduler
             )

@@ -44,7 +44,7 @@ final class AnimeDetailViewModel: ObservableObject {
         favoriteRepository: any FavoriteRepository,
         broadcastReminderRepository: any AnimeBroadcastReminderRepository,
         requestLifecycleScope: RequestLifecycleScope,
-        requestLifecycleManager: any RequestLifecycleManaging,
+        requestLifecycleManager: any RequestLifecycleControlling,
         watchProgressController: AnimeWatchProgressController = AnimeWatchProgressController()
     ) {
         self.malId = malId

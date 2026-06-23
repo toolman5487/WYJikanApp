@@ -41,7 +41,7 @@ final class MainSearchViewModel: ObservableObject {
     init(
         service: MainSearchServicing,
         historyRepository: any MainSearchHistoryRepository,
-        requestLifecycleManager: any RequestLifecycleManaging,
+        requestLifecycleManager: any RequestLifecycleControlling,
         initialKind: MainSearchKind = .anime,
         initialQuery: String = "",
         initialSortOption: MainSearchSortOption = .defaultOption,

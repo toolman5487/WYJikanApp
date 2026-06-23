@@ -30,7 +30,7 @@ final class MainCategoryListViewModel: ObservableObject {
         mangaListViewModel: MangaListViewModel,
         peopleListViewModel: PeopleListViewModel,
         characterListViewModel: CharacterListViewModel,
-        requestLifecycleManager: any RequestLifecycleManaging
+        requestLifecycleManager: any RequestLifecycleControlling
     ) {
         self.animeListViewModel = animeListViewModel
         self.mangaListViewModel = mangaListViewModel

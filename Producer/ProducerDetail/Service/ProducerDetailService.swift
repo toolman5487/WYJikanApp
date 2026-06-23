@@ -23,8 +23,8 @@ nonisolated final class ProducerDetailService: ProducerDetailServicing {
     private let lifecycleScope: RequestLifecycleScope
 
     init(
-        apiService: JikanAPIServicing = JikanAPIService.shared,
-        lifecycleScope: RequestLifecycleScope = .independent
+        apiService: JikanAPIServicing,
+        lifecycleScope: RequestLifecycleScope
     ) {
         self.apiService = apiService
         self.lifecycleScope = lifecycleScope

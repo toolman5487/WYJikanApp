@@ -108,7 +108,7 @@ final class RandomHeroViewModel: ObservableObject {
 
     init(
         service: RandomPickServicing,
-        requestLifecycleManager: any RequestLifecycleManaging,
+        requestLifecycleManager: any RequestLifecycleControlling,
         storage: UserDefaults = .standard
     ) {
         self.service = service

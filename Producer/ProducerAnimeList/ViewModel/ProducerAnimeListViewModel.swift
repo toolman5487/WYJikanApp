@@ -49,7 +49,7 @@ final class ProducerAnimeListViewModel: ObservableObject {
         producerName: String,
         service: ProducerAnimeListServicing,
         requestLifecycleScope: RequestLifecycleScope,
-        requestLifecycleManager: any RequestLifecycleManaging
+        requestLifecycleManager: any RequestLifecycleControlling
     ) {
         self.producerId = producerId
         self.producerName = producerName

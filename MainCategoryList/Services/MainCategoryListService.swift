@@ -66,7 +66,7 @@ nonisolated final class MainCategoryListService: MainCategoryListServicing {
     }
 
 
-    init(apiService: JikanAPIServicing = JikanAPIService.shared) {
+    init(apiService: JikanAPIServicing) {
         self.apiService = apiService
     }
 

@@ -53,7 +53,7 @@ final class PeopleDetailViewModel: ObservableObject {
         malId: Int,
         service: PeopleDetailServicing,
         requestLifecycleScope: RequestLifecycleScope,
-        requestLifecycleManager: any RequestLifecycleManaging
+        requestLifecycleManager: any RequestLifecycleControlling
     ) {
         self.malId = malId
         self.service = service

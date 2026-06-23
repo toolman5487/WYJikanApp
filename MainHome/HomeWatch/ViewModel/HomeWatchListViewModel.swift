@@ -41,7 +41,7 @@ final class HomeWatchListViewModel: ObservableObject {
     init(
         initialFeed: HomeWatchFeedKind = .latestEpisodes,
         service: HomeWatchServicing,
-        requestLifecycleManager: any RequestLifecycleManaging
+        requestLifecycleManager: any RequestLifecycleControlling
     ) {
         self.selectedFeed = initialFeed
         self.service = service

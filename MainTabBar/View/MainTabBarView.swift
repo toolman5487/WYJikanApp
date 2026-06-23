@@ -77,7 +77,7 @@ private struct MainTabBarConfiguredView: View {
         .toolbarBackground(.visible, for: .tabBar)
         .tabBarMinimizeBehavior(.onScrollDown)
         .task(id: viewModel.selectedTab) {
-            await JikanAPIService.shared.setActiveRequestScope(
+            await dependencies.requestLifecycleManager.setActiveTabScope(
                 viewModel.selectedTab.requestScope
             )
         }

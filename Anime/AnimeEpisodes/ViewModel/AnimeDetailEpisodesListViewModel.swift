@@ -41,7 +41,7 @@ final class AnimeDetailEpisodesListViewModel: ObservableObject {
         malId: Int,
         service: any AnimeDetailServicing,
         requestLifecycleScope: RequestLifecycleScope,
-        requestLifecycleManager: any RequestLifecycleManaging,
+        requestLifecycleManager: any RequestLifecycleControlling,
         rowPresenter: AnimeDetailEpisodeRowPresenter = AnimeDetailEpisodeRowPresenter()
     ) {
         self.malId = malId

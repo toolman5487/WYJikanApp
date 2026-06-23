@@ -44,7 +44,7 @@ final class HomeTodayAnimeScheduleListViewModel: ObservableObject {
     init(
         initialDay: HomeScheduleDay = .current(),
         service: HomeTodayAnimeScheduleListServicing,
-        requestLifecycleManager: any RequestLifecycleManaging,
+        requestLifecycleManager: any RequestLifecycleControlling,
         presentationBuilder: HomeTodayAnimeScheduleListPresentationBuilder = HomeTodayAnimeScheduleListPresentationBuilder()
     ) {
         self.selectedDay = initialDay

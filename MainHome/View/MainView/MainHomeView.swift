@@ -96,7 +96,7 @@ private final class HomeFeedRuntime {
                 recommendedAnime: recommendedAnimeViewModel
             ),
             homeLoadCoordinator: dependencies.homeLoadCoordinator,
-            requestLifecycleManager: RequestLifecycleManager.shared
+            requestLifecycleManager: dependencies.requestLifecycleManager
         )
     }
 }

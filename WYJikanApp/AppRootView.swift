@@ -33,7 +33,7 @@ struct AppRootView: View {
         .environmentObject(HomeTodayAnimeNotificationScheduler())
         .environmentObject(
             AppBootstrapViewModel(
-                animeDetailService: AppDependencies.live.animeDetailService,
+                backgroundAnimeDetailService: AppDependencies.live.backgroundAnimeDetailService,
                 broadcastReminderRepository: AppDependencies.live.broadcastReminderRepository,
                 notificationScheduler: HomeTodayAnimeNotificationScheduler(),
                 homeLoadCoordinator: AppDependencies.live.homeLoadCoordinator

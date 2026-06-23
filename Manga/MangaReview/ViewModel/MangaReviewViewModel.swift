@@ -63,7 +63,7 @@ final class MangaReviewViewModel: ObservableObject {
         malId: Int,
         service: MangaReviewServicing,
         requestLifecycleScope: RequestLifecycleScope,
-        requestLifecycleManager: any RequestLifecycleManaging
+        requestLifecycleManager: any RequestLifecycleControlling
     ) {
         self.malId = malId
         self.service = service

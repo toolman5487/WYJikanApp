@@ -54,7 +54,7 @@ final class CharacterDetailViewModel: ObservableObject {
         malId: Int,
         service: CharacterDetailServicing,
         requestLifecycleScope: RequestLifecycleScope,
-        requestLifecycleManager: any RequestLifecycleManaging
+        requestLifecycleManager: any RequestLifecycleControlling
     ) {
         self.malId = malId
         self.service = service

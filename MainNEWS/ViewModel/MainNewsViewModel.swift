@@ -21,7 +21,7 @@ final class MainNewsViewModel: ObservableObject {
 
     init(
         service: MainNewsServicing,
-        requestLifecycleManager: any RequestLifecycleManaging,
+        requestLifecycleManager: any RequestLifecycleControlling,
         presentationBuilder: MainNewsPresentationBuilder = MainNewsPresentationBuilder()
     ) {
         self.service = service

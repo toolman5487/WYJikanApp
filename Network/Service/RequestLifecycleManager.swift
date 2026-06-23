@@ -174,21 +174,34 @@ nonisolated struct RequestLifecycleSnapshot: Sendable {
     let runningRequestCounts: [RequestLifecycleScope: Int]
 }
 
-// MARK: - RequestLifecycleManaging
+// MARK: - RequestLifecycleControlling
 
-nonisolated protocol RequestLifecycleManaging: Sendable {
+nonisolated protocol RequestLifecycleControlling: Sendable {
     func activate(_ scope: RequestLifecycleScope) async
     func deactivate(
         _ scope: RequestLifecycleScope,
         cancelQueued: Bool,
         cancelRunning: Bool
     ) async
-    func cancelRequests(in scope: RequestLifecycleScope) async
+}
+
+// MARK: - RequestLifecycleExecuting
+
+nonisolated protocol RequestLifecycleExecuting: Sendable {
     func perform<Value: Sendable>(
         scope: RequestLifecycleScope?,
         inactivePolicy: RequestInactivePolicy,
         operation: @escaping @Sendable () async throws -> Value
     ) async throws -> Value
+}
+
+// MARK: - RequestLifecycleManaging
+
+nonisolated protocol RequestLifecycleManaging:
+    RequestLifecycleControlling,
+    RequestLifecycleExecuting {
+
+    func setActiveTabScope(_ scope: JikanAPIRequestScope) async
 }
 
 // MARK: - RequestScreenLifecycleController
@@ -199,24 +212,24 @@ final class RequestScreenLifecycleController {
     // MARK: - Properties
 
     private let scope: RequestLifecycleScope
-    private let requestLifecycleManager: any RequestLifecycleManaging
+    private let requestLifecycleController: any RequestLifecycleControlling
     private var isActive = false
 
     // MARK: - Lifecycle
 
     init(
         scope: RequestLifecycleScope,
-        requestLifecycleManager: any RequestLifecycleManaging
+        requestLifecycleManager: any RequestLifecycleControlling
     ) {
         self.scope = scope
-        self.requestLifecycleManager = requestLifecycleManager
+        self.requestLifecycleController = requestLifecycleManager
     }
 
     // MARK: - Public Methods
 
     func activate() async -> Bool {
         isActive = true
-        await requestLifecycleManager.activate(scope)
+        await requestLifecycleController.activate(scope)
         return isActive && !Task.isCancelled
     }
 
@@ -224,16 +237,16 @@ final class RequestScreenLifecycleController {
         isActive = false
 
         let scope = scope
-        let requestLifecycleManager = requestLifecycleManager
+        let requestLifecycleController = requestLifecycleController
         Task { [weak self] in
-            await requestLifecycleManager.deactivate(
+            await requestLifecycleController.deactivate(
                 scope,
                 cancelQueued: true,
                 cancelRunning: true
             )
 
             guard let self, self.isActive else { return }
-            await requestLifecycleManager.activate(scope)
+            await requestLifecycleController.activate(scope)
         }
     }
 }
@@ -241,8 +254,6 @@ final class RequestScreenLifecycleController {
 // MARK: - RequestLifecycleManager
 
 actor RequestLifecycleManager: RequestLifecycleManaging {
-
-    static let shared = RequestLifecycleManager()
 
     // MARK: - Types
 

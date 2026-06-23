@@ -23,7 +23,7 @@ nonisolated final class HomeTrendingAnimeListService: HomeTrendingAnimeListServi
 
     // MARK: - Lifecycle
 
-    init(apiService: JikanAPIServicing = JikanAPIService.shared) {
+    init(apiService: JikanAPIServicing) {
         self.apiService = apiService
     }
 

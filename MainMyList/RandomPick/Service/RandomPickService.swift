@@ -14,7 +14,7 @@ nonisolated final class RandomPickService: RandomPickServicing {
 
     private let apiService: JikanAPIServicing
 
-    init(apiService: JikanAPIServicing = JikanAPIService.shared) {
+    init(apiService: JikanAPIServicing) {
         self.apiService = apiService
     }
 

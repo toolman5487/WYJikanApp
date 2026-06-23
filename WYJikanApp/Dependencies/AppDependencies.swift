@@ -11,6 +11,11 @@ struct AppDependencies {
     // MARK: - Coordination
 
     let homeLoadCoordinator: any HomeLoadCoordinating
+    let requestLifecycleManager: any RequestLifecycleManaging
+
+    // MARK: - Networking
+
+    let jikanAPIService: JikanAPIServicing
 
     // MARK: - Services
 
@@ -20,16 +25,7 @@ struct AppDependencies {
     let mainCategoryListService: MainCategoryListServicing
     let mainSearchService: MainSearchServicing
     let mainNewsService: MainNewsServicing
-    let animeDetailService: AnimeDetailServicing
-    let mangaDetailService: MangaDetailServicing
-    let animeReviewService: AnimeReviewServicing
-    let mangaReviewService: MangaReviewServicing
-    let peopleDetailService: PeopleDetailServicing
-    let characterDetailService: CharacterDetailServicing
-    let producerDetailService: ProducerDetailServicing
-    let producerAnimeListService: ProducerAnimeListServicing
-    let animeCategoryDetailService: AnimeCategoryDetailServicing
-    let mangaCategoryDetailService: MangaCategoryDetailServicing
+    let backgroundAnimeDetailService: AnimeDetailServicing
     let homeTodayAnimeScheduleListService: HomeTodayAnimeScheduleListServicing
     let homeTrendingAnimeListService: HomeTrendingAnimeListServicing
     let homeTrendingMangaListService: HomeTrendingMangaListServicing
@@ -52,23 +48,31 @@ struct AppDependencies {
     }
 
     static let live: AppDependencies = {
+        let requestLifecycleManager = RequestLifecycleManager()
+        let jikanAPIService = JikanAPIService(
+            requestLifecycleExecutor: requestLifecycleManager
+        )
         let favoriteRepository = SwiftDataFavoriteRepository()
         let broadcastReminderRepository = SwiftDataAnimeBroadcastReminderRepository()
         let mainSearchHistoryRepository = UserDefaultsMainSearchHistoryRepository()
         let mainNewsService = MainNewsService(
             lifecycleScope: .mainNews,
-            requestLifecycleManager: RequestLifecycleManager.shared
+            requestLifecycleExecutor: requestLifecycleManager
         )
-        let mainCategoryListService = MainCategoryListService()
-        let randomPickService = RandomPickService()
+        let mainCategoryListService = MainCategoryListService(
+            apiService: jikanAPIService
+        )
+        let randomPickService = RandomPickService(
+            apiService: jikanAPIService
+        )
         let myListDependencies = MyListDependencies(
             favoriteRepository: favoriteRepository,
             broadcastReminderRepository: broadcastReminderRepository,
             searchHistoryRepository: mainSearchHistoryRepository,
             randomPickService: randomPickService,
-            requestLifecycleManager: RequestLifecycleManager.shared,
+            requestLifecycleManager: requestLifecycleManager,
             clearApplicationCache: {
-                await JikanAPIService.shared.clearCache()
+                await jikanAPIService.clearCache()
                 await mainNewsService.clearCache()
                 URLCache.shared.removeAllCachedResponses()
             }
@@ -76,25 +80,36 @@ struct AppDependencies {
 
         return AppDependencies(
             homeLoadCoordinator: HomeLoadCoordinator(),
-            mainHomeService: MainHomeService(lifecycleScope: .mainHome),
-            homeWatchService: HomeWatchService(lifecycleScope: .mainHome),
-            homeWatchListService: HomeWatchService(lifecycleScope: .homeWatchList),
+            requestLifecycleManager: requestLifecycleManager,
+            jikanAPIService: jikanAPIService,
+            mainHomeService: MainHomeService(
+                apiService: jikanAPIService,
+                lifecycleScope: .mainHome
+            ),
+            homeWatchService: HomeWatchService(
+                apiService: jikanAPIService,
+                lifecycleScope: .mainHome
+            ),
+            homeWatchListService: HomeWatchService(
+                apiService: jikanAPIService,
+                lifecycleScope: .homeWatchList
+            ),
             mainCategoryListService: mainCategoryListService,
-            mainSearchService: MainSearchService(),
+            mainSearchService: MainSearchService(apiService: jikanAPIService),
             mainNewsService: mainNewsService,
-            animeDetailService: AnimeDetailService(lifecycleScope: .background),
-            mangaDetailService: MangaDetailService(),
-            animeReviewService: AnimeReviewService(),
-            mangaReviewService: MangaReviewService(),
-            peopleDetailService: PeopleDetailService(),
-            characterDetailService: CharacterDetailService(),
-            producerDetailService: ProducerDetailService(),
-            producerAnimeListService: ProducerAnimeListService(),
-            animeCategoryDetailService: AnimeCategoryDetailService(),
-            mangaCategoryDetailService: MangaCategoryDetailService(),
-            homeTodayAnimeScheduleListService: HomeTodayAnimeScheduleListService(),
-            homeTrendingAnimeListService: HomeTrendingAnimeListService(),
-            homeTrendingMangaListService: HomeTrendingMangaListService(),
+            backgroundAnimeDetailService: AnimeDetailService(
+                apiService: jikanAPIService,
+                lifecycleScope: .background
+            ),
+            homeTodayAnimeScheduleListService: HomeTodayAnimeScheduleListService(
+                apiService: jikanAPIService
+            ),
+            homeTrendingAnimeListService: HomeTrendingAnimeListService(
+                apiService: jikanAPIService
+            ),
+            homeTrendingMangaListService: HomeTrendingMangaListService(
+                apiService: jikanAPIService
+            ),
             favoriteRepository: favoriteRepository,
             broadcastReminderRepository: broadcastReminderRepository,
             mainSearchHistoryRepository: mainSearchHistoryRepository,
@@ -112,7 +127,7 @@ struct AppDependencies {
         MainSearchViewModel(
             service: mainSearchService,
             historyRepository: mainSearchHistoryRepository,
-            requestLifecycleManager: RequestLifecycleManager.shared,
+            requestLifecycleManager: requestLifecycleManager,
             initialKind: initialKind,
             initialQuery: initialQuery,
             initialSortOption: initialSortOption
@@ -122,7 +137,7 @@ struct AppDependencies {
     func makeMainNewsViewModel() -> MainNewsViewModel {
         MainNewsViewModel(
             service: mainNewsService,
-            requestLifecycleManager: RequestLifecycleManager.shared
+            requestLifecycleManager: requestLifecycleManager
         )
     }
 
@@ -136,7 +151,7 @@ struct AppDependencies {
             ),
             peopleListViewModel: PeopleListViewModel(service: mainCategoryListService),
             characterListViewModel: CharacterListViewModel(service: mainCategoryListService),
-            requestLifecycleManager: RequestLifecycleManager.shared
+            requestLifecycleManager: requestLifecycleManager
         )
     }
 
@@ -145,21 +160,21 @@ struct AppDependencies {
     func makeHomeTodayAnimeScheduleListViewModel() -> HomeTodayAnimeScheduleListViewModel {
         HomeTodayAnimeScheduleListViewModel(
             service: homeTodayAnimeScheduleListService,
-            requestLifecycleManager: RequestLifecycleManager.shared
+            requestLifecycleManager: requestLifecycleManager
         )
     }
 
     func makeHomeTrendingAnimeListViewModel() -> HomeTrendingAnimeListViewModel {
         HomeTrendingAnimeListViewModel(
             service: homeTrendingAnimeListService,
-            requestLifecycleManager: RequestLifecycleManager.shared
+            requestLifecycleManager: requestLifecycleManager
         )
     }
 
     func makeHomeTrendingMangaListViewModel() -> HomeTrendingMangaListViewModel {
         HomeTrendingMangaListViewModel(
             service: homeTrendingMangaListService,
-            requestLifecycleManager: RequestLifecycleManager.shared
+            requestLifecycleManager: requestLifecycleManager
         )
     }
 
@@ -167,7 +182,7 @@ struct AppDependencies {
         HomeWatchListViewModel(
             initialFeed: initialFeed,
             service: homeWatchListService,
-            requestLifecycleManager: RequestLifecycleManager.shared
+            requestLifecycleManager: requestLifecycleManager
         )
     }
 
@@ -177,11 +192,14 @@ struct AppDependencies {
         let requestLifecycleScope = RequestLifecycleScope.animeDetail(malID: malId)
         return AnimeDetailViewModel(
             malId: malId,
-            service: AnimeDetailService(lifecycleScope: requestLifecycleScope),
+            service: AnimeDetailService(
+                apiService: jikanAPIService,
+                lifecycleScope: requestLifecycleScope
+            ),
             favoriteRepository: favoriteRepository,
             broadcastReminderRepository: broadcastReminderRepository,
             requestLifecycleScope: requestLifecycleScope,
-            requestLifecycleManager: RequestLifecycleManager.shared
+            requestLifecycleManager: requestLifecycleManager
         )
     }
 
@@ -189,10 +207,13 @@ struct AppDependencies {
         let requestLifecycleScope = RequestLifecycleScope.mangaDetail(malID: malId)
         return MangaDetailViewModel(
             malId: malId,
-            service: MangaDetailService(lifecycleScope: requestLifecycleScope),
+            service: MangaDetailService(
+                apiService: jikanAPIService,
+                lifecycleScope: requestLifecycleScope
+            ),
             favoriteRepository: favoriteRepository,
             requestLifecycleScope: requestLifecycleScope,
-            requestLifecycleManager: RequestLifecycleManager.shared
+            requestLifecycleManager: requestLifecycleManager
         )
     }
 
@@ -200,9 +221,12 @@ struct AppDependencies {
         let requestLifecycleScope = RequestLifecycleScope.animeEpisodes(malID: malId)
         return AnimeDetailEpisodesListViewModel(
             malId: malId,
-            service: AnimeDetailService(lifecycleScope: requestLifecycleScope),
+            service: AnimeDetailService(
+                apiService: jikanAPIService,
+                lifecycleScope: requestLifecycleScope
+            ),
             requestLifecycleScope: requestLifecycleScope,
-            requestLifecycleManager: RequestLifecycleManager.shared
+            requestLifecycleManager: requestLifecycleManager
         )
     }
 
@@ -210,9 +234,12 @@ struct AppDependencies {
         let requestLifecycleScope = RequestLifecycleScope.animeReview(malID: malId)
         return AnimeReviewViewModel(
             malId: malId,
-            service: AnimeReviewService(lifecycleScope: requestLifecycleScope),
+            service: AnimeReviewService(
+                apiService: jikanAPIService,
+                lifecycleScope: requestLifecycleScope
+            ),
             requestLifecycleScope: requestLifecycleScope,
-            requestLifecycleManager: RequestLifecycleManager.shared
+            requestLifecycleManager: requestLifecycleManager
         )
     }
 
@@ -220,9 +247,12 @@ struct AppDependencies {
         let requestLifecycleScope = RequestLifecycleScope.mangaReview(malID: malId)
         return MangaReviewViewModel(
             malId: malId,
-            service: MangaReviewService(lifecycleScope: requestLifecycleScope),
+            service: MangaReviewService(
+                apiService: jikanAPIService,
+                lifecycleScope: requestLifecycleScope
+            ),
             requestLifecycleScope: requestLifecycleScope,
-            requestLifecycleManager: RequestLifecycleManager.shared
+            requestLifecycleManager: requestLifecycleManager
         )
     }
 
@@ -230,9 +260,12 @@ struct AppDependencies {
         let requestLifecycleScope = RequestLifecycleScope.peopleDetail(malID: malId)
         return PeopleDetailViewModel(
             malId: malId,
-            service: PeopleDetailService(lifecycleScope: requestLifecycleScope),
+            service: PeopleDetailService(
+                apiService: jikanAPIService,
+                lifecycleScope: requestLifecycleScope
+            ),
             requestLifecycleScope: requestLifecycleScope,
-            requestLifecycleManager: RequestLifecycleManager.shared
+            requestLifecycleManager: requestLifecycleManager
         )
     }
 
@@ -240,9 +273,12 @@ struct AppDependencies {
         let requestLifecycleScope = RequestLifecycleScope.characterDetail(malID: malId)
         return CharacterDetailViewModel(
             malId: malId,
-            service: CharacterDetailService(lifecycleScope: requestLifecycleScope),
+            service: CharacterDetailService(
+                apiService: jikanAPIService,
+                lifecycleScope: requestLifecycleScope
+            ),
             requestLifecycleScope: requestLifecycleScope,
-            requestLifecycleManager: RequestLifecycleManager.shared
+            requestLifecycleManager: requestLifecycleManager
         )
     }
 
@@ -252,9 +288,12 @@ struct AppDependencies {
         )
         return ProducerDetailViewModel(
             malId: malId,
-            service: ProducerDetailService(lifecycleScope: requestLifecycleScope),
+            service: ProducerDetailService(
+                apiService: jikanAPIService,
+                lifecycleScope: requestLifecycleScope
+            ),
             requestLifecycleScope: requestLifecycleScope,
-            requestLifecycleManager: RequestLifecycleManager.shared
+            requestLifecycleManager: requestLifecycleManager
         )
     }
 
@@ -268,9 +307,12 @@ struct AppDependencies {
         return ProducerAnimeListViewModel(
             producerId: producerId,
             producerName: producerName,
-            service: ProducerAnimeListService(lifecycleScope: requestLifecycleScope),
+            service: ProducerAnimeListService(
+                apiService: jikanAPIService,
+                lifecycleScope: requestLifecycleScope
+            ),
             requestLifecycleScope: requestLifecycleScope,
-            requestLifecycleManager: RequestLifecycleManager.shared
+            requestLifecycleManager: requestLifecycleManager
         )
     }
 
@@ -280,9 +322,12 @@ struct AppDependencies {
         )
         return AnimeCategoryDetailViewModel(
             genre: genre,
-            service: AnimeCategoryDetailService(lifecycleScope: requestLifecycleScope),
+            service: AnimeCategoryDetailService(
+                apiService: jikanAPIService,
+                lifecycleScope: requestLifecycleScope
+            ),
             requestLifecycleScope: requestLifecycleScope,
-            requestLifecycleManager: RequestLifecycleManager.shared
+            requestLifecycleManager: requestLifecycleManager
         )
     }
 
@@ -292,9 +337,12 @@ struct AppDependencies {
         )
         return MangaCategoryDetailViewModel(
             genre: genre,
-            service: MangaCategoryDetailService(lifecycleScope: requestLifecycleScope),
+            service: MangaCategoryDetailService(
+                apiService: jikanAPIService,
+                lifecycleScope: requestLifecycleScope
+            ),
             requestLifecycleScope: requestLifecycleScope,
-            requestLifecycleManager: RequestLifecycleManager.shared
+            requestLifecycleManager: requestLifecycleManager
         )
     }
 }

@@ -13,7 +13,7 @@ struct MyListDependencies {
     private let broadcastReminderRepository: any AnimeBroadcastReminderRepository
     private let searchHistoryRepository: any MainSearchHistoryRepository
     private let randomPickService: RandomPickServicing
-    private let requestLifecycleManager: any RequestLifecycleManaging
+    private let requestLifecycleManager: any RequestLifecycleControlling
     private let clearApplicationCache: () async -> Void
 
     // MARK: - Lifecycle
@@ -23,7 +23,7 @@ struct MyListDependencies {
         broadcastReminderRepository: any AnimeBroadcastReminderRepository,
         searchHistoryRepository: any MainSearchHistoryRepository,
         randomPickService: RandomPickServicing,
-        requestLifecycleManager: any RequestLifecycleManaging,
+        requestLifecycleManager: any RequestLifecycleControlling,
         clearApplicationCache: @escaping () async -> Void
     ) {
         self.favoriteRepository = favoriteRepository

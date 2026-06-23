@@ -27,7 +27,7 @@ nonisolated final class HomeTodayAnimeScheduleListService: HomeTodayAnimeSchedul
 
     // MARK: - Lifecycle
 
-    init(apiService: JikanAPIServicing = JikanAPIService.shared) {
+    init(apiService: JikanAPIServicing) {
         self.apiService = apiService
     }
 

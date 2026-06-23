@@ -25,8 +25,6 @@ private enum JikanAPIExecutionControl: Error, Sendable {
 
 nonisolated final class JikanAPIService: Sendable {
 
-    static let shared = JikanAPIService()
-
     // MARK: - Constants
 
     private static let defaultRateLimitCooldown: TimeInterval = 60
@@ -45,20 +43,20 @@ nonisolated final class JikanAPIService: Sendable {
     private let decoder: JSONDecoder
     private let responseCache = JikanAPIResponseCache()
     private let inFlightRequestStore = JikanAPIInFlightRequestStore()
-    private let requestLifecycleManager: RequestLifecycleManager
+    private let requestLifecycleExecutor: any RequestLifecycleExecuting
     private let requestGovernor = JikanAPIRequestGovernor()
     private let transientFailureBackoffStore = JikanAPITransientFailureBackoffStore()
 
     // MARK: - Lifecycle
 
     init(
+        requestLifecycleExecutor: any RequestLifecycleExecuting,
         session: URLSession = .shared,
-        decoder: JSONDecoder = JikanAPIService.makeDefaultDecoder(),
-        requestLifecycleManager: RequestLifecycleManager = .shared
+        decoder: JSONDecoder = JikanAPIService.makeDefaultDecoder()
     ) {
+        self.requestLifecycleExecutor = requestLifecycleExecutor
         self.session = session
         self.decoder = decoder
-        self.requestLifecycleManager = requestLifecycleManager
     }
 
     // MARK: - Cache Management
@@ -67,10 +65,6 @@ nonisolated final class JikanAPIService: Sendable {
         await responseCache.removeAll()
         await transientFailureBackoffStore.removeAll()
         session.configuration.urlCache?.removeAllCachedResponses()
-    }
-
-    func setActiveRequestScope(_ scope: JikanAPIRequestScope) async {
-        await requestLifecycleManager.setActiveTabScope(scope)
     }
 
     // MARK: - Public API
@@ -305,7 +299,7 @@ private extension JikanAPIService {
         scope: RequestLifecycleScope?,
         attempt: Int
     ) async throws -> Data {
-        try await requestLifecycleManager.perform(
+        try await requestLifecycleExecutor.perform(
             scope: scope,
             inactivePolicy: .pauseQueued
         ) { [self] in

@@ -46,7 +46,7 @@ struct WYJikanAppApp: App {
         _todayAnimeNotificationScheduler = StateObject(wrappedValue: todayAnimeNotificationScheduler)
         _appBootstrapViewModel = StateObject(
             wrappedValue: AppBootstrapViewModel(
-                animeDetailService: dependencies.animeDetailService,
+                backgroundAnimeDetailService: dependencies.backgroundAnimeDetailService,
                 broadcastReminderRepository: dependencies.broadcastReminderRepository,
                 notificationScheduler: todayAnimeNotificationScheduler,
                 homeLoadCoordinator: dependencies.homeLoadCoordinator

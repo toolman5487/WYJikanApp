@@ -61,7 +61,7 @@ final class ProducerDetailViewModel: ObservableObject {
         malId: Int,
         service: ProducerDetailServicing,
         requestLifecycleScope: RequestLifecycleScope,
-        requestLifecycleManager: any RequestLifecycleManaging
+        requestLifecycleManager: any RequestLifecycleControlling
     ) {
         self.malId = malId
         self.service = service

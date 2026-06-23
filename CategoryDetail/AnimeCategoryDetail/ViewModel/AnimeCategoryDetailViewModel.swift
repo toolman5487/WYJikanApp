@@ -46,7 +46,7 @@ final class AnimeCategoryDetailViewModel: ObservableObject {
         genre: AnimeListGenreDTO,
         service: AnimeCategoryDetailServicing,
         requestLifecycleScope: RequestLifecycleScope,
-        requestLifecycleManager: any RequestLifecycleManaging
+        requestLifecycleManager: any RequestLifecycleControlling
     ) {
         self.genre = genre
         self.service = service

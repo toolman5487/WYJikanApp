@@ -83,17 +83,17 @@ nonisolated final class MainNewsService: MainNewsServicing {
 
     private let session: URLSession
     private let lifecycleScope: RequestLifecycleScope
-    private let requestLifecycleManager: any RequestLifecycleManaging
+    private let requestLifecycleExecutor: any RequestLifecycleExecuting
     private let cache = MainNewsResponseCache()
 
     init(
         session: URLSession = .shared,
-        lifecycleScope: RequestLifecycleScope = .independent,
-        requestLifecycleManager: any RequestLifecycleManaging = RequestLifecycleManager.shared
+        lifecycleScope: RequestLifecycleScope,
+        requestLifecycleExecutor: any RequestLifecycleExecuting
     ) {
         self.session = session
         self.lifecycleScope = lifecycleScope
-        self.requestLifecycleManager = requestLifecycleManager
+        self.requestLifecycleExecutor = requestLifecycleExecutor
     }
 
     func fetchLatestNews(
@@ -250,7 +250,7 @@ nonisolated final class MainNewsService: MainNewsServicing {
         AppLogger.network.debug("GET \(url.absoluteString, privacy: .public)")
         let urlRequest = request
 
-        let (data, response) = try await requestLifecycleManager.perform(
+        let (data, response) = try await requestLifecycleExecutor.perform(
             scope: lifecycleScope,
             inactivePolicy: .pauseQueued
         ) { [session] in

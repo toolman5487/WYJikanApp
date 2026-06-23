@@ -42,7 +42,7 @@ final class HomeTrendingAnimeListViewModel: ObservableObject {
 
     init(
         service: HomeTrendingAnimeListServicing,
-        requestLifecycleManager: any RequestLifecycleManaging,
+        requestLifecycleManager: any RequestLifecycleControlling,
         presentationBuilder: HomeTrendingAnimeListPresentationBuilder = HomeTrendingAnimeListPresentationBuilder()
     ) {
         self.service = service
