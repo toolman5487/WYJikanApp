@@ -156,6 +156,10 @@ final class MainCategoryGenreBatchLoader<Genre: Identifiable, Item> where Genre.
                 pendingBatch = batch
                 return .cancelled
             } catch {
+                guard !Task.isCancelled else {
+                    pendingBatch = batch
+                    return .cancelled
+                }
                 pendingBatch = batch
                 return .failed(FeatureLoadFailure(error))
             }

@@ -229,6 +229,8 @@ nonisolated final class JikanAPIService: Sendable {
                 throw apiError
             } catch is CancellationError {
                 throw CancellationError()
+            } catch let urlError as URLError where urlError.code == .cancelled {
+                throw CancellationError()
             } catch {
                 AppLogger.network.error("request failed \(url.absoluteString, privacy: .public) \(error.localizedDescription, privacy: .public)")
                 throw JikanAPIError.networkError(error)
