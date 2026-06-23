@@ -292,12 +292,27 @@ actor RequestLifecycleManager: RequestLifecycleManaging {
         let cancel: @Sendable () -> Void
     }
 
+    private let clock: ContinuousClock
+    private let backgroundQuietPeriod: Duration
     private var activeTabScope: JikanAPIRequestScope = .home
     private var inactiveScopes = Set<RequestLifecycleScope>()
     private var pendingRequests: [UUID: PendingRequest] = [:]
     private var runningRequests: [UUID: RunningRequest] = [:]
     private var knownRequestIDs = Set<UUID>()
     private var cancelledPendingRequestIDs = Set<UUID>()
+    private var backgroundEligibleInstant: ContinuousClock.Instant
+    private var backgroundResumeTask: Task<Void, Never>?
+
+    init(
+        backgroundQuietPeriod: Duration = .seconds(2),
+        clock: ContinuousClock = ContinuousClock()
+    ) {
+        self.clock = clock
+        self.backgroundQuietPeriod = backgroundQuietPeriod
+        self.backgroundEligibleInstant = clock.now.advanced(
+            by: backgroundQuietPeriod
+        )
+    }
 
     // MARK: - Scope Lifecycle
 
@@ -353,16 +368,21 @@ actor RequestLifecycleManager: RequestLifecycleManaging {
         let resolvedScope = scope ?? .independent
         let requestID = UUID()
         knownRequestIDs.insert(requestID)
+        if isForeground(resolvedScope) {
+            prepareForForegroundRequest()
+        }
         defer {
             knownRequestIDs.remove(requestID)
             cancelledPendingRequestIDs.remove(requestID)
         }
 
-        try await waitUntilEligible(
-            requestID: requestID,
-            scope: resolvedScope,
-            inactivePolicy: inactivePolicy
-        )
+        while !isEligible(resolvedScope) {
+            try await waitUntilEligible(
+                requestID: requestID,
+                scope: resolvedScope,
+                inactivePolicy: inactivePolicy
+            )
+        }
         try Task.checkCancellation()
 
         let task = Task {
@@ -381,9 +401,11 @@ actor RequestLifecycleManager: RequestLifecycleManaging {
                 task.cancel()
             }
             runningRequests.removeValue(forKey: requestID)
+            requestDidFinish(scope: resolvedScope)
             return value
         } catch {
             runningRequests.removeValue(forKey: requestID)
+            requestDidFinish(scope: resolvedScope)
             throw error
         }
     }
@@ -440,6 +462,9 @@ actor RequestLifecycleManager: RequestLifecycleManaging {
             scope: scope,
             continuation: continuation
         )
+        if scope == .background {
+            scheduleBackgroundResume()
+        }
     }
 
     private func cancelPendingRequest(requestID: UUID) {
@@ -452,6 +477,7 @@ actor RequestLifecycleManager: RequestLifecycleManaging {
             return
         }
         request.continuation.resume(throwing: CancellationError())
+        requestDidFinish(scope: request.scope)
     }
 
     private func resumeEligiblePendingRequests() {
@@ -499,10 +525,76 @@ actor RequestLifecycleManager: RequestLifecycleManaging {
         }
     }
 
+    // MARK: - Priority
+
+    private func prepareForForegroundRequest() {
+        markForegroundActivity()
+        cancelRunningRequests(in: .background)
+    }
+
+    private func requestDidFinish(scope: RequestLifecycleScope) {
+        if isForeground(scope) {
+            markForegroundActivity()
+        }
+        resumeEligiblePendingRequests()
+    }
+
+    private func markForegroundActivity() {
+        backgroundEligibleInstant = clock.now.advanced(
+            by: backgroundQuietPeriod
+        )
+        scheduleBackgroundResume()
+    }
+
+    private func scheduleBackgroundResume() {
+        backgroundResumeTask?.cancel()
+        let eligibleInstant = backgroundEligibleInstant
+        let clock = clock
+
+        backgroundResumeTask = Task { [weak self] in
+            do {
+                try await clock.sleep(until: eligibleInstant)
+            } catch {
+                return
+            }
+            await self?.resumeBackgroundRequestsIfEligible(
+                expectedInstant: eligibleInstant
+            )
+        }
+    }
+
+    private func resumeBackgroundRequestsIfEligible(
+        expectedInstant: ContinuousClock.Instant
+    ) {
+        guard backgroundEligibleInstant == expectedInstant else { return }
+        backgroundResumeTask = nil
+        resumeEligiblePendingRequests()
+    }
+
+    private func hasForegroundRequests() -> Bool {
+        pendingRequests.values.contains {
+            isForeground($0.scope) && isScopeActive($0.scope)
+        }
+            || runningRequests.values.contains { isForeground($0.scope) }
+    }
+
+    private func isForeground(_ scope: RequestLifecycleScope) -> Bool {
+        switch scope {
+        case .background:
+            return false
+        case .tab:
+            return true
+        case .screen:
+            return true
+        case .independent:
+            return true
+        }
+    }
+
     // MARK: - Eligibility
 
     private func isEligible(_ scope: RequestLifecycleScope) -> Bool {
-        guard !inactiveScopes.contains(scope) else { return false }
+        guard isScopeActive(scope) else { return false }
 
         switch scope {
         case .tab(let tabScope):
@@ -513,8 +605,25 @@ actor RequestLifecycleManager: RequestLifecycleManaging {
             return parentTab == activeTabScope
 
         case .background:
-            return true
+            return !hasForegroundRequests()
+                && clock.now >= backgroundEligibleInstant
 
+        case .independent:
+            return true
+        }
+    }
+
+    private func isScopeActive(_ scope: RequestLifecycleScope) -> Bool {
+        guard !inactiveScopes.contains(scope) else { return false }
+
+        switch scope {
+        case .tab(let tabScope):
+            return tabScope == activeTabScope
+        case .screen(let screenScope):
+            guard let parentTab = screenScope.parentTab else { return true }
+            return parentTab == activeTabScope
+        case .background:
+            return true
         case .independent:
             return true
         }

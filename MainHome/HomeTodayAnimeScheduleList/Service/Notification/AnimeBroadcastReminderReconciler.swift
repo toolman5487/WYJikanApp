@@ -177,6 +177,12 @@ enum AnimeBroadcastReminderReconciler {
                     "Broadcast reminder reconciliation paused after rate limit for animeID=\(subscription.malId, privacy: .public), retry after \(retryAfter, format: .fixed(precision: 1)) seconds, pending=\(pendingCount, privacy: .public)"
                 )
                 break
+            } catch is CancellationError {
+                let pendingCount = subscriptionsToCheck.count - index
+                AppLogger.notifications.debug(
+                    "Broadcast reminder reconciliation deferred for foreground requests pending=\(pendingCount, privacy: .public)"
+                )
+                return
             } catch {
                 AppLogger.notifications.warning(
                     "Inactive broadcast reminder reconciliation skipped for animeID=\(subscription.malId, privacy: .public): \(error.localizedDescription, privacy: .public)"

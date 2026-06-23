@@ -55,7 +55,7 @@ final class GenreMangaViewModel: ObservableObject {
             return .error(failure)
         case .idle:
             if genreSections.isEmpty {
-                return .empty
+                return .loading
             }
 
             return .content(
@@ -64,7 +64,7 @@ final class GenreMangaViewModel: ObservableObject {
             )
         case .loadingInitial:
             if genreSections.isEmpty {
-                return .empty
+                return .loading
             }
 
             return .content(
@@ -73,7 +73,7 @@ final class GenreMangaViewModel: ObservableObject {
             )
         case .loadingMore:
             if genreSections.isEmpty {
-                return .empty
+                return .loading
             }
 
             return .content(
@@ -82,7 +82,7 @@ final class GenreMangaViewModel: ObservableObject {
             )
         case .paused:
             if genreSections.isEmpty {
-                return .empty
+                return .loading
             }
 
             return .content(

@@ -79,7 +79,7 @@ struct AppDependencies {
             mainCategoryListService: mainCategoryListService,
             mainSearchService: MainSearchService(),
             mainNewsService: mainNewsService,
-            animeDetailService: AnimeDetailService(),
+            animeDetailService: AnimeDetailService(lifecycleScope: .background),
             mangaDetailService: MangaDetailService(),
             animeReviewService: AnimeReviewService(),
             mangaReviewService: MangaReviewService(),

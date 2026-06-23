@@ -53,7 +53,7 @@ final class CharacterListViewModel: ObservableObject {
             return .error(failure)
         case .idle:
             if rows.isEmpty {
-                return .empty
+                return currentPage == 0 ? .loading : .empty
             }
 
             let inlineError: FeatureLoadFailure?
@@ -75,7 +75,7 @@ final class CharacterListViewModel: ObservableObject {
             return .content(rows: rows, inlineError: inlineError, footer: footer)
         case .loadingInitial:
             if rows.isEmpty {
-                return .empty
+                return .loading
             }
 
             let inlineError: FeatureLoadFailure?
@@ -97,7 +97,7 @@ final class CharacterListViewModel: ObservableObject {
             return .content(rows: rows, inlineError: inlineError, footer: footer)
         case .loadingMore:
             if rows.isEmpty {
-                return .empty
+                return .loading
             }
 
             let inlineError: FeatureLoadFailure?
