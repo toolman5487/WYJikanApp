@@ -82,10 +82,18 @@ nonisolated final class MainNewsService: MainNewsServicing {
     private static let maximumArticleCount = 80
 
     private let session: URLSession
+    private let lifecycleScope: RequestLifecycleScope
+    private let requestLifecycleManager: any RequestLifecycleManaging
     private let cache = MainNewsResponseCache()
 
-    init(session: URLSession = .shared) {
+    init(
+        session: URLSession = .shared,
+        lifecycleScope: RequestLifecycleScope = .independent,
+        requestLifecycleManager: any RequestLifecycleManaging = RequestLifecycleManager.shared
+    ) {
         self.session = session
+        self.lifecycleScope = lifecycleScope
+        self.requestLifecycleManager = requestLifecycleManager
     }
 
     func fetchLatestNews(
@@ -149,6 +157,8 @@ nonisolated final class MainNewsService: MainNewsServicing {
                         )
                         return .success(source: source, articles: articles)
                     } catch is CancellationError {
+                        throw CancellationError()
+                    } catch let urlError as URLError where urlError.code == .cancelled {
                         throw CancellationError()
                     } catch {
                         let message = Self.failureMessage(from: error)
@@ -238,8 +248,14 @@ nonisolated final class MainNewsService: MainNewsServicing {
         )
 
         AppLogger.network.debug("GET \(url.absoluteString, privacy: .public)")
+        let urlRequest = request
 
-        let (data, response) = try await session.data(for: request)
+        let (data, response) = try await requestLifecycleManager.perform(
+            scope: lifecycleScope,
+            inactivePolicy: .pauseQueued
+        ) { [session] in
+            try await session.data(for: urlRequest)
+        }
         guard let httpResponse = response as? HTTPURLResponse else {
             throw MainNewsServiceError.invalidResponse(source: source)
         }

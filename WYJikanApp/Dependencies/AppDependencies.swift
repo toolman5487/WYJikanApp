@@ -55,7 +55,10 @@ struct AppDependencies {
         let favoriteRepository = SwiftDataFavoriteRepository()
         let broadcastReminderRepository = SwiftDataAnimeBroadcastReminderRepository()
         let mainSearchHistoryRepository = UserDefaultsMainSearchHistoryRepository()
-        let mainNewsService = MainNewsService()
+        let mainNewsService = MainNewsService(
+            lifecycleScope: .mainNews,
+            requestLifecycleManager: RequestLifecycleManager.shared
+        )
         let mainCategoryListService = MainCategoryListService()
         let randomPickService = RandomPickService()
         let myListDependencies = MyListDependencies(
@@ -117,7 +120,10 @@ struct AppDependencies {
     }
 
     func makeMainNewsViewModel() -> MainNewsViewModel {
-        MainNewsViewModel(service: mainNewsService)
+        MainNewsViewModel(
+            service: mainNewsService,
+            requestLifecycleManager: RequestLifecycleManager.shared
+        )
     }
 
     func makeMainCategoryListViewModel() -> MainCategoryListViewModel {

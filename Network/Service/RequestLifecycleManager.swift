@@ -22,6 +22,7 @@ nonisolated extension RequestLifecycleScope {
 
     static let mainHome = mainTabScreen("mainHome", parentTab: .home)
     static let mainCategoryList = mainTabScreen("mainCategoryList", parentTab: .categoryList)
+    static let mainNews = mainTabScreen("mainNews", parentTab: .news)
     static let mainSearch = mainTabScreen("mainSearch", parentTab: .search)
     static let mainMyListRandomAnime = mainTabScreen("mainMyListRandomAnime", parentTab: .myList)
     static let mainMyListRandomManga = mainTabScreen("mainMyListRandomManga", parentTab: .myList)
@@ -183,6 +184,11 @@ nonisolated protocol RequestLifecycleManaging: Sendable {
         cancelRunning: Bool
     ) async
     func cancelRequests(in scope: RequestLifecycleScope) async
+    func perform<Value: Sendable>(
+        scope: RequestLifecycleScope?,
+        inactivePolicy: RequestInactivePolicy,
+        operation: @escaping @Sendable () async throws -> Value
+    ) async throws -> Value
 }
 
 // MARK: - RequestScreenLifecycleController

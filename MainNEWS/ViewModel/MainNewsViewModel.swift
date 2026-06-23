@@ -13,6 +13,7 @@ final class MainNewsViewModel: ObservableObject {
 
     private let service: MainNewsServicing
     private let presentationBuilder: MainNewsPresentationBuilder
+    private let requestLifecycleController: RequestScreenLifecycleController
     private var articles: [MainNewsArticle] = []
     private var updatedAt: Date?
     private var hasLoaded = false
@@ -20,10 +21,15 @@ final class MainNewsViewModel: ObservableObject {
 
     init(
         service: MainNewsServicing,
+        requestLifecycleManager: any RequestLifecycleManaging,
         presentationBuilder: MainNewsPresentationBuilder = MainNewsPresentationBuilder()
     ) {
         self.service = service
         self.presentationBuilder = presentationBuilder
+        self.requestLifecycleController = RequestScreenLifecycleController(
+            scope: .mainNews,
+            requestLifecycleManager: requestLifecycleManager
+        )
     }
 
     var headerContent: MainNewsHeaderContent {
@@ -55,11 +61,13 @@ final class MainNewsViewModel: ObservableObject {
     }
 
     func screenDidAppear() async {
+        guard await requestLifecycleController.activate() else { return }
         await loadIfNeeded()
     }
 
     func screenDidDisappear() {
         requestGeneration += 1
+        requestLifecycleController.deactivate()
     }
 
     func reload() async {
