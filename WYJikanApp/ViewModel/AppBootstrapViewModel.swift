@@ -5,18 +5,16 @@
 
 import Combine
 
-// MARK: - HomeInitialLoadCoordinating
+// MARK: - HomeLoadCoordinating
 
-nonisolated protocol HomeInitialLoadCoordinating: Sendable {
+nonisolated protocol HomeLoadCoordinating: Sendable {
     func waitForCompletion() async
     func markCompleted() async
 }
 
-// MARK: - HomeInitialLoadGate
+// MARK: - HomeLoadGate
 
-actor HomeInitialLoadGate: HomeInitialLoadCoordinating {
-
-    static let shared = HomeInitialLoadGate()
+actor HomeLoadGate: HomeLoadCoordinating {
 
     private var isCompleted = false
     private var waiters: [CheckedContinuation<Void, Never>] = []
@@ -39,6 +37,13 @@ actor HomeInitialLoadGate: HomeInitialLoadCoordinating {
     }
 }
 
+// MARK: - HomeLoadGates
+
+nonisolated enum HomeLoadGates {
+    static let initial = HomeLoadGate()
+    static let allFeeds = HomeLoadGate()
+}
+
 // MARK: - AppBootstrapViewModel
 
 @MainActor
@@ -57,7 +62,7 @@ final class AppBootstrapViewModel: ObservableObject {
     private let animeDetailService: AnimeDetailServicing
     private let broadcastReminderRepository: any AnimeBroadcastReminderRepository
     private let notificationScheduler: HomeTodayAnimeNotificationScheduler
-    private let homeInitialLoadGate: any HomeInitialLoadCoordinating
+    private let homeFeedLoadGate: any HomeLoadCoordinating
 
     // MARK: - Properties
 
@@ -69,12 +74,12 @@ final class AppBootstrapViewModel: ObservableObject {
         animeDetailService: AnimeDetailServicing,
         broadcastReminderRepository: any AnimeBroadcastReminderRepository,
         notificationScheduler: HomeTodayAnimeNotificationScheduler,
-        homeInitialLoadGate: any HomeInitialLoadCoordinating = HomeInitialLoadGate.shared
+        homeFeedLoadGate: any HomeLoadCoordinating = HomeLoadGates.allFeeds
     ) {
         self.animeDetailService = animeDetailService
         self.broadcastReminderRepository = broadcastReminderRepository
         self.notificationScheduler = notificationScheduler
-        self.homeInitialLoadGate = homeInitialLoadGate
+        self.homeFeedLoadGate = homeFeedLoadGate
     }
 
     // MARK: - Public Methods
@@ -90,7 +95,7 @@ final class AppBootstrapViewModel: ObservableObject {
         let subscriptions = broadcastReminderRepository.currentSnapshot.subscriptions
 
         if !subscriptions.isEmpty {
-            await homeInitialLoadGate.waitForCompletion()
+            await homeFeedLoadGate.waitForCompletion()
 
             guard !Task.isCancelled else {
                 bootstrapState = .idle

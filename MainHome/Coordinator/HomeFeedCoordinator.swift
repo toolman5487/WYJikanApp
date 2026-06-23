@@ -26,6 +26,44 @@ enum HomeFeedSection: Hashable, CaseIterable {
     }
 }
 
+// MARK: - HomeDeferredSectionLoadScheduler
+
+private actor HomeDeferredSectionLoadScheduler {
+
+    // MARK: - Properties
+
+    private let initialDelay: Duration
+    private let requestInterval: Duration
+    private var nextAllowedInstant: ContinuousClock.Instant?
+
+    // MARK: - Lifecycle
+
+    init(
+        initialDelay: Duration = .seconds(1),
+        requestInterval: Duration = .seconds(1)
+    ) {
+        self.initialDelay = initialDelay
+        self.requestInterval = requestInterval
+    }
+
+    // MARK: - Public Methods
+
+    func waitForTurn() async throws {
+        let clock = ContinuousClock()
+        let now = clock.now
+        let scheduledInstant: ContinuousClock.Instant
+
+        if let nextAllowedInstant {
+            scheduledInstant = max(nextAllowedInstant, now)
+        } else {
+            scheduledInstant = now.advanced(by: initialDelay)
+        }
+
+        nextAllowedInstant = scheduledInstant.advanced(by: requestInterval)
+        try await clock.sleep(until: scheduledInstant)
+    }
+}
+
 // MARK: - HomeFeedViewModels
 
 struct HomeFeedViewModels {
@@ -85,17 +123,22 @@ final class HomeFeedCoordinator {
     // MARK: - Properties
 
     private let viewModels: HomeFeedViewModels
-    private let initialLoadGate: any HomeInitialLoadCoordinating
+    private let initialLoadGate: any HomeLoadCoordinating
+    private let allFeedsLoadGate: any HomeLoadCoordinating
+    private let deferredSectionLoadScheduler = HomeDeferredSectionLoadScheduler()
     private var loadedSections = Set<HomeFeedSection>()
+    private var pendingDeferredSections = Set<HomeFeedSection>()
 
     // MARK: - Lifecycle
 
     init(
         viewModels: HomeFeedViewModels,
-        initialLoadGate: any HomeInitialLoadCoordinating = HomeInitialLoadGate.shared
+        initialLoadGate: any HomeLoadCoordinating = HomeLoadGates.initial,
+        allFeedsLoadGate: any HomeLoadCoordinating = HomeLoadGates.allFeeds
     ) {
         self.viewModels = viewModels
         self.initialLoadGate = initialLoadGate
+        self.allFeedsLoadGate = allFeedsLoadGate
     }
 
     // MARK: - Public Methods
@@ -113,26 +156,28 @@ final class HomeFeedCoordinator {
 
     func loadSectionIfNeeded(_ section: HomeFeedSection) async {
         guard section.isDeferred else { return }
-        await load(section, priority: .utility)
+        await initialLoadGate.waitForCompletion()
+        guard !Task.isCancelled else { return }
+        await loadDeferredSection(section, priority: .utility)
     }
 
     func loadDeferredSections(
         priority: TaskPriority,
         sectionDelay: Duration = .zero
     ) async {
-        await load(.watchPromos, priority: priority)
+        await loadDeferredSection(.watchPromos, priority: priority)
 
         if sectionDelay > .zero {
             try? await Task.sleep(for: sectionDelay)
         }
 
-        await load(.watchEpisodes, priority: priority)
+        await loadDeferredSection(.watchEpisodes, priority: priority)
 
         if sectionDelay > .zero {
             try? await Task.sleep(for: sectionDelay)
         }
 
-        await load(.recommendedAnime, priority: priority)
+        await loadDeferredSection(.recommendedAnime, priority: priority)
     }
 
     func refreshAll() async {
@@ -162,6 +207,31 @@ final class HomeFeedCoordinator {
 
     // MARK: - Section Operations
 
+    private func loadDeferredSection(
+        _ section: HomeFeedSection,
+        priority: TaskPriority
+    ) async {
+        guard section.isDeferred,
+              !loadedSections.contains(section),
+              pendingDeferredSections.insert(section).inserted else {
+            return
+        }
+        defer {
+            pendingDeferredSections.remove(section)
+        }
+
+        do {
+            try await deferredSectionLoadScheduler.waitForTurn()
+        } catch is CancellationError {
+            return
+        } catch {
+            return
+        }
+
+        guard !Task.isCancelled else { return }
+        await load(section, priority: priority)
+    }
+
     private func load(_ section: HomeFeedSection, priority: TaskPriority) async {
         guard loadedSections.insert(section).inserted else { return }
 
@@ -180,6 +250,10 @@ final class HomeFeedCoordinator {
             await loadIfNeeded(viewModels.watchEpisodes, priority: priority)
         case .recommendedAnime:
             await loadIfNeeded(viewModels.recommendedAnime, priority: priority)
+        }
+
+        if loadedSections.count == HomeFeedSection.allCases.count {
+            await allFeedsLoadGate.markCompleted()
         }
     }
 
