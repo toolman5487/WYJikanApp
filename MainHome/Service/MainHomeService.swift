@@ -53,11 +53,16 @@ nonisolated final class MainHomeService: MainHomeServicing {
     // MARK: - Properties
 
     private let apiService: JikanAPIServicing
+    private let lifecycleScope: RequestLifecycleScope
 
     // MARK: - Lifecycle
 
-    init(apiService: JikanAPIServicing = JikanAPIService.shared) {
+    init(
+        apiService: JikanAPIServicing = JikanAPIService.shared,
+        lifecycleScope: RequestLifecycleScope = .tab(.home)
+    ) {
         self.apiService = apiService
+        self.lifecycleScope = lifecycleScope
     }
 
     // MARK: - Public Methods
@@ -66,7 +71,7 @@ nonisolated final class MainHomeService: MainHomeServicing {
         try await apiService.fetch(
             endpoint: APIConfig.Seasons.now(),
             cachePolicy: .feed(forceRefresh: forceRefresh),
-            scope: .home
+            lifecycleScope: lifecycleScope
         )
     }
 
@@ -77,7 +82,7 @@ nonisolated final class MainHomeService: MainHomeServicing {
             queryItems: [
                 URLQueryItem(name: "limit", value: String(limit))
             ],
-            scope: .home
+            lifecycleScope: lifecycleScope
         )
     }
 
@@ -88,7 +93,7 @@ nonisolated final class MainHomeService: MainHomeServicing {
             queryItems: [
                 URLQueryItem(name: "limit", value: String(limit))
             ],
-            scope: .home
+            lifecycleScope: lifecycleScope
         )
     }
 
@@ -101,7 +106,7 @@ nonisolated final class MainHomeService: MainHomeServicing {
                 URLQueryItem(name: "limit", value: String(limit)),
                 URLQueryItem(name: "sfw", value: "true")
             ],
-            scope: .home
+            lifecycleScope: lifecycleScope
         )
     }
 
@@ -112,14 +117,15 @@ nonisolated final class MainHomeService: MainHomeServicing {
             queryItems: [
                 URLQueryItem(name: "limit", value: String(limit))
             ],
-            scope: .home
+            lifecycleScope: lifecycleScope
         )
     }
 
     func fetchAnimeDetail(malId: Int, forceRefresh: Bool) async throws -> AnimeDetailResponse {
         try await apiService.fetch(
             endpoint: APIConfig.Anime.detail(id: malId),
-            cachePolicy: .detail(forceRefresh: forceRefresh)
+            cachePolicy: .detail(forceRefresh: forceRefresh),
+            lifecycleScope: lifecycleScope
         )
     }
 }

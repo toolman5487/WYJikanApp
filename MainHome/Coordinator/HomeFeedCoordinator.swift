@@ -183,6 +183,7 @@ final class HomeFeedCoordinator {
 
     private let viewModels: HomeFeedViewModels
     private let homeLoadCoordinator: any HomeLoadCoordinating
+    private let requestLifecycleController: RequestScreenLifecycleController
     private let deferredSectionLoadScheduler = HomeDeferredSectionLoadScheduler()
     private var loadedSections = Set<HomeFeedSection>()
     private var loadingSections = Set<HomeFeedSection>()
@@ -192,13 +193,26 @@ final class HomeFeedCoordinator {
 
     init(
         viewModels: HomeFeedViewModels,
-        homeLoadCoordinator: any HomeLoadCoordinating
+        homeLoadCoordinator: any HomeLoadCoordinating,
+        requestLifecycleManager: any RequestLifecycleManaging
     ) {
         self.viewModels = viewModels
         self.homeLoadCoordinator = homeLoadCoordinator
+        self.requestLifecycleController = RequestScreenLifecycleController(
+            scope: .mainHome,
+            requestLifecycleManager: requestLifecycleManager
+        )
     }
 
     // MARK: - Public Methods
+
+    func screenDidAppear() async -> Bool {
+        await requestLifecycleController.activate()
+    }
+
+    func screenDidDisappear() {
+        requestLifecycleController.deactivate()
+    }
 
     func loadInitial() async {
         AppLaunchSignposter.beginHomeInitialLoad()

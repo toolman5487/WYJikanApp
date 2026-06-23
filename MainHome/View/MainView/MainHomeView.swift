@@ -95,7 +95,8 @@ private final class HomeFeedRuntime {
                 watchEpisodes: watchEpisodesViewModel,
                 recommendedAnime: recommendedAnimeViewModel
             ),
-            homeLoadCoordinator: dependencies.homeLoadCoordinator
+            homeLoadCoordinator: dependencies.homeLoadCoordinator,
+            requestLifecycleManager: RequestLifecycleManager.shared
         )
     }
 }
@@ -194,33 +195,45 @@ private struct MainHomeFeedView: View {
             await runtime.coordinator.refreshAll()
         }
         .task(id: mainTabBarViewModel.selectedTab, priority: .userInitiated) {
-            guard mainTabBarViewModel.selectedTab == .home else { return }
+            await handleSelectedTabChange()
+        }
+        .onDisappear {
+            runtime.coordinator.screenDidDisappear()
+        }
+    }
 
-            do {
-                try await Task.sleep(for: Self.initialLoadGracePeriod)
-            } catch {
-                return
-            }
+    private func handleSelectedTabChange() async {
+        guard mainTabBarViewModel.selectedTab == .home else {
+            runtime.coordinator.screenDidDisappear()
+            return
+        }
 
-            guard !Task.isCancelled,
-                  mainTabBarViewModel.selectedTab == .home else {
-                return
-            }
+        guard await runtime.coordinator.screenDidAppear() else { return }
 
-            let platform = UserInterfacePlatform.current
-            await runtime.coordinator.loadInitial()
+        do {
+            try await Task.sleep(for: Self.initialLoadGracePeriod)
+        } catch {
+            return
+        }
 
-            guard !Task.isCancelled,
-                  mainTabBarViewModel.selectedTab == .home else {
-                return
-            }
+        guard !Task.isCancelled,
+              mainTabBarViewModel.selectedTab == .home else {
+            return
+        }
 
-            if platform.shouldPreloadHomeDeferredSections {
-                await runtime.coordinator.loadDeferredSections(
-                    priority: .utility,
-                    sectionDelay: platform.homeDeferredSectionLoadDelay
-                )
-            }
+        let platform = UserInterfacePlatform.current
+        await runtime.coordinator.loadInitial()
+
+        guard !Task.isCancelled,
+              mainTabBarViewModel.selectedTab == .home else {
+            return
+        }
+
+        if platform.shouldPreloadHomeDeferredSections {
+            await runtime.coordinator.loadDeferredSections(
+                priority: .utility,
+                sectionDelay: platform.homeDeferredSectionLoadDelay
+            )
         }
     }
 

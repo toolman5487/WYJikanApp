@@ -15,6 +15,13 @@ nonisolated enum RequestLifecycleScope: Hashable, Sendable {
 }
 
 nonisolated extension RequestLifecycleScope {
+    static let mainHome = RequestLifecycleScope.screen(
+        RequestScreenScope(
+            identifier: "mainHome",
+            parentTab: .home
+        )
+    )
+
     static let mainCategoryList = RequestLifecycleScope.screen(
         RequestScreenScope(
             identifier: "mainCategoryList",

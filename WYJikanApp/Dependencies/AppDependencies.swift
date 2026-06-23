@@ -73,8 +73,8 @@ struct AppDependencies {
 
         return AppDependencies(
             homeLoadCoordinator: HomeLoadCoordinator(),
-            mainHomeService: MainHomeService(),
-            homeWatchService: HomeWatchService(),
+            mainHomeService: MainHomeService(lifecycleScope: .mainHome),
+            homeWatchService: HomeWatchService(lifecycleScope: .mainHome),
             homeWatchListService: HomeWatchService(lifecycleScope: .homeWatchList),
             mainCategoryListService: mainCategoryListService,
             mainSearchService: MainSearchService(),
