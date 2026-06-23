@@ -356,7 +356,7 @@ nonisolated final class JikanAPIService: Sendable {
                 throw error
             }
         } onCancel: {
-            Task {
+            Task(priority: .utility) {
                 await self.inFlightRequestStore.releaseWaiter(
                     for: key,
                     requestID: lease.requestID,

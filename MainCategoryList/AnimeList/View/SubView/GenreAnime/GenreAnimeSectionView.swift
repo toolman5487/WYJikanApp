@@ -39,6 +39,7 @@ struct GenreAnimeSectionView: View {
                 contentView
             }
         }
+        .padding(.bottom, 8)
     }
 
     // MARK: - Private Methods
@@ -115,8 +116,11 @@ struct GenreAnimeSectionHeaderView: View {
         } label: {
             GlassSectionHeaderView(
                 title: titleText,
-                showsDisclosureIndicator: true
+                showsDisclosureIndicator: true,
+                outerVerticalPadding: 0
             )
+            .padding(.top, 4)
+            .padding(.bottom, 10)
         }
         .buttonStyle(.plain)
         .background(Color(.systemBackground).opacity(0.001))

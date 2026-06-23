@@ -81,7 +81,7 @@ struct WYJikanAppApp: App {
                 .environmentObject(appBootstrapViewModel)
                 .environmentObject(mainTabBarViewModel)
                 .environmentObject(mainHomeRouter)
-                .task(id: appPersistenceStore.initializationAttempt) {
+                .task(id: appPersistenceStore.initializationAttempt, priority: .utility) {
                     await initializePersistence()
                 }
         }

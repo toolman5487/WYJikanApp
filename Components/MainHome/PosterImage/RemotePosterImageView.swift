@@ -87,7 +87,7 @@ struct RemotePosterImageView: View {
     // MARK: - Private Methods
 
     private func setDidFail(_ value: Bool) {
-        Task { @MainActor in
+        Task(priority: .utility) { @MainActor in
             await Task.yield()
             guard didFail != value else { return }
             didFail = value

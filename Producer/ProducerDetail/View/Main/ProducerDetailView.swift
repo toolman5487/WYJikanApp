@@ -133,13 +133,13 @@ private struct ProducerDetailBodyView: View {
     }
 
     private func retry() {
-        Task {
+        Task(priority: .userInitiated) {
             await viewModel.reload()
         }
     }
 
     private func retryRelatedAnime() {
-        Task {
+        Task(priority: .userInitiated) {
             await viewModel.retryRelatedAnime()
         }
     }

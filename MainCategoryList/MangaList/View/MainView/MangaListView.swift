@@ -49,7 +49,7 @@ private struct MainView: View {
                 onSelectGenre: onSelectGenre
             )
         }
-        .padding(.top, 8)
+        .padding(.top, 4)
     }
 }
 

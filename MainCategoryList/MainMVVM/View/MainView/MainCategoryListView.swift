@@ -104,7 +104,8 @@ struct MainCategoryListView: View {
             reloadButton
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, 12)
+        .padding(.top, 8)
+        .padding(.bottom, 4)
         .background(Color.clear)
     }
     

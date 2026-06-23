@@ -138,7 +138,7 @@ struct MainMyListView: View {
             .padding(.top, Layout.topPadding)
             .padding(.bottom, Layout.bottomPadding)
         }
-        .task(id: viewModel.selectedFilter) {
+        .task(id: viewModel.selectedFilter, priority: .userInitiated) {
             loadRandomPickIfNeeded(for: viewModel.selectedFilter)
         }
     }
