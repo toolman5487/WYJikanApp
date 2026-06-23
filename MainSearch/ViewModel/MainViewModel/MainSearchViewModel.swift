@@ -41,7 +41,7 @@ final class MainSearchViewModel: ObservableObject {
     init(
         service: MainSearchServicing,
         historyRepository: any MainSearchHistoryRepository,
-        requestLifecycleManager: any RequestLifecycleControlling,
+        requestLifecycleController: any RequestLifecycleControlling,
         initialKind: MainSearchKind = .anime,
         initialQuery: String = "",
         initialSortOption: MainSearchSortOption = .defaultOption,
@@ -57,7 +57,7 @@ final class MainSearchViewModel: ObservableObject {
         self.presentationBuilder = presentationBuilder
         self.requestLifecycleController = RequestScreenLifecycleController(
             scope: .mainSearch,
-            requestLifecycleManager: requestLifecycleManager
+            requestLifecycleController: requestLifecycleController
         )
         self.query = initialQuery
         self.kind = initialKind

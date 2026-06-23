@@ -219,10 +219,10 @@ final class RequestScreenLifecycleController {
 
     init(
         scope: RequestLifecycleScope,
-        requestLifecycleManager: any RequestLifecycleControlling
+        requestLifecycleController: any RequestLifecycleControlling
     ) {
         self.scope = scope
-        self.requestLifecycleController = requestLifecycleManager
+        self.requestLifecycleController = requestLifecycleController
     }
 
     // MARK: - Public Methods

@@ -15,7 +15,7 @@ struct AppDependencies {
 
     // MARK: - Networking
 
-    let jikanAPIService: JikanAPIServicing
+    private let jikanAPIService: JikanAPIServicing
 
     // MARK: - Services
 
@@ -47,7 +47,243 @@ struct AppDependencies {
         broadcastReminderRepository.connect(modelContext: modelContext)
     }
 
-    static let live: AppDependencies = {
+    static let live = makeLiveDependencies()
+
+    // MARK: - Tab Factories
+
+    func makeMainSearchViewModel(
+        initialKind: MainSearchKind = .anime,
+        initialQuery: String = "",
+        initialSortOption: MainSearchSortOption = .defaultOption
+    ) -> MainSearchViewModel {
+        MainSearchViewModel(
+            service: mainSearchService,
+            historyRepository: mainSearchHistoryRepository,
+            requestLifecycleController: requestLifecycleManager,
+            initialKind: initialKind,
+            initialQuery: initialQuery,
+            initialSortOption: initialSortOption
+        )
+    }
+
+    func makeMainNewsViewModel() -> MainNewsViewModel {
+        MainNewsViewModel(
+            service: mainNewsService,
+            requestLifecycleController: requestLifecycleManager
+        )
+    }
+
+    func makeMainCategoryListViewModel() -> MainCategoryListViewModel {
+        MainCategoryListViewModel(
+            animeListViewModel: AnimeListViewModel(
+                genreAnimeViewModel: GenreAnimeViewModel(service: mainCategoryListService)
+            ),
+            mangaListViewModel: MangaListViewModel(
+                genreMangaViewModel: GenreMangaViewModel(service: mainCategoryListService)
+            ),
+            peopleListViewModel: PeopleListViewModel(service: mainCategoryListService),
+            characterListViewModel: CharacterListViewModel(service: mainCategoryListService),
+            requestLifecycleController: requestLifecycleManager
+        )
+    }
+
+    // MARK: - Home Factories
+
+    func makeHomeTodayAnimeScheduleListViewModel() -> HomeTodayAnimeScheduleListViewModel {
+        HomeTodayAnimeScheduleListViewModel(
+            service: homeTodayAnimeScheduleListService,
+            requestLifecycleController: requestLifecycleManager
+        )
+    }
+
+    func makeHomeTrendingAnimeListViewModel() -> HomeTrendingAnimeListViewModel {
+        HomeTrendingAnimeListViewModel(
+            service: homeTrendingAnimeListService,
+            requestLifecycleController: requestLifecycleManager
+        )
+    }
+
+    func makeHomeTrendingMangaListViewModel() -> HomeTrendingMangaListViewModel {
+        HomeTrendingMangaListViewModel(
+            service: homeTrendingMangaListService,
+            requestLifecycleController: requestLifecycleManager
+        )
+    }
+
+    func makeHomeWatchListViewModel(initialFeed: HomeWatchFeedKind) -> HomeWatchListViewModel {
+        HomeWatchListViewModel(
+            initialFeed: initialFeed,
+            service: homeWatchListService,
+            requestLifecycleController: requestLifecycleManager
+        )
+    }
+
+    // MARK: - Detail Factories
+
+    func makeAnimeDetailViewModel(malId: Int) -> AnimeDetailViewModel {
+        let requestLifecycleScope = RequestLifecycleScope.animeDetail(malID: malId)
+        return AnimeDetailViewModel(
+            malId: malId,
+            service: AnimeDetailService(
+                apiService: jikanAPIService,
+                lifecycleScope: requestLifecycleScope
+            ),
+            favoriteRepository: favoriteRepository,
+            broadcastReminderRepository: broadcastReminderRepository,
+            requestLifecycleScope: requestLifecycleScope,
+            requestLifecycleController: requestLifecycleManager
+        )
+    }
+
+    func makeMangaDetailViewModel(malId: Int) -> MangaDetailViewModel {
+        let requestLifecycleScope = RequestLifecycleScope.mangaDetail(malID: malId)
+        return MangaDetailViewModel(
+            malId: malId,
+            service: MangaDetailService(
+                apiService: jikanAPIService,
+                lifecycleScope: requestLifecycleScope
+            ),
+            favoriteRepository: favoriteRepository,
+            requestLifecycleScope: requestLifecycleScope,
+            requestLifecycleController: requestLifecycleManager
+        )
+    }
+
+    func makeAnimeDetailEpisodesListViewModel(malId: Int) -> AnimeDetailEpisodesListViewModel {
+        let requestLifecycleScope = RequestLifecycleScope.animeEpisodes(malID: malId)
+        return AnimeDetailEpisodesListViewModel(
+            malId: malId,
+            service: AnimeDetailService(
+                apiService: jikanAPIService,
+                lifecycleScope: requestLifecycleScope
+            ),
+            requestLifecycleScope: requestLifecycleScope,
+            requestLifecycleController: requestLifecycleManager
+        )
+    }
+
+    func makeAnimeReviewViewModel(malId: Int) -> AnimeReviewViewModel {
+        let requestLifecycleScope = RequestLifecycleScope.animeReview(malID: malId)
+        return AnimeReviewViewModel(
+            malId: malId,
+            service: AnimeReviewService(
+                apiService: jikanAPIService,
+                lifecycleScope: requestLifecycleScope
+            ),
+            requestLifecycleScope: requestLifecycleScope,
+            requestLifecycleController: requestLifecycleManager
+        )
+    }
+
+    func makeMangaReviewViewModel(malId: Int) -> MangaReviewViewModel {
+        let requestLifecycleScope = RequestLifecycleScope.mangaReview(malID: malId)
+        return MangaReviewViewModel(
+            malId: malId,
+            service: MangaReviewService(
+                apiService: jikanAPIService,
+                lifecycleScope: requestLifecycleScope
+            ),
+            requestLifecycleScope: requestLifecycleScope,
+            requestLifecycleController: requestLifecycleManager
+        )
+    }
+
+    func makePeopleDetailViewModel(malId: Int) -> PeopleDetailViewModel {
+        let requestLifecycleScope = RequestLifecycleScope.peopleDetail(malID: malId)
+        return PeopleDetailViewModel(
+            malId: malId,
+            service: PeopleDetailService(
+                apiService: jikanAPIService,
+                lifecycleScope: requestLifecycleScope
+            ),
+            requestLifecycleScope: requestLifecycleScope,
+            requestLifecycleController: requestLifecycleManager
+        )
+    }
+
+    func makeCharacterDetailViewModel(malId: Int) -> CharacterDetailViewModel {
+        let requestLifecycleScope = RequestLifecycleScope.characterDetail(malID: malId)
+        return CharacterDetailViewModel(
+            malId: malId,
+            service: CharacterDetailService(
+                apiService: jikanAPIService,
+                lifecycleScope: requestLifecycleScope
+            ),
+            requestLifecycleScope: requestLifecycleScope,
+            requestLifecycleController: requestLifecycleManager
+        )
+    }
+
+    func makeProducerDetailViewModel(malId: Int) -> ProducerDetailViewModel {
+        let requestLifecycleScope = RequestLifecycleScope.producerDetail(
+            producerID: malId
+        )
+        return ProducerDetailViewModel(
+            malId: malId,
+            service: ProducerDetailService(
+                apiService: jikanAPIService,
+                lifecycleScope: requestLifecycleScope
+            ),
+            requestLifecycleScope: requestLifecycleScope,
+            requestLifecycleController: requestLifecycleManager
+        )
+    }
+
+    func makeProducerAnimeListViewModel(
+        producerId: Int,
+        producerName: String
+    ) -> ProducerAnimeListViewModel {
+        let requestLifecycleScope = RequestLifecycleScope.producerAnimeList(
+            producerID: producerId
+        )
+        return ProducerAnimeListViewModel(
+            producerId: producerId,
+            producerName: producerName,
+            service: ProducerAnimeListService(
+                apiService: jikanAPIService,
+                lifecycleScope: requestLifecycleScope
+            ),
+            requestLifecycleScope: requestLifecycleScope,
+            requestLifecycleController: requestLifecycleManager
+        )
+    }
+
+    func makeAnimeCategoryDetailViewModel(genre: AnimeListGenreDTO) -> AnimeCategoryDetailViewModel {
+        let requestLifecycleScope = RequestLifecycleScope.animeCategoryDetail(
+            genreID: genre.id
+        )
+        return AnimeCategoryDetailViewModel(
+            genre: genre,
+            service: AnimeCategoryDetailService(
+                apiService: jikanAPIService,
+                lifecycleScope: requestLifecycleScope
+            ),
+            requestLifecycleScope: requestLifecycleScope,
+            requestLifecycleController: requestLifecycleManager
+        )
+    }
+
+    func makeMangaCategoryDetailViewModel(genre: MangaListGenreDTO) -> MangaCategoryDetailViewModel {
+        let requestLifecycleScope = RequestLifecycleScope.mangaCategoryDetail(
+            genreID: genre.id
+        )
+        return MangaCategoryDetailViewModel(
+            genre: genre,
+            service: MangaCategoryDetailService(
+                apiService: jikanAPIService,
+                lifecycleScope: requestLifecycleScope
+            ),
+            requestLifecycleScope: requestLifecycleScope,
+            requestLifecycleController: requestLifecycleManager
+        )
+    }
+}
+
+// MARK: - Live Dependencies
+
+private extension AppDependencies {
+
+    static func makeLiveDependencies() -> AppDependencies {
         let requestLifecycleManager = RequestLifecycleManager()
         let jikanAPIService = JikanAPIService(
             requestLifecycleExecutor: requestLifecycleManager
@@ -70,7 +306,7 @@ struct AppDependencies {
             broadcastReminderRepository: broadcastReminderRepository,
             searchHistoryRepository: mainSearchHistoryRepository,
             randomPickService: randomPickService,
-            requestLifecycleManager: requestLifecycleManager,
+            requestLifecycleController: requestLifecycleManager,
             clearApplicationCache: {
                 await jikanAPIService.clearCache()
                 await mainNewsService.clearCache()
@@ -114,235 +350,6 @@ struct AppDependencies {
             broadcastReminderRepository: broadcastReminderRepository,
             mainSearchHistoryRepository: mainSearchHistoryRepository,
             myList: myListDependencies
-        )
-    }()
-
-    // MARK: - Tab Factories
-
-    func makeMainSearchViewModel(
-        initialKind: MainSearchKind = .anime,
-        initialQuery: String = "",
-        initialSortOption: MainSearchSortOption = .defaultOption
-    ) -> MainSearchViewModel {
-        MainSearchViewModel(
-            service: mainSearchService,
-            historyRepository: mainSearchHistoryRepository,
-            requestLifecycleManager: requestLifecycleManager,
-            initialKind: initialKind,
-            initialQuery: initialQuery,
-            initialSortOption: initialSortOption
-        )
-    }
-
-    func makeMainNewsViewModel() -> MainNewsViewModel {
-        MainNewsViewModel(
-            service: mainNewsService,
-            requestLifecycleManager: requestLifecycleManager
-        )
-    }
-
-    func makeMainCategoryListViewModel() -> MainCategoryListViewModel {
-        MainCategoryListViewModel(
-            animeListViewModel: AnimeListViewModel(
-                genreAnimeViewModel: GenreAnimeViewModel(service: mainCategoryListService)
-            ),
-            mangaListViewModel: MangaListViewModel(
-                genreMangaViewModel: GenreMangaViewModel(service: mainCategoryListService)
-            ),
-            peopleListViewModel: PeopleListViewModel(service: mainCategoryListService),
-            characterListViewModel: CharacterListViewModel(service: mainCategoryListService),
-            requestLifecycleManager: requestLifecycleManager
-        )
-    }
-
-    // MARK: - Home Factories
-
-    func makeHomeTodayAnimeScheduleListViewModel() -> HomeTodayAnimeScheduleListViewModel {
-        HomeTodayAnimeScheduleListViewModel(
-            service: homeTodayAnimeScheduleListService,
-            requestLifecycleManager: requestLifecycleManager
-        )
-    }
-
-    func makeHomeTrendingAnimeListViewModel() -> HomeTrendingAnimeListViewModel {
-        HomeTrendingAnimeListViewModel(
-            service: homeTrendingAnimeListService,
-            requestLifecycleManager: requestLifecycleManager
-        )
-    }
-
-    func makeHomeTrendingMangaListViewModel() -> HomeTrendingMangaListViewModel {
-        HomeTrendingMangaListViewModel(
-            service: homeTrendingMangaListService,
-            requestLifecycleManager: requestLifecycleManager
-        )
-    }
-
-    func makeHomeWatchListViewModel(initialFeed: HomeWatchFeedKind) -> HomeWatchListViewModel {
-        HomeWatchListViewModel(
-            initialFeed: initialFeed,
-            service: homeWatchListService,
-            requestLifecycleManager: requestLifecycleManager
-        )
-    }
-
-    // MARK: - Detail Factories
-
-    func makeAnimeDetailViewModel(malId: Int) -> AnimeDetailViewModel {
-        let requestLifecycleScope = RequestLifecycleScope.animeDetail(malID: malId)
-        return AnimeDetailViewModel(
-            malId: malId,
-            service: AnimeDetailService(
-                apiService: jikanAPIService,
-                lifecycleScope: requestLifecycleScope
-            ),
-            favoriteRepository: favoriteRepository,
-            broadcastReminderRepository: broadcastReminderRepository,
-            requestLifecycleScope: requestLifecycleScope,
-            requestLifecycleManager: requestLifecycleManager
-        )
-    }
-
-    func makeMangaDetailViewModel(malId: Int) -> MangaDetailViewModel {
-        let requestLifecycleScope = RequestLifecycleScope.mangaDetail(malID: malId)
-        return MangaDetailViewModel(
-            malId: malId,
-            service: MangaDetailService(
-                apiService: jikanAPIService,
-                lifecycleScope: requestLifecycleScope
-            ),
-            favoriteRepository: favoriteRepository,
-            requestLifecycleScope: requestLifecycleScope,
-            requestLifecycleManager: requestLifecycleManager
-        )
-    }
-
-    func makeAnimeDetailEpisodesListViewModel(malId: Int) -> AnimeDetailEpisodesListViewModel {
-        let requestLifecycleScope = RequestLifecycleScope.animeEpisodes(malID: malId)
-        return AnimeDetailEpisodesListViewModel(
-            malId: malId,
-            service: AnimeDetailService(
-                apiService: jikanAPIService,
-                lifecycleScope: requestLifecycleScope
-            ),
-            requestLifecycleScope: requestLifecycleScope,
-            requestLifecycleManager: requestLifecycleManager
-        )
-    }
-
-    func makeAnimeReviewViewModel(malId: Int) -> AnimeReviewViewModel {
-        let requestLifecycleScope = RequestLifecycleScope.animeReview(malID: malId)
-        return AnimeReviewViewModel(
-            malId: malId,
-            service: AnimeReviewService(
-                apiService: jikanAPIService,
-                lifecycleScope: requestLifecycleScope
-            ),
-            requestLifecycleScope: requestLifecycleScope,
-            requestLifecycleManager: requestLifecycleManager
-        )
-    }
-
-    func makeMangaReviewViewModel(malId: Int) -> MangaReviewViewModel {
-        let requestLifecycleScope = RequestLifecycleScope.mangaReview(malID: malId)
-        return MangaReviewViewModel(
-            malId: malId,
-            service: MangaReviewService(
-                apiService: jikanAPIService,
-                lifecycleScope: requestLifecycleScope
-            ),
-            requestLifecycleScope: requestLifecycleScope,
-            requestLifecycleManager: requestLifecycleManager
-        )
-    }
-
-    func makePeopleDetailViewModel(malId: Int) -> PeopleDetailViewModel {
-        let requestLifecycleScope = RequestLifecycleScope.peopleDetail(malID: malId)
-        return PeopleDetailViewModel(
-            malId: malId,
-            service: PeopleDetailService(
-                apiService: jikanAPIService,
-                lifecycleScope: requestLifecycleScope
-            ),
-            requestLifecycleScope: requestLifecycleScope,
-            requestLifecycleManager: requestLifecycleManager
-        )
-    }
-
-    func makeCharacterDetailViewModel(malId: Int) -> CharacterDetailViewModel {
-        let requestLifecycleScope = RequestLifecycleScope.characterDetail(malID: malId)
-        return CharacterDetailViewModel(
-            malId: malId,
-            service: CharacterDetailService(
-                apiService: jikanAPIService,
-                lifecycleScope: requestLifecycleScope
-            ),
-            requestLifecycleScope: requestLifecycleScope,
-            requestLifecycleManager: requestLifecycleManager
-        )
-    }
-
-    func makeProducerDetailViewModel(malId: Int) -> ProducerDetailViewModel {
-        let requestLifecycleScope = RequestLifecycleScope.producerDetail(
-            producerID: malId
-        )
-        return ProducerDetailViewModel(
-            malId: malId,
-            service: ProducerDetailService(
-                apiService: jikanAPIService,
-                lifecycleScope: requestLifecycleScope
-            ),
-            requestLifecycleScope: requestLifecycleScope,
-            requestLifecycleManager: requestLifecycleManager
-        )
-    }
-
-    func makeProducerAnimeListViewModel(
-        producerId: Int,
-        producerName: String
-    ) -> ProducerAnimeListViewModel {
-        let requestLifecycleScope = RequestLifecycleScope.producerAnimeList(
-            producerID: producerId
-        )
-        return ProducerAnimeListViewModel(
-            producerId: producerId,
-            producerName: producerName,
-            service: ProducerAnimeListService(
-                apiService: jikanAPIService,
-                lifecycleScope: requestLifecycleScope
-            ),
-            requestLifecycleScope: requestLifecycleScope,
-            requestLifecycleManager: requestLifecycleManager
-        )
-    }
-
-    func makeAnimeCategoryDetailViewModel(genre: AnimeListGenreDTO) -> AnimeCategoryDetailViewModel {
-        let requestLifecycleScope = RequestLifecycleScope.animeCategoryDetail(
-            genreID: genre.id
-        )
-        return AnimeCategoryDetailViewModel(
-            genre: genre,
-            service: AnimeCategoryDetailService(
-                apiService: jikanAPIService,
-                lifecycleScope: requestLifecycleScope
-            ),
-            requestLifecycleScope: requestLifecycleScope,
-            requestLifecycleManager: requestLifecycleManager
-        )
-    }
-
-    func makeMangaCategoryDetailViewModel(genre: MangaListGenreDTO) -> MangaCategoryDetailViewModel {
-        let requestLifecycleScope = RequestLifecycleScope.mangaCategoryDetail(
-            genreID: genre.id
-        )
-        return MangaCategoryDetailViewModel(
-            genre: genre,
-            service: MangaCategoryDetailService(
-                apiService: jikanAPIService,
-                lifecycleScope: requestLifecycleScope
-            ),
-            requestLifecycleScope: requestLifecycleScope,
-            requestLifecycleManager: requestLifecycleManager
         )
     }
 }

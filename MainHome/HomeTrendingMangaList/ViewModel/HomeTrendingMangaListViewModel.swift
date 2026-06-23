@@ -43,14 +43,14 @@ final class HomeTrendingMangaListViewModel: ObservableObject {
 
     init(
         service: HomeTrendingMangaListServicing,
-        requestLifecycleManager: any RequestLifecycleControlling,
+        requestLifecycleController: any RequestLifecycleControlling,
         presentationBuilder: HomeTrendingMangaListPresentationBuilder = HomeTrendingMangaListPresentationBuilder()
     ) {
         self.service = service
         self.presentationBuilder = presentationBuilder
         self.requestLifecycleController = RequestScreenLifecycleController(
             scope: .homeTrendingMangaList,
-            requestLifecycleManager: requestLifecycleManager
+            requestLifecycleController: requestLifecycleController
         )
         bindPresentation()
     }

@@ -21,14 +21,14 @@ final class MainNewsViewModel: ObservableObject {
 
     init(
         service: MainNewsServicing,
-        requestLifecycleManager: any RequestLifecycleControlling,
+        requestLifecycleController: any RequestLifecycleControlling,
         presentationBuilder: MainNewsPresentationBuilder = MainNewsPresentationBuilder()
     ) {
         self.service = service
         self.presentationBuilder = presentationBuilder
         self.requestLifecycleController = RequestScreenLifecycleController(
             scope: .mainNews,
-            requestLifecycleManager: requestLifecycleManager
+            requestLifecycleController: requestLifecycleController
         )
     }
 

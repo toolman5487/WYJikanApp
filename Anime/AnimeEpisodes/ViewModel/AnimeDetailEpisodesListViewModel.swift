@@ -41,14 +41,14 @@ final class AnimeDetailEpisodesListViewModel: ObservableObject {
         malId: Int,
         service: any AnimeDetailServicing,
         requestLifecycleScope: RequestLifecycleScope,
-        requestLifecycleManager: any RequestLifecycleControlling,
+        requestLifecycleController: any RequestLifecycleControlling,
         rowPresenter: AnimeDetailEpisodeRowPresenter = AnimeDetailEpisodeRowPresenter()
     ) {
         self.malId = malId
         self.service = service
         self.requestLifecycleController = RequestScreenLifecycleController(
             scope: requestLifecycleScope,
-            requestLifecycleManager: requestLifecycleManager
+            requestLifecycleController: requestLifecycleController
         )
         self.rowPresenter = rowPresenter
     }

@@ -48,7 +48,7 @@ final class MangaDetailViewModel: ObservableObject {
         service: MangaDetailServicing,
         favoriteRepository: any FavoriteRepository,
         requestLifecycleScope: RequestLifecycleScope,
-        requestLifecycleManager: any RequestLifecycleControlling,
+        requestLifecycleController: any RequestLifecycleControlling,
         readingProgressController: MangaReadingProgressController = MangaReadingProgressController()
     ) {
         self.malId = malId
@@ -57,7 +57,7 @@ final class MangaDetailViewModel: ObservableObject {
         self.readingProgressController = readingProgressController
         self.requestLifecycleController = RequestScreenLifecycleController(
             scope: requestLifecycleScope,
-            requestLifecycleManager: requestLifecycleManager
+            requestLifecycleController: requestLifecycleController
         )
         self.synopsisTranslationViewModel = SynopsisTranslationViewModel(context: .mangaWork)
         connectToMyList()

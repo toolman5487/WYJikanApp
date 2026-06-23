@@ -30,7 +30,7 @@ final class MainCategoryListViewModel: ObservableObject {
         mangaListViewModel: MangaListViewModel,
         peopleListViewModel: PeopleListViewModel,
         characterListViewModel: CharacterListViewModel,
-        requestLifecycleManager: any RequestLifecycleControlling
+        requestLifecycleController: any RequestLifecycleControlling
     ) {
         self.animeListViewModel = animeListViewModel
         self.mangaListViewModel = mangaListViewModel
@@ -38,7 +38,7 @@ final class MainCategoryListViewModel: ObservableObject {
         self.characterListViewModel = characterListViewModel
         self.requestLifecycleController = RequestScreenLifecycleController(
             scope: .mainCategoryList,
-            requestLifecycleManager: requestLifecycleManager
+            requestLifecycleController: requestLifecycleController
         )
 
         bindSelectedKind()

@@ -44,7 +44,7 @@ final class AnimeDetailViewModel: ObservableObject {
         favoriteRepository: any FavoriteRepository,
         broadcastReminderRepository: any AnimeBroadcastReminderRepository,
         requestLifecycleScope: RequestLifecycleScope,
-        requestLifecycleManager: any RequestLifecycleControlling,
+        requestLifecycleController: any RequestLifecycleControlling,
         watchProgressController: AnimeWatchProgressController = AnimeWatchProgressController()
     ) {
         self.malId = malId
@@ -54,7 +54,7 @@ final class AnimeDetailViewModel: ObservableObject {
         self.watchProgressController = watchProgressController
         self.requestLifecycleController = RequestScreenLifecycleController(
             scope: requestLifecycleScope,
-            requestLifecycleManager: requestLifecycleManager
+            requestLifecycleController: requestLifecycleController
         )
         self.synopsisTranslationViewModel = SynopsisTranslationViewModel(context: .animeWork)
         connectToMyList()

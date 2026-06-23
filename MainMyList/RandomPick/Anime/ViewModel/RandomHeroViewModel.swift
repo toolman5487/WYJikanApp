@@ -108,14 +108,14 @@ final class RandomHeroViewModel: ObservableObject {
 
     init(
         service: RandomPickServicing,
-        requestLifecycleManager: any RequestLifecycleControlling,
+        requestLifecycleController: any RequestLifecycleControlling,
         storage: UserDefaults = .standard
     ) {
         self.service = service
         self.storage = storage
         self.requestLifecycleController = RequestScreenLifecycleController(
             scope: .mainMyListRandomAnime,
-            requestLifecycleManager: requestLifecycleManager
+            requestLifecycleController: requestLifecycleController
         )
         self.drawCooldownTimer = GlobalCooldownTimer(
             key: "anime.random.draw",

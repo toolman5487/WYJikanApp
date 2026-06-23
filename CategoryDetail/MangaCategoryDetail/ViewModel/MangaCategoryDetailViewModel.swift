@@ -46,13 +46,13 @@ final class MangaCategoryDetailViewModel: ObservableObject {
         genre: MangaListGenreDTO,
         service: MangaCategoryDetailServicing,
         requestLifecycleScope: RequestLifecycleScope,
-        requestLifecycleManager: any RequestLifecycleControlling
+        requestLifecycleController: any RequestLifecycleControlling
     ) {
         self.genre = genre
         self.service = service
         self.requestLifecycleController = RequestScreenLifecycleController(
             scope: requestLifecycleScope,
-            requestLifecycleManager: requestLifecycleManager
+            requestLifecycleController: requestLifecycleController
         )
         bindPresentation()
     }

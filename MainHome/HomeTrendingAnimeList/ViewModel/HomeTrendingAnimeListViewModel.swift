@@ -42,14 +42,14 @@ final class HomeTrendingAnimeListViewModel: ObservableObject {
 
     init(
         service: HomeTrendingAnimeListServicing,
-        requestLifecycleManager: any RequestLifecycleControlling,
+        requestLifecycleController: any RequestLifecycleControlling,
         presentationBuilder: HomeTrendingAnimeListPresentationBuilder = HomeTrendingAnimeListPresentationBuilder()
     ) {
         self.service = service
         self.presentationBuilder = presentationBuilder
         self.requestLifecycleController = RequestScreenLifecycleController(
             scope: .homeTrendingAnimeList,
-            requestLifecycleManager: requestLifecycleManager
+            requestLifecycleController: requestLifecycleController
         )
         bindSelectedSort()
     }

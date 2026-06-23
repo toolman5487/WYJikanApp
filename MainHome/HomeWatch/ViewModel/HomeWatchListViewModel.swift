@@ -41,13 +41,13 @@ final class HomeWatchListViewModel: ObservableObject {
     init(
         initialFeed: HomeWatchFeedKind = .latestEpisodes,
         service: HomeWatchServicing,
-        requestLifecycleManager: any RequestLifecycleControlling
+        requestLifecycleController: any RequestLifecycleControlling
     ) {
         self.selectedFeed = initialFeed
         self.service = service
         self.requestLifecycleController = RequestScreenLifecycleController(
             scope: .homeWatchList,
-            requestLifecycleManager: requestLifecycleManager
+            requestLifecycleController: requestLifecycleController
         )
     }
 

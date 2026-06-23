@@ -194,13 +194,13 @@ final class HomeFeedCoordinator {
     init(
         viewModels: HomeFeedViewModels,
         homeLoadCoordinator: any HomeLoadCoordinating,
-        requestLifecycleManager: any RequestLifecycleControlling
+        requestLifecycleController: any RequestLifecycleControlling
     ) {
         self.viewModels = viewModels
         self.homeLoadCoordinator = homeLoadCoordinator
         self.requestLifecycleController = RequestScreenLifecycleController(
             scope: .mainHome,
-            requestLifecycleManager: requestLifecycleManager
+            requestLifecycleController: requestLifecycleController
         )
     }
 
