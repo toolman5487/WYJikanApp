@@ -28,14 +28,15 @@ nonisolated final class MangaCategoryDetailService: MangaCategoryDetailServicing
     private enum MangaGenreRequest {
         case page(genreId: Int, page: Int, pageSize: Int, filter: MangaCategoryFilter)
 
-        var request: JikanAPIRequest {
+        func request(lifecycleScope: RequestLifecycleScope) -> JikanAPIRequest {
             switch self {
             case let .page(genreId, page, pageSize, filter):
                 return JikanAPIRequest(
                     path: APIConfig.Manga.list,
                     queryItems: baseQueryItems(genreId: genreId, page: page, pageSize: pageSize)
                         + filterQueryItems(for: filter),
-                    cachePolicy: cachePolicy
+                    cachePolicy: cachePolicy,
+                    scope: lifecycleScope
                 )
             }
         }
@@ -89,9 +90,14 @@ nonisolated final class MangaCategoryDetailService: MangaCategoryDetailServicing
     // MARK: - Dependencies
 
     private let apiService: JikanAPIServicing
+    private let lifecycleScope: RequestLifecycleScope
 
-    init(apiService: JikanAPIServicing = JikanAPIService.shared) {
+    init(
+        apiService: JikanAPIServicing = JikanAPIService.shared,
+        lifecycleScope: RequestLifecycleScope = .independent
+    ) {
         self.apiService = apiService
+        self.lifecycleScope = lifecycleScope
     }
 
     // MARK: - Public API
@@ -121,7 +127,9 @@ nonisolated final class MangaCategoryDetailService: MangaCategoryDetailServicing
             pageSize: pageSize,
             filter: filter
         )
-        let response: MangaCategoryResponse = try await apiService.send(request.request)
+        let response: MangaCategoryResponse = try await apiService.send(
+            request.request(lifecycleScope: lifecycleScope)
+        )
         return MangaCategoryPage(
             items: response.data,
             currentPage: response.pagination?.currentPage ?? page,

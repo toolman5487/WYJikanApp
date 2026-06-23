@@ -54,13 +54,23 @@ final class AnimeReviewViewModel: ObservableObject {
 
     private let malId: Int
     private let service: AnimeReviewServicing
+    private let requestLifecycleController: RequestScreenLifecycleController
     private var loadedPage = 0
     private var loadingPhase: LoadingPhase = .idle
     private var hasNextPage = false
 
-    init(malId: Int, service: AnimeReviewServicing) {
+    init(
+        malId: Int,
+        service: AnimeReviewServicing,
+        requestLifecycleScope: RequestLifecycleScope,
+        requestLifecycleManager: any RequestLifecycleManaging
+    ) {
         self.malId = malId
         self.service = service
+        self.requestLifecycleController = RequestScreenLifecycleController(
+            scope: requestLifecycleScope,
+            requestLifecycleManager: requestLifecycleManager
+        )
     }
 
     var reviews: [AnimeReviewEntryDTO] {
@@ -68,6 +78,16 @@ final class AnimeReviewViewModel: ObservableObject {
     }
 
     // MARK: - Load
+
+    func screenDidAppear() async {
+        guard await requestLifecycleController.activate() else { return }
+        guard loadedPage == 0 else { return }
+        await load()
+    }
+
+    func screenDidDisappear() {
+        requestLifecycleController.deactivate()
+    }
 
     func load() async {
         guard loadingPhase.isIdle else { return }
@@ -86,6 +106,7 @@ final class AnimeReviewViewModel: ObservableObject {
             screenState = response.data.isEmpty ? .empty : .content(response.data)
             loadMoreState = hasNextPage ? .available : .hidden
         } catch is CancellationError {
+            screenState = reviews.isEmpty ? .loading : .content(reviews)
             return
         } catch {
             screenState = .error(FeatureLoadFailure(error))
@@ -107,6 +128,7 @@ final class AnimeReviewViewModel: ObservableObject {
             screenState = mergedReviews.isEmpty ? .empty : .content(mergedReviews)
             loadMoreState = hasNextPage ? .available : .hidden
         } catch is CancellationError {
+            loadMoreState = hasNextPage ? .available : .hidden
             return
         } catch {
             loadMoreState = .error(FeatureLoadFailure.loadMore())

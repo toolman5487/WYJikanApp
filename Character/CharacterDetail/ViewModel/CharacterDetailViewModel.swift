@@ -47,11 +47,21 @@ final class CharacterDetailViewModel: ObservableObject {
 
     private let malId: Int
     private let service: CharacterDetailServicing
+    private let requestLifecycleController: RequestScreenLifecycleController
     private var loadState: LoadState = .idle
 
-    init(malId: Int, service: CharacterDetailServicing) {
+    init(
+        malId: Int,
+        service: CharacterDetailServicing,
+        requestLifecycleScope: RequestLifecycleScope,
+        requestLifecycleManager: any RequestLifecycleManaging
+    ) {
         self.malId = malId
         self.service = service
+        self.requestLifecycleController = RequestScreenLifecycleController(
+            scope: requestLifecycleScope,
+            requestLifecycleManager: requestLifecycleManager
+        )
         self.synopsisTranslationViewModel = SynopsisTranslationViewModel(context: .characterProfile)
     }
 
@@ -59,7 +69,16 @@ final class CharacterDetailViewModel: ObservableObject {
         screenState.detail
     }
 
-    func load() async {
+    func screenDidAppear() async {
+        guard await requestLifecycleController.activate() else { return }
+        await load()
+    }
+
+    func screenDidDisappear() {
+        requestLifecycleController.deactivate()
+    }
+
+    private func load() async {
         guard detail == nil, !loadState.isLoading else { return }
 
         loadState = .loading

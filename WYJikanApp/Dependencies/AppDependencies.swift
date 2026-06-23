@@ -168,63 +168,128 @@ struct AppDependencies {
     // MARK: - Detail Factories
 
     func makeAnimeDetailViewModel(malId: Int) -> AnimeDetailViewModel {
-        AnimeDetailViewModel(
+        let requestLifecycleScope = RequestLifecycleScope.animeDetail(malID: malId)
+        return AnimeDetailViewModel(
             malId: malId,
-            service: animeDetailService,
+            service: AnimeDetailService(lifecycleScope: requestLifecycleScope),
             favoriteRepository: favoriteRepository,
-            broadcastReminderRepository: broadcastReminderRepository
+            broadcastReminderRepository: broadcastReminderRepository,
+            requestLifecycleScope: requestLifecycleScope,
+            requestLifecycleManager: RequestLifecycleManager.shared
         )
     }
 
     func makeMangaDetailViewModel(malId: Int) -> MangaDetailViewModel {
-        MangaDetailViewModel(
+        let requestLifecycleScope = RequestLifecycleScope.mangaDetail(malID: malId)
+        return MangaDetailViewModel(
             malId: malId,
-            service: mangaDetailService,
-            favoriteRepository: favoriteRepository
+            service: MangaDetailService(lifecycleScope: requestLifecycleScope),
+            favoriteRepository: favoriteRepository,
+            requestLifecycleScope: requestLifecycleScope,
+            requestLifecycleManager: RequestLifecycleManager.shared
         )
     }
 
     func makeAnimeDetailEpisodesListViewModel(malId: Int) -> AnimeDetailEpisodesListViewModel {
-        AnimeDetailEpisodesListViewModel(malId: malId, service: animeDetailService)
+        let requestLifecycleScope = RequestLifecycleScope.animeEpisodes(malID: malId)
+        return AnimeDetailEpisodesListViewModel(
+            malId: malId,
+            service: AnimeDetailService(lifecycleScope: requestLifecycleScope),
+            requestLifecycleScope: requestLifecycleScope,
+            requestLifecycleManager: RequestLifecycleManager.shared
+        )
     }
 
     func makeAnimeReviewViewModel(malId: Int) -> AnimeReviewViewModel {
-        AnimeReviewViewModel(malId: malId, service: animeReviewService)
+        let requestLifecycleScope = RequestLifecycleScope.animeReview(malID: malId)
+        return AnimeReviewViewModel(
+            malId: malId,
+            service: AnimeReviewService(lifecycleScope: requestLifecycleScope),
+            requestLifecycleScope: requestLifecycleScope,
+            requestLifecycleManager: RequestLifecycleManager.shared
+        )
     }
 
     func makeMangaReviewViewModel(malId: Int) -> MangaReviewViewModel {
-        MangaReviewViewModel(malId: malId, service: mangaReviewService)
+        let requestLifecycleScope = RequestLifecycleScope.mangaReview(malID: malId)
+        return MangaReviewViewModel(
+            malId: malId,
+            service: MangaReviewService(lifecycleScope: requestLifecycleScope),
+            requestLifecycleScope: requestLifecycleScope,
+            requestLifecycleManager: RequestLifecycleManager.shared
+        )
     }
 
     func makePeopleDetailViewModel(malId: Int) -> PeopleDetailViewModel {
-        PeopleDetailViewModel(malId: malId, service: peopleDetailService)
+        let requestLifecycleScope = RequestLifecycleScope.peopleDetail(malID: malId)
+        return PeopleDetailViewModel(
+            malId: malId,
+            service: PeopleDetailService(lifecycleScope: requestLifecycleScope),
+            requestLifecycleScope: requestLifecycleScope,
+            requestLifecycleManager: RequestLifecycleManager.shared
+        )
     }
 
     func makeCharacterDetailViewModel(malId: Int) -> CharacterDetailViewModel {
-        CharacterDetailViewModel(malId: malId, service: characterDetailService)
+        let requestLifecycleScope = RequestLifecycleScope.characterDetail(malID: malId)
+        return CharacterDetailViewModel(
+            malId: malId,
+            service: CharacterDetailService(lifecycleScope: requestLifecycleScope),
+            requestLifecycleScope: requestLifecycleScope,
+            requestLifecycleManager: RequestLifecycleManager.shared
+        )
     }
 
     func makeProducerDetailViewModel(malId: Int) -> ProducerDetailViewModel {
-        ProducerDetailViewModel(malId: malId, service: producerDetailService)
+        let requestLifecycleScope = RequestLifecycleScope.producerDetail(
+            producerID: malId
+        )
+        return ProducerDetailViewModel(
+            malId: malId,
+            service: ProducerDetailService(lifecycleScope: requestLifecycleScope),
+            requestLifecycleScope: requestLifecycleScope,
+            requestLifecycleManager: RequestLifecycleManager.shared
+        )
     }
 
     func makeProducerAnimeListViewModel(
         producerId: Int,
         producerName: String
     ) -> ProducerAnimeListViewModel {
-        ProducerAnimeListViewModel(
+        let requestLifecycleScope = RequestLifecycleScope.producerAnimeList(
+            producerID: producerId
+        )
+        return ProducerAnimeListViewModel(
             producerId: producerId,
             producerName: producerName,
-            service: producerAnimeListService
+            service: ProducerAnimeListService(lifecycleScope: requestLifecycleScope),
+            requestLifecycleScope: requestLifecycleScope,
+            requestLifecycleManager: RequestLifecycleManager.shared
         )
     }
 
     func makeAnimeCategoryDetailViewModel(genre: AnimeListGenreDTO) -> AnimeCategoryDetailViewModel {
-        AnimeCategoryDetailViewModel(genre: genre, service: animeCategoryDetailService)
+        let requestLifecycleScope = RequestLifecycleScope.animeCategoryDetail(
+            genreID: genre.id
+        )
+        return AnimeCategoryDetailViewModel(
+            genre: genre,
+            service: AnimeCategoryDetailService(lifecycleScope: requestLifecycleScope),
+            requestLifecycleScope: requestLifecycleScope,
+            requestLifecycleManager: RequestLifecycleManager.shared
+        )
     }
 
     func makeMangaCategoryDetailViewModel(genre: MangaListGenreDTO) -> MangaCategoryDetailViewModel {
-        MangaCategoryDetailViewModel(genre: genre, service: mangaCategoryDetailService)
+        let requestLifecycleScope = RequestLifecycleScope.mangaCategoryDetail(
+            genreID: genre.id
+        )
+        return MangaCategoryDetailViewModel(
+            genre: genre,
+            service: MangaCategoryDetailService(lifecycleScope: requestLifecycleScope),
+            requestLifecycleScope: requestLifecycleScope,
+            requestLifecycleManager: RequestLifecycleManager.shared
+        )
     }
 }
 

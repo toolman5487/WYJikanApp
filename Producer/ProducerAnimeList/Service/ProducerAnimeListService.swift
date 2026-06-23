@@ -21,9 +21,14 @@ nonisolated protocol ProducerAnimeListServicing: Sendable {
 nonisolated final class ProducerAnimeListService: ProducerAnimeListServicing {
 
     private let apiService: JikanAPIServicing
+    private let lifecycleScope: RequestLifecycleScope
 
-    init(apiService: JikanAPIServicing = JikanAPIService.shared) {
+    init(
+        apiService: JikanAPIServicing = JikanAPIService.shared,
+        lifecycleScope: RequestLifecycleScope = .independent
+    ) {
         self.apiService = apiService
+        self.lifecycleScope = lifecycleScope
     }
 
     func fetchAnimePage(
@@ -42,7 +47,8 @@ nonisolated final class ProducerAnimeListService: ProducerAnimeListServicing {
         let response: AnimeCategoryResponse = try await apiService.fetch(
             endpoint: APIConfig.Anime.list,
             cachePolicy: .paging(page: page),
-            queryItems: queryItems
+            queryItems: queryItems,
+            lifecycleScope: lifecycleScope
         )
 
         return AnimeCategoryPage(

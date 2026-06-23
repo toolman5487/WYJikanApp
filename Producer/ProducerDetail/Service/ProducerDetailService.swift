@@ -20,15 +20,21 @@ nonisolated protocol ProducerDetailServicing: Sendable {
 nonisolated final class ProducerDetailService: ProducerDetailServicing {
 
     private let apiService: JikanAPIServicing
+    private let lifecycleScope: RequestLifecycleScope
 
-    init(apiService: JikanAPIServicing = JikanAPIService.shared) {
+    init(
+        apiService: JikanAPIServicing = JikanAPIService.shared,
+        lifecycleScope: RequestLifecycleScope = .independent
+    ) {
         self.apiService = apiService
+        self.lifecycleScope = lifecycleScope
     }
 
     func fetchProducerDetail(malId: Int) async throws -> ProducerDetailResponse {
         try await apiService.fetch(
             endpoint: APIConfig.Producers.full(id: malId),
-            cachePolicy: .cacheFirst(ttl: 600)
+            cachePolicy: .cacheFirst(ttl: 600),
+            lifecycleScope: lifecycleScope
         )
     }
 
@@ -45,7 +51,8 @@ nonisolated final class ProducerDetailService: ProducerDetailServicing {
                 URLQueryItem(name: "sort", value: "desc"),
                 URLQueryItem(name: "page", value: "1"),
                 URLQueryItem(name: "limit", value: String(limit))
-            ]
+            ],
+            lifecycleScope: lifecycleScope
         )
 
         return AnimeCategoryPage(

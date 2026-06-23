@@ -35,9 +35,11 @@ final class MangaDetailViewModel: ObservableObject {
     private let service: MangaDetailServicing
     private let favoriteRepository: any FavoriteRepository
     private let readingProgressController: MangaReadingProgressController
+    private let requestLifecycleController: RequestScreenLifecycleController
     private let persistenceMutationController = PersistenceMutationController()
     private let supplementaryLoadingController = DetailSupplementaryLoadingController()
     private var myListCancellable: AnyCancellable?
+    private var shouldResumeSupplementaryLoading = false
 
     // MARK: - Lifecycle
 
@@ -45,12 +47,18 @@ final class MangaDetailViewModel: ObservableObject {
         malId: Int,
         service: MangaDetailServicing,
         favoriteRepository: any FavoriteRepository,
+        requestLifecycleScope: RequestLifecycleScope,
+        requestLifecycleManager: any RequestLifecycleManaging,
         readingProgressController: MangaReadingProgressController = MangaReadingProgressController()
     ) {
         self.malId = malId
         self.service = service
         self.favoriteRepository = favoriteRepository
         self.readingProgressController = readingProgressController
+        self.requestLifecycleController = RequestScreenLifecycleController(
+            scope: requestLifecycleScope,
+            requestLifecycleManager: requestLifecycleManager
+        )
         self.synopsisTranslationViewModel = SynopsisTranslationViewModel(context: .mangaWork)
         connectToMyList()
     }
@@ -124,6 +132,20 @@ final class MangaDetailViewModel: ObservableObject {
 
     // MARK: - Load
 
+    func screenDidAppear() async {
+        guard await requestLifecycleController.activate() else { return }
+
+        if detail == nil {
+            await load()
+        } else if shouldResumeSupplementaryLoading {
+            await resumeSupplementaryLoading()
+        }
+    }
+
+    func screenDidDisappear() {
+        requestLifecycleController.deactivate()
+    }
+
     func load(forceRefresh: Bool = false) async {
         let existingDetail = detail
         guard forceRefresh || existingDetail == nil else { return }
@@ -142,11 +164,14 @@ final class MangaDetailViewModel: ObservableObject {
             prepareSupplementaryLoading(resetOnFailure: existingDetail == nil)
             screenState = .loaded(detail)
             resetSynopsisTranslation()
+            shouldResumeSupplementaryLoading = true
             await loadSupplementaryContent(
                 resetOnFailure: existingDetail == nil,
                 loadingPrepared: true
             )
+            shouldResumeSupplementaryLoading = Task.isCancelled
         } catch is CancellationError {
+            screenState = existingDetail.map(ScreenState.loaded) ?? .idle
             return
         } catch {
             if let existingDetail, forceRefresh {
@@ -156,6 +181,12 @@ final class MangaDetailViewModel: ObservableObject {
                 resetSupplementaryContent()
             }
         }
+    }
+
+    private func resumeSupplementaryLoading() async {
+        shouldResumeSupplementaryLoading = true
+        await loadSupplementaryContent(resetOnFailure: false)
+        shouldResumeSupplementaryLoading = Task.isCancelled
     }
 
     private func loadSupplementaryContent(

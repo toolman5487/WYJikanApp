@@ -70,6 +70,127 @@ nonisolated extension RequestLifecycleScope {
             parentTab: .myList
         )
     )
+
+    static func animeDetail(
+        malID: Int,
+        instanceID: UUID = UUID()
+    ) -> RequestLifecycleScope {
+        .screen(
+            RequestScreenScope(
+                identifier: "animeDetail.\(malID).\(instanceID.uuidString)"
+            )
+        )
+    }
+
+    static func mangaDetail(
+        malID: Int,
+        instanceID: UUID = UUID()
+    ) -> RequestLifecycleScope {
+        .screen(
+            RequestScreenScope(
+                identifier: "mangaDetail.\(malID).\(instanceID.uuidString)"
+            )
+        )
+    }
+
+    static func peopleDetail(
+        malID: Int,
+        instanceID: UUID = UUID()
+    ) -> RequestLifecycleScope {
+        .screen(
+            RequestScreenScope(
+                identifier: "peopleDetail.\(malID).\(instanceID.uuidString)"
+            )
+        )
+    }
+
+    static func characterDetail(
+        malID: Int,
+        instanceID: UUID = UUID()
+    ) -> RequestLifecycleScope {
+        .screen(
+            RequestScreenScope(
+                identifier: "characterDetail.\(malID).\(instanceID.uuidString)"
+            )
+        )
+    }
+
+    static func animeReview(
+        malID: Int,
+        instanceID: UUID = UUID()
+    ) -> RequestLifecycleScope {
+        .screen(
+            RequestScreenScope(
+                identifier: "animeReview.\(malID).\(instanceID.uuidString)"
+            )
+        )
+    }
+
+    static func mangaReview(
+        malID: Int,
+        instanceID: UUID = UUID()
+    ) -> RequestLifecycleScope {
+        .screen(
+            RequestScreenScope(
+                identifier: "mangaReview.\(malID).\(instanceID.uuidString)"
+            )
+        )
+    }
+
+    static func animeEpisodes(
+        malID: Int,
+        instanceID: UUID = UUID()
+    ) -> RequestLifecycleScope {
+        .screen(
+            RequestScreenScope(
+                identifier: "animeEpisodes.\(malID).\(instanceID.uuidString)"
+            )
+        )
+    }
+
+    static func animeCategoryDetail(
+        genreID: Int,
+        instanceID: UUID = UUID()
+    ) -> RequestLifecycleScope {
+        .screen(
+            RequestScreenScope(
+                identifier: "animeCategoryDetail.\(genreID).\(instanceID.uuidString)"
+            )
+        )
+    }
+
+    static func mangaCategoryDetail(
+        genreID: Int,
+        instanceID: UUID = UUID()
+    ) -> RequestLifecycleScope {
+        .screen(
+            RequestScreenScope(
+                identifier: "mangaCategoryDetail.\(genreID).\(instanceID.uuidString)"
+            )
+        )
+    }
+
+    static func producerDetail(
+        producerID: Int,
+        instanceID: UUID = UUID()
+    ) -> RequestLifecycleScope {
+        .screen(
+            RequestScreenScope(
+                identifier: "producerDetail.\(producerID).\(instanceID.uuidString)"
+            )
+        )
+    }
+
+    static func producerAnimeList(
+        producerID: Int,
+        instanceID: UUID = UUID()
+    ) -> RequestLifecycleScope {
+        .screen(
+            RequestScreenScope(
+                identifier: "producerAnimeList.\(producerID).\(instanceID.uuidString)"
+            )
+        )
+    }
 }
 
 // MARK: - RequestScreenScope

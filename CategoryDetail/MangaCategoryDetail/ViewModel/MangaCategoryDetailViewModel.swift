@@ -31,6 +31,7 @@ final class MangaCategoryDetailViewModel: ObservableObject {
     let genre: MangaListGenreDTO
 
     private let service: MangaCategoryDetailServicing
+    private let requestLifecycleController: RequestScreenLifecycleController
 
     // MARK: - Pagination State
 
@@ -43,10 +44,16 @@ final class MangaCategoryDetailViewModel: ObservableObject {
 
     init(
         genre: MangaListGenreDTO,
-        service: MangaCategoryDetailServicing
+        service: MangaCategoryDetailServicing,
+        requestLifecycleScope: RequestLifecycleScope,
+        requestLifecycleManager: any RequestLifecycleManaging
     ) {
         self.genre = genre
         self.service = service
+        self.requestLifecycleController = RequestScreenLifecycleController(
+            scope: requestLifecycleScope,
+            requestLifecycleManager: requestLifecycleManager
+        )
         bindPresentation()
     }
 
@@ -66,13 +73,20 @@ final class MangaCategoryDetailViewModel: ObservableObject {
 
     // MARK: - Public Methods
 
-    func loadIfNeeded() async {
+    func screenDidAppear() async {
+        guard await requestLifecycleController.activate() else { return }
         await paginationController.loadIfNeeded(
             setLoading: applyLoading,
             fetchPage: fetchPage,
             applyPresentation: applyPresentation,
             applyError: applyInitialLoadError
         )
+    }
+
+    func screenDidDisappear() {
+        filterRequestTask?.cancel()
+        filterRequestTask = nil
+        requestLifecycleController.deactivate()
     }
 
     func reload() async {

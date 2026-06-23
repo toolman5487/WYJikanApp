@@ -78,7 +78,10 @@ private struct AnimeReviewBodyView: View {
         .navigationTitle(navigationTitleText)
         .navigationBarTitleDisplayMode(.inline)
         .task(id: malId, priority: .userInitiated) {
-            await viewModel.load()
+            await viewModel.screenDidAppear()
+        }
+        .onDisappear {
+            viewModel.screenDidDisappear()
         }
     }
 

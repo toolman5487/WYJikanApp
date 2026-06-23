@@ -33,6 +33,7 @@ final class ProducerAnimeListViewModel: ObservableObject {
 
     private let producerId: Int
     private let service: ProducerAnimeListServicing
+    private let requestLifecycleController: RequestScreenLifecycleController
 
     // MARK: - Pagination State
 
@@ -46,23 +47,36 @@ final class ProducerAnimeListViewModel: ObservableObject {
     init(
         producerId: Int,
         producerName: String,
-        service: ProducerAnimeListServicing
+        service: ProducerAnimeListServicing,
+        requestLifecycleScope: RequestLifecycleScope,
+        requestLifecycleManager: any RequestLifecycleManaging
     ) {
         self.producerId = producerId
         self.producerName = producerName
         self.service = service
+        self.requestLifecycleController = RequestScreenLifecycleController(
+            scope: requestLifecycleScope,
+            requestLifecycleManager: requestLifecycleManager
+        )
         bindFilters()
     }
 
     // MARK: - Public Methods
 
-    func loadIfNeeded() async {
+    func screenDidAppear() async {
+        guard await requestLifecycleController.activate() else { return }
         await paginationController.loadIfNeeded(
             setLoading: applyLoading,
             fetchPage: fetchPage,
             applyPresentation: applyPresentation,
             applyError: applyInitialLoadError
         )
+    }
+
+    func screenDidDisappear() {
+        filterRequestTask?.cancel()
+        filterRequestTask = nil
+        requestLifecycleController.deactivate()
     }
 
     func reload() async {

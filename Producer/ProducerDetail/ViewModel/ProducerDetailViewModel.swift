@@ -51,14 +51,24 @@ final class ProducerDetailViewModel: ObservableObject {
 
     private let malId: Int
     private let service: ProducerDetailServicing
+    private let requestLifecycleController: RequestScreenLifecycleController
     private var loadState: LoadState = .idle
     private var isLoadingRelatedAnime = false
 
     // MARK: - Lifecycle
 
-    init(malId: Int, service: ProducerDetailServicing) {
+    init(
+        malId: Int,
+        service: ProducerDetailServicing,
+        requestLifecycleScope: RequestLifecycleScope,
+        requestLifecycleManager: any RequestLifecycleManaging
+    ) {
         self.malId = malId
         self.service = service
+        self.requestLifecycleController = RequestScreenLifecycleController(
+            scope: requestLifecycleScope,
+            requestLifecycleManager: requestLifecycleManager
+        )
     }
 
     var detail: ProducerDetailDTO? {
@@ -67,9 +77,19 @@ final class ProducerDetailViewModel: ObservableObject {
 
     // MARK: - Public Methods
 
-    func load() async {
-        guard detail == nil, !loadState.isLoading else { return }
-        await fetchDetail()
+    func screenDidAppear() async {
+        guard await requestLifecycleController.activate() else { return }
+
+        if detail == nil {
+            guard !loadState.isLoading else { return }
+            await fetchDetail()
+        } else if case .loading = relatedAnimeState {
+            await fetchRelatedAnime()
+        }
+    }
+
+    func screenDidDisappear() {
+        requestLifecycleController.deactivate()
     }
 
     func reload() async {
@@ -85,6 +105,7 @@ final class ProducerDetailViewModel: ObservableObject {
     // MARK: - Private Methods
 
     private func fetchDetail() async {
+        let existingDetail = detail
         loadState = .loading
         screenState = .loading
         defer { loadState = .idle }
@@ -94,6 +115,7 @@ final class ProducerDetailViewModel: ObservableObject {
             screenState = .loaded(response.data)
             await fetchRelatedAnime()
         } catch is CancellationError {
+            screenState = existingDetail.map(ScreenState.loaded) ?? .loading
             return
         } catch {
             screenState = .error(FeatureLoadFailure(error))

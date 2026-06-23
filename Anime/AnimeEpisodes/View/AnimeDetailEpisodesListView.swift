@@ -91,7 +91,10 @@ private struct AnimeDetailEpisodesListBodyView: View {
         .navigationTitle("\(animeTitle) 集數")
         .navigationBarTitleDisplayMode(.inline)
         .task(id: malId, priority: .userInitiated) {
-            await viewModel.loadIfNeeded()
+            await viewModel.screenDidAppear()
+        }
+        .onDisappear {
+            viewModel.screenDidDisappear()
         }
     }
 }

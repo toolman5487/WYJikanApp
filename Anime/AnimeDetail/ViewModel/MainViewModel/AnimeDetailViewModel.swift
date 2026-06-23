@@ -32,15 +32,19 @@ final class AnimeDetailViewModel: ObservableObject {
     private let favoriteRepository: any FavoriteRepository
     private let broadcastReminderRepository: any AnimeBroadcastReminderRepository
     private let watchProgressController: AnimeWatchProgressController
+    private let requestLifecycleController: RequestScreenLifecycleController
     private let persistenceMutationController = PersistenceMutationController()
     private let supplementaryLoadingController = DetailSupplementaryLoadingController()
     private var myListCancellable: AnyCancellable?
+    private var shouldResumeSupplementaryLoading = false
 
     init(
         malId: Int,
         service: AnimeDetailServicing,
         favoriteRepository: any FavoriteRepository,
         broadcastReminderRepository: any AnimeBroadcastReminderRepository,
+        requestLifecycleScope: RequestLifecycleScope,
+        requestLifecycleManager: any RequestLifecycleManaging,
         watchProgressController: AnimeWatchProgressController = AnimeWatchProgressController()
     ) {
         self.malId = malId
@@ -48,6 +52,10 @@ final class AnimeDetailViewModel: ObservableObject {
         self.favoriteRepository = favoriteRepository
         self.broadcastReminderRepository = broadcastReminderRepository
         self.watchProgressController = watchProgressController
+        self.requestLifecycleController = RequestScreenLifecycleController(
+            scope: requestLifecycleScope,
+            requestLifecycleManager: requestLifecycleManager
+        )
         self.synopsisTranslationViewModel = SynopsisTranslationViewModel(context: .animeWork)
         connectToMyList()
     }
@@ -119,6 +127,20 @@ final class AnimeDetailViewModel: ObservableObject {
 
     // MARK: - Load
 
+    func screenDidAppear() async {
+        guard await requestLifecycleController.activate() else { return }
+
+        if detail == nil {
+            await load()
+        } else if shouldResumeSupplementaryLoading {
+            await resumeSupplementaryLoading()
+        }
+    }
+
+    func screenDidDisappear() {
+        requestLifecycleController.deactivate()
+    }
+
     func load(forceRefresh: Bool = false) async {
         let existingDetail = detail
         guard forceRefresh || existingDetail == nil else { return }
@@ -137,11 +159,14 @@ final class AnimeDetailViewModel: ObservableObject {
             prepareSupplementaryLoading(resetOnFailure: existingDetail == nil)
             screenState = .loaded(detail)
             resetSynopsisTranslation()
+            shouldResumeSupplementaryLoading = true
             await loadSupplementaryContent(
                 resetOnFailure: existingDetail == nil,
                 loadingPrepared: true
             )
+            shouldResumeSupplementaryLoading = Task.isCancelled
         } catch is CancellationError {
+            screenState = existingDetail.map(ScreenState.loaded) ?? .idle
             return
         } catch {
             if let existingDetail, forceRefresh {
@@ -151,6 +176,12 @@ final class AnimeDetailViewModel: ObservableObject {
                 resetSupplementaryContent()
             }
         }
+    }
+
+    private func resumeSupplementaryLoading() async {
+        shouldResumeSupplementaryLoading = true
+        await loadSupplementaryContent(resetOnFailure: false)
+        shouldResumeSupplementaryLoading = Task.isCancelled
     }
 
     private func loadSupplementaryContent(

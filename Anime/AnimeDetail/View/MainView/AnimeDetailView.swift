@@ -214,7 +214,10 @@ private struct AnimeDetailBodyView: View {
             }
         }
         .task(id: malId, priority: .userInitiated) {
-            await viewModel.load()
+            await viewModel.screenDidAppear()
+        }
+        .onDisappear {
+            viewModel.screenDidDisappear()
         }
         .task(id: broadcastReminderSyncTrigger, priority: .utility) {
             guard appPersistenceStore.isReady, currentAnime != nil else { return }

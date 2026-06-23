@@ -14,15 +14,21 @@ nonisolated protocol CharacterDetailServicing: Sendable {
 nonisolated final class CharacterDetailService: CharacterDetailServicing {
 
     private let apiService: JikanAPIServicing
+    private let lifecycleScope: RequestLifecycleScope
 
-    init(apiService: JikanAPIServicing = JikanAPIService.shared) {
+    init(
+        apiService: JikanAPIServicing = JikanAPIService.shared,
+        lifecycleScope: RequestLifecycleScope = .independent
+    ) {
         self.apiService = apiService
+        self.lifecycleScope = lifecycleScope
     }
 
     func fetchCharacterDetail(malId: Int) async throws -> CharacterDetailResponse {
         try await apiService.fetch(
             endpoint: APIConfig.Characters.full(id: malId),
-            cachePolicy: .detail()
+            cachePolicy: .detail(),
+            lifecycleScope: lifecycleScope
         )
     }
 }

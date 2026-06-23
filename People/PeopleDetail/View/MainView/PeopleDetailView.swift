@@ -100,7 +100,10 @@ private struct PeopleDetailBodyView: View {
             )
         }
         .task(id: malId, priority: .userInitiated) {
-            await viewModel.load()
+            await viewModel.screenDidAppear()
+        }
+        .onDisappear {
+            viewModel.screenDidDisappear()
         }
     }
 

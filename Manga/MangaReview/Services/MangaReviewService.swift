@@ -14,13 +14,23 @@ nonisolated protocol MangaReviewServicing: Sendable {
 nonisolated final class MangaReviewService: MangaReviewServicing {
 
     private let apiService: JikanAPIServicing
+    private let lifecycleScope: RequestLifecycleScope
 
-    init(apiService: JikanAPIServicing = JikanAPIService.shared) {
+    init(
+        apiService: JikanAPIServicing = JikanAPIService.shared,
+        lifecycleScope: RequestLifecycleScope = .independent
+    ) {
         self.apiService = apiService
+        self.lifecycleScope = lifecycleScope
     }
 
     func fetchReviews(malId: Int, page: Int) async throws -> MangaReviewsListResponse {
         let query = [URLQueryItem(name: "page", value: String(page))]
-        return try await apiService.fetch(endpoint: APIConfig.Manga.reviews(id: malId), queryItems: query)
+        return try await apiService.fetch(
+            endpoint: APIConfig.Manga.reviews(id: malId),
+            cachePolicy: .remoteOnly,
+            queryItems: query,
+            lifecycleScope: lifecycleScope
+        )
     }
 }

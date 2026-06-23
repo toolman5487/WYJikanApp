@@ -48,7 +48,10 @@ private struct AnimeCategoryDetailBodyView: View {
             .navigationBarTitleDisplayMode(.inline)
             .background(Color(.systemBackground))
             .task(priority: .userInitiated) {
-                await viewModel.loadIfNeeded()
+                await viewModel.screenDidAppear()
+            }
+            .onDisappear {
+                viewModel.screenDidDisappear()
             }
     }
 

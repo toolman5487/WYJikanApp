@@ -30,6 +30,7 @@ final class AnimeDetailEpisodesListViewModel: ObservableObject {
     private let malId: Int
     private let service: any AnimeDetailServicing
     private let rowPresenter: AnimeDetailEpisodeRowPresenter
+    private let requestLifecycleController: RequestScreenLifecycleController
     private var currentPage = 0
     private var hasNextPage = false
     private var hasLoaded = false
@@ -39,16 +40,27 @@ final class AnimeDetailEpisodesListViewModel: ObservableObject {
     init(
         malId: Int,
         service: any AnimeDetailServicing,
+        requestLifecycleScope: RequestLifecycleScope,
+        requestLifecycleManager: any RequestLifecycleManaging,
         rowPresenter: AnimeDetailEpisodeRowPresenter = AnimeDetailEpisodeRowPresenter()
     ) {
         self.malId = malId
         self.service = service
+        self.requestLifecycleController = RequestScreenLifecycleController(
+            scope: requestLifecycleScope,
+            requestLifecycleManager: requestLifecycleManager
+        )
         self.rowPresenter = rowPresenter
     }
 
-    func loadIfNeeded() async {
+    func screenDidAppear() async {
+        guard await requestLifecycleController.activate() else { return }
         guard !hasLoaded else { return }
         await loadFirstPage()
+    }
+
+    func screenDidDisappear() {
+        requestLifecycleController.deactivate()
     }
 
     func loadMore() async {
