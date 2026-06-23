@@ -20,6 +20,7 @@ struct RandomPickHeroSkeletonView: View {
                 )
             )
             .frame(height: RandomPickHeroLayout.heroHeight)
+            .allowsHitTesting(false)
     }
 }
 

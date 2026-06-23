@@ -191,9 +191,12 @@ struct MainMyListView: View {
         CapsuleFilterBarView(
             tags: MyListFilter.allCases,
             title: { $0.title },
-            selection: $viewModel.selectedFilter
+            selection: $viewModel.selectedFilter,
+            selectionAnimation: nil
         )
         .frame(maxWidth: .infinity, alignment: .leading)
+        .contentShape(Rectangle())
+        .zIndex(1)
     }
 
     @ViewBuilder

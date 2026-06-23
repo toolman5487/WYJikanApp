@@ -35,76 +35,92 @@ struct RandomPickHeroCardView<DetailDestination: View>: View {
     // MARK: - Body
 
     var body: some View {
-        GeometryReader { proxy in
-            ZStack {
-                heroBackground
-                    .frame(width: proxy.size.width, height: proxy.size.height)
-                    .clipped()
+        Color.clear
+            .frame(maxWidth: .infinity)
+            .frame(height: RandomPickHeroLayout.heroHeight)
+            .overlay {
+                GeometryReader { proxy in
+                    heroCardBody(containerWidth: proxy.size.width)
+                }
+            }
+            .clipShape(RoundedRectangle(cornerRadius: RandomPickHeroLayout.cardCornerRadius, style: .continuous))
+            .overlay(alignment: .topTrailing) {
+                if item != nil {
+                    MyListCollectionStatusBadgeView(isFavorite: isFavorite)
+                        .padding(12)
+                        .allowsHitTesting(false)
+                }
+            }
+            .overlay {
+                if isDrawing {
+                    Group {
+                        RoundedRectangle(cornerRadius: RandomPickHeroLayout.cardCornerRadius, style: .continuous)
+                            .fill(.ultraThinMaterial)
 
-                LinearGradient(
-                    colors: [
-                        Color.black.opacity(0.18),
-                        Color.black.opacity(0.74)
-                    ],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
+                        VStack(spacing: 12) {
+                            ProgressView()
+                                .tint(ThemeColor.sakura)
 
-                VStack(alignment: .leading, spacing: 12) {
-                    heroBadge
-                        .padding(.trailing, 48)
-
-                    Spacer(minLength: 0)
-
-                    HStack(alignment: .bottom, spacing: 16) {
-                        posterPanel(width: posterWidth(for: proxy.size.width))
-
-                        VStack(alignment: .leading, spacing: 8) {
-                            heroHeadline
-                            heroMetadata
-                            heroSynopsis
+                            Text(style.drawingText)
+                                .font(.footnote.weight(.medium))
+                                .foregroundStyle(ThemeColor.textPrimary)
                         }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .layoutPriority(1)
                     }
-
-                    actionButtons
+                    .allowsHitTesting(false)
                 }
-                .padding(.horizontal, RandomPickHeroLayout.horizontalPadding)
-                .padding(.vertical, RandomPickHeroLayout.verticalPadding)
             }
-        }
-        .clipShape(RoundedRectangle(cornerRadius: RandomPickHeroLayout.cardCornerRadius, style: .continuous))
-        .frame(maxWidth: .infinity)
-        .frame(height: RandomPickHeroLayout.heroHeight)
-        .overlay(alignment: .topTrailing) {
-            if item != nil {
-                MyListCollectionStatusBadgeView(isFavorite: isFavorite)
-                    .padding(12)
-            }
-        }
-        .overlay {
-            if isDrawing {
+            .overlay {
                 RoundedRectangle(cornerRadius: RandomPickHeroLayout.cardCornerRadius, style: .continuous)
-                    .fill(.ultraThinMaterial)
-
-                VStack(spacing: 12) {
-                    ProgressView()
-                        .tint(ThemeColor.sakura)
-
-                    Text(style.drawingText)
-                        .font(.footnote.weight(.medium))
-                        .foregroundStyle(ThemeColor.textPrimary)
-                }
+                    .strokeBorder(Color.white.opacity(0.08))
+                    .allowsHitTesting(false)
             }
-        }
-        .overlay {
-            RoundedRectangle(cornerRadius: RandomPickHeroLayout.cardCornerRadius, style: .continuous)
-                .strokeBorder(Color.white.opacity(0.08))
-        }
     }
 
     // MARK: - Private Methods
+
+    private func heroCardBody(containerWidth: CGFloat) -> some View {
+        let resolvedWidth = max(containerWidth, 1)
+        let resolvedHeight = RandomPickHeroLayout.heroHeight
+
+        return ZStack {
+            heroBackground
+                .frame(width: resolvedWidth, height: resolvedHeight)
+                .clipped()
+
+            LinearGradient(
+                colors: [
+                    Color.black.opacity(0.18),
+                    Color.black.opacity(0.74)
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .allowsHitTesting(false)
+
+            VStack(alignment: .leading, spacing: 12) {
+                heroBadge
+                    .padding(.trailing, 48)
+
+                Spacer(minLength: 0)
+
+                HStack(alignment: .bottom, spacing: 16) {
+                    posterPanel(width: posterWidth(for: resolvedWidth))
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        heroHeadline
+                        heroMetadata
+                        heroSynopsis
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .layoutPriority(1)
+                }
+
+                actionButtons
+            }
+            .padding(.horizontal, RandomPickHeroLayout.horizontalPadding)
+            .padding(.vertical, RandomPickHeroLayout.verticalPadding)
+        }
+    }
 
     private func posterWidth(for containerWidth: CGFloat) -> CGFloat {
         min(118, max(92, containerWidth * 0.32))
@@ -120,6 +136,10 @@ struct RandomPickHeroCardView<DetailDestination: View>: View {
             } placeholder: {
                 Color(.secondarySystemFill)
             }
+            .frame(
+                minWidth: 1,
+                minHeight: RandomPickHeroLayout.heroHeight
+            )
             .blur(radius: 18)
             .scaleEffect(1.08)
             .overlay(Color.black.opacity(0.18))
