@@ -13,6 +13,7 @@ struct MyListDependencies {
     private let broadcastReminderRepository: any AnimeBroadcastReminderRepository
     private let searchHistoryRepository: any MainSearchHistoryRepository
     private let randomPickService: RandomPickServicing
+    private let requestLifecycleManager: any RequestLifecycleManaging
     private let clearApplicationCache: () async -> Void
 
     // MARK: - Lifecycle
@@ -22,12 +23,14 @@ struct MyListDependencies {
         broadcastReminderRepository: any AnimeBroadcastReminderRepository,
         searchHistoryRepository: any MainSearchHistoryRepository,
         randomPickService: RandomPickServicing,
+        requestLifecycleManager: any RequestLifecycleManaging,
         clearApplicationCache: @escaping () async -> Void
     ) {
         self.favoriteRepository = favoriteRepository
         self.broadcastReminderRepository = broadcastReminderRepository
         self.searchHistoryRepository = searchHistoryRepository
         self.randomPickService = randomPickService
+        self.requestLifecycleManager = requestLifecycleManager
         self.clearApplicationCache = clearApplicationCache
     }
 
@@ -38,11 +41,17 @@ struct MyListDependencies {
     }
 
     func makeRandomAnimeViewModel() -> RandomHeroViewModel {
-        RandomHeroViewModel(service: randomPickService)
+        RandomHeroViewModel(
+            service: randomPickService,
+            requestLifecycleManager: requestLifecycleManager
+        )
     }
 
     func makeRandomMangaViewModel() -> RandomMangaViewModel {
-        RandomMangaViewModel(service: randomPickService)
+        RandomMangaViewModel(
+            service: randomPickService,
+            requestLifecycleManager: requestLifecycleManager
+        )
     }
 
     func makeMangaReadingStatusQueryViewModel() -> MangaReadingStatusQueryViewModel {

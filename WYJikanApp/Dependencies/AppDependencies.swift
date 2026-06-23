@@ -16,6 +16,7 @@ struct AppDependencies {
 
     let mainHomeService: MainHomeServicing
     let homeWatchService: HomeWatchServicing
+    let homeWatchListService: HomeWatchServicing
     let mainCategoryListService: MainCategoryListServicing
     let mainSearchService: MainSearchServicing
     let mainNewsService: MainNewsServicing
@@ -62,6 +63,7 @@ struct AppDependencies {
             broadcastReminderRepository: broadcastReminderRepository,
             searchHistoryRepository: mainSearchHistoryRepository,
             randomPickService: randomPickService,
+            requestLifecycleManager: RequestLifecycleManager.shared,
             clearApplicationCache: {
                 await JikanAPIService.shared.clearCache()
                 await mainNewsService.clearCache()
@@ -73,6 +75,7 @@ struct AppDependencies {
             homeLoadCoordinator: HomeLoadCoordinator(),
             mainHomeService: MainHomeService(),
             homeWatchService: HomeWatchService(),
+            homeWatchListService: HomeWatchService(lifecycleScope: .homeWatchList),
             mainCategoryListService: mainCategoryListService,
             mainSearchService: MainSearchService(),
             mainNewsService: mainNewsService,
@@ -106,6 +109,7 @@ struct AppDependencies {
         MainSearchViewModel(
             service: mainSearchService,
             historyRepository: mainSearchHistoryRepository,
+            requestLifecycleManager: RequestLifecycleManager.shared,
             initialKind: initialKind,
             initialQuery: initialQuery,
             initialSortOption: initialSortOption
@@ -125,26 +129,40 @@ struct AppDependencies {
                 genreMangaViewModel: GenreMangaViewModel(service: mainCategoryListService)
             ),
             peopleListViewModel: PeopleListViewModel(service: mainCategoryListService),
-            characterListViewModel: CharacterListViewModel(service: mainCategoryListService)
+            characterListViewModel: CharacterListViewModel(service: mainCategoryListService),
+            requestLifecycleManager: RequestLifecycleManager.shared
         )
     }
 
     // MARK: - Home Factories
 
     func makeHomeTodayAnimeScheduleListViewModel() -> HomeTodayAnimeScheduleListViewModel {
-        HomeTodayAnimeScheduleListViewModel(service: homeTodayAnimeScheduleListService)
+        HomeTodayAnimeScheduleListViewModel(
+            service: homeTodayAnimeScheduleListService,
+            requestLifecycleManager: RequestLifecycleManager.shared
+        )
     }
 
     func makeHomeTrendingAnimeListViewModel() -> HomeTrendingAnimeListViewModel {
-        HomeTrendingAnimeListViewModel(service: homeTrendingAnimeListService)
+        HomeTrendingAnimeListViewModel(
+            service: homeTrendingAnimeListService,
+            requestLifecycleManager: RequestLifecycleManager.shared
+        )
     }
 
     func makeHomeTrendingMangaListViewModel() -> HomeTrendingMangaListViewModel {
-        HomeTrendingMangaListViewModel(service: homeTrendingMangaListService)
+        HomeTrendingMangaListViewModel(
+            service: homeTrendingMangaListService,
+            requestLifecycleManager: RequestLifecycleManager.shared
+        )
     }
 
     func makeHomeWatchListViewModel(initialFeed: HomeWatchFeedKind) -> HomeWatchListViewModel {
-        HomeWatchListViewModel(initialFeed: initialFeed, service: homeWatchService)
+        HomeWatchListViewModel(
+            initialFeed: initialFeed,
+            service: homeWatchListService,
+            requestLifecycleManager: RequestLifecycleManager.shared
+        )
     }
 
     // MARK: - Detail Factories

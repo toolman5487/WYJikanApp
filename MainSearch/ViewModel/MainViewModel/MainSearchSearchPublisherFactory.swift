@@ -82,6 +82,9 @@ struct MainSearchSearchPublisherFactory {
                         return
                     }
                     subject.send(.result(intent: intent, page: page, error: nil))
+                } catch is CancellationError {
+                    subject.send(completion: .finished)
+                    return
                 } catch {
                     guard !Task.isCancelled else {
                         subject.send(completion: .finished)

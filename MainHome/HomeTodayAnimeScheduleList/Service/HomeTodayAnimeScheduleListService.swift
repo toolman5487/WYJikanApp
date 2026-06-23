@@ -47,7 +47,7 @@ nonisolated final class HomeTodayAnimeScheduleListService: HomeTodayAnimeSchedul
                 URLQueryItem(name: "limit", value: String(limit)),
                 URLQueryItem(name: "sfw", value: "true")
             ],
-            scope: .home
+            lifecycleScope: .homeTodayAnimeScheduleList
         )
     }
 }

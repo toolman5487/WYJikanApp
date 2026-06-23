@@ -74,7 +74,7 @@ nonisolated final class MainCategoryListService: MainCategoryListServicing {
         try await apiService.fetch(
             endpoint: APIConfig.Genres.anime,
             cachePolicy: .genreList(),
-            scope: .categoryList
+            lifecycleScope: .mainCategoryList
         )
     }
 
@@ -82,7 +82,7 @@ nonisolated final class MainCategoryListService: MainCategoryListServicing {
         try await apiService.fetch(
             endpoint: APIConfig.Genres.manga,
             cachePolicy: .genreList(),
-            scope: .categoryList
+            lifecycleScope: .mainCategoryList
         )
     }
 
@@ -95,7 +95,7 @@ nonisolated final class MainCategoryListService: MainCategoryListServicing {
             endpoint: APIConfig.Anime.list,
             cachePolicy: .cacheFirst(ttl: JikanCacheDuration.genreItems),
             queryItems: queryItems,
-            scope: .categoryList
+            lifecycleScope: .mainCategoryList
         )
     }
 
@@ -108,7 +108,7 @@ nonisolated final class MainCategoryListService: MainCategoryListServicing {
             endpoint: APIConfig.Manga.list,
             cachePolicy: .cacheFirst(ttl: JikanCacheDuration.genreItems),
             queryItems: queryItems,
-            scope: .categoryList
+            lifecycleScope: .mainCategoryList
         )
     }
 
@@ -118,7 +118,7 @@ nonisolated final class MainCategoryListService: MainCategoryListServicing {
             endpoint: request.endpoint,
             cachePolicy: request.cachePolicy,
             queryItems: request.queryItems,
-            scope: .categoryList
+            lifecycleScope: .mainCategoryList
         )
     }
 
@@ -128,7 +128,7 @@ nonisolated final class MainCategoryListService: MainCategoryListServicing {
             endpoint: request.endpoint,
             cachePolicy: request.cachePolicy,
             queryItems: request.queryItems,
-            scope: .categoryList
+            lifecycleScope: .mainCategoryList
         )
     }
 }

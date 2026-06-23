@@ -114,8 +114,7 @@ struct MainMyListView: View {
                 Text(viewModel.persistenceMutationState.failureMessage ?? "")
             }
             .onDisappear {
-                randomAnimeViewModel.stop()
-                randomMangaViewModel.stop()
+                stopRandomPickRequests()
             }
         }
     }
@@ -139,7 +138,7 @@ struct MainMyListView: View {
             .padding(.bottom, Layout.bottomPadding)
         }
         .task(id: viewModel.selectedFilter, priority: .userInitiated) {
-            loadRandomPickIfNeeded(for: viewModel.selectedFilter)
+            await updateRandomPickLifecycle(for: viewModel.selectedFilter)
         }
     }
 
@@ -334,15 +333,23 @@ struct MainMyListView: View {
         presentation.filteredItems.isEmpty ? .empty : .populated
     }
 
-    private func loadRandomPickIfNeeded(for filter: MyListFilter) {
+    private func updateRandomPickLifecycle(for filter: MyListFilter) async {
         switch filter {
         case .all:
-            break
+            randomAnimeViewModel.screenDidDisappear()
+            randomMangaViewModel.screenDidDisappear()
         case .anime:
-            randomAnimeViewModel.loadIfNeeded()
+            randomMangaViewModel.screenDidDisappear()
+            await randomAnimeViewModel.screenDidAppear()
         case .manga:
-            randomMangaViewModel.loadIfNeeded()
+            randomAnimeViewModel.screenDidDisappear()
+            await randomMangaViewModel.screenDidAppear()
         }
+    }
+
+    private func stopRandomPickRequests() {
+        randomAnimeViewModel.screenDidDisappear()
+        randomMangaViewModel.screenDidDisappear()
     }
 
     private func showGenreCollectionsDetail(

@@ -28,16 +28,20 @@ final class MainSearchViewModel: ObservableObject {
     private let historyRepository: any MainSearchHistoryRepository
     private let sorter: MainSearchResultSorter
     private let presentationBuilder: MainSearchPresentationBuilder
+    private let requestLifecycleController: RequestScreenLifecycleController
 
     private var cancellables = Set<AnyCancellable>()
     private var pagination = MainSearchPaginationState()
     private var loadMoreTask: Task<Void, Never>?
+    private let resumeSearchSubject = PassthroughSubject<MainSearchEvent, Never>()
+    private var shouldResumeSearch = false
 
     // MARK: - Lifecycle
 
     init(
         service: MainSearchServicing,
         historyRepository: any MainSearchHistoryRepository,
+        requestLifecycleManager: any RequestLifecycleManaging,
         initialKind: MainSearchKind = .anime,
         initialQuery: String = "",
         initialSortOption: MainSearchSortOption = .defaultOption,
@@ -51,6 +55,10 @@ final class MainSearchViewModel: ObservableObject {
         self.historyRepository = historyRepository
         self.sorter = sorter
         self.presentationBuilder = presentationBuilder
+        self.requestLifecycleController = RequestScreenLifecycleController(
+            scope: .mainSearch,
+            requestLifecycleManager: requestLifecycleManager
+        )
         self.query = initialQuery
         self.kind = initialKind
         self.searchHistory = historyRepository.loadHistory()
@@ -63,6 +71,23 @@ final class MainSearchViewModel: ObservableObject {
     }
 
     // MARK: - Public
+
+    func screenDidAppear() async {
+        guard await requestLifecycleController.activate() else { return }
+        guard shouldResumeSearch else { return }
+
+        shouldResumeSearch = false
+        resumeSearchSubject.send(.queryAdjusted)
+    }
+
+    func screenDidDisappear() {
+        shouldResumeSearch = pagination.isSearching
+        loadMoreTask?.cancel()
+        loadMoreTask = nil
+        pagination.cancelLoadMore()
+        applySortedResults()
+        requestLifecycleController.deactivate()
+    }
 
     func loadMoreIfNeeded(currentRow: MainSearchResultRow) {
         guard pagination.shouldLoadMore(currentRow: currentRow) else { return }
@@ -125,9 +150,13 @@ private extension MainSearchViewModel {
             .dropFirst()
             .map { _ in MainSearchEvent.kindAdjusted }
 
-        let triggers = Publishers.Merge(
+        let inputTriggers = Publishers.Merge(
             Publishers.Merge(initialQuerySync, queryPath),
             kindPath
+        )
+        let triggers = Publishers.Merge(
+            inputTriggers,
+            resumeSearchSubject
         )
 
         triggers
@@ -260,7 +289,10 @@ private extension MainSearchViewModel {
                 self.pagination.finishLoadMore(page: page)
                 self.applySortedResults()
             } catch {
-                guard !Task.isCancelled else { return }
+                guard !Task.isCancelled,
+                      !(error is CancellationError) else {
+                    return
+                }
                 self.pagination.failLoadMore(FeatureLoadFailure(error))
                 self.loadMoreState = self.presentationBuilder.loadMoreState(
                     requestState: self.pagination.requestState,

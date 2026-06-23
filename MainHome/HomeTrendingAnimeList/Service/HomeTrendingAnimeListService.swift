@@ -37,7 +37,7 @@ nonisolated final class HomeTrendingAnimeListService: HomeTrendingAnimeListServi
                 URLQueryItem(name: "page", value: String(page)),
                 URLQueryItem(name: "limit", value: String(limit))
             ],
-            scope: .home
+            lifecycleScope: .homeTrendingAnimeList
         )
     }
 }

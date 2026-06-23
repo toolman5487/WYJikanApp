@@ -31,6 +31,7 @@ final class HomeWatchListViewModel: ObservableObject {
     @Published private(set) var loadMoreState: LoadMoreState = .hidden
 
     private let service: HomeWatchServicing
+    private let requestLifecycleController: RequestScreenLifecycleController
     private let pageSize = 12
     private let paginationController = PaginatedListLoadingController<HomeWatchListItem>()
     private var feedChangeTask: Task<Void, Never>?
@@ -39,10 +40,15 @@ final class HomeWatchListViewModel: ObservableObject {
 
     init(
         initialFeed: HomeWatchFeedKind = .latestEpisodes,
-        service: HomeWatchServicing
+        service: HomeWatchServicing,
+        requestLifecycleManager: any RequestLifecycleManaging
     ) {
         self.selectedFeed = initialFeed
         self.service = service
+        self.requestLifecycleController = RequestScreenLifecycleController(
+            scope: .homeWatchList,
+            requestLifecycleManager: requestLifecycleManager
+        )
     }
 
     deinit {
@@ -70,7 +76,8 @@ final class HomeWatchListViewModel: ObservableObject {
 
     // MARK: - Public Methods
 
-    func loadIfNeeded() async {
+    func screenDidAppear() async {
+        guard await requestLifecycleController.activate() else { return }
         await paginationController.loadIfNeeded(
             setLoading: applyLoading,
             fetchPage: { [weak self] page in
@@ -82,6 +89,12 @@ final class HomeWatchListViewModel: ObservableObject {
             applyPresentation: applyPresentation,
             applyError: applyInitialLoadError
         )
+    }
+
+    func screenDidDisappear() {
+        feedChangeTask?.cancel()
+        feedChangeTask = nil
+        requestLifecycleController.deactivate()
     }
 
     func reload() async {

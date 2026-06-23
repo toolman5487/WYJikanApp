@@ -32,6 +32,7 @@ final class HomeTrendingAnimeListViewModel: ObservableObject {
 
     private let service: HomeTrendingAnimeListServicing
     private let presentationBuilder: HomeTrendingAnimeListPresentationBuilder
+    private let requestLifecycleController: RequestScreenLifecycleController
     private let pageSize = 12
 
     private let paginationController = PaginatedListLoadingController<HomeTrendingAnimeListItem>()
@@ -41,10 +42,15 @@ final class HomeTrendingAnimeListViewModel: ObservableObject {
 
     init(
         service: HomeTrendingAnimeListServicing,
+        requestLifecycleManager: any RequestLifecycleManaging,
         presentationBuilder: HomeTrendingAnimeListPresentationBuilder = HomeTrendingAnimeListPresentationBuilder()
     ) {
         self.service = service
         self.presentationBuilder = presentationBuilder
+        self.requestLifecycleController = RequestScreenLifecycleController(
+            scope: .homeTrendingAnimeList,
+            requestLifecycleManager: requestLifecycleManager
+        )
         bindSelectedSort()
     }
 
@@ -65,13 +71,18 @@ final class HomeTrendingAnimeListViewModel: ObservableObject {
 
     // MARK: - Public Methods
 
-    func loadIfNeeded() async {
+    func screenDidAppear() async {
+        guard await requestLifecycleController.activate() else { return }
         await paginationController.loadIfNeeded(
             setLoading: applyLoading,
             fetchPage: fetchPage,
             applyPresentation: applyPresentation,
             applyError: applyInitialLoadError
         )
+    }
+
+    func screenDidDisappear() {
+        requestLifecycleController.deactivate()
     }
 
     func reload() async {

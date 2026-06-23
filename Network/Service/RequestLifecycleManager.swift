@@ -14,6 +14,64 @@ nonisolated enum RequestLifecycleScope: Hashable, Sendable {
     case independent
 }
 
+nonisolated extension RequestLifecycleScope {
+    static let mainCategoryList = RequestLifecycleScope.screen(
+        RequestScreenScope(
+            identifier: "mainCategoryList",
+            parentTab: .categoryList
+        )
+    )
+
+    static let homeTodayAnimeScheduleList = RequestLifecycleScope.screen(
+        RequestScreenScope(
+            identifier: "homeTodayAnimeScheduleList",
+            parentTab: .home
+        )
+    )
+
+    static let homeTrendingAnimeList = RequestLifecycleScope.screen(
+        RequestScreenScope(
+            identifier: "homeTrendingAnimeList",
+            parentTab: .home
+        )
+    )
+
+    static let homeTrendingMangaList = RequestLifecycleScope.screen(
+        RequestScreenScope(
+            identifier: "homeTrendingMangaList",
+            parentTab: .home
+        )
+    )
+
+    static let homeWatchList = RequestLifecycleScope.screen(
+        RequestScreenScope(
+            identifier: "homeWatchList",
+            parentTab: .home
+        )
+    )
+
+    static let mainSearch = RequestLifecycleScope.screen(
+        RequestScreenScope(
+            identifier: "mainSearch",
+            parentTab: .search
+        )
+    )
+
+    static let mainMyListRandomAnime = RequestLifecycleScope.screen(
+        RequestScreenScope(
+            identifier: "mainMyListRandomAnime",
+            parentTab: .myList
+        )
+    )
+
+    static let mainMyListRandomManga = RequestLifecycleScope.screen(
+        RequestScreenScope(
+            identifier: "mainMyListRandomManga",
+            parentTab: .myList
+        )
+    )
+}
+
 // MARK: - RequestScreenScope
 
 nonisolated struct RequestScreenScope: Hashable, Sendable {
@@ -45,9 +103,61 @@ nonisolated struct RequestLifecycleSnapshot: Sendable {
     let runningRequestCounts: [RequestLifecycleScope: Int]
 }
 
+// MARK: - RequestLifecycleManaging
+
+nonisolated protocol RequestLifecycleManaging: Sendable {
+    func activate(_ scope: RequestLifecycleScope) async
+    func deactivate(
+        _ scope: RequestLifecycleScope,
+        cancelQueued: Bool,
+        cancelRunning: Bool
+    ) async
+    func cancelRequests(in scope: RequestLifecycleScope) async
+}
+
+// MARK: - RequestScreenLifecycleController
+
+@MainActor
+final class RequestScreenLifecycleController {
+    private let scope: RequestLifecycleScope
+    private let requestLifecycleManager: any RequestLifecycleManaging
+    private var isActive = false
+
+    init(
+        scope: RequestLifecycleScope,
+        requestLifecycleManager: any RequestLifecycleManaging
+    ) {
+        self.scope = scope
+        self.requestLifecycleManager = requestLifecycleManager
+    }
+
+    func activate() async -> Bool {
+        isActive = true
+        await requestLifecycleManager.activate(scope)
+        return isActive && !Task.isCancelled
+    }
+
+    func deactivate() {
+        isActive = false
+
+        let scope = scope
+        let requestLifecycleManager = requestLifecycleManager
+        Task { [weak self] in
+            await requestLifecycleManager.deactivate(
+                scope,
+                cancelQueued: true,
+                cancelRunning: true
+            )
+
+            guard let self, self.isActive else { return }
+            await requestLifecycleManager.activate(scope)
+        }
+    }
+}
+
 // MARK: - RequestLifecycleManager
 
-actor RequestLifecycleManager {
+actor RequestLifecycleManager: RequestLifecycleManaging {
     static let shared = RequestLifecycleManager()
 
     private struct PendingRequest {

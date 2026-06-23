@@ -129,7 +129,7 @@ nonisolated final class MainSearchService: MainSearchServicing {
                 endpoint: request.endpoint,
                 cachePolicy: request.cachePolicy,
                 queryItems: request.queryItems,
-                scope: .search
+                lifecycleScope: .mainSearch
             )
             return MainSearchPage(
                 rows: response.data.map { MainSearchResultRow.from(anime: $0) },
@@ -141,7 +141,7 @@ nonisolated final class MainSearchService: MainSearchServicing {
                 endpoint: request.endpoint,
                 cachePolicy: request.cachePolicy,
                 queryItems: request.queryItems,
-                scope: .search
+                lifecycleScope: .mainSearch
             )
             return MainSearchPage(
                 rows: response.data.map { MainSearchResultRow.from(manga: $0) },
@@ -153,7 +153,7 @@ nonisolated final class MainSearchService: MainSearchServicing {
                 endpoint: request.endpoint,
                 cachePolicy: request.cachePolicy,
                 queryItems: request.queryItems,
-                scope: .search
+                lifecycleScope: .mainSearch
             )
             return MainSearchPage(
                 rows: response.data.map { MainSearchResultRow.from(character: $0) },
@@ -165,7 +165,7 @@ nonisolated final class MainSearchService: MainSearchServicing {
                 endpoint: request.endpoint,
                 cachePolicy: request.cachePolicy,
                 queryItems: request.queryItems,
-                scope: .search
+                lifecycleScope: .mainSearch
             )
             return MainSearchPage(
                 rows: response.data.map { MainSearchResultRow.from(person: $0) },

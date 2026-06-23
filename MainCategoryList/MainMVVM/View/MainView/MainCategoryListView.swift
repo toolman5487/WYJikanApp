@@ -29,10 +29,10 @@ struct MainCategoryListView: View {
             scrollView
                 .toolbar(.hidden, for: .navigationBar)
                 .task(priority: .userInitiated) {
-                    viewModel.prepareSelectedKind(platform: .current)
+                    await viewModel.screenDidAppear(platform: .current)
                 }
                 .onDisappear {
-                    viewModel.stopLoading()
+                    viewModel.screenDidDisappear()
                 }
         }
     }

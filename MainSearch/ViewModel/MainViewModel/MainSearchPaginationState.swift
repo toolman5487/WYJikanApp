@@ -52,6 +52,10 @@ struct MainSearchPaginationState: Sendable {
         currentPage + 1
     }
 
+    var isSearching: Bool {
+        requestState == .searching
+    }
+
     // MARK: - Loading Rules
 
     func shouldLoadMore(currentRow: MainSearchResultRow) -> Bool {
@@ -112,6 +116,11 @@ struct MainSearchPaginationState: Sendable {
 
     mutating func failLoadMore(_ failure: FeatureLoadFailure) {
         requestState = .loadMoreError(failure)
+    }
+
+    mutating func cancelLoadMore() {
+        guard requestState == .loadingMore else { return }
+        requestState = .idle
     }
 
     mutating func updateLoadMoreTriggers(from sortedRows: [MainSearchResultRow]) {

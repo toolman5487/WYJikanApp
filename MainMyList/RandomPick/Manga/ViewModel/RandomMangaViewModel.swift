@@ -104,6 +104,7 @@ final class RandomMangaViewModel: ObservableObject {
     private let service: RandomPickServicing
     private let drawCooldownTimer: GlobalCooldownTimer
     private let storage: UserDefaults
+    private let requestLifecycleController: RequestScreenLifecycleController
 
     private var drawTask: Task<Void, Never>?
     private var cooldownCancellable: AnyCancellable?
@@ -111,10 +112,15 @@ final class RandomMangaViewModel: ObservableObject {
 
     init(
         service: RandomPickServicing,
+        requestLifecycleManager: any RequestLifecycleManaging,
         storage: UserDefaults = .standard
     ) {
         self.service = service
         self.storage = storage
+        self.requestLifecycleController = RequestScreenLifecycleController(
+            scope: .mainMyListRandomManga,
+            requestLifecycleManager: requestLifecycleManager
+        )
         self.drawCooldownTimer = GlobalCooldownTimer(
             key: "manga.random.draw",
             cooldownSeconds: Self.drawCooldownSeconds
@@ -130,7 +136,17 @@ final class RandomMangaViewModel: ObservableObject {
             }
     }
 
-    func loadIfNeeded() {
+    func screenDidAppear() async {
+        guard await requestLifecycleController.activate() else { return }
+        loadIfNeeded()
+    }
+
+    func screenDidDisappear() {
+        stop()
+        requestLifecycleController.deactivate()
+    }
+
+    private func loadIfNeeded() {
         guard randomPick == nil, !hasAttemptedAutomaticDraw else { return }
         hasAttemptedAutomaticDraw = true
         drawRandomManga(isAutomatic: true)
@@ -162,6 +178,8 @@ final class RandomMangaViewModel: ObservableObject {
                 self.drawState = .ready
                 self.drawCooldownTimer.startCooldown()
                 self.updateCooldownState(seconds: self.drawCooldownTimer.remainingSeconds)
+            } catch is CancellationError {
+                self.handleCancelledDraw()
             } catch {
                 guard !Task.isCancelled else { return }
                 await self.waitForMinimumLoadingDuration(since: drawStartedAt)
@@ -210,6 +228,14 @@ final class RandomMangaViewModel: ObservableObject {
                 break
             }
         }
+    }
+
+    private func handleCancelledDraw() {
+        guard isDrawing else { return }
+        if randomPick == nil {
+            hasAttemptedAutomaticDraw = false
+        }
+        drawState = randomPick == nil ? .idle : .ready
     }
 
     private func persistRandomPick(_ pick: MangaListRandomDTO) {

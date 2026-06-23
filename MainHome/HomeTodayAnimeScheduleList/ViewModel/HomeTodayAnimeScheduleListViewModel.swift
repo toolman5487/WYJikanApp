@@ -29,6 +29,7 @@ final class HomeTodayAnimeScheduleListViewModel: ObservableObject {
 
     private let service: HomeTodayAnimeScheduleListServicing
     private let presentationBuilder: HomeTodayAnimeScheduleListPresentationBuilder
+    private let requestLifecycleController: RequestScreenLifecycleController
 
     // MARK: - Pagination State
 
@@ -43,11 +44,16 @@ final class HomeTodayAnimeScheduleListViewModel: ObservableObject {
     init(
         initialDay: HomeScheduleDay = .current(),
         service: HomeTodayAnimeScheduleListServicing,
+        requestLifecycleManager: any RequestLifecycleManaging,
         presentationBuilder: HomeTodayAnimeScheduleListPresentationBuilder = HomeTodayAnimeScheduleListPresentationBuilder()
     ) {
         self.selectedDay = initialDay
         self.service = service
         self.presentationBuilder = presentationBuilder
+        self.requestLifecycleController = RequestScreenLifecycleController(
+            scope: .homeTodayAnimeScheduleList,
+            requestLifecycleManager: requestLifecycleManager
+        )
         bindSelectedDay()
     }
 
@@ -67,13 +73,20 @@ final class HomeTodayAnimeScheduleListViewModel: ObservableObject {
 
     // MARK: - Public Methods
 
-    func loadIfNeeded() async {
+    func screenDidAppear() async {
+        guard await requestLifecycleController.activate() else { return }
         await paginationController.loadIfNeeded(
             setLoading: applyLoading,
             fetchPage: fetchPage,
             applyPresentation: applyPresentation,
             applyError: applyInitialLoadError
         )
+    }
+
+    func screenDidDisappear() {
+        dayRequestTask?.cancel()
+        dayRequestTask = nil
+        requestLifecycleController.deactivate()
     }
 
     func reload() async {

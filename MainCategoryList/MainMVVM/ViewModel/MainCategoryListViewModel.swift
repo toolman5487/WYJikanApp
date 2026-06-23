@@ -20,6 +20,7 @@ final class MainCategoryListViewModel: ObservableObject {
 
     @Published var selectedKind: MainListKind = .anime
 
+    private let requestLifecycleController: RequestScreenLifecycleController
     private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Lifecycle
@@ -28,25 +29,33 @@ final class MainCategoryListViewModel: ObservableObject {
         animeListViewModel: AnimeListViewModel,
         mangaListViewModel: MangaListViewModel,
         peopleListViewModel: PeopleListViewModel,
-        characterListViewModel: CharacterListViewModel
+        characterListViewModel: CharacterListViewModel,
+        requestLifecycleManager: any RequestLifecycleManaging
     ) {
         self.animeListViewModel = animeListViewModel
         self.mangaListViewModel = mangaListViewModel
         self.peopleListViewModel = peopleListViewModel
         self.characterListViewModel = characterListViewModel
+        self.requestLifecycleController = RequestScreenLifecycleController(
+            scope: .mainCategoryList,
+            requestLifecycleManager: requestLifecycleManager
+        )
 
         bindSelectedKind()
         makeParentChromeStateCancellable()
             .store(in: &cancellables)
     }
 
-    func stopLoading() {
+    func screenDidDisappear() {
         MainListKind.allCases.forEach { stopLoading(for: $0) }
+        requestLifecycleController.deactivate()
     }
 
     // MARK: - Preparation
 
-    func prepareSelectedKind(platform: UserInterfacePlatform) {
+    func screenDidAppear(platform: UserInterfacePlatform) async {
+        guard await requestLifecycleController.activate() else { return }
+
         configureGenreBatch(platform: platform)
         activateKind(selectedKind)
     }

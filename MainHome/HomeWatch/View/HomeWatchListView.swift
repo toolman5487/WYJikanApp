@@ -74,7 +74,10 @@ struct HomeWatchListView: View {
             }
         }
         .task(priority: .userInitiated) {
-            await viewModel.loadIfNeeded()
+            await viewModel.screenDidAppear()
+        }
+        .onDisappear {
+            viewModel.screenDidDisappear()
         }
     }
 

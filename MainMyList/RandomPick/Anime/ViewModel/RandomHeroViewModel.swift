@@ -96,6 +96,7 @@ final class RandomHeroViewModel: ObservableObject {
     private let service: RandomPickServicing
     private let drawCooldownTimer: GlobalCooldownTimer
     private let storage: UserDefaults
+    private let requestLifecycleController: RequestScreenLifecycleController
 
     // MARK: - Private Properties
 
@@ -107,10 +108,15 @@ final class RandomHeroViewModel: ObservableObject {
 
     init(
         service: RandomPickServicing,
+        requestLifecycleManager: any RequestLifecycleManaging,
         storage: UserDefaults = .standard
     ) {
         self.service = service
         self.storage = storage
+        self.requestLifecycleController = RequestScreenLifecycleController(
+            scope: .mainMyListRandomAnime,
+            requestLifecycleManager: requestLifecycleManager
+        )
         self.drawCooldownTimer = GlobalCooldownTimer(
             key: "anime.random.draw",
             cooldownSeconds: Self.drawCooldownSeconds
@@ -127,7 +133,17 @@ final class RandomHeroViewModel: ObservableObject {
 
     // MARK: - Public Methods
 
-    func loadIfNeeded() {
+    func screenDidAppear() async {
+        guard await requestLifecycleController.activate() else { return }
+        loadIfNeeded()
+    }
+
+    func screenDidDisappear() {
+        stop()
+        requestLifecycleController.deactivate()
+    }
+
+    private func loadIfNeeded() {
         guard randomPick == nil, !hasAttemptedAutomaticDraw else { return }
         hasAttemptedAutomaticDraw = true
         drawRandomAnime(isAutomatic: true)
@@ -158,6 +174,8 @@ final class RandomHeroViewModel: ObservableObject {
                 self.drawState = .ready
                 self.drawCooldownTimer.startCooldown()
                 self.updateCooldownState(seconds: self.drawCooldownTimer.remainingSeconds)
+            } catch is CancellationError {
+                self.handleCancelledDraw()
             } catch {
                 guard !Task.isCancelled else { return }
                 await self.waitForMinimumLoadingDuration(since: drawStartedAt)
@@ -208,6 +226,14 @@ final class RandomHeroViewModel: ObservableObject {
                 break
             }
         }
+    }
+
+    private func handleCancelledDraw() {
+        guard isDrawing else { return }
+        if randomPick == nil {
+            hasAttemptedAutomaticDraw = false
+        }
+        drawState = randomPick == nil ? .idle : .ready
     }
 
     private func persistRandomPick(_ pick: AnimeListRandomDTO) {

@@ -75,11 +75,16 @@ nonisolated final class HomeWatchService: HomeWatchServicing {
     // MARK: - Properties
 
     private let apiService: JikanAPIServicing
+    private let lifecycleScope: RequestLifecycleScope
 
     // MARK: - Lifecycle
 
-    init(apiService: JikanAPIServicing = JikanAPIService.shared) {
+    init(
+        apiService: JikanAPIServicing = JikanAPIService.shared,
+        lifecycleScope: RequestLifecycleScope = .tab(.home)
+    ) {
         self.apiService = apiService
+        self.lifecycleScope = lifecycleScope
     }
 
     // MARK: - Public Methods
@@ -114,7 +119,7 @@ nonisolated final class HomeWatchService: HomeWatchServicing {
             endpoint: endpoint(for: feed),
             cachePolicy: cachePolicy(forceRefresh: forceRefresh, ttl: ttl(for: feed)),
             queryItems: queryItems(page: page, limit: limit),
-            scope: .home
+            lifecycleScope: lifecycleScope
         )
         return response
     }
@@ -131,7 +136,7 @@ nonisolated final class HomeWatchService: HomeWatchServicing {
             endpoint: endpoint(for: feed),
             cachePolicy: cachePolicy(forceRefresh: forceRefresh, ttl: ttl(for: feed)),
             queryItems: queryItems(page: page, limit: limit),
-            scope: .home
+            lifecycleScope: lifecycleScope
         )
         return response
     }

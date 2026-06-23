@@ -22,6 +22,12 @@ struct MainSearchView: View {
             .onSubmit(of: .search) {
                 viewModel.submitSearch()
             }
+            .task(priority: .userInitiated) {
+                await viewModel.screenDidAppear()
+            }
+            .onDisappear {
+                viewModel.screenDidDisappear()
+            }
     }
 
     // MARK: - Private Views
