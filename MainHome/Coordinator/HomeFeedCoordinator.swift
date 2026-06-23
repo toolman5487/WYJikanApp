@@ -26,6 +26,57 @@ enum HomeFeedSection: Hashable, CaseIterable {
     }
 }
 
+// MARK: - HomeLoadPhase
+
+nonisolated enum HomeLoadPhase: Int, CaseIterable, Sendable {
+    case initialFeeds
+    case allFeeds
+}
+
+// MARK: - HomeLoadCoordinating
+
+nonisolated protocol HomeLoadCoordinating: Sendable {
+    func wait(for phase: HomeLoadPhase) async
+    func markCompleted(_ phase: HomeLoadPhase) async
+}
+
+// MARK: - HomeLoadCoordinator
+
+actor HomeLoadCoordinator: HomeLoadCoordinating {
+
+    // MARK: - Properties
+
+    static let shared = HomeLoadCoordinator()
+
+    private var completedPhases = Set<HomeLoadPhase>()
+    private var waiters: [HomeLoadPhase: [CheckedContinuation<Void, Never>]] = [:]
+
+    // MARK: - Public Methods
+
+    func wait(for phase: HomeLoadPhase) async {
+        guard !completedPhases.contains(phase) else { return }
+
+        await withCheckedContinuation { continuation in
+            waiters[phase, default: []].append(continuation)
+        }
+    }
+
+    func markCompleted(_ phase: HomeLoadPhase) {
+        for completedPhase in HomeLoadPhase.allCases where completedPhase.rawValue <= phase.rawValue {
+            complete(completedPhase)
+        }
+    }
+
+    // MARK: - Private Methods
+
+    private func complete(_ phase: HomeLoadPhase) {
+        guard completedPhases.insert(phase).inserted else { return }
+
+        let pendingWaiters = waiters.removeValue(forKey: phase) ?? []
+        pendingWaiters.forEach { $0.resume() }
+    }
+}
+
 // MARK: - HomeDeferredSectionLoadScheduler
 
 private actor HomeDeferredSectionLoadScheduler {
@@ -123,8 +174,7 @@ final class HomeFeedCoordinator {
     // MARK: - Properties
 
     private let viewModels: HomeFeedViewModels
-    private let initialLoadGate: any HomeLoadCoordinating
-    private let allFeedsLoadGate: any HomeLoadCoordinating
+    private let homeLoadCoordinator: any HomeLoadCoordinating
     private let deferredSectionLoadScheduler = HomeDeferredSectionLoadScheduler()
     private var loadedSections = Set<HomeFeedSection>()
     private var pendingDeferredSections = Set<HomeFeedSection>()
@@ -133,12 +183,10 @@ final class HomeFeedCoordinator {
 
     init(
         viewModels: HomeFeedViewModels,
-        initialLoadGate: any HomeLoadCoordinating = HomeLoadGates.initial,
-        allFeedsLoadGate: any HomeLoadCoordinating = HomeLoadGates.allFeeds
+        homeLoadCoordinator: any HomeLoadCoordinating = HomeLoadCoordinator.shared
     ) {
         self.viewModels = viewModels
-        self.initialLoadGate = initialLoadGate
-        self.allFeedsLoadGate = allFeedsLoadGate
+        self.homeLoadCoordinator = homeLoadCoordinator
     }
 
     // MARK: - Public Methods
@@ -151,12 +199,12 @@ final class HomeFeedCoordinator {
 
         await loadPhase(.heroBanner, .todayAnime, priority: .userInitiated)
         await loadPhase(.trendingAnime, .trendingManga, priority: .userInitiated)
-        await initialLoadGate.markCompleted()
+        await homeLoadCoordinator.markCompleted(.initialFeeds)
     }
 
     func loadSectionIfNeeded(_ section: HomeFeedSection) async {
         guard section.isDeferred else { return }
-        await initialLoadGate.waitForCompletion()
+        await homeLoadCoordinator.wait(for: .initialFeeds)
         guard !Task.isCancelled else { return }
         await loadDeferredSection(section, priority: .utility)
     }
@@ -253,7 +301,7 @@ final class HomeFeedCoordinator {
         }
 
         if loadedSections.count == HomeFeedSection.allCases.count {
-            await allFeedsLoadGate.markCompleted()
+            await homeLoadCoordinator.markCompleted(.allFeeds)
         }
     }
 
