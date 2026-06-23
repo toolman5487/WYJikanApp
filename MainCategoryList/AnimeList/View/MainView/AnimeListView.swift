@@ -43,12 +43,6 @@ private struct MainView: View {
 
     var body: some View {
         LazyVStack(alignment: .leading, spacing: 4, pinnedViews: [.sectionHeaders]) {
-            if showsRandomHeroSection {
-                RandomHeroSectionView(
-                    viewModel: viewModel.randomHeroViewModel,
-                    favoriteIDs: favoriteIDs
-                )
-            }
             GenreAnimeListContainerView(
                 viewModel: viewModel.genreAnimeViewModel,
                 favoriteIDs: favoriteIDs,
@@ -56,13 +50,6 @@ private struct MainView: View {
             )
         }
         .padding(.top, 8)
-    }
-
-    private var showsRandomHeroSection: Bool {
-        if case .error = viewModel.genreAnimeViewModel.screenState {
-            return false
-        }
-        return true
     }
 }
 

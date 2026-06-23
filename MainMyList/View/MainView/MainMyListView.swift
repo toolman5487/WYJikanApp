@@ -34,6 +34,8 @@ struct MainMyListView: View {
     private let dependencies: MyListDependencies
 
     @StateObject private var viewModel: MainMyListViewModel
+    @StateObject private var randomAnimeViewModel: RandomHeroViewModel
+    @StateObject private var randomMangaViewModel: RandomMangaViewModel
 
     @State private var genreCollectionsRoute: MyListGenreCollectionsRoute?
     @State private var formatCollectionsRoute: MyListFormatCollectionsRoute?
@@ -46,6 +48,8 @@ struct MainMyListView: View {
     init(dependencies: MyListDependencies) {
         self.dependencies = dependencies
         _viewModel = StateObject(wrappedValue: dependencies.makeMainViewModel())
+        _randomAnimeViewModel = StateObject(wrappedValue: dependencies.makeRandomAnimeViewModel())
+        _randomMangaViewModel = StateObject(wrappedValue: dependencies.makeRandomMangaViewModel())
     }
 
     // MARK: - Body
@@ -109,6 +113,10 @@ struct MainMyListView: View {
             } message: {
                 Text(viewModel.persistenceMutationState.failureMessage ?? "")
             }
+            .onDisappear {
+                randomAnimeViewModel.stop()
+                randomMangaViewModel.stop()
+            }
         }
     }
 
@@ -121,6 +129,7 @@ struct MainMyListView: View {
             LazyVStack(alignment: .leading, spacing: Layout.sectionSpacing) {
                 headerView
                 filterView
+                randomPickSectionView
                 summaryView(presentation: presentation)
                 progressStatusSectionView(presentation: presentation)
                 contentView(presentation: presentation)
@@ -128,6 +137,9 @@ struct MainMyListView: View {
             .padding(.horizontal, Layout.horizontalPadding)
             .padding(.top, Layout.topPadding)
             .padding(.bottom, Layout.bottomPadding)
+        }
+        .task(id: viewModel.selectedFilter) {
+            loadRandomPickIfNeeded(for: viewModel.selectedFilter)
         }
     }
 
@@ -182,6 +194,24 @@ struct MainMyListView: View {
             selection: $viewModel.selectedFilter
         )
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    @ViewBuilder
+    private var randomPickSectionView: some View {
+        switch viewModel.selectedFilter {
+        case .all:
+            EmptyView()
+        case .anime:
+            RandomHeroSectionView(
+                viewModel: randomAnimeViewModel,
+                favoriteIDs: favoriteStatusStore.favoriteIDs(for: .anime)
+            )
+        case .manga:
+            RandomMangaSectionView(
+                viewModel: randomMangaViewModel,
+                favoriteIDs: favoriteStatusStore.favoriteIDs(for: .manga)
+            )
+        }
     }
 
     private func summaryView(presentation: MyListPresentation) -> some View {
@@ -299,6 +329,17 @@ struct MainMyListView: View {
 
     private func contentState(for presentation: MyListPresentation) -> ContentState {
         presentation.filteredItems.isEmpty ? .empty : .populated
+    }
+
+    private func loadRandomPickIfNeeded(for filter: MyListFilter) {
+        switch filter {
+        case .all:
+            break
+        case .anime:
+            randomAnimeViewModel.loadIfNeeded()
+        case .manga:
+            randomMangaViewModel.loadIfNeeded()
+        }
     }
 
     private func showGenreCollectionsDetail(

@@ -10,14 +10,9 @@ import Combine
 
 @MainActor
 final class MangaListViewModel: ObservableObject {
-    let randomHeroViewModel: RandomMangaViewModel
     let genreMangaViewModel: GenreMangaViewModel
 
-    init(
-        randomHeroViewModel: RandomMangaViewModel,
-        genreMangaViewModel: GenreMangaViewModel
-    ) {
-        self.randomHeroViewModel = randomHeroViewModel
+    init(genreMangaViewModel: GenreMangaViewModel) {
         self.genreMangaViewModel = genreMangaViewModel
     }
 
@@ -26,7 +21,6 @@ final class MangaListViewModel: ObservableObject {
     }
 
     func loadIfNeeded() {
-        randomHeroViewModel.loadIfNeeded()
         genreMangaViewModel.loadIfNeeded()
     }
 
@@ -35,7 +29,6 @@ final class MangaListViewModel: ObservableObject {
     }
 
     func stop() {
-        randomHeroViewModel.stop()
         genreMangaViewModel.stop()
     }
 }

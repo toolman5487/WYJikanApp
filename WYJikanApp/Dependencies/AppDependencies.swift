@@ -55,10 +55,12 @@ struct AppDependencies {
         let broadcastReminderRepository = SwiftDataAnimeBroadcastReminderRepository()
         let mainSearchHistoryRepository = UserDefaultsMainSearchHistoryRepository()
         let mainNewsService = MainNewsService()
+        let mainCategoryListService = MainCategoryListService()
         let myListDependencies = MyListDependencies(
             favoriteRepository: favoriteRepository,
             broadcastReminderRepository: broadcastReminderRepository,
             searchHistoryRepository: mainSearchHistoryRepository,
+            mainCategoryListService: mainCategoryListService,
             clearApplicationCache: {
                 await JikanAPIService.shared.clearCache()
                 await mainNewsService.clearCache()
@@ -70,7 +72,7 @@ struct AppDependencies {
             homeLoadCoordinator: HomeLoadCoordinator(),
             mainHomeService: MainHomeService(),
             homeWatchService: HomeWatchService(),
-            mainCategoryListService: MainCategoryListService(),
+            mainCategoryListService: mainCategoryListService,
             mainSearchService: MainSearchService(),
             mainNewsService: mainNewsService,
             animeDetailService: AnimeDetailService(),
@@ -116,11 +118,9 @@ struct AppDependencies {
     func makeMainCategoryListViewModel() -> MainCategoryListViewModel {
         MainCategoryListViewModel(
             animeListViewModel: AnimeListViewModel(
-                randomHeroViewModel: RandomHeroViewModel(service: mainCategoryListService),
                 genreAnimeViewModel: GenreAnimeViewModel(service: mainCategoryListService)
             ),
             mangaListViewModel: MangaListViewModel(
-                randomHeroViewModel: RandomMangaViewModel(service: mainCategoryListService),
                 genreMangaViewModel: GenreMangaViewModel(service: mainCategoryListService)
             ),
             peopleListViewModel: PeopleListViewModel(service: mainCategoryListService),

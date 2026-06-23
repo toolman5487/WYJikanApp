@@ -12,16 +12,11 @@ import Combine
 final class AnimeListViewModel: ObservableObject {
     // MARK: - Properties
 
-    let randomHeroViewModel: RandomHeroViewModel
     let genreAnimeViewModel: GenreAnimeViewModel
 
     // MARK: - Lifecycle
 
-    init(
-        randomHeroViewModel: RandomHeroViewModel,
-        genreAnimeViewModel: GenreAnimeViewModel
-    ) {
-        self.randomHeroViewModel = randomHeroViewModel
+    init(genreAnimeViewModel: GenreAnimeViewModel) {
         self.genreAnimeViewModel = genreAnimeViewModel
     }
 
@@ -32,7 +27,6 @@ final class AnimeListViewModel: ObservableObject {
     }
 
     func loadIfNeeded() {
-        randomHeroViewModel.loadIfNeeded()
         genreAnimeViewModel.loadIfNeeded()
     }
 
@@ -41,7 +35,6 @@ final class AnimeListViewModel: ObservableObject {
     }
 
     func stop() {
-        randomHeroViewModel.stop()
         genreAnimeViewModel.stop()
     }
 }

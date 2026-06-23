@@ -12,6 +12,7 @@ struct MyListDependencies {
     private let favoriteRepository: any FavoriteRepository
     private let broadcastReminderRepository: any AnimeBroadcastReminderRepository
     private let searchHistoryRepository: any MainSearchHistoryRepository
+    private let mainCategoryListService: MainCategoryListServicing
     private let clearApplicationCache: () async -> Void
 
     // MARK: - Lifecycle
@@ -20,11 +21,13 @@ struct MyListDependencies {
         favoriteRepository: any FavoriteRepository,
         broadcastReminderRepository: any AnimeBroadcastReminderRepository,
         searchHistoryRepository: any MainSearchHistoryRepository,
+        mainCategoryListService: MainCategoryListServicing,
         clearApplicationCache: @escaping () async -> Void
     ) {
         self.favoriteRepository = favoriteRepository
         self.broadcastReminderRepository = broadcastReminderRepository
         self.searchHistoryRepository = searchHistoryRepository
+        self.mainCategoryListService = mainCategoryListService
         self.clearApplicationCache = clearApplicationCache
     }
 
@@ -32,6 +35,14 @@ struct MyListDependencies {
 
     func makeMainViewModel() -> MainMyListViewModel {
         MainMyListViewModel(favoriteRepository: favoriteRepository)
+    }
+
+    func makeRandomAnimeViewModel() -> RandomHeroViewModel {
+        RandomHeroViewModel(service: mainCategoryListService)
+    }
+
+    func makeRandomMangaViewModel() -> RandomMangaViewModel {
+        RandomMangaViewModel(service: mainCategoryListService)
     }
 
     func makeMangaReadingStatusQueryViewModel() -> MangaReadingStatusQueryViewModel {
