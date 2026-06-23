@@ -45,7 +45,9 @@ struct GlassSectionHeaderView: View {
     var body: some View {
         Group {
             switch state {
-            case .plain, .accessoryText:
+            case .plain:
+                headerContent
+            case .accessoryText:
                 headerContent
             case let .navigable(action):
                 Button(action: action) {

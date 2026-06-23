@@ -73,7 +73,13 @@ nonisolated final class MainSearchService: MainSearchServicing {
 
         var cachePolicy: JikanAPICachePolicy {
             switch self {
-            case .anime, .manga, .character, .people:
+            case .anime:
+                return .search()
+            case .manga:
+                return .search()
+            case .character:
+                return .search()
+            case .people:
                 return .search()
             }
         }

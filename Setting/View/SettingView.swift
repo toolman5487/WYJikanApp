@@ -102,7 +102,9 @@ struct SettingView: View {
             Task(priority: .utility) {
                 await viewModel.refresh()
             }
-        case .inactive, .background:
+        case .inactive:
+            break
+        case .background:
             break
         @unknown default:
             break
@@ -111,7 +113,11 @@ struct SettingView: View {
 
     private func handleNotificationAction(_ action: SettingNotificationAction) {
         switch action {
-        case .requestAuthorization, .refreshReminders:
+        case .requestAuthorization:
+            Task(priority: .userInitiated) {
+                await viewModel.performNotificationAction(action)
+            }
+        case .refreshReminders:
             Task(priority: .userInitiated) {
                 await viewModel.performNotificationAction(action)
             }

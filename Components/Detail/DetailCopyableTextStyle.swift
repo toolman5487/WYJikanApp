@@ -16,14 +16,18 @@ enum DetailCopyableTextStyle {
         switch self {
         case .primary:
             return .title2.weight(.bold)
-        case .secondary, .info:
+        case .secondary:
+            return .subheadline
+        case .info:
             return .subheadline
         }
     }
 
     var foregroundStyle: Color {
         switch self {
-        case .primary, .info:
+        case .primary:
+            return ThemeColor.textPrimary
+        case .info:
             return ThemeColor.textPrimary
         case .secondary:
             return ThemeColor.textSecondary

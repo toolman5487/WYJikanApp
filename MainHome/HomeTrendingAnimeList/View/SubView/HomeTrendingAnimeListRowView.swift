@@ -125,7 +125,9 @@ struct HomeTrendingAnimeListRowView: View {
 
     private var highlightText: String? {
         switch sort {
-        case .apiDefault, .rank:
+        case .apiDefault:
+            return item.rank.map { "榜單排名 #\($0)" }
+        case .rank:
             return item.rank.map { "榜單排名 #\($0)" }
         case .popularity:
             return item.popularityText
@@ -142,7 +144,9 @@ struct HomeTrendingAnimeListRowView: View {
 
     private var secondaryMetricText: String? {
         switch sort {
-        case .apiDefault, .rank:
+        case .apiDefault:
+            return item.popularityText
+        case .rank:
             return item.popularityText
         case .popularity:
             return item.scoreText.map { "評分 \($0)" }

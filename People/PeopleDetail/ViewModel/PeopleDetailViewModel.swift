@@ -20,7 +20,9 @@ final class PeopleDetailViewModel: ObservableObject {
             switch self {
             case .loaded(let detail):
                 return detail
-            case .loading, .error:
+            case .loading:
+                return nil
+            case .error:
                 return nil
             }
         }

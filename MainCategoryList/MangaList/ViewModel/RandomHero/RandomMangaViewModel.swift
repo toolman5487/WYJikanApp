@@ -29,7 +29,13 @@ final class RandomMangaViewModel: ObservableObject {
         switch drawState {
         case .loading:
             return true
-        case .idle, .ready, .failure, .cooldown:
+        case .idle:
+            return false
+        case .ready:
+            return false
+        case .failure:
+            return false
+        case .cooldown:
             return false
         }
     }
@@ -38,7 +44,13 @@ final class RandomMangaViewModel: ObservableObject {
         switch drawState {
         case .failure(let failure):
             return failure
-        case .idle, .loading, .ready, .cooldown:
+        case .idle:
+            return nil
+        case .loading:
+            return nil
+        case .ready:
+            return nil
+        case .cooldown:
             return nil
         }
     }
@@ -47,7 +59,13 @@ final class RandomMangaViewModel: ObservableObject {
         switch drawState {
         case .cooldown(let seconds):
             return seconds
-        case .idle, .loading, .ready, .failure:
+        case .idle:
+            return 0
+        case .loading:
+            return 0
+        case .ready:
+            return 0
+        case .failure:
             return 0
         }
     }
@@ -72,7 +90,11 @@ final class RandomMangaViewModel: ObservableObject {
         switch drawState {
         case .idle:
             return "開始抽獎"
-        case .ready, .failure, .cooldown:
+        case .ready:
+            return randomPick == nil ? "開始抽獎" : "再抽一次"
+        case .failure:
+            return randomPick == nil ? "開始抽獎" : "再抽一次"
+        case .cooldown:
             return randomPick == nil ? "開始抽獎" : "再抽一次"
         case .loading:
             return "抽獎中..."
@@ -178,7 +200,13 @@ final class RandomMangaViewModel: ObservableObject {
             switch drawState {
             case .cooldown:
                 drawState = randomPick == nil ? .idle : .ready
-            case .idle, .loading, .ready, .failure:
+            case .idle:
+                break
+            case .loading:
+                break
+            case .ready:
+                break
+            case .failure:
                 break
             }
         }

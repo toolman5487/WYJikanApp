@@ -18,9 +18,19 @@ enum HomeFeedSection: Hashable, CaseIterable {
 
     var isDeferred: Bool {
         switch self {
-        case .heroBanner, .todayAnime, .trendingAnime, .trendingManga:
+        case .heroBanner:
             return false
-        case .watchPromos, .watchEpisodes, .recommendedAnime:
+        case .todayAnime:
+            return false
+        case .trendingAnime:
+            return false
+        case .trendingManga:
+            return false
+        case .watchPromos:
+            return true
+        case .watchEpisodes:
+            return true
+        case .recommendedAnime:
             return true
         }
     }
@@ -45,8 +55,6 @@ nonisolated protocol HomeLoadCoordinating: Sendable {
 actor HomeLoadCoordinator: HomeLoadCoordinating {
 
     // MARK: - Properties
-
-    static let shared = HomeLoadCoordinator()
 
     private var completedPhases = Set<HomeLoadPhase>()
     private var waiters: [HomeLoadPhase: [CheckedContinuation<Void, Never>]] = [:]
@@ -131,7 +139,7 @@ struct HomeFeedViewModels {
 
 @MainActor
 private protocol HomeFeedInitialLoadable: AnyObject {
-    var hasFeedContent: Bool { get }
+    var isFeedLoadSuccessful: Bool { get }
     func loadIfNeeded(priority: TaskPriority)
     func refresh() async
 }
@@ -139,31 +147,31 @@ private protocol HomeFeedInitialLoadable: AnyObject {
 // MARK: - HomeFeedInitialLoadable Conformance
 
 extension HeroBannerViewModel: HomeFeedInitialLoadable {
-    var hasFeedContent: Bool { screenState.hasContent }
+    var isFeedLoadSuccessful: Bool { screenState.isLoadSuccessful }
 }
 
 extension HomeTodayAnimeViewModel: HomeFeedInitialLoadable {
-    var hasFeedContent: Bool { screenState.hasContent }
+    var isFeedLoadSuccessful: Bool { screenState.isLoadSuccessful }
 }
 
 extension HomeTrendingAnimeViewModel: HomeFeedInitialLoadable {
-    var hasFeedContent: Bool { screenState.hasContent }
+    var isFeedLoadSuccessful: Bool { screenState.isLoadSuccessful }
 }
 
 extension HomeTrendingMangaViewModel: HomeFeedInitialLoadable {
-    var hasFeedContent: Bool { screenState.hasContent }
+    var isFeedLoadSuccessful: Bool { screenState.isLoadSuccessful }
 }
 
 extension HomeWatchPromosViewModel: HomeFeedInitialLoadable {
-    var hasFeedContent: Bool { screenState.hasContent }
+    var isFeedLoadSuccessful: Bool { screenState.isLoadSuccessful }
 }
 
 extension HomeWatchEpisodesViewModel: HomeFeedInitialLoadable {
-    var hasFeedContent: Bool { screenState.hasContent }
+    var isFeedLoadSuccessful: Bool { screenState.isLoadSuccessful }
 }
 
 extension HomeRecommendedAnimeViewModel: HomeFeedInitialLoadable {
-    var hasFeedContent: Bool { screenState.hasContent }
+    var isFeedLoadSuccessful: Bool { screenState.isLoadSuccessful }
 }
 
 // MARK: - HomeFeedCoordinator
@@ -177,13 +185,14 @@ final class HomeFeedCoordinator {
     private let homeLoadCoordinator: any HomeLoadCoordinating
     private let deferredSectionLoadScheduler = HomeDeferredSectionLoadScheduler()
     private var loadedSections = Set<HomeFeedSection>()
+    private var loadingSections = Set<HomeFeedSection>()
     private var pendingDeferredSections = Set<HomeFeedSection>()
 
     // MARK: - Lifecycle
 
     init(
         viewModels: HomeFeedViewModels,
-        homeLoadCoordinator: any HomeLoadCoordinating = HomeLoadCoordinator.shared
+        homeLoadCoordinator: any HomeLoadCoordinating
     ) {
         self.viewModels = viewModels
         self.homeLoadCoordinator = homeLoadCoordinator
@@ -281,9 +290,15 @@ final class HomeFeedCoordinator {
     }
 
     private func load(_ section: HomeFeedSection, priority: TaskPriority) async {
-        guard loadedSections.insert(section).inserted else { return }
+        guard !loadedSections.contains(section),
+              loadingSections.insert(section).inserted else {
+            return
+        }
+        defer {
+            loadingSections.remove(section)
+        }
 
-        switch section {
+        let isSuccessful = switch section {
         case .heroBanner:
             await loadIfNeeded(viewModels.heroBanner, priority: priority)
         case .todayAnime:
@@ -300,37 +315,58 @@ final class HomeFeedCoordinator {
             await loadIfNeeded(viewModels.recommendedAnime, priority: priority)
         }
 
-        if loadedSections.count == HomeFeedSection.allCases.count {
-            await homeLoadCoordinator.markCompleted(.allFeeds)
-        }
+        await updateLoadCompletion(for: section, isSuccessful: isSuccessful)
     }
 
     private func refresh(_ section: HomeFeedSection) async {
-        switch section {
+        let isSuccessful = switch section {
         case .heroBanner:
-            await viewModels.heroBanner.refresh()
+            await refresh(viewModels.heroBanner)
         case .todayAnime:
-            await viewModels.todayAnime.refresh()
+            await refresh(viewModels.todayAnime)
         case .trendingAnime:
-            await viewModels.trendingAnime.refresh()
+            await refresh(viewModels.trendingAnime)
         case .trendingManga:
-            await viewModels.trendingManga.refresh()
+            await refresh(viewModels.trendingManga)
         case .watchPromos:
-            await viewModels.watchPromos.refresh()
+            await refresh(viewModels.watchPromos)
         case .watchEpisodes:
-            await viewModels.watchEpisodes.refresh()
+            await refresh(viewModels.watchEpisodes)
         case .recommendedAnime:
-            await viewModels.recommendedAnime.refresh()
+            await refresh(viewModels.recommendedAnime)
         }
+
+        await updateLoadCompletion(for: section, isSuccessful: isSuccessful)
     }
 
     private func loadIfNeeded(
         _ viewModel: some HomeFeedInitialLoadable,
         priority: TaskPriority
-    ) async {
-        guard !viewModel.hasFeedContent else { return }
+    ) async -> Bool {
+        guard !viewModel.isFeedLoadSuccessful else { return true }
         viewModel.loadIfNeeded(priority: priority)
         await viewModel.refresh()
+        return viewModel.isFeedLoadSuccessful
+    }
+
+    private func refresh(_ viewModel: some HomeFeedInitialLoadable) async -> Bool {
+        await viewModel.refresh()
+        return viewModel.isFeedLoadSuccessful
+    }
+
+    private func updateLoadCompletion(
+        for section: HomeFeedSection,
+        isSuccessful: Bool
+    ) async {
+        if isSuccessful {
+            loadedSections.insert(section)
+        } else {
+            loadedSections.remove(section)
+        }
+
+        if loadedSections.count == HomeFeedSection.allCases.count {
+            await homeLoadCoordinator.markCompleted(.allFeeds)
+        }
     }
 }
 

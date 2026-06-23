@@ -34,7 +34,13 @@ final class MainNewsViewModel: ObservableObject {
         switch screenState {
         case .refreshing:
             return true
-        case .loading, .content, .empty, .error:
+        case .loading:
+            return false
+        case .content:
+            return false
+        case .empty:
+            return false
+        case .error:
             return false
         }
     }

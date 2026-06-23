@@ -58,7 +58,13 @@ nonisolated enum SettingNotificationAuthorizationStatus: Equatable, Sendable {
             return nil
         case .notDetermined:
             return .requestAuthorization
-        case .authorized, .provisional, .ephemeral, .denied:
+        case .authorized:
+            return .openSystemSettings
+        case .provisional:
+            return .openSystemSettings
+        case .ephemeral:
+            return .openSystemSettings
+        case .denied:
             return .openSystemSettings
         }
     }
@@ -67,9 +73,15 @@ nonisolated enum SettingNotificationAuthorizationStatus: Equatable, Sendable {
         switch self {
         case .loading:
             return false
-        case .authorized, .provisional, .ephemeral:
+        case .authorized:
             return true
-        case .notDetermined, .denied:
+        case .provisional:
+            return true
+        case .ephemeral:
+            return true
+        case .notDetermined:
+            return false
+        case .denied:
             return false
         }
     }
@@ -128,7 +140,9 @@ nonisolated enum SettingCacheState: Equatable, Sendable {
         switch self {
         case .available:
             return true
-        case .loading, .clearing:
+        case .loading:
+            return false
+        case .clearing:
             return false
         }
     }
@@ -178,9 +192,13 @@ nonisolated struct SettingStoragePresentation: Equatable, Sendable {
 
     var isOperationInProgress: Bool {
         switch (cacheState, localDataOperationState) {
-        case (.clearing, _), (_, .deleting):
+        case (.clearing, _):
             return true
-        case (.loading, .idle), (.available, .idle):
+        case (_, .deleting):
+            return true
+        case (.loading, .idle):
+            return false
+        case (.available, .idle):
             return false
         }
     }

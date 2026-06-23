@@ -177,7 +177,19 @@ final class HomeTrendingMangaListViewModel: ObservableObject {
         switch screenState {
         case .content(let items):
             return items
-        case .loading, .empty, .error:
+        case .loading:
+            return presentationBuilder.presentedItems(
+                from: paginationController.items,
+                sort: selectedSort,
+                format: selectedFormat
+            )
+        case .empty:
+            return presentationBuilder.presentedItems(
+                from: paginationController.items,
+                sort: selectedSort,
+                format: selectedFormat
+            )
+        case .error:
             return presentationBuilder.presentedItems(
                 from: paginationController.items,
                 sort: selectedSort,

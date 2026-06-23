@@ -16,7 +16,9 @@ enum BaseUserNotificationState: Equatable {
         switch self {
         case .enabled:
             return true
-        case .disabled, .processing:
+        case .disabled:
+            return false
+        case .processing:
             return false
         }
     }
@@ -25,7 +27,9 @@ enum BaseUserNotificationState: Equatable {
         switch self {
         case .processing:
             return true
-        case .disabled, .enabled:
+        case .disabled:
+            return false
+        case .enabled:
             return false
         }
     }
@@ -66,7 +70,9 @@ enum BaseUserNotificationAuthorizationState: Equatable {
         switch self {
         case .allowed:
             return true
-        case .notDetermined, .denied:
+        case .notDetermined:
+            return false
+        case .denied:
             return false
         }
     }

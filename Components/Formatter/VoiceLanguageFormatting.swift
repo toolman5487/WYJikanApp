@@ -31,7 +31,9 @@ nonisolated enum VoiceLanguageFormatting {
             return "義大利語"
         case "spanish":
             return "西班牙語"
-        case "portuguese", "brazilian":
+        case "portuguese":
+            return "葡萄牙語"
+        case "brazilian":
             return "葡萄牙語"
         default:
             return rawValue

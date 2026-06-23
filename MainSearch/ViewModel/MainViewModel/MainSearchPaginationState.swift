@@ -17,9 +17,13 @@ enum MainSearchRequestState: Equatable, Sendable {
 
     var canStartLoadMore: Bool {
         switch self {
-        case .idle, .loadMoreError:
+        case .idle:
             return true
-        case .searching, .loadingMore:
+        case .loadMoreError:
+            return true
+        case .searching:
+            return false
+        case .loadingMore:
             return false
         }
     }

@@ -93,9 +93,19 @@ struct AnimeWatchProgressEditorView: View {
 
     private func normalizedStatus(for currentEpisode: Int) -> AnimeWatchStatus {
         switch draft.status {
-        case .onHold, .dropped, .completed:
+        case .onHold:
             return draft.status
-        case .planned, .watching:
+        case .dropped:
+            return draft.status
+        case .completed:
+            return draft.status
+        case .planned:
+            guard currentEpisode > 0 else { return .planned }
+            if let totalEpisodes = draft.totalEpisodes, currentEpisode >= totalEpisodes {
+                return .completed
+            }
+            return .watching
+        case .watching:
             guard currentEpisode > 0 else { return .planned }
             if let totalEpisodes = draft.totalEpisodes, currentEpisode >= totalEpisodes {
                 return .completed

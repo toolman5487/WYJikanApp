@@ -51,7 +51,73 @@ final class CharacterListViewModel: ObservableObject {
             return .loading
         case .error(let failure) where rows.isEmpty:
             return .error(failure)
-        case .idle, .loadingInitial, .loadingMore, .error:
+        case .idle:
+            if rows.isEmpty {
+                return .empty
+            }
+
+            let inlineError: FeatureLoadFailure?
+            if case .error(let failure) = paginationState {
+                inlineError = failure
+            } else {
+                inlineError = nil
+            }
+
+            let footer: FooterState
+            if !hasNextPage {
+                footer = .hidden
+            } else if paginationState == .loadingMore {
+                footer = .loadingMore
+            } else {
+                footer = .loadMore
+            }
+
+            return .content(rows: rows, inlineError: inlineError, footer: footer)
+        case .loadingInitial:
+            if rows.isEmpty {
+                return .empty
+            }
+
+            let inlineError: FeatureLoadFailure?
+            if case .error(let failure) = paginationState {
+                inlineError = failure
+            } else {
+                inlineError = nil
+            }
+
+            let footer: FooterState
+            if !hasNextPage {
+                footer = .hidden
+            } else if paginationState == .loadingMore {
+                footer = .loadingMore
+            } else {
+                footer = .loadMore
+            }
+
+            return .content(rows: rows, inlineError: inlineError, footer: footer)
+        case .loadingMore:
+            if rows.isEmpty {
+                return .empty
+            }
+
+            let inlineError: FeatureLoadFailure?
+            if case .error(let failure) = paginationState {
+                inlineError = failure
+            } else {
+                inlineError = nil
+            }
+
+            let footer: FooterState
+            if !hasNextPage {
+                footer = .hidden
+            } else if paginationState == .loadingMore {
+                footer = .loadingMore
+            } else {
+                footer = .loadMore
+            }
+
+            return .content(rows: rows, inlineError: inlineError, footer: footer)
+        case .error:
             if rows.isEmpty {
                 return .empty
             }
@@ -94,7 +160,9 @@ final class CharacterListViewModel: ObservableObject {
     func loadMore() {
         guard hasNextPage else { return }
         switch paginationState {
-        case .loadingInitial, .loadingMore:
+        case .loadingInitial:
+            return
+        case .loadingMore:
             return
         default:
             break

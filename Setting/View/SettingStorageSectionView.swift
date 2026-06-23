@@ -104,7 +104,11 @@ struct SettingStorageSectionView: View {
         case .loading:
             ProgressView()
                 .controlSize(.small)
-        case .available, .clearing:
+        case .available:
+            SettingValueAccessory(
+                text: presentation.cacheState.sizeText
+            )
+        case .clearing:
             SettingValueAccessory(
                 text: presentation.cacheState.sizeText
             )
@@ -113,7 +117,9 @@ struct SettingStorageSectionView: View {
 
     private var cacheActionTitle: String {
         switch presentation.cacheState {
-        case .loading, .available:
+        case .loading:
+            return "清除快取"
+        case .available:
             return "清除快取"
         case .clearing:
             return "正在清除快取"
@@ -122,7 +128,9 @@ struct SettingStorageSectionView: View {
 
     private var cacheActionState: SettingActionState {
         switch presentation.cacheState {
-        case .loading, .available:
+        case .loading:
+            return .idle
+        case .available:
             return .idle
         case .clearing:
             return .processing

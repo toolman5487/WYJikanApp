@@ -93,7 +93,9 @@ final class MainCategoryListViewModel: ObservableObject {
 
     var loadMoreFooterTitle: String {
         switch selectedKind {
-        case .anime, .manga:
+        case .anime:
+            return "載入更多種類"
+        case .manga:
             return "載入更多種類"
         case .people:
             return "載入更多聲優"
@@ -123,7 +125,9 @@ final class MainCategoryListViewModel: ObservableObject {
 
     var topFilterState: MainCategoryTopFilterState {
         switch selectedKind {
-        case .anime, .manga:
+        case .anime:
+            return .hidden
+        case .manga:
             return .hidden
         case .people:
             return .menu(

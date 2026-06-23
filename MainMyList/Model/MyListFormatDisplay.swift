@@ -30,13 +30,17 @@ nonisolated enum MyListFormatDisplay {
         switch title {
         case "電視動畫":
             return "tv.fill"
-        case "劇場版", "電影":
+        case "劇場版":
+            return "film.fill"
+        case "電影":
             return "film.fill"
         case "OVA":
             return "opticaldisc.fill"
         case "ONA":
             return "play.rectangle.on.rectangle.fill"
-        case "特別篇", "電視特別篇":
+        case "特別篇":
+            return "sparkles.tv.fill"
+        case "電視特別篇":
             return "sparkles.tv.fill"
         case "音樂":
             return "music.note"
@@ -44,13 +48,17 @@ nonisolated enum MyListFormatDisplay {
             return "book.closed.fill"
         case "韓漫":
             return "book.pages.fill"
-        case "條漫／華漫", "華語漫畫":
+        case "條漫／華漫":
+            return "books.vertical.fill"
+        case "華語漫畫":
             return "books.vertical.fill"
         case "小說":
             return "text.book.closed.fill"
         case "輕小說":
             return "book.fill"
-        case "單篇", "短篇":
+        case "單篇":
+            return "doc.text.fill"
+        case "短篇":
             return "doc.text.fill"
         case "同人誌":
             return "person.2.fill"

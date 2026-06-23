@@ -87,12 +87,27 @@ nonisolated struct MainNewsPresentationBuilder: Sendable {
 
     func makeHeaderContent(for screenState: MainNewsScreenState) -> MainNewsHeaderContent {
         switch screenState {
-        case .content(let content), .refreshing(let content):
+        case .content(let content):
             return headerContent(
                 countText: content.countText,
                 updatedText: content.updatedText
             )
-        case .loading, .empty, .error:
+        case .refreshing(let content):
+            return headerContent(
+                countText: content.countText,
+                updatedText: content.updatedText
+            )
+        case .loading:
+            return headerContent(
+                countText: nil,
+                updatedText: nil
+            )
+        case .empty:
+            return headerContent(
+                countText: nil,
+                updatedText: nil
+            )
+        case .error:
             return headerContent(
                 countText: nil,
                 updatedText: nil

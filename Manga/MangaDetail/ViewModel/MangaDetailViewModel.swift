@@ -59,9 +59,15 @@ final class MangaDetailViewModel: ObservableObject {
 
     var detail: MangaDetailDTO? {
         switch screenState {
-        case let .refreshing(detail), let .loaded(detail):
+        case let .refreshing(detail):
             return detail
-        case .idle, .loading, .error:
+        case let .loaded(detail):
+            return detail
+        case .idle:
+            return nil
+        case .loading:
+            return nil
+        case .error:
             return nil
         }
     }
@@ -172,7 +178,9 @@ final class MangaDetailViewModel: ObservableObject {
                 recommendationsState
             )
             return
-        case .completed, .failed:
+        case .completed:
+            break
+        case .failed:
             break
         }
 
@@ -190,7 +198,9 @@ final class MangaDetailViewModel: ObservableObject {
                 resetValueTo: resetOnFailure ? [] : nil
             )
             return
-        case .completed, .failed:
+        case .completed:
+            break
+        case .failed:
             break
         }
 

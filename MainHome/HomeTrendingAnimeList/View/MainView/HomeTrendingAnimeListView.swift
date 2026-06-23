@@ -171,7 +171,11 @@ private struct HomeTrendingAnimeListBodyView: View {
         switch viewModel.loadMoreState {
         case .available:
             return true
-        case .hidden, .loading, .error:
+        case .hidden:
+            return false
+        case .loading:
+            return false
+        case .error:
             return false
         }
     }

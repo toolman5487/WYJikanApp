@@ -58,7 +58,13 @@ private struct MangaDetailBodyView: View {
     var body: some View {
         Group {
             switch viewModel.screenState {
-            case let .refreshing(manga), let .loaded(manga):
+            case let .refreshing(manga):
+                detailScroll {
+                    ForEach(viewModel.sections(for: manga)) { section in
+                        sectionView(section, viewModel: viewModel, manga: manga)
+                    }
+                }
+            case let .loaded(manga):
                 detailScroll {
                     ForEach(viewModel.sections(for: manga)) { section in
                         sectionView(section, viewModel: viewModel, manga: manga)
@@ -74,7 +80,19 @@ private struct MangaDetailBodyView: View {
                 }
                 .padding(16)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-            case .idle, .loading:
+            case .idle:
+                detailScroll {
+                    MangaDetailHeaderSectionSkeletonView()
+                    MangaDetailHighlightsSectionSkeletonView()
+                    AnimeDetailBasicInfoSectionSkeletonView()
+                    MangaDetailScoreSectionSkeletonView()
+                    MangaDetailSynopsisSectionSkeletonView()
+                    MangaDetailCharactersSectionSkeletonView()
+                    MangaDetailPublicationSectionSkeletonView()
+                    AnimeDetailPicturesSectionSkeletonView()
+                    MangaDetailRecommendationsSectionSkeletonView()
+                }
+            case .loading:
                 detailScroll {
                     MangaDetailHeaderSectionSkeletonView()
                     MangaDetailHighlightsSectionSkeletonView()
@@ -194,9 +212,15 @@ private struct MangaDetailBodyView: View {
 
     private var currentManga: MangaDetailDTO? {
         switch viewModel.screenState {
-        case let .loaded(manga), let .refreshing(manga):
+        case let .loaded(manga):
             return manga
-        case .idle, .loading, .error:
+        case let .refreshing(manga):
+            return manga
+        case .idle:
+            return nil
+        case .loading:
+            return nil
+        case .error:
             return nil
         }
     }

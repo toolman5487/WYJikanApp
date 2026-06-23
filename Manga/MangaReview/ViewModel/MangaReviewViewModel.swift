@@ -20,7 +20,11 @@ final class MangaReviewViewModel: ObservableObject {
             switch self {
             case .content(let reviews):
                 return reviews
-            case .loading, .error, .empty:
+            case .loading:
+                return []
+            case .error:
+                return []
+            case .empty:
                 return []
             }
         }
@@ -37,7 +41,9 @@ final class MangaReviewViewModel: ObservableObject {
             switch self {
             case .idle:
                 return true
-            case .initial, .loadingMore:
+            case .initial:
+                return false
+            case .loadingMore:
                 return false
             }
         }

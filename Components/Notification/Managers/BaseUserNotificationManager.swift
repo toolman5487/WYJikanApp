@@ -88,7 +88,11 @@ class BaseUserNotificationManager: ObservableObject {
         switch state {
         case .processing(let currentKind) where currentKind == kind:
             setState(previousState)
-        case .disabled, .enabled, .processing:
+        case .disabled:
+            break
+        case .enabled:
+            break
+        case .processing:
             break
         }
     }

@@ -151,7 +151,9 @@ struct HomeWatchListView: View {
         case (.promo, .some(let actionURL)):
             openExternally(.watchPromo(url: actionURL))
 
-        case (.episode, .none), (.promo, .none):
+        case (.episode, .none):
+            router.push(.animeDetail(malId: item.animeID))
+        case (.promo, .none):
             router.push(.animeDetail(malId: item.animeID))
         }
     }
@@ -172,7 +174,11 @@ struct HomeWatchListView: View {
         switch viewModel.loadMoreState {
         case .available:
             return true
-        case .hidden, .loading, .error:
+        case .hidden:
+            return false
+        case .loading:
+            return false
+        case .error:
             return false
         }
     }

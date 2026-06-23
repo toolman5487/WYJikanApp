@@ -94,7 +94,8 @@ private final class HomeFeedRuntime {
                 watchPromos: watchPromosViewModel,
                 watchEpisodes: watchEpisodesViewModel,
                 recommendedAnime: recommendedAnimeViewModel
-            )
+            ),
+            homeLoadCoordinator: dependencies.homeLoadCoordinator
         )
     }
 }

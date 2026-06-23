@@ -75,7 +75,9 @@ struct ImagePreviewViewer: View {
     @ViewBuilder
     private func sideNavigationOverlay() -> some View {
         switch viewModel.viewState {
-        case .empty, .single:
+        case .empty:
+            EmptyView()
+        case .single:
             EmptyView()
         case .multiple(_, _, _, let navigationState):
             ImagePreviewSideNavigationBar(

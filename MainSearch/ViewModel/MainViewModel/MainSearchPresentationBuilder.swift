@@ -34,7 +34,9 @@ struct MainSearchPresentationBuilder: Sendable {
             return .loading
         case .loadMoreError(let failure):
             return .error(failure)
-        case .idle, .searching:
+        case .idle:
+            return hasNextPage ? .available : .hidden
+        case .searching:
             return hasNextPage ? .available : .hidden
         }
     }

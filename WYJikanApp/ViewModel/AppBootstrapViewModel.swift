@@ -35,7 +35,7 @@ final class AppBootstrapViewModel: ObservableObject {
         animeDetailService: AnimeDetailServicing,
         broadcastReminderRepository: any AnimeBroadcastReminderRepository,
         notificationScheduler: HomeTodayAnimeNotificationScheduler,
-        homeLoadCoordinator: any HomeLoadCoordinating = HomeLoadCoordinator.shared
+        homeLoadCoordinator: any HomeLoadCoordinating
     ) {
         self.animeDetailService = animeDetailService
         self.broadcastReminderRepository = broadcastReminderRepository

@@ -107,7 +107,17 @@ struct MainNewsView: View {
                 startReload()
             }
             .transition(.opacity)
-        case .content(let content), .refreshing(let content):
+        case .content(let content):
+            LazyVStack(alignment: .leading, spacing: 12) {
+                ForEach(content.rows) { row in
+                    MainNewsArticleRowView(row: row) {
+                        selectedArticle = row
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .transition(.opacity)
+        case .refreshing(let content):
             LazyVStack(alignment: .leading, spacing: 12) {
                 ForEach(content.rows) { row in
                     MainNewsArticleRowView(row: row) {

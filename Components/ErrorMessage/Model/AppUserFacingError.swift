@@ -28,11 +28,17 @@ extension Error {
 private extension URLError {
     nonisolated var userMessage: String {
         switch code {
-        case .notConnectedToInternet, .networkConnectionLost:
+        case .notConnectedToInternet:
+            return "網路連線不穩，請確認連線後再試。"
+        case .networkConnectionLost:
             return "網路連線不穩，請確認連線後再試。"
         case .timedOut:
             return "連線逾時，請稍後再試。"
-        case .cannotFindHost, .cannotConnectToHost, .dnsLookupFailed:
+        case .cannotFindHost:
+            return "目前無法連上伺服器，請稍後再試。"
+        case .cannotConnectToHost:
+            return "目前無法連上伺服器，請稍後再試。"
+        case .dnsLookupFailed:
             return "目前無法連上伺服器，請稍後再試。"
         case .cancelled:
             return "操作已取消。"

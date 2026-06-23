@@ -35,7 +35,9 @@ struct SynopsisTranslationButton: View {
 
     private var title: String {
         switch state {
-        case .idle, .failed:
+        case .idle:
+            return idleTitle
+        case .failed:
             return idleTitle
         case .translating:
             return "翻譯中"
@@ -75,7 +77,17 @@ struct TranslatedSynopsisTextView: View {
                 .foregroundStyle(ThemeColor.textPrimary.opacity(0.9))
                 .fixedSize(horizontal: false, vertical: true)
 
-        case .idle, .translating, .failed:
+        case .idle:
+            Text(originalText)
+                .font(primaryFont)
+                .foregroundStyle(ThemeColor.textPrimary.opacity(0.9))
+                .fixedSize(horizontal: false, vertical: true)
+        case .translating:
+            Text(originalText)
+                .font(primaryFont)
+                .foregroundStyle(ThemeColor.textPrimary.opacity(0.9))
+                .fixedSize(horizontal: false, vertical: true)
+        case .failed:
             Text(originalText)
                 .font(primaryFont)
                 .foregroundStyle(ThemeColor.textPrimary.opacity(0.9))

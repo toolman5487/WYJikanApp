@@ -89,7 +89,9 @@ nonisolated struct SynopsisTranslationService: SynopsisTranslating {
         switch error {
         case .guardrailViolation:
             return .guardrailViolation
-        case .rateLimited, .concurrentRequests:
+        case .rateLimited:
+            return .modelBusy
+        case .concurrentRequests:
             return .modelBusy
         case .assetsUnavailable:
             return .modelNotReady
@@ -99,7 +101,9 @@ nonisolated struct SynopsisTranslationService: SynopsisTranslating {
             return .unsupportedLanguage
         case .refusal:
             return .guardrailViolation
-        case .decodingFailure, .unsupportedGuide:
+        case .decodingFailure:
+            return .generationFailed
+        case .unsupportedGuide:
             return .generationFailed
         @unknown default:
             return .generationFailed

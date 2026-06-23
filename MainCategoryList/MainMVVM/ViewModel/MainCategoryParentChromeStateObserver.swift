@@ -115,9 +115,17 @@ private struct MainCategoryParentChromeState: Equatable {
 private extension GenreAnimeViewModel.LoadState {
     var allowsPullLoadMore: Bool {
         switch self {
-        case .loadingMore, .error:
+        case .loadingMore:
             return false
-        case .idle, .loadingInitial, .paused, .loaded:
+        case .error:
+            return false
+        case .idle:
+            return true
+        case .loadingInitial:
+            return true
+        case .paused:
+            return true
+        case .loaded:
             return true
         }
     }
@@ -126,9 +134,17 @@ private extension GenreAnimeViewModel.LoadState {
 private extension GenreMangaViewModel.LoadState {
     var allowsPullLoadMore: Bool {
         switch self {
-        case .loadingMore, .error:
+        case .loadingMore:
             return false
-        case .idle, .loadingInitial, .paused, .loaded:
+        case .error:
+            return false
+        case .idle:
+            return true
+        case .loadingInitial:
+            return true
+        case .paused:
+            return true
+        case .loaded:
             return true
         }
     }

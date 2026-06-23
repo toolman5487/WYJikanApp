@@ -30,7 +30,9 @@ nonisolated enum MediaTypeFormatting {
                 return "OVA"
             case "ONA":
                 return "ONA"
-            case "SPECIAL", "TV SPECIAL":
+            case "SPECIAL":
+                return "特別篇"
+            case "TV SPECIAL":
                 return "特別篇"
             case "MUSIC":
                 return "音樂"
@@ -52,7 +54,9 @@ nonisolated enum MediaTypeFormatting {
                 return "輕小說"
             case "oneshot":
                 return "單篇"
-            case "doujinshi", "doujin":
+            case "doujinshi":
+                return "同人誌"
+            case "doujin":
                 return "同人誌"
             case "manhwa":
                 return "韓漫"

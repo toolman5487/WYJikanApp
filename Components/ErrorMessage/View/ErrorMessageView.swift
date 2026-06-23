@@ -265,11 +265,23 @@ private extension ErrorMessageView.State {
         switch self {
         case .network:
             Color.red
-        case .serverError, .rateLimited, .timeout:
+        case .serverError:
             Color.orange
-        case .unavailable, .loadMoreFailed:
+        case .rateLimited:
             Color.orange
-        case .emptyCollection, .filteredEmpty, .noSearchResults, .notFound:
+        case .timeout:
+            Color.orange
+        case .unavailable:
+            Color.orange
+        case .loadMoreFailed:
+            Color.orange
+        case .emptyCollection:
+            ThemeColor.sakura
+        case .filteredEmpty:
+            ThemeColor.sakura
+        case .noSearchResults:
+            ThemeColor.sakura
+        case .notFound:
             ThemeColor.sakura
         case .permissionDenied:
             ThemeColor.sakura
@@ -278,11 +290,27 @@ private extension ErrorMessageView.State {
 
     var iconEffect: ErrorMessageIconEffect {
         switch self {
-        case .rateLimited, .filteredEmpty, .loadMoreFailed:
+        case .rateLimited:
             .rotate
-        case .network, .serverError, .timeout, .unavailable:
+        case .filteredEmpty:
+            .rotate
+        case .loadMoreFailed:
+            .rotate
+        case .network:
             .breathe
-        case .noSearchResults, .emptyCollection, .notFound, .permissionDenied:
+        case .serverError:
+            .breathe
+        case .timeout:
+            .breathe
+        case .unavailable:
+            .breathe
+        case .noSearchResults:
+            .none
+        case .emptyCollection:
+            .none
+        case .notFound:
+            .none
+        case .permissionDenied:
             .none
         }
     }

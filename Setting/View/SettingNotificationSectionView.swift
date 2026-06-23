@@ -100,7 +100,23 @@ struct SettingNotificationSectionView: View {
         case .loading:
             ProgressView()
                 .controlSize(.small)
-        case .notDetermined, .authorized, .provisional, .ephemeral, .denied:
+        case .notDetermined:
+            SettingValueAccessory(
+                text: presentation.authorizationStatus.title
+            )
+        case .authorized:
+            SettingValueAccessory(
+                text: presentation.authorizationStatus.title
+            )
+        case .provisional:
+            SettingValueAccessory(
+                text: presentation.authorizationStatus.title
+            )
+        case .ephemeral:
+            SettingValueAccessory(
+                text: presentation.authorizationStatus.title
+            )
+        case .denied:
             SettingValueAccessory(
                 text: presentation.authorizationStatus.title
             )

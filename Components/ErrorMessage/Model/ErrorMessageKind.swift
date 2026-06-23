@@ -30,7 +30,9 @@ nonisolated enum ErrorMessageKind: Equatable, Sendable {
             switch urlError.code {
             case .timedOut:
                 return .timeout
-            case .notConnectedToInternet, .networkConnectionLost:
+            case .notConnectedToInternet:
+                return .network
+            case .networkConnectionLost:
                 return .network
             case .cancelled:
                 return .unavailable
@@ -49,7 +51,9 @@ nonisolated enum ErrorMessageKind: Equatable, Sendable {
                 return resolving(from: underlyingError)
             case .noData:
                 return .emptyCollection
-            case .decodingError, .invalidURL:
+            case .decodingError:
+                return .unavailable
+            case .invalidURL:
                 return .unavailable
             }
         }

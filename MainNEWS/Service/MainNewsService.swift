@@ -53,7 +53,13 @@ nonisolated enum MainNewsServiceError: LocalizedError, AppUserFacingError, Senda
         switch self {
         case .invalidFeedURL:
             return "新聞來源設定暫時異常，請稍後再試。"
-        case .invalidResponse, .serverError, .requestFailed, .parsingFailed:
+        case .invalidResponse:
+            return "目前無法更新新聞，請稍後再試。"
+        case .serverError:
+            return "目前無法更新新聞，請稍後再試。"
+        case .requestFailed:
+            return "目前無法更新新聞，請稍後再試。"
+        case .parsingFailed:
             return "目前無法更新新聞，請稍後再試。"
         case .emptyFeed:
             return "目前沒有可顯示的新聞。"
@@ -356,7 +362,11 @@ private nonisolated final class MainNewsRSSParser: NSObject, XMLParserDelegate {
         )
 
         switch name {
-        case "item", "entry":
+        case "item":
+            currentItem = MainNewsRSSItem()
+            currentElementName = nil
+            textBuffer = ""
+        case "entry":
             currentItem = MainNewsRSSItem()
             currentElementName = nil
             textBuffer = ""
@@ -370,7 +380,17 @@ private nonisolated final class MainNewsRSSParser: NSObject, XMLParserDelegate {
                     item.imageURL = imageURL
                 }
             }
-        case "media:content", "media:thumbnail":
+        case "media:content":
+            guard let imageURL = Self.url(
+                from: attributeDict["url"],
+                requiresImageLikeURL: false
+            ) else { return }
+            updateCurrentItem { item in
+                if item.imageURL == nil {
+                    item.imageURL = imageURL
+                }
+            }
+        case "media:thumbnail":
             guard let imageURL = Self.url(
                 from: attributeDict["url"],
                 requiresImageLikeURL: false
@@ -422,7 +442,14 @@ private nonisolated final class MainNewsRSSParser: NSObject, XMLParserDelegate {
         )
 
         switch name {
-        case "item", "entry":
+        case "item":
+            if let currentItem {
+                items.append(currentItem)
+            }
+            self.currentItem = nil
+            currentElementName = nil
+            textBuffer = ""
+        case "entry":
             if let currentItem {
                 items.append(currentItem)
             }
@@ -459,21 +486,63 @@ private nonisolated final class MainNewsRSSParser: NSObject, XMLParserDelegate {
                     item.linkURL = linkURL
                 }
             }
-        case "description", "summary", "content", "content:encoded":
+        case "description":
             let summary = Self.plainText(fromHTML: text)
             updateCurrentItem { item in
                 if item.summary == nil {
                     item.summary = summary
                 }
             }
-        case "pubdate", "published", "updated":
+        case "summary":
+            let summary = Self.plainText(fromHTML: text)
+            updateCurrentItem { item in
+                if item.summary == nil {
+                    item.summary = summary
+                }
+            }
+        case "content":
+            let summary = Self.plainText(fromHTML: text)
+            updateCurrentItem { item in
+                if item.summary == nil {
+                    item.summary = summary
+                }
+            }
+        case "content:encoded":
+            let summary = Self.plainText(fromHTML: text)
+            updateCurrentItem { item in
+                if item.summary == nil {
+                    item.summary = summary
+                }
+            }
+        case "pubdate":
             guard let publishedAt = dateParser.date(from: text) else { return }
             updateCurrentItem { item in
                 if item.publishedAt == nil {
                     item.publishedAt = publishedAt
                 }
             }
-        case "author", "dc:creator":
+        case "published":
+            guard let publishedAt = dateParser.date(from: text) else { return }
+            updateCurrentItem { item in
+                if item.publishedAt == nil {
+                    item.publishedAt = publishedAt
+                }
+            }
+        case "updated":
+            guard let publishedAt = dateParser.date(from: text) else { return }
+            updateCurrentItem { item in
+                if item.publishedAt == nil {
+                    item.publishedAt = publishedAt
+                }
+            }
+        case "author":
+            let author = Self.plainText(fromHTML: text)
+            updateCurrentItem { item in
+                if item.author == nil {
+                    item.author = author
+                }
+            }
+        case "dc:creator":
             let author = Self.plainText(fromHTML: text)
             updateCurrentItem { item in
                 if item.author == nil {

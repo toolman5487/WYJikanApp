@@ -102,9 +102,19 @@ struct MangaReadingProgressEditorView: View {
 
     private func normalizedStatus(for currentChapter: Int) -> MangaReadingStatus {
         switch draft.status {
-        case .onHold, .dropped, .completed:
+        case .onHold:
             return draft.status
-        case .planned, .reading:
+        case .dropped:
+            return draft.status
+        case .completed:
+            return draft.status
+        case .planned:
+            guard currentChapter > 0 else { return .planned }
+            if let totalChapters = draft.totalChapters, currentChapter >= totalChapters {
+                return .completed
+            }
+            return .reading
+        case .reading:
             guard currentChapter > 0 else { return .planned }
             if let totalChapters = draft.totalChapters, currentChapter >= totalChapters {
                 return .completed

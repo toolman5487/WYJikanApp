@@ -44,7 +44,9 @@ enum DetailNavigationToolbarPersistenceActionState: Equatable {
         switch self {
         case .available:
             return ThemeColor.sakura
-        case .loading, .unavailable:
+        case .loading:
+            return ThemeColor.textSecondary
+        case .unavailable:
             return ThemeColor.textSecondary
         }
     }

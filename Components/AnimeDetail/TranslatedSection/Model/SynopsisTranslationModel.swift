@@ -22,7 +22,9 @@ nonisolated enum SynopsisTranslationState: Equatable, Sendable {
 
     var buttonTitle: String {
         switch self {
-        case .idle, .failed:
+        case .idle:
+            return "翻譯劇情"
+        case .failed:
             return "翻譯劇情"
         case .translating:
             return "翻譯中"
@@ -73,9 +75,13 @@ nonisolated enum SynopsisTranslationContext: Sendable {
 
     var maximumResponseTokens: Int {
         switch self {
-        case .animeWork, .mangaWork:
+        case .animeWork:
             return 900
-        case .animeEpisode, .characterProfile:
+        case .mangaWork:
+            return 900
+        case .animeEpisode:
+            return 700
+        case .characterProfile:
             return 700
         }
     }

@@ -88,9 +88,13 @@ nonisolated enum HomeWatchFeedKind: String, CaseIterable, Identifiable, Sendable
 
     var contentKind: HomeWatchContentKind {
         switch self {
-        case .latestEpisodes, .popularEpisodes:
+        case .latestEpisodes:
             return .episode
-        case .latestPromos, .popularPromos:
+        case .popularEpisodes:
+            return .episode
+        case .latestPromos:
+            return .promo
+        case .popularPromos:
             return .promo
         }
     }
@@ -101,7 +105,9 @@ nonisolated enum HomeWatchFeedKind: String, CaseIterable, Identifiable, Sendable
             return .latest
         case .popularEpisodes:
             return .popular
-        case .latestPromos, .popularPromos:
+        case .latestPromos:
+            return nil
+        case .popularPromos:
             return nil
         }
     }
@@ -112,7 +118,9 @@ nonisolated enum HomeWatchFeedKind: String, CaseIterable, Identifiable, Sendable
             return .latest
         case .popularPromos:
             return .popular
-        case .latestEpisodes, .popularEpisodes:
+        case .latestEpisodes:
+            return nil
+        case .popularEpisodes:
             return nil
         }
     }

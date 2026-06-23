@@ -17,7 +17,10 @@ enum AnimeDetailSeasonFormatting {
         case "winter": return "冬季"
         case "spring": return "春季"
         case "summer": return "夏季"
-        case "fall", "autumn": return "秋季"
+        case "fall":
+            return "秋季"
+        case "autumn":
+            return "秋季"
         default: return raw
         }
     }

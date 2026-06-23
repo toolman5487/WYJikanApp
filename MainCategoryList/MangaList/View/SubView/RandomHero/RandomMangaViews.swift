@@ -70,7 +70,19 @@ struct RandomMangaSectionView: View {
                 onDrawTap: viewModel.drawRandomManga
             )
 
-        case .ready, .cooldown:
+        case .ready:
+            RandomMangaCardView(
+                pick: viewModel.randomPick,
+                isDrawing: false,
+                cooldownText: viewModel.cooldownRemainingSeconds > 0 ? "再次抽選倒數 \(viewModel.cooldownDisplayText)" : nil,
+                drawButtonTitle: viewModel.drawButtonTitle,
+                canDraw: viewModel.canDraw,
+                detailMalId: viewModel.randomPick?.malId,
+                isFavorite: viewModel.randomPick.map { favoriteIDs.contains($0.id) } ?? false,
+                onDrawTap: viewModel.drawRandomManga
+            )
+
+        case .cooldown:
             RandomMangaCardView(
                 pick: viewModel.randomPick,
                 isDrawing: false,

@@ -80,7 +80,11 @@ final class RandomHeroViewModel: ObservableObject {
         switch drawState {
         case .idle:
             return "開始抽獎"
-        case .ready, .failure, .cooldown:
+        case .ready:
+            return randomPick == nil ? "開始抽獎" : "再抽一次"
+        case .failure:
+            return randomPick == nil ? "開始抽獎" : "再抽一次"
+        case .cooldown:
             return randomPick == nil ? "開始抽獎" : "再抽一次"
         case .loading:
             return "抽獎中..."
@@ -194,7 +198,13 @@ final class RandomHeroViewModel: ObservableObject {
             switch drawState {
             case .cooldown:
                 drawState = randomPick == nil ? .idle : .ready
-            case .idle, .loading, .ready, .failure:
+            case .idle:
+                break
+            case .loading:
+                break
+            case .ready:
+                break
+            case .failure:
                 break
             }
         }

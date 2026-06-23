@@ -53,7 +53,52 @@ final class GenreMangaViewModel: ObservableObject {
             return .loading
         case .error(let failure) where !hasDisplayableSections:
             return .error(failure)
-        case .idle, .loadingInitial, .loadingMore, .paused, .loaded, .error:
+        case .idle:
+            if genreSections.isEmpty {
+                return .empty
+            }
+
+            return .content(
+                sections: sectionsForDisplay,
+                inlineError: inlineErrorMessage
+            )
+        case .loadingInitial:
+            if genreSections.isEmpty {
+                return .empty
+            }
+
+            return .content(
+                sections: sectionsForDisplay,
+                inlineError: inlineErrorMessage
+            )
+        case .loadingMore:
+            if genreSections.isEmpty {
+                return .empty
+            }
+
+            return .content(
+                sections: sectionsForDisplay,
+                inlineError: inlineErrorMessage
+            )
+        case .paused:
+            if genreSections.isEmpty {
+                return .empty
+            }
+
+            return .content(
+                sections: sectionsForDisplay,
+                inlineError: inlineErrorMessage
+            )
+        case .loaded:
+            if genreSections.isEmpty {
+                return .empty
+            }
+
+            return .content(
+                sections: sectionsForDisplay,
+                inlineError: inlineErrorMessage
+            )
+        case .error:
             if genreSections.isEmpty {
                 return .empty
             }
@@ -101,7 +146,15 @@ final class GenreMangaViewModel: ObservableObject {
             loadSections()
         case .paused:
             resumeLoading()
-        case .idle, .loadingInitial, .loadingMore, .loaded, .error:
+        case .idle:
+            break
+        case .loadingInitial:
+            break
+        case .loadingMore:
+            break
+        case .loaded:
+            break
+        case .error:
             break
         }
     }
@@ -113,9 +166,17 @@ final class GenreMangaViewModel: ObservableObject {
 
     func loadMoreSections() {
         switch loadState {
-        case .loadingInitial, .loadingMore:
+        case .loadingInitial:
             return
-        case .idle, .paused, .loaded, .error:
+        case .loadingMore:
+            return
+        case .idle:
+            break
+        case .paused:
+            break
+        case .loaded:
+            break
+        case .error:
             break
         }
         guard canLoadMore else { return }
@@ -137,9 +198,17 @@ final class GenreMangaViewModel: ObservableObject {
         loadTask = nil
 
         switch loadState {
-        case .loadingInitial, .loadingMore:
+        case .loadingInitial:
             loadState = .paused
-        case .idle, .paused, .loaded, .error:
+        case .loadingMore:
+            loadState = .paused
+        case .idle:
+            break
+        case .paused:
+            break
+        case .loaded:
+            break
+        case .error:
             break
         }
     }
@@ -156,7 +225,15 @@ private extension GenreMangaViewModel {
         switch loadState {
         case .error:
             return genreSections.filter { !$0.items.isEmpty }
-        case .idle, .loadingInitial, .loadingMore, .paused, .loaded:
+        case .idle:
+            return genreSections
+        case .loadingInitial:
+            return genreSections
+        case .loadingMore:
+            return genreSections
+        case .paused:
+            return genreSections
+        case .loaded:
             return genreSections
         }
     }
@@ -165,7 +242,17 @@ private extension GenreMangaViewModel {
         switch loadState {
         case .idle where genreSections.isEmpty:
             return true
-        case .idle, .loadingInitial, .loadingMore, .paused, .loaded, .error:
+        case .idle:
+            return false
+        case .loadingInitial:
+            return false
+        case .loadingMore:
+            return false
+        case .paused:
+            return false
+        case .loaded:
+            return false
+        case .error:
             return false
         }
     }

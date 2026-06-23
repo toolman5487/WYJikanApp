@@ -283,7 +283,9 @@ final class SettingViewModel: ObservableObject {
         from state: BaseUserNotificationState
     ) -> SettingActionState {
         switch state {
-        case .disabled, .enabled:
+        case .disabled:
+            return .idle
+        case .enabled:
             return .idle
         case .processing:
             return .processing

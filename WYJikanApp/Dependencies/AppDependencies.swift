@@ -8,6 +8,10 @@ import SwiftUI
 
 struct AppDependencies {
 
+    // MARK: - Coordination
+
+    let homeLoadCoordinator: any HomeLoadCoordinating
+
     // MARK: - Services
 
     let mainHomeService: MainHomeServicing
@@ -63,6 +67,7 @@ struct AppDependencies {
         )
 
         return AppDependencies(
+            homeLoadCoordinator: HomeLoadCoordinator(),
             mainHomeService: MainHomeService(),
             homeWatchService: HomeWatchService(),
             mainCategoryListService: MainCategoryListService(),

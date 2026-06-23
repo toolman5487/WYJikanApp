@@ -67,7 +67,19 @@ struct RandomHeroSectionView: View {
                 onDrawTap: viewModel.drawRandomAnime
             )
 
-        case .ready, .cooldown:
+        case .ready:
+            RandomHeroCardView(
+                pick: viewModel.randomPick,
+                isDrawing: false,
+                cooldownText: viewModel.cooldownRemainingSeconds > 0 ? "再次抽選倒數 \(viewModel.cooldownDisplayText)" : nil,
+                drawButtonTitle: viewModel.drawButtonTitle,
+                canDraw: viewModel.canDraw,
+                detailMalId: viewModel.randomPick?.malId,
+                isFavorite: viewModel.randomPick.map { favoriteIDs.contains($0.id) } ?? false,
+                onDrawTap: viewModel.drawRandomAnime
+            )
+
+        case .cooldown:
             RandomHeroCardView(
                 pick: viewModel.randomPick,
                 isDrawing: false,

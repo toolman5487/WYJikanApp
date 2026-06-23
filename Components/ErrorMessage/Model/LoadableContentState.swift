@@ -17,7 +17,11 @@ nonisolated enum LoadableContentState<Content> {
         switch self {
         case .content(let content):
             return content
-        case .loading, .error, .empty:
+        case .loading:
+            return nil
+        case .error:
+            return nil
+        case .empty:
             return nil
         }
     }
@@ -25,6 +29,19 @@ nonisolated enum LoadableContentState<Content> {
     var hasContent: Bool {
         if case .content = self { return true }
         return false
+    }
+
+    var isLoadSuccessful: Bool {
+        switch self {
+        case .empty:
+            return true
+        case .content:
+            return true
+        case .loading:
+            return false
+        case .error:
+            return false
+        }
     }
 }
 
@@ -37,7 +54,11 @@ extension LoadableContentState where Content: RangeReplaceableCollection {
         switch self {
         case .content(let items):
             return items
-        case .loading, .error, .empty:
+        case .loading:
+            return Content()
+        case .error:
+            return Content()
+        case .empty:
             return Content()
         }
     }

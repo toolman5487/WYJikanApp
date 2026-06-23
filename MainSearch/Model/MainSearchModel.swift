@@ -80,7 +80,7 @@ nonisolated enum MainSearchSortOption: String, CaseIterable, Hashable, Sendable 
 
     static func supportedOptions(for kind: MainSearchKind) -> [MainSearchSortOption] {
         switch kind {
-        case .anime, .manga:
+        case .anime:
             return [
                 .defaultOption,
                 .titleAscending,
@@ -90,7 +90,25 @@ nonisolated enum MainSearchSortOption: String, CaseIterable, Hashable, Sendable 
                 .popularityDescending,
                 .popularityAscending
             ]
-        case .character, .people:
+        case .manga:
+            return [
+                .defaultOption,
+                .titleAscending,
+                .titleDescending,
+                .newest,
+                .oldest,
+                .popularityDescending,
+                .popularityAscending
+            ]
+        case .character:
+            return [
+                .defaultOption,
+                .titleAscending,
+                .titleDescending,
+                .popularityDescending,
+                .popularityAscending
+            ]
+        case .people:
             return [
                 .defaultOption,
                 .titleAscending,

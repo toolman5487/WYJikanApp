@@ -61,7 +61,13 @@ private struct AnimeDetailBodyView: View {
     var body: some View {
         Group {
             switch viewModel.screenState {
-            case let .refreshing(anime), let .loaded(anime):
+            case let .refreshing(anime):
+                detailScroll {
+                    ForEach(viewModel.sections(for: anime)) { section in
+                        sectionView(section, viewModel: viewModel, anime: anime)
+                    }
+                }
+            case let .loaded(anime):
                 detailScroll {
                     ForEach(viewModel.sections(for: anime)) { section in
                         sectionView(section, viewModel: viewModel, anime: anime)
@@ -77,7 +83,21 @@ private struct AnimeDetailBodyView: View {
                 }
                 .padding(16)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-            case .idle, .loading:
+            case .idle:
+                detailScroll {
+                    AnimeDetailHeaderSectionSkeletonView()
+                    AnimeDetailHighlightsSectionSkeletonView()
+                    AnimeDetailBasicInfoSectionSkeletonView()
+                    AnimeDetailEpisodesEntrySectionSkeletonView()
+                    AnimeDetailScoreSectionSkeletonView()
+                    AnimeDetailTrailerSectionSkeletonView()
+                    AnimeDetailSynopsisSectionSkeletonView()
+                    AnimeDetailCharactersSectionSkeletonView()
+                    AnimeDetailStaffSectionSkeletonView()
+                    AnimeDetailPicturesSectionSkeletonView()
+                    AnimeDetailRecommendationsSectionSkeletonView()
+                }
+            case .loading:
                 detailScroll {
                     AnimeDetailHeaderSectionSkeletonView()
                     AnimeDetailHighlightsSectionSkeletonView()
@@ -245,9 +265,15 @@ private struct AnimeDetailBodyView: View {
 
     private var currentAnime: AnimeDetailDTO? {
         switch viewModel.screenState {
-        case let .loaded(anime), let .refreshing(anime):
+        case let .loaded(anime):
             return anime
-        case .idle, .loading, .error:
+        case let .refreshing(anime):
+            return anime
+        case .idle:
+            return nil
+        case .loading:
+            return nil
+        case .error:
             return nil
         }
     }
