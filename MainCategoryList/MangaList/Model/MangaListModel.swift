@@ -67,10 +67,6 @@ nonisolated struct MangaListResponse: Codable, Sendable {
     let data: [MangaListRandomDTO]
 }
 
-nonisolated struct MangaListRandomResponse: Codable, Sendable {
-    let data: MangaListRandomDTO
-}
-
 // MARK: - Display
 
 nonisolated extension MangaListRandomDTO {

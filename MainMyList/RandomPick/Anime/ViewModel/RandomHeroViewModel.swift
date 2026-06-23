@@ -1,15 +1,17 @@
 //
-//  RandomMangaViewModel.swift
+//  RandomHeroViewModel.swift
 //  WYJikanApp
 //
-//  Created by Willy Hsu on 2026/4/10.
+//  Created by Willy Hsu on 2026/4/9.
 //
 
 import Foundation
 import Combine
 
 @MainActor
-final class RandomMangaViewModel: ObservableObject {
+final class RandomHeroViewModel: ObservableObject {
+    // MARK: - Types
+
     enum DrawState {
         case idle
         case loading
@@ -18,24 +20,24 @@ final class RandomMangaViewModel: ObservableObject {
         case cooldown(remainingSeconds: Int)
     }
 
+    // MARK: - Constants
+
     private static let drawCooldownSeconds = 10
     private static let minimumDrawLoadingDuration: Duration = .seconds(2)
-    private static let persistedRandomPickKey = "manga.random.lastPick"
+    private static let persistedRandomPickKey = "anime.random.lastPick"
+
+    // MARK: - Published State
 
     @Published private(set) var drawState: DrawState = .idle
-    @Published private(set) var randomPick: MangaListRandomDTO?
+    @Published private(set) var randomPick: AnimeListRandomDTO?
+
+    // MARK: - Computed Properties
 
     var isDrawing: Bool {
         switch drawState {
         case .loading:
             return true
-        case .idle:
-            return false
-        case .ready:
-            return false
-        case .failure:
-            return false
-        case .cooldown:
+        default:
             return false
         }
     }
@@ -44,13 +46,7 @@ final class RandomMangaViewModel: ObservableObject {
         switch drawState {
         case .failure(let failure):
             return failure
-        case .idle:
-            return nil
-        case .loading:
-            return nil
-        case .ready:
-            return nil
-        case .cooldown:
+        default:
             return nil
         }
     }
@@ -59,13 +55,7 @@ final class RandomMangaViewModel: ObservableObject {
         switch drawState {
         case .cooldown(let seconds):
             return seconds
-        case .idle:
-            return 0
-        case .loading:
-            return 0
-        case .ready:
-            return 0
-        case .failure:
+        default:
             return 0
         }
     }
@@ -101,25 +91,30 @@ final class RandomMangaViewModel: ObservableObject {
         }
     }
 
-    private let service: MainCategoryListServicing
+    // MARK: - Dependencies
+
+    private let service: RandomPickServicing
     private let drawCooldownTimer: GlobalCooldownTimer
     private let storage: UserDefaults
+
+    // MARK: - Private Properties
 
     private var drawTask: Task<Void, Never>?
     private var cooldownCancellable: AnyCancellable?
     private var hasAttemptedAutomaticDraw = false
 
+    // MARK: - Lifecycle
+
     init(
-        service: MainCategoryListServicing,
+        service: RandomPickServicing,
         storage: UserDefaults = .standard
     ) {
         self.service = service
         self.storage = storage
         self.drawCooldownTimer = GlobalCooldownTimer(
-            key: "manga.random.draw",
+            key: "anime.random.draw",
             cooldownSeconds: Self.drawCooldownSeconds
         )
-
         let persistedPick = restorePersistedRandomPick()
         randomPick = persistedPick
         drawState = persistedPick == nil ? .idle : .ready
@@ -130,20 +125,21 @@ final class RandomMangaViewModel: ObservableObject {
             }
     }
 
+    // MARK: - Public Methods
+
     func loadIfNeeded() {
         guard randomPick == nil, !hasAttemptedAutomaticDraw else { return }
         hasAttemptedAutomaticDraw = true
-        drawRandomManga(isAutomatic: true)
+        drawRandomAnime(isAutomatic: true)
     }
 
-    func drawRandomManga() {
-        drawRandomManga(isAutomatic: false)
+    func drawRandomAnime() {
+        drawRandomAnime(isAutomatic: false)
     }
 
-    private func drawRandomManga(isAutomatic: Bool) {
+    private func drawRandomAnime(isAutomatic: Bool) {
         guard !isDrawing else { return }
         guard drawCooldownTimer.canTrigger else { return }
-
         drawTask?.cancel()
         drawState = .loading
         let drawStartedAt = ContinuousClock().now
@@ -152,13 +148,13 @@ final class RandomMangaViewModel: ObservableObject {
         drawTask = Task(priority: taskPriority) { [weak self] in
             guard let self else { return }
             do {
-                let response = try await self.service.fetchRandomManga()
+                let response = try await self.service.fetchRandomAnime()
                 guard !Task.isCancelled else { return }
                 await self.waitForMinimumLoadingDuration(since: drawStartedAt)
                 guard !Task.isCancelled else { return }
-                let pickedManga = response.data
-                self.persistRandomPick(pickedManga)
-                self.randomPick = pickedManga
+                let pickedAnime = response.data
+                self.persistRandomPick(pickedAnime)
+                self.randomPick = pickedAnime
                 self.drawState = .ready
                 self.drawCooldownTimer.startCooldown()
                 self.updateCooldownState(seconds: self.drawCooldownTimer.remainingSeconds)
@@ -192,6 +188,8 @@ final class RandomMangaViewModel: ObservableObject {
         }
     }
 
+    // MARK: - Private Methods
+
     private func updateCooldownState(seconds: Int) {
         switch seconds {
         case let remaining where remaining > 0:
@@ -212,14 +210,14 @@ final class RandomMangaViewModel: ObservableObject {
         }
     }
 
-    private func persistRandomPick(_ pick: MangaListRandomDTO) {
+    private func persistRandomPick(_ pick: AnimeListRandomDTO) {
         guard let data = try? JSONEncoder().encode(pick) else { return }
         storage.set(data, forKey: Self.persistedRandomPickKey)
     }
 
-    private func restorePersistedRandomPick() -> MangaListRandomDTO? {
+    private func restorePersistedRandomPick() -> AnimeListRandomDTO? {
         guard let data = storage.data(forKey: Self.persistedRandomPickKey) else { return nil }
-        return try? JSONDecoder().decode(MangaListRandomDTO.self, from: data)
+        return try? JSONDecoder().decode(AnimeListRandomDTO.self, from: data)
     }
 
     private func waitForMinimumLoadingDuration(since startTime: ContinuousClock.Instant) async {

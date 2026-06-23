@@ -370,6 +370,8 @@
 		16F800022FDB100000000002 /* RandomPickHeroItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F800012FDB100000000001 /* RandomPickHeroItem.swift */; };
 		16F800042FDB100000000004 /* RandomPickHeroCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F800032FDB100000000003 /* RandomPickHeroCardView.swift */; };
 		16F800062FDB100000000006 /* RandomPickHeroSkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F800052FDB100000000005 /* RandomPickHeroSkeletonView.swift */; };
+		16A900012FF6000000000001 /* RandomPickResponseModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A900022FF6000000000002 /* RandomPickResponseModel.swift */; };
+		16A900032FF6000000000003 /* RandomPickService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A900042FF6000000000004 /* RandomPickService.swift */; };
 		16F900022FEA000000000002 /* HomeWatchModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F900012FEA000000000001 /* HomeWatchModel.swift */; };
 		16F900042FEA000000000004 /* HomeWatchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F900032FEA000000000003 /* HomeWatchService.swift */; };
 		16F900062FEA000000000006 /* HomeWatchPromosViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16F900052FEA000000000005 /* HomeWatchPromosViewModel.swift */; };
@@ -786,6 +788,8 @@
 		16F800012FDB100000000001 /* RandomPickHeroItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomPickHeroItem.swift; sourceTree = "<group>"; };
 		16F800032FDB100000000003 /* RandomPickHeroCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomPickHeroCardView.swift; sourceTree = "<group>"; };
 		16F800052FDB100000000005 /* RandomPickHeroSkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomPickHeroSkeletonView.swift; sourceTree = "<group>"; };
+		16A900022FF6000000000002 /* RandomPickResponseModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomPickResponseModel.swift; sourceTree = "<group>"; };
+		16A900042FF6000000000004 /* RandomPickService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RandomPickService.swift; sourceTree = "<group>"; };
 		16F900012FEA000000000001 /* HomeWatchModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeWatchModel.swift; sourceTree = "<group>"; };
 		16F900032FEA000000000003 /* HomeWatchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeWatchService.swift; sourceTree = "<group>"; };
 		16F900052FEA000000000005 /* HomeWatchPromosViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeWatchPromosViewModel.swift; sourceTree = "<group>"; };
@@ -1267,7 +1271,6 @@
 			isa = PBXGroup;
 			children = (
 				16A001102F89000000A1B2C3 /* GenreManga */,
-				16A001112F89000000A1B2C3 /* RandomHero */,
 			);
 			path = SubView;
 			sourceTree = "<group>";
@@ -1285,7 +1288,6 @@
 			children = (
 				16A0010D2F89000000A1B2C3 /* GenreManga */,
 				16A0010C2F89000000A1B2C3 /* MainViewModel */,
-				16A0010E2F89000000A1B2C3 /* RandomHero */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -1608,7 +1610,6 @@
 			children = (
 				15AC996F2F87A368008EAAEE /* GenreAnime */,
 				15AC99682F8797F7008EAAEE /* MainViewModel */,
-				15AC99662F8797BA008EAAEE /* RandomHero */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -1625,19 +1626,8 @@
 			isa = PBXGroup;
 			children = (
 				15AC996A2F879D8B008EAAEE /* GenreAnime */,
-				159668082F865C960033410A /* RandomHero */,
 			);
 			path = SubView;
-			sourceTree = "<group>";
-		};
-		159668082F865C960033410A /* RandomHero */ = {
-			isa = PBXGroup;
-			children = (
-				1596680A2F865F720033410A /* RandomHeroSectionView.swift */,
-				159667FC2F865AC60033410A /* RandomHeroCardView.swift */,
-				159667FD2F865AC60033410A /* RandomHeroSkeletonView.swift */,
-			);
-			path = RandomHero;
 			sourceTree = "<group>";
 		};
 		15A295462F86297D0056071F /* Logging */ = {
@@ -1657,7 +1647,6 @@
 				15A2955A2F86313B0056071F /* MangaList */,
 				159667DF2F864A6F0033410A /* PeopleList */,
 				159667EA2F86516D0033410A /* Services */,
-				16F800082FDB100000000008 /* Shared */,
 			);
 			path = MainCategoryList;
 			sourceTree = "<group>";
@@ -1855,14 +1844,6 @@
 				15A8C0222F7E0E0100E20013 /* MangaReviewSkeletonViews.swift */,
 			);
 			path = SubView;
-			sourceTree = "<group>";
-		};
-		15AC99662F8797BA008EAAEE /* RandomHero */ = {
-			isa = PBXGroup;
-			children = (
-				15AC99652F8797BA008EAAEE /* RandomHeroViewModel.swift */,
-			);
-			path = RandomHero;
 			sourceTree = "<group>";
 		};
 		15AC99682F8797F7008EAAEE /* MainViewModel */ = {
@@ -2362,6 +2343,7 @@
 				15ACFD002FD916DC00B38F89 /* GenreCollections */,
 				16FB001B2FF0000000000001 /* MangaReadingStatus */,
 				16E200052FAA200000000005 /* Model */,
+				16A900102FF6000000000010 /* RandomPick */,
 				16E201032FAA210000000003 /* Repository */,
 				16E201062FAA210000000006 /* Store */,
 				15FA49FE2F97C80500EC4C09 /* View */,
@@ -2721,14 +2703,6 @@
 			path = GenreManga;
 			sourceTree = "<group>";
 		};
-		16A0010E2F89000000A1B2C3 /* RandomHero */ = {
-			isa = PBXGroup;
-			children = (
-				16A001052F89000000A1B2C3 /* RandomMangaViewModel.swift */,
-			);
-			path = RandomHero;
-			sourceTree = "<group>";
-		};
 		16A001102F89000000A1B2C3 /* GenreManga */ = {
 			isa = PBXGroup;
 			children = (
@@ -2738,14 +2712,6 @@
 				16A001152FB5000000A1B2C3 /* GenreMangaSectionView.swift */,
 			);
 			path = GenreManga;
-			sourceTree = "<group>";
-		};
-		16A001112F89000000A1B2C3 /* RandomHero */ = {
-			isa = PBXGroup;
-			children = (
-				16A001092F89000000A1B2C3 /* RandomMangaViews.swift */,
-			);
-			path = RandomHero;
 			sourceTree = "<group>";
 		};
 		16A2002C2FB4000000D1E001 /* AnimeEpisodes */ = {
@@ -3257,22 +3223,94 @@
 			path = Pagination;
 			sourceTree = "<group>";
 		};
-		16F800072FDB100000000007 /* RandomPick */ = {
+		16A900102FF6000000000010 /* RandomPick */ = {
+			isa = PBXGroup;
+			children = (
+				16A900142FF6000000000014 /* Anime */,
+				16A900172FF6000000000017 /* Manga */,
+				16A900112FF6000000000011 /* Model */,
+				16A900122FF6000000000012 /* Service */,
+				16A900132FF6000000000013 /* Shared */,
+			);
+			path = RandomPick;
+			sourceTree = "<group>";
+		};
+		16A900112FF6000000000011 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				16A900022FF6000000000002 /* RandomPickResponseModel.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		16A900122FF6000000000012 /* Service */ = {
+			isa = PBXGroup;
+			children = (
+				16A900042FF6000000000004 /* RandomPickService.swift */,
+			);
+			path = Service;
+			sourceTree = "<group>";
+		};
+		16A900132FF6000000000013 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
 				16F800032FDB100000000003 /* RandomPickHeroCardView.swift */,
 				16F800012FDB100000000001 /* RandomPickHeroItem.swift */,
 				16F800052FDB100000000005 /* RandomPickHeroSkeletonView.swift */,
 			);
-			path = RandomPick;
+			path = Shared;
 			sourceTree = "<group>";
 		};
-		16F800082FDB100000000008 /* Shared */ = {
+		16A900142FF6000000000014 /* Anime */ = {
 			isa = PBXGroup;
 			children = (
-				16F800072FDB100000000007 /* RandomPick */,
+				16A900152FF6000000000015 /* View */,
+				16A900162FF6000000000016 /* ViewModel */,
 			);
-			path = Shared;
+			path = Anime;
+			sourceTree = "<group>";
+		};
+		16A900152FF6000000000015 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				159667FC2F865AC60033410A /* RandomHeroCardView.swift */,
+				1596680A2F865F720033410A /* RandomHeroSectionView.swift */,
+				159667FD2F865AC60033410A /* RandomHeroSkeletonView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		16A900162FF6000000000016 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				15AC99652F8797BA008EAAEE /* RandomHeroViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		16A900172FF6000000000017 /* Manga */ = {
+			isa = PBXGroup;
+			children = (
+				16A900182FF6000000000018 /* View */,
+				16A900192FF6000000000019 /* ViewModel */,
+			);
+			path = Manga;
+			sourceTree = "<group>";
+		};
+		16A900182FF6000000000018 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				16A001092F89000000A1B2C3 /* RandomMangaViews.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		16A900192FF6000000000019 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				16A001052F89000000A1B2C3 /* RandomMangaViewModel.swift */,
+			);
+			path = ViewModel;
 			sourceTree = "<group>";
 		};
 		16F9000D2FEA00000000000D /* HomeWatch */ = {
@@ -3883,6 +3921,8 @@
 				159667FF2F865AC60033410A /* RandomHeroSkeletonView.swift in Sources */,
 				159668002F865AC60033410A /* RandomHeroCardView.swift in Sources */,
 				16F800062FDB100000000006 /* RandomPickHeroSkeletonView.swift in Sources */,
+				16A900012FF6000000000001 /* RandomPickResponseModel.swift in Sources */,
+				16A900032FF6000000000003 /* RandomPickService.swift in Sources */,
 				15B3C76E2FDA91E10021D375 /* DetailCopyableTextStyle.swift in Sources */,
 				15B3C76F2FDA91E10021D375 /* DetailCopyableTextView.swift in Sources */,
 				15B3C7702FDA91E10021D375 /* DetailCopySuccessIndicator.swift in Sources */,

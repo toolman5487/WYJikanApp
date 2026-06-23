@@ -56,11 +56,12 @@ struct AppDependencies {
         let mainSearchHistoryRepository = UserDefaultsMainSearchHistoryRepository()
         let mainNewsService = MainNewsService()
         let mainCategoryListService = MainCategoryListService()
+        let randomPickService = RandomPickService()
         let myListDependencies = MyListDependencies(
             favoriteRepository: favoriteRepository,
             broadcastReminderRepository: broadcastReminderRepository,
             searchHistoryRepository: mainSearchHistoryRepository,
-            mainCategoryListService: mainCategoryListService,
+            randomPickService: randomPickService,
             clearApplicationCache: {
                 await JikanAPIService.shared.clearCache()
                 await mainNewsService.clearCache()

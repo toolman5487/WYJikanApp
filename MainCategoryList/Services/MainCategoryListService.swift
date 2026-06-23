@@ -8,8 +8,6 @@
 import Foundation
 
 nonisolated protocol MainCategoryListServicing: Sendable {
-    func fetchRandomAnime() async throws -> AnimeListRandomResponse
-    func fetchRandomManga() async throws -> MangaListRandomResponse
     func fetchAnimeGenres() async throws -> AnimeGenreListResponse
     func fetchMangaGenres() async throws -> MangaGenreListResponse
     func fetchAnimeByGenre(genreId: Int, limit: Int) async throws -> AnimeListResponse
@@ -70,14 +68,6 @@ nonisolated final class MainCategoryListService: MainCategoryListServicing {
 
     init(apiService: JikanAPIServicing = JikanAPIService.shared) {
         self.apiService = apiService
-    }
-
-    func fetchRandomAnime() async throws -> AnimeListRandomResponse {
-        try await apiService.fetch(endpoint: APIConfig.Random.anime)
-    }
-
-    func fetchRandomManga() async throws -> MangaListRandomResponse {
-        try await apiService.fetch(endpoint: APIConfig.Random.manga)
     }
 
     func fetchAnimeGenres() async throws -> AnimeGenreListResponse {

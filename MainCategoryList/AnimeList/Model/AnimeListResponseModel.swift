@@ -18,9 +18,3 @@ nonisolated struct AnimeGenreListResponse: Codable, Sendable {
 nonisolated struct AnimeListResponse: Codable, Sendable {
     let data: [AnimeListRandomDTO]
 }
-
-// MARK: - Random Anime Response
-
-nonisolated struct AnimeListRandomResponse: Codable, Sendable {
-    let data: AnimeListRandomDTO
-}
