@@ -26,7 +26,6 @@ struct RandomHeroCardView: View {
     let pick: AnimeListRandomDTO?
     let isDrawing: Bool
     var loadFailure: FeatureLoadFailure? = nil
-    var cooldownText: String? = nil
     let drawButtonTitle: String
     let canDraw: Bool
     let detailMalId: Int?
@@ -41,7 +40,6 @@ struct RandomHeroCardView: View {
             style: Self.style,
             isDrawing: isDrawing,
             loadFailure: loadFailure,
-            cooldownText: cooldownText,
             drawButtonTitle: drawButtonTitle,
             canDraw: canDraw,
             detailID: detailMalId,
@@ -105,9 +103,8 @@ private extension RandomPickHeroItem {
                 genres: nil
             ),
             isDrawing: false,
-            cooldownText: "再次抽選倒數 00:08",
-            drawButtonTitle: "再抽一次",
-            canDraw: true,
+            drawButtonTitle: "00:08 後可再抽",
+            canDraw: false,
             detailMalId: 1,
             isFavorite: true,
             onDrawTap: {}

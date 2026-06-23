@@ -48,7 +48,6 @@ struct RandomMangaSectionView: View {
                 pick: nil,
                 isDrawing: false,
                 loadFailure: nil,
-                cooldownText: nil,
                 drawButtonTitle: viewModel.drawButtonTitle,
                 canDraw: viewModel.canDraw,
                 detailMalId: nil,
@@ -62,7 +61,6 @@ struct RandomMangaSectionView: View {
             RandomMangaCardView(
                 pick: viewModel.randomPick,
                 isDrawing: true,
-                cooldownText: nil,
                 drawButtonTitle: viewModel.drawButtonTitle,
                 canDraw: viewModel.canDraw,
                 detailMalId: viewModel.randomPick?.malId,
@@ -74,7 +72,6 @@ struct RandomMangaSectionView: View {
             RandomMangaCardView(
                 pick: viewModel.randomPick,
                 isDrawing: false,
-                cooldownText: viewModel.cooldownRemainingSeconds > 0 ? "再次抽選倒數 \(viewModel.cooldownDisplayText)" : nil,
                 drawButtonTitle: viewModel.drawButtonTitle,
                 canDraw: viewModel.canDraw,
                 detailMalId: viewModel.randomPick?.malId,
@@ -86,7 +83,6 @@ struct RandomMangaSectionView: View {
             RandomMangaCardView(
                 pick: viewModel.randomPick,
                 isDrawing: false,
-                cooldownText: viewModel.cooldownRemainingSeconds > 0 ? "再次抽選倒數 \(viewModel.cooldownDisplayText)" : nil,
                 drawButtonTitle: viewModel.drawButtonTitle,
                 canDraw: viewModel.canDraw,
                 detailMalId: viewModel.randomPick?.malId,
@@ -99,7 +95,6 @@ struct RandomMangaSectionView: View {
                 pick: viewModel.randomPick,
                 isDrawing: false,
                 loadFailure: viewModel.drawFailure,
-                cooldownText: nil,
                 drawButtonTitle: viewModel.drawButtonTitle,
                 canDraw: viewModel.canDraw,
                 detailMalId: viewModel.randomPick?.malId,
@@ -130,7 +125,6 @@ private struct RandomMangaCardView: View {
     let pick: MangaListRandomDTO?
     let isDrawing: Bool
     var loadFailure: FeatureLoadFailure? = nil
-    var cooldownText: String? = nil
     let drawButtonTitle: String
     let canDraw: Bool
     let detailMalId: Int?
@@ -145,7 +139,6 @@ private struct RandomMangaCardView: View {
             style: Self.style,
             isDrawing: isDrawing,
             loadFailure: loadFailure,
-            cooldownText: cooldownText,
             drawButtonTitle: drawButtonTitle,
             canDraw: canDraw,
             detailID: detailMalId,

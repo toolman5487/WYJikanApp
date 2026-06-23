@@ -25,7 +25,6 @@ struct RandomPickHeroCardView<DetailDestination: View>: View {
     let style: RandomPickHeroStyle
     let isDrawing: Bool
     var loadFailure: FeatureLoadFailure? = nil
-    var cooldownText: String? = nil
     let drawButtonTitle: String
     let canDraw: Bool
     let detailID: Int?
@@ -64,13 +63,6 @@ struct RandomPickHeroCardView<DetailDestination: View>: View {
                             heroHeadline
                             heroMetadata
                             heroSynopsis
-
-                            if let cooldownText, !cooldownText.isEmpty {
-                                Text(cooldownText)
-                                    .font(.footnote.weight(.semibold))
-                                    .foregroundStyle(ThemeColor.textPrimary.opacity(0.86))
-                                    .lineLimit(1)
-                            }
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .layoutPriority(1)
@@ -314,9 +306,8 @@ struct RandomPickHeroCardView<DetailDestination: View>: View {
                 drawingText: "正在幫你抽選下一部作品..."
             ),
             isDrawing: false,
-            cooldownText: "再次抽選倒數 00:08",
-            drawButtonTitle: "再抽一次",
-            canDraw: true,
+            drawButtonTitle: "00:08 後可再抽",
+            canDraw: false,
             detailID: 1,
             isFavorite: true,
             onDrawTap: {},

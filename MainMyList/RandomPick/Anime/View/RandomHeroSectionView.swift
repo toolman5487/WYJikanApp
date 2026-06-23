@@ -45,7 +45,6 @@ struct RandomHeroSectionView: View {
                 pick: nil,
                 isDrawing: false,
                 loadFailure: nil,
-                cooldownText: nil,
                 drawButtonTitle: viewModel.drawButtonTitle,
                 canDraw: viewModel.canDraw,
                 detailMalId: nil,
@@ -59,7 +58,6 @@ struct RandomHeroSectionView: View {
             RandomHeroCardView(
                 pick: viewModel.randomPick,
                 isDrawing: true,
-                cooldownText: nil,
                 drawButtonTitle: viewModel.drawButtonTitle,
                 canDraw: viewModel.canDraw,
                 detailMalId: viewModel.randomPick?.malId,
@@ -71,7 +69,6 @@ struct RandomHeroSectionView: View {
             RandomHeroCardView(
                 pick: viewModel.randomPick,
                 isDrawing: false,
-                cooldownText: viewModel.cooldownRemainingSeconds > 0 ? "再次抽選倒數 \(viewModel.cooldownDisplayText)" : nil,
                 drawButtonTitle: viewModel.drawButtonTitle,
                 canDraw: viewModel.canDraw,
                 detailMalId: viewModel.randomPick?.malId,
@@ -83,7 +80,6 @@ struct RandomHeroSectionView: View {
             RandomHeroCardView(
                 pick: viewModel.randomPick,
                 isDrawing: false,
-                cooldownText: viewModel.cooldownRemainingSeconds > 0 ? "再次抽選倒數 \(viewModel.cooldownDisplayText)" : nil,
                 drawButtonTitle: viewModel.drawButtonTitle,
                 canDraw: viewModel.canDraw,
                 detailMalId: viewModel.randomPick?.malId,
@@ -96,7 +92,6 @@ struct RandomHeroSectionView: View {
                 pick: viewModel.randomPick,
                 isDrawing: false,
                 loadFailure: viewModel.drawFailure,
-                cooldownText: nil,
                 drawButtonTitle: viewModel.drawButtonTitle,
                 canDraw: viewModel.canDraw,
                 detailMalId: viewModel.randomPick?.malId,
