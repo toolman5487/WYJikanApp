@@ -52,6 +52,10 @@ nonisolated final class JikanAPIService: Sendable {
         await transientFailureBackoffStore.removeAll()
         session.configuration.urlCache?.removeAllCachedResponses()
     }
+
+    func setActiveRequestScope(_ scope: JikanAPIRequestScope) async {
+        await requestGovernor.setActiveScope(scope)
+    }
     
     // MARK: - Decoder
 
@@ -174,7 +178,10 @@ nonisolated final class JikanAPIService: Sendable {
 
     // MARK: - Remote Execution
 
-    private func execute(_ urlRequest: URLRequest) async throws -> Data {
+    private func execute(
+        _ urlRequest: URLRequest,
+        scope: JikanAPIRequestScope?
+    ) async throws -> Data {
         guard let url = urlRequest.url else {
             throw JikanAPIError.invalidURL
         }
@@ -182,11 +189,11 @@ nonisolated final class JikanAPIService: Sendable {
         var attempt = 0
 
         while true {
-            try await requestGovernor.waitForPermit()
-            AppLogger.network.debug("\(urlRequest.httpMethod ?? "GET") \(url.absoluteString, privacy: .public)")
-
             do {
-                let (data, response) = try await session.data(for: urlRequest)
+                let (data, response) = try await performRequest(
+                    urlRequest,
+                    scope: scope
+                )
 
                 switch responseState(for: response, data: data) {
                 case .success:
@@ -238,18 +245,39 @@ nonisolated final class JikanAPIService: Sendable {
         }
     }
 
+    private func performRequest(
+        _ urlRequest: URLRequest,
+        scope: JikanAPIRequestScope?
+    ) async throws -> (Data, URLResponse) {
+        try await requestGovernor.waitForPermit(scope: scope)
+        let urlString = urlRequest.url?.absoluteString ?? "invalid-url"
+        AppLogger.network.debug(
+            "\(urlRequest.httpMethod ?? "GET") \(urlString, privacy: .public)"
+        )
+
+        do {
+            let response = try await session.data(for: urlRequest)
+            await requestGovernor.releasePermit()
+            return response
+        } catch {
+            await requestGovernor.releasePermit()
+            throw error
+        }
+    }
+
     // MARK: - Data Loading
 
     private func data(
         for urlRequest: URLRequest,
-        cachePolicy: JikanAPICachePolicy
+        cachePolicy: JikanAPICachePolicy,
+        scope: JikanAPIRequestScope?
     ) async throws -> Data {
         let key = cacheKey(for: urlRequest)
 
         switch cachePolicy {
         case .remoteOnly:
             try await throwIfTransientFailureBackoffIsActive(for: key)
-            return try await sharedDataTask(for: urlRequest, key: key)
+            return try await sharedDataTask(for: urlRequest, key: key, scope: scope)
         case .cacheFirst(let ttl):
             if let cachedData = await responseCache.data(for: key) {
                 AppLogger.cache.debug("cache hit \(key, privacy: .public)")
@@ -265,7 +293,8 @@ nonisolated final class JikanAPIService: Sendable {
             return try await loadRemoteCachingResponse(
                 for: urlRequest,
                 key: key,
-                ttl: ttl
+                ttl: ttl,
+                scope: scope
             )
         case .reloadIgnoringCache(let ttl):
             try await throwIfTransientFailureBackoffIsActive(for: key)
@@ -273,7 +302,8 @@ nonisolated final class JikanAPIService: Sendable {
             return try await loadRemoteCachingResponse(
                 for: urlRequest,
                 key: key,
-                ttl: ttl
+                ttl: ttl,
+                scope: scope
             )
         }
     }
@@ -290,10 +320,15 @@ nonisolated final class JikanAPIService: Sendable {
     private func loadRemoteCachingResponse(
         for urlRequest: URLRequest,
         key: String,
-        ttl: TimeInterval
+        ttl: TimeInterval,
+        scope: JikanAPIRequestScope?
     ) async throws -> Data {
         do {
-            let freshData = try await sharedDataTask(for: urlRequest, key: key)
+            let freshData = try await sharedDataTask(
+                for: urlRequest,
+                key: key,
+                scope: scope
+            )
             await responseCache.insert(
                 freshData,
                 for: key,
@@ -322,11 +357,15 @@ nonisolated final class JikanAPIService: Sendable {
 
     // MARK: - In-Flight Requests
 
-    private func sharedDataTask(for urlRequest: URLRequest, key: String) async throws -> Data {
+    private func sharedDataTask(
+        for urlRequest: URLRequest,
+        key: String,
+        scope: JikanAPIRequestScope?
+    ) async throws -> Data {
         let priority = Task.currentPriority
         let lease = await inFlightRequestStore.acquireTask(for: key) {
             Task(priority: priority) {
-                try await self.execute(urlRequest)
+                try await self.execute(urlRequest, scope: scope)
             }
         }
 
@@ -385,7 +424,8 @@ nonisolated final class JikanAPIService: Sendable {
         let urlRequest = try makeURLRequest(for: request)
         let data = try await data(
             for: urlRequest,
-            cachePolicy: request.cachePolicy
+            cachePolicy: request.cachePolicy,
+            scope: request.scope
         )
 
         do {

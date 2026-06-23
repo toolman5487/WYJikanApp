@@ -128,7 +128,8 @@ nonisolated final class MainSearchService: MainSearchServicing {
             let response: MainSearchAnimeSearchResponse = try await apiService.fetch(
                 endpoint: request.endpoint,
                 cachePolicy: request.cachePolicy,
-                queryItems: request.queryItems
+                queryItems: request.queryItems,
+                scope: .search
             )
             return MainSearchPage(
                 rows: response.data.map { MainSearchResultRow.from(anime: $0) },
@@ -139,7 +140,8 @@ nonisolated final class MainSearchService: MainSearchServicing {
             let response: MainSearchMangaSearchResponse = try await apiService.fetch(
                 endpoint: request.endpoint,
                 cachePolicy: request.cachePolicy,
-                queryItems: request.queryItems
+                queryItems: request.queryItems,
+                scope: .search
             )
             return MainSearchPage(
                 rows: response.data.map { MainSearchResultRow.from(manga: $0) },
@@ -150,7 +152,8 @@ nonisolated final class MainSearchService: MainSearchServicing {
             let response: MainSearchCharacterSearchResponse = try await apiService.fetch(
                 endpoint: request.endpoint,
                 cachePolicy: request.cachePolicy,
-                queryItems: request.queryItems
+                queryItems: request.queryItems,
+                scope: .search
             )
             return MainSearchPage(
                 rows: response.data.map { MainSearchResultRow.from(character: $0) },
@@ -161,7 +164,8 @@ nonisolated final class MainSearchService: MainSearchServicing {
             let response: MainSearchPersonSearchResponse = try await apiService.fetch(
                 endpoint: request.endpoint,
                 cachePolicy: request.cachePolicy,
-                queryItems: request.queryItems
+                queryItems: request.queryItems,
+                scope: .search
             )
             return MainSearchPage(
                 rows: response.data.map { MainSearchResultRow.from(person: $0) },

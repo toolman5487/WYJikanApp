@@ -73,14 +73,16 @@ nonisolated final class MainCategoryListService: MainCategoryListServicing {
     func fetchAnimeGenres() async throws -> AnimeGenreListResponse {
         try await apiService.fetch(
             endpoint: APIConfig.Genres.anime,
-            cachePolicy: .genreList()
+            cachePolicy: .genreList(),
+            scope: .categoryList
         )
     }
 
     func fetchMangaGenres() async throws -> MangaGenreListResponse {
         try await apiService.fetch(
             endpoint: APIConfig.Genres.manga,
-            cachePolicy: .genreList()
+            cachePolicy: .genreList(),
+            scope: .categoryList
         )
     }
 
@@ -92,7 +94,8 @@ nonisolated final class MainCategoryListService: MainCategoryListServicing {
         return try await apiService.fetch(
             endpoint: APIConfig.Anime.list,
             cachePolicy: .cacheFirst(ttl: JikanCacheDuration.genreItems),
-            queryItems: queryItems
+            queryItems: queryItems,
+            scope: .categoryList
         )
     }
 
@@ -104,7 +107,8 @@ nonisolated final class MainCategoryListService: MainCategoryListServicing {
         return try await apiService.fetch(
             endpoint: APIConfig.Manga.list,
             cachePolicy: .cacheFirst(ttl: JikanCacheDuration.genreItems),
-            queryItems: queryItems
+            queryItems: queryItems,
+            scope: .categoryList
         )
     }
 
@@ -113,7 +117,8 @@ nonisolated final class MainCategoryListService: MainCategoryListServicing {
         return try await apiService.fetch(
             endpoint: request.endpoint,
             cachePolicy: request.cachePolicy,
-            queryItems: request.queryItems
+            queryItems: request.queryItems,
+            scope: .categoryList
         )
     }
 
@@ -122,7 +127,8 @@ nonisolated final class MainCategoryListService: MainCategoryListServicing {
         return try await apiService.fetch(
             endpoint: request.endpoint,
             cachePolicy: request.cachePolicy,
-            queryItems: request.queryItems
+            queryItems: request.queryItems,
+            scope: .categoryList
         )
     }
 }

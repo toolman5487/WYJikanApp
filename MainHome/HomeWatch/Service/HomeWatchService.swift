@@ -113,7 +113,8 @@ nonisolated final class HomeWatchService: HomeWatchServicing {
         let response: HomeWatchPromosResponse = try await apiService.fetch(
             endpoint: endpoint(for: feed),
             cachePolicy: cachePolicy(forceRefresh: forceRefresh, ttl: ttl(for: feed)),
-            queryItems: queryItems(page: page, limit: limit)
+            queryItems: queryItems(page: page, limit: limit),
+            scope: .home
         )
         return response
     }
@@ -129,7 +130,8 @@ nonisolated final class HomeWatchService: HomeWatchServicing {
         let response: HomeWatchEpisodesResponse = try await apiService.fetch(
             endpoint: endpoint(for: feed),
             cachePolicy: cachePolicy(forceRefresh: forceRefresh, ttl: ttl(for: feed)),
-            queryItems: queryItems(page: page, limit: limit)
+            queryItems: queryItems(page: page, limit: limit),
+            scope: .home
         )
         return response
     }

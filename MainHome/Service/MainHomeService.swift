@@ -65,7 +65,8 @@ nonisolated final class MainHomeService: MainHomeServicing {
     func fetchHeroBanner(forceRefresh: Bool) async throws -> HeroBannerResponse {
         try await apiService.fetch(
             endpoint: APIConfig.Seasons.now(),
-            cachePolicy: .feed(forceRefresh: forceRefresh)
+            cachePolicy: .feed(forceRefresh: forceRefresh),
+            scope: .home
         )
     }
 
@@ -75,7 +76,8 @@ nonisolated final class MainHomeService: MainHomeServicing {
             cachePolicy: .feed(forceRefresh: forceRefresh),
             queryItems: [
                 URLQueryItem(name: "limit", value: String(limit))
-            ]
+            ],
+            scope: .home
         )
     }
 
@@ -85,7 +87,8 @@ nonisolated final class MainHomeService: MainHomeServicing {
             cachePolicy: .feed(forceRefresh: forceRefresh),
             queryItems: [
                 URLQueryItem(name: "limit", value: String(limit))
-            ]
+            ],
+            scope: .home
         )
     }
 
@@ -97,7 +100,8 @@ nonisolated final class MainHomeService: MainHomeServicing {
                 URLQueryItem(name: "filter", value: "tv"),
                 URLQueryItem(name: "limit", value: String(limit)),
                 URLQueryItem(name: "sfw", value: "true")
-            ]
+            ],
+            scope: .home
         )
     }
 
@@ -107,7 +111,8 @@ nonisolated final class MainHomeService: MainHomeServicing {
             cachePolicy: .feed(forceRefresh: forceRefresh),
             queryItems: [
                 URLQueryItem(name: "limit", value: String(limit))
-            ]
+            ],
+            scope: .home
         )
     }
 

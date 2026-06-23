@@ -104,6 +104,8 @@ private final class HomeFeedRuntime {
 
 private struct MainHomeFeedView: View {
 
+    private static let initialLoadGracePeriod: Duration = .milliseconds(600)
+
     enum SectionKind: Identifiable {
         case watchPromos
         case todayAnime
@@ -136,6 +138,7 @@ private struct MainHomeFeedView: View {
     }
 
     @EnvironmentObject private var router: MainHomeRouter
+    @EnvironmentObject private var mainTabBarViewModel: MainTabBarViewModel
     @State private var loadMoreBounceProgress: CGFloat = 0
     @State private var canLoadMoreRecommendations = false
 
@@ -190,9 +193,28 @@ private struct MainHomeFeedView: View {
         .refreshable {
             await runtime.coordinator.refreshAll()
         }
-        .task(priority: .userInitiated) {
+        .task(id: mainTabBarViewModel.selectedTab, priority: .userInitiated) {
+            guard mainTabBarViewModel.selectedTab == .home else { return }
+
+            do {
+                try await Task.sleep(for: Self.initialLoadGracePeriod)
+            } catch {
+                return
+            }
+
+            guard !Task.isCancelled,
+                  mainTabBarViewModel.selectedTab == .home else {
+                return
+            }
+
             let platform = UserInterfacePlatform.current
             await runtime.coordinator.loadInitial()
+
+            guard !Task.isCancelled,
+                  mainTabBarViewModel.selectedTab == .home else {
+                return
+            }
+
             if platform.shouldPreloadHomeDeferredSections {
                 await runtime.coordinator.loadDeferredSections(
                     priority: .utility,
@@ -244,9 +266,10 @@ private struct MainHomeFeedView: View {
                 )
             }
         }
-        .task(priority: .utility) {
+        .task(id: mainTabBarViewModel.selectedTab, priority: .utility) {
             let platform = UserInterfacePlatform.current
-            guard platform.loadsHomeDeferredSectionsWhenVisible,
+            guard mainTabBarViewModel.selectedTab == .home,
+                  platform.loadsHomeDeferredSectionsWhenVisible,
                   let feedSection = homeFeedSection(for: section) else { return }
             await runtime.coordinator.loadSectionIfNeeded(feedSection)
         }

@@ -72,6 +72,14 @@ nonisolated enum JikanAPICachePolicy: Sendable {
     case reloadIgnoringCache(ttl: TimeInterval)
 }
 
+nonisolated enum JikanAPIRequestScope: Hashable, Sendable {
+    case home
+    case categoryList
+    case news
+    case myList
+    case search
+}
+
 // MARK: - JikanCacheDuration
 
 nonisolated enum JikanCacheDuration {
@@ -117,29 +125,34 @@ nonisolated struct JikanAPIRequest: Sendable {
     let queryItems: [URLQueryItem]
     let method: String
     let cachePolicy: JikanAPICachePolicy
+    let scope: JikanAPIRequestScope?
 
     init(
         path: String,
         queryItems: [URLQueryItem] = [],
         method: String = "GET",
-        cachePolicy: JikanAPICachePolicy = .remoteOnly
+        cachePolicy: JikanAPICachePolicy = .remoteOnly,
+        scope: JikanAPIRequestScope? = nil
     ) {
         self.target = .path(path)
         self.queryItems = queryItems
         self.method = method
         self.cachePolicy = cachePolicy
+        self.scope = scope
     }
 
     init(
         absoluteURL: String,
         queryItems: [URLQueryItem] = [],
         method: String = "GET",
-        cachePolicy: JikanAPICachePolicy = .remoteOnly
+        cachePolicy: JikanAPICachePolicy = .remoteOnly,
+        scope: JikanAPIRequestScope? = nil
     ) {
         self.target = .absoluteURL(absoluteURL)
         self.queryItems = queryItems
         self.method = method
         self.cachePolicy = cachePolicy
+        self.scope = scope
     }
 }
 
@@ -162,6 +175,33 @@ nonisolated protocol JikanAPIServicing: Sendable {
 // MARK: - JikanAPIServicing Convenience
 
 nonisolated extension JikanAPIServicing {
+    func fetch<T: Decodable & Sendable>(
+        endpoint: String,
+        cachePolicy: JikanAPICachePolicy,
+        queryItems: [URLQueryItem]? = nil,
+        scope: JikanAPIRequestScope
+    ) async throws -> T {
+        try await send(
+            JikanAPIRequest(
+                path: endpoint,
+                queryItems: queryItems ?? [],
+                cachePolicy: cachePolicy,
+                scope: scope
+            )
+        )
+    }
+
+    func fetch<T: Decodable & Sendable>(
+        endpoint: String,
+        scope: JikanAPIRequestScope
+    ) async throws -> T {
+        try await fetch(
+            endpoint: endpoint,
+            cachePolicy: .remoteOnly,
+            scope: scope
+        )
+    }
+
     func fetch<T: Decodable & Sendable>(
         endpoint: String,
         queryItems: [URLQueryItem]? = nil

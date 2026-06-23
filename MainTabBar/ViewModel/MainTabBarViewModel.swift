@@ -12,6 +12,21 @@ enum AppTab: Hashable {
     case news
     case myList
     case searchLiquidGlass
+
+    var requestScope: JikanAPIRequestScope {
+        switch self {
+        case .home:
+            return .home
+        case .categorylist:
+            return .categoryList
+        case .news:
+            return .news
+        case .myList:
+            return .myList
+        case .searchLiquidGlass:
+            return .search
+        }
+    }
 }
 
 @MainActor

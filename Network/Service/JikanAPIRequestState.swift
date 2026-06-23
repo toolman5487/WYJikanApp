@@ -156,20 +156,27 @@ actor JikanAPIInFlightRequestStore {
 // MARK: - JikanAPIRequestGovernor
 
 actor JikanAPIRequestGovernor {
+    private static let concurrencyPollInterval: TimeInterval = 0.05
+
+    private let maximumConcurrentRequests: Int
     private let tokenCapacity: Double
     private let tokenRefillInterval: TimeInterval
     private let minimumRequestInterval: TimeInterval
 
+    private var activeRequestCount = 0
     private var availableTokens: Double
     private var lastTokenRefillDate: Date
     private var nextRequestDate = Date.distantPast
     private var rateLimitExpirationDate = Date.distantPast
+    private var activeScope: JikanAPIRequestScope = .home
 
     init(
+        maximumConcurrentRequests: Int = 2,
         maximumRequestsPerSecond: Int = 3,
         maximumRequestsPerMinute: Int = 60,
         now: Date = Date()
     ) {
+        self.maximumConcurrentRequests = max(1, maximumConcurrentRequests)
         let burstSize = max(1, maximumRequestsPerSecond)
         let refillableRequestsPerMinute = max(1, maximumRequestsPerMinute - burstSize)
 
@@ -180,15 +187,29 @@ actor JikanAPIRequestGovernor {
         self.lastTokenRefillDate = now
     }
 
-    func waitForPermit() async throws {
+    func setActiveScope(_ scope: JikanAPIRequestScope) {
+        activeScope = scope
+    }
+
+    func waitForPermit(scope: JikanAPIRequestScope?) async throws {
         while true {
             try Task.checkCancellation()
+
+            if let scope, scope != activeScope {
+                try await sleep(for: Self.concurrencyPollInterval)
+                continue
+            }
 
             let now = Date()
             if rateLimitExpirationDate > now {
                 throw JikanAPIError.rateLimited(
                     retryAfter: rateLimitExpirationDate.timeIntervalSince(now)
                 )
+            }
+
+            guard activeRequestCount < maximumConcurrentRequests else {
+                try await sleep(for: Self.concurrencyPollInterval)
+                continue
             }
 
             refillTokens(at: now)
@@ -206,8 +227,13 @@ actor JikanAPIRequestGovernor {
 
             availableTokens -= 1
             nextRequestDate = now.addingTimeInterval(minimumRequestInterval)
+            activeRequestCount += 1
             return
         }
+    }
+
+    func releasePermit() {
+        activeRequestCount = max(0, activeRequestCount - 1)
     }
 
     func recordRateLimit(retryAfter: TimeInterval, now: Date = Date()) {

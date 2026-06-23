@@ -36,7 +36,8 @@ nonisolated final class HomeTrendingMangaListService: HomeTrendingMangaListServi
             queryItems: [
                 URLQueryItem(name: "page", value: String(page)),
                 URLQueryItem(name: "limit", value: String(limit))
-            ]
+            ],
+            scope: .home
         )
 
         return MangaCategoryPage(

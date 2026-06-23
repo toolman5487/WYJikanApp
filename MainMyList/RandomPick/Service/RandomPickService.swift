@@ -19,10 +19,16 @@ nonisolated final class RandomPickService: RandomPickServicing {
     }
 
     func fetchRandomAnime() async throws -> AnimeListRandomResponse {
-        try await apiService.fetch(endpoint: APIConfig.Random.anime)
+        try await apiService.fetch(
+            endpoint: APIConfig.Random.anime,
+            scope: .myList
+        )
     }
 
     func fetchRandomManga() async throws -> MangaListRandomResponse {
-        try await apiService.fetch(endpoint: APIConfig.Random.manga)
+        try await apiService.fetch(
+            endpoint: APIConfig.Random.manga,
+            scope: .myList
+        )
     }
 }

@@ -76,6 +76,11 @@ private struct MainTabBarConfiguredView: View {
         .tabViewStyle(.sidebarAdaptable)
         .toolbarBackground(.visible, for: .tabBar)
         .tabBarMinimizeBehavior(.onScrollDown)
+        .task(id: viewModel.selectedTab) {
+            await JikanAPIService.shared.setActiveRequestScope(
+                viewModel.selectedTab.requestScope
+            )
+        }
         .onChange(of: viewModel.selectedTab) { _, selectedTab in
             viewModel.handleSelectedTabChange(
                 selectedTab,
