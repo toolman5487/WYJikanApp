@@ -28,6 +28,7 @@ struct MainMyListView: View {
 
     @EnvironmentObject private var broadcastReminderStatusStore: AnimeBroadcastReminderStatusStore
     @EnvironmentObject private var favoriteStatusStore: FavoriteStatusStore
+    @EnvironmentObject private var mainTabBarViewModel: MainTabBarViewModel
     @EnvironmentObject private var notificationScheduler: HomeTodayAnimeNotificationScheduler
     @EnvironmentObject private var appPersistenceStore: AppPersistenceStore
 
@@ -113,10 +114,23 @@ struct MainMyListView: View {
             } message: {
                 Text(viewModel.persistenceMutationState.failureMessage ?? "")
             }
+            .task(id: mainTabBarViewModel.selectedTab, priority: .userInitiated) {
+                await handleSelectedTabChange()
+            }
             .onDisappear {
                 stopRandomPickRequests()
             }
         }
+    }
+
+    private func handleSelectedTabChange() async {
+        guard mainTabBarViewModel.selectedTab == .myList else {
+            stopRandomPickRequests()
+            return
+        }
+
+        guard appPersistenceStore.isReady else { return }
+        await updateRandomPickLifecycle(for: viewModel.selectedFilter)
     }
 
     // MARK: - Private Views
@@ -138,6 +152,7 @@ struct MainMyListView: View {
             .padding(.bottom, Layout.bottomPadding)
         }
         .task(id: viewModel.selectedFilter, priority: .userInitiated) {
+            guard mainTabBarViewModel.selectedTab == .myList else { return }
             await updateRandomPickLifecycle(for: viewModel.selectedFilter)
         }
     }
@@ -378,4 +393,5 @@ struct MainMyListView: View {
 #Preview {
     MainMyListView(dependencies: AppDependencies.live.myList)
         .environmentObject(AppPersistenceStore())
+        .environmentObject(MainTabBarViewModel())
 }

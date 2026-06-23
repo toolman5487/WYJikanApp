@@ -11,6 +11,7 @@ struct MainCategoryListView: View {
 
     // MARK: - Properties
 
+    @EnvironmentObject private var mainTabBarViewModel: MainTabBarViewModel
     @StateObject private var viewModel: MainCategoryListViewModel
 
     // MARK: - Lifecycle
@@ -28,13 +29,22 @@ struct MainCategoryListView: View {
         NavigationStack {
             scrollView
                 .toolbar(.hidden, for: .navigationBar)
-                .task(priority: .userInitiated) {
-                    await viewModel.screenDidAppear(platform: .current)
+                .task(id: mainTabBarViewModel.selectedTab, priority: .userInitiated) {
+                    await handleSelectedTabChange()
                 }
                 .onDisappear {
                     viewModel.screenDidDisappear()
                 }
         }
+    }
+
+    private func handleSelectedTabChange() async {
+        guard mainTabBarViewModel.selectedTab == .categorylist else {
+            viewModel.screenDidDisappear()
+            return
+        }
+
+        await viewModel.screenDidAppear(platform: .current)
     }
     
     // MARK: - Scroll View
@@ -174,4 +184,5 @@ struct MainCategoryListView: View {
 
 #Preview {
     MainCategoryListView(dependencies: .live)
+        .environmentObject(MainTabBarViewModel())
 }

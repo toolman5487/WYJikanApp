@@ -54,6 +54,14 @@ final class MainNewsViewModel: ObservableObject {
         await fetchLatestNews(forceRefresh: false, showLoading: true)
     }
 
+    func screenDidAppear() async {
+        await loadIfNeeded()
+    }
+
+    func screenDidDisappear() {
+        requestGeneration += 1
+    }
+
     func reload() async {
         guard !isRefreshing else { return }
         await fetchLatestNews(forceRefresh: true, showLoading: !hasLoaded)

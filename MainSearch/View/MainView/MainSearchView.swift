@@ -11,6 +11,7 @@ struct MainSearchView: View {
 
     // MARK: - Properties
 
+    @EnvironmentObject private var mainTabBarViewModel: MainTabBarViewModel
     @ObservedObject var viewModel: MainSearchViewModel
     @State private var loadMoreBounceProgress: CGFloat = 0
 
@@ -22,12 +23,21 @@ struct MainSearchView: View {
             .onSubmit(of: .search) {
                 viewModel.submitSearch()
             }
-            .task(priority: .userInitiated) {
-                await viewModel.screenDidAppear()
+            .task(id: mainTabBarViewModel.selectedTab, priority: .userInitiated) {
+                await handleSelectedTabChange()
             }
             .onDisappear {
                 viewModel.screenDidDisappear()
             }
+    }
+
+    private func handleSelectedTabChange() async {
+        guard mainTabBarViewModel.selectedTab == .searchLiquidGlass else {
+            viewModel.screenDidDisappear()
+            return
+        }
+
+        await viewModel.screenDidAppear()
     }
 
     // MARK: - Private Views
@@ -99,6 +109,7 @@ struct MainSearchView: View {
 
         var body: some View {
             MainSearchView(viewModel: viewModel)
+                .environmentObject(MainTabBarViewModel())
         }
     }
 

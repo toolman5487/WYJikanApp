@@ -9,6 +9,7 @@ struct MainNewsView: View {
 
     // MARK: - Properties
 
+    @EnvironmentObject private var mainTabBarViewModel: MainTabBarViewModel
     @StateObject private var viewModel: MainNewsViewModel
     @State private var reloadTask: Task<Void, Never>?
     @State private var selectedArticle: MainNewsRow?
@@ -23,6 +24,25 @@ struct MainNewsView: View {
 
     var body: some View {
         newsNavigationStack
+            .task(id: mainTabBarViewModel.selectedTab, priority: .userInitiated) {
+                await handleSelectedTabChange()
+            }
+            .onDisappear {
+                viewModel.screenDidDisappear()
+                reloadTask?.cancel()
+                reloadTask = nil
+            }
+    }
+
+    private func handleSelectedTabChange() async {
+        guard mainTabBarViewModel.selectedTab == .news else {
+            viewModel.screenDidDisappear()
+            reloadTask?.cancel()
+            reloadTask = nil
+            return
+        }
+
+        await viewModel.screenDidAppear()
     }
 
     // MARK: - Private Views
@@ -56,13 +76,6 @@ struct MainNewsView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     reloadButton
                 }
-            }
-            .task(priority: .userInitiated) {
-                await viewModel.loadIfNeeded()
-            }
-            .onDisappear {
-                reloadTask?.cancel()
-                reloadTask = nil
             }
             .navigationDestination(item: $selectedArticle) { row in
                 BaseWebView(page: .newsArticle(sourceName: row.sourceName, url: row.linkURL))
@@ -142,4 +155,5 @@ struct MainNewsView: View {
 
 #Preview {
     MainNewsView(dependencies: .live)
+        .environmentObject(MainTabBarViewModel())
 }
