@@ -97,7 +97,8 @@ nonisolated final class JikanAPIService: Sendable {
             JikanAPIRequest(
                 path: endpoint,
                 queryItems: queryItems ?? [],
-                cachePolicy: cachePolicy
+                cachePolicy: cachePolicy,
+                scope: .independent
             )
         )
     }
@@ -109,7 +110,8 @@ nonisolated final class JikanAPIService: Sendable {
         try await send(
             JikanAPIRequest(
                 absoluteURL: urlString,
-                cachePolicy: cachePolicy
+                cachePolicy: cachePolicy,
+                scope: .independent
             )
         )
     }
@@ -250,7 +252,7 @@ private extension JikanAPIService {
 
     nonisolated func execute(
         _ urlRequest: URLRequest,
-        scope: RequestLifecycleScope?
+        scope: RequestLifecycleScope
     ) async throws -> Data {
         guard let url = urlRequest.url else {
             throw JikanAPIError.invalidURL
@@ -296,7 +298,7 @@ private extension JikanAPIService {
 
     nonisolated func performRequest(
         _ urlRequest: URLRequest,
-        scope: RequestLifecycleScope?,
+        scope: RequestLifecycleScope,
         attempt: Int
     ) async throws -> Data {
         try await requestLifecycleExecutor.perform(
@@ -377,7 +379,7 @@ private extension JikanAPIService {
     nonisolated func data(
         for urlRequest: URLRequest,
         cachePolicy: JikanAPICachePolicy,
-        scope: RequestLifecycleScope?
+        scope: RequestLifecycleScope
     ) async throws -> Data {
         let key = cacheKey(for: urlRequest)
 
@@ -430,7 +432,7 @@ private extension JikanAPIService {
         for urlRequest: URLRequest,
         key: String,
         ttl: TimeInterval,
-        scope: RequestLifecycleScope?
+        scope: RequestLifecycleScope
     ) async throws -> Data {
         do {
             let freshData = try await sharedDataTask(
@@ -472,7 +474,7 @@ private extension JikanAPIService {
     nonisolated func sharedDataTask(
         for urlRequest: URLRequest,
         key: String,
-        scope: RequestLifecycleScope?
+        scope: RequestLifecycleScope
     ) async throws -> Data {
         let priority = Task.currentPriority
         let lease = await inFlightRequestStore.acquireTask(for: key) {

@@ -135,14 +135,14 @@ nonisolated struct JikanAPIRequest: Sendable {
     let queryItems: [URLQueryItem]
     let method: String
     let cachePolicy: JikanAPICachePolicy
-    let scope: RequestLifecycleScope?
+    let scope: RequestLifecycleScope
 
     init(
         path: String,
         queryItems: [URLQueryItem] = [],
         method: String = "GET",
         cachePolicy: JikanAPICachePolicy = .remoteOnly,
-        scope: RequestLifecycleScope? = nil
+        scope: RequestLifecycleScope
     ) {
         self.target = .path(path)
         self.queryItems = queryItems
@@ -156,7 +156,7 @@ nonisolated struct JikanAPIRequest: Sendable {
         queryItems: [URLQueryItem] = [],
         method: String = "GET",
         cachePolicy: JikanAPICachePolicy = .remoteOnly,
-        scope: RequestLifecycleScope? = nil
+        scope: RequestLifecycleScope
     ) {
         self.target = .absoluteURL(absoluteURL)
         self.queryItems = queryItems

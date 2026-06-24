@@ -189,7 +189,7 @@ nonisolated protocol RequestLifecycleControlling: Sendable {
 
 nonisolated protocol RequestLifecycleExecuting: Sendable {
     func perform<Value: Sendable>(
-        scope: RequestLifecycleScope?,
+        scope: RequestLifecycleScope,
         inactivePolicy: RequestInactivePolicy,
         operation: @escaping @Sendable () async throws -> Value
     ) async throws -> Value
@@ -329,14 +329,13 @@ actor RequestLifecycleManager: RequestLifecycleManaging {
     // MARK: - Request Execution
 
     func perform<Value: Sendable>(
-        scope: RequestLifecycleScope?,
+        scope: RequestLifecycleScope,
         inactivePolicy: RequestInactivePolicy = .pauseQueued,
         operation: @escaping @Sendable () async throws -> Value
     ) async throws -> Value {
-        let resolvedScope = scope ?? .independent
         let requestID = UUID()
         knownRequestIDs.insert(requestID)
-        if isForeground(resolvedScope) {
+        if isForeground(scope) {
             prepareForForegroundRequest()
         }
         defer {
@@ -344,10 +343,10 @@ actor RequestLifecycleManager: RequestLifecycleManaging {
             cancelledPendingRequestIDs.remove(requestID)
         }
 
-        while !isEligible(resolvedScope) {
+        while !isEligible(scope) {
             try await waitUntilEligible(
                 requestID: requestID,
-                scope: resolvedScope,
+                scope: scope,
                 inactivePolicy: inactivePolicy
             )
         }
@@ -357,7 +356,7 @@ actor RequestLifecycleManager: RequestLifecycleManaging {
             try await operation()
         }
         runningRequests[requestID] = RunningRequest(
-            scope: resolvedScope,
+            scope: scope,
             inactivePolicy: inactivePolicy,
             cancel: { task.cancel() }
         )
@@ -369,11 +368,11 @@ actor RequestLifecycleManager: RequestLifecycleManaging {
                 task.cancel()
             }
             runningRequests.removeValue(forKey: requestID)
-            requestDidFinish(scope: resolvedScope)
+            requestDidFinish(scope: scope)
             return value
         } catch {
             runningRequests.removeValue(forKey: requestID)
-            requestDidFinish(scope: resolvedScope)
+            requestDidFinish(scope: scope)
             throw error
         }
     }
