@@ -77,7 +77,7 @@ private struct AnimeDetailBodyView: View {
                     title: "作品資料暫時載入失敗",
                     retryTitle: "重新載入"
                 ) {
-                    Task(priority: .userInitiated) { await viewModel.load(forceRefresh: true) }
+                    viewModel.refresh()
                 }
                 .padding(16)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -145,10 +145,7 @@ private struct AnimeDetailBodyView: View {
                     handleBroadcastReminderTap()
                 },
                 onRefreshTap: {
-                    Task(priority: .userInitiated) {
-                        await viewModel.load(forceRefresh: true)
-                        await syncBroadcastReminderIfAvailable()
-                    }
+                    refreshAndSyncBroadcastReminder()
                 },
                 reviewDestination: { title in
                     AnimeReviewView(
@@ -330,9 +327,7 @@ private struct AnimeDetailBodyView: View {
                 title: "角色與聲優",
                 isEmpty: { _ in viewModel.allCharacterRoles.isEmpty },
                 onRetry: {
-                    Task(priority: .userInitiated) {
-                        await viewModel.reloadCharacters()
-                    }
+                    viewModel.retryCharacters()
                 },
                 loading: {
                     AnimeDetailCharactersSectionSkeletonView()
@@ -353,9 +348,7 @@ private struct AnimeDetailBodyView: View {
                 title: "劇照",
                 isEmpty: \.isEmpty,
                 onRetry: {
-                    Task(priority: .userInitiated) {
-                        await viewModel.reloadPictures()
-                    }
+                    viewModel.retryPictures()
                 },
                 loading: {
                     AnimeDetailPicturesSectionSkeletonView()
@@ -375,9 +368,7 @@ private struct AnimeDetailBodyView: View {
                 title: "你可能也喜歡",
                 isEmpty: { _ in viewModel.allRecommendations.isEmpty },
                 onRetry: {
-                    Task(priority: .userInitiated) {
-                        await viewModel.reloadRecommendations()
-                    }
+                    viewModel.retryRecommendations()
                 },
                 loading: {
                     AnimeDetailRecommendationsSectionSkeletonView()
@@ -400,16 +391,6 @@ private struct AnimeDetailBodyView: View {
         imagePreviewSession = ImagePreviewSession(items: items, selectedIndex: selectedIndex)
     }
 
-    private func toggleBroadcastReminder() async {
-        if let error = await viewModel.toggleBroadcastReminder(
-            isSubscribed: broadcastReminderStatusStore.isSubscribed(malId: malId),
-            subscribedCount: broadcastReminderStatusStore.subscriptions.count,
-            notificationScheduler: todayAnimeNotificationScheduler
-        ) {
-            viewModel.presentBroadcastReminderAlert(message: error.localizedDescription)
-        }
-    }
-
     private func handleFavoriteTap() {
         guard canPerformPersistenceAction() else { return }
         viewModel.toggleFavorite(isFavorite: isFavorite)
@@ -418,9 +399,11 @@ private struct AnimeDetailBodyView: View {
     private func handleBroadcastReminderTap() {
         guard canPerformPersistenceAction() else { return }
 
-        Task(priority: .userInitiated) {
-            await toggleBroadcastReminder()
-        }
+        viewModel.requestBroadcastReminderToggle(
+            isSubscribed: broadcastReminderStatusStore.isSubscribed(malId: malId),
+            subscribedCount: broadcastReminderStatusStore.subscriptions.count,
+            notificationScheduler: todayAnimeNotificationScheduler
+        )
     }
 
     private func canPerformPersistenceAction() -> Bool {
@@ -441,6 +424,14 @@ private struct AnimeDetailBodyView: View {
         guard appPersistenceStore.isReady else { return }
 
         await viewModel.syncBroadcastReminderIfNeeded(
+            isSubscribed: broadcastReminderStatusStore.isSubscribed(malId: malId),
+            subscribedCount: broadcastReminderStatusStore.subscriptions.count,
+            notificationScheduler: todayAnimeNotificationScheduler
+        )
+    }
+
+    private func refreshAndSyncBroadcastReminder() {
+        viewModel.refreshAndSyncBroadcastReminder(
             isSubscribed: broadcastReminderStatusStore.isSubscribed(malId: malId),
             subscribedCount: broadcastReminderStatusStore.subscriptions.count,
             notificationScheduler: todayAnimeNotificationScheduler

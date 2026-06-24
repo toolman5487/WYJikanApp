@@ -75,7 +75,7 @@ private struct MangaDetailBodyView: View {
                     title: "作品資料暫時載入失敗",
                     retryTitle: "重新載入"
                 ) {
-                    Task(priority: .userInitiated) { await viewModel.load(forceRefresh: true) }
+                    viewModel.refresh()
                 }
                 .padding(16)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -134,9 +134,7 @@ private struct MangaDetailBodyView: View {
                     handleFavoriteTap()
                 },
                 onRefreshTap: {
-                    Task(priority: .userInitiated) {
-                        await viewModel.load(forceRefresh: true)
-                    }
+                    viewModel.refresh()
                 },
                 reviewDestination: { title in
                     MangaReviewView(
@@ -305,9 +303,7 @@ private struct MangaDetailBodyView: View {
                 title: "角色",
                 isEmpty: { _ in viewModel.allCharacterRoles.isEmpty },
                 onRetry: {
-                    Task(priority: .userInitiated) {
-                        await viewModel.reloadCharacters()
-                    }
+                    viewModel.retryCharacters()
                 },
                 loading: {
                     MangaDetailCharactersSectionSkeletonView()
@@ -328,9 +324,7 @@ private struct MangaDetailBodyView: View {
                 title: "圖片",
                 isEmpty: \.isEmpty,
                 onRetry: {
-                    Task(priority: .userInitiated) {
-                        await viewModel.reloadPictures()
-                    }
+                    viewModel.retryPictures()
                 },
                 loading: {
                     AnimeDetailPicturesSectionSkeletonView()
@@ -350,9 +344,7 @@ private struct MangaDetailBodyView: View {
                 title: "你可能也喜歡",
                 isEmpty: { _ in viewModel.allRecommendations.isEmpty },
                 onRetry: {
-                    Task(priority: .userInitiated) {
-                        await viewModel.reloadRecommendations()
-                    }
+                    viewModel.retryRecommendations()
                 },
                 loading: {
                     MangaDetailRecommendationsSectionSkeletonView()

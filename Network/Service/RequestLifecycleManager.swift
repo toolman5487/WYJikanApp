@@ -247,10 +247,18 @@ final class RequestScreenLifecycleController {
         return RequestScreenLifecycleToken(generation: lifecycleGeneration)
     }
 
+    var canPresentLifecycleBoundState: Bool {
+        isActive && !Task.isCancelled
+    }
+
     func canApplyAsyncResult(for token: RequestScreenLifecycleToken) -> Bool {
         isActive
             && lifecycleGeneration == token.generation
             && !Task.isCancelled
+    }
+
+    func shouldRestoreAsyncState(for token: RequestScreenLifecycleToken) -> Bool {
+        !isActive || lifecycleGeneration == token.generation
     }
 
     func deactivate() {

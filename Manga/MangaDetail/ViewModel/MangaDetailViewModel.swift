@@ -163,6 +163,12 @@ final class MangaDetailViewModel: ObservableObject {
         dismissActiveAlert()
     }
 
+    func refresh() {
+        Task(priority: .userInitiated) { [weak self] in
+            await self?.load(forceRefresh: true)
+        }
+    }
+
     func load(forceRefresh: Bool = false) async {
         guard let lifecycleToken = requestLifecycleController.activeLifecycleToken() else { return }
         let existingDetail = detail
@@ -178,7 +184,13 @@ final class MangaDetailViewModel: ObservableObject {
 
         do {
             let response = try await service.fetchMangaDetail(malId: malId)
-            guard requestLifecycleController.canApplyAsyncResult(for: lifecycleToken) else { return }
+            guard requestLifecycleController.canApplyAsyncResult(for: lifecycleToken) else {
+                restoreScreenStateAfterAsyncInvalidation(
+                    existingDetail: existingDetail,
+                    lifecycleToken: lifecycleToken
+                )
+                return
+            }
             let detail = response.data
             prepareSupplementaryLoading(resetOnFailure: existingDetail == nil)
             screenState = .loaded(detail)
@@ -191,11 +203,23 @@ final class MangaDetailViewModel: ObservableObject {
             )
             shouldResumeSupplementaryLoading = Task.isCancelled
         } catch is CancellationError {
-            guard requestLifecycleController.canApplyAsyncResult(for: lifecycleToken) else { return }
+            guard requestLifecycleController.canApplyAsyncResult(for: lifecycleToken) else {
+                restoreScreenStateAfterAsyncInvalidation(
+                    existingDetail: existingDetail,
+                    lifecycleToken: lifecycleToken
+                )
+                return
+            }
             screenState = existingDetail.map(ScreenState.loaded) ?? .idle
             return
         } catch {
-            guard requestLifecycleController.canApplyAsyncResult(for: lifecycleToken) else { return }
+            guard requestLifecycleController.canApplyAsyncResult(for: lifecycleToken) else {
+                restoreScreenStateAfterAsyncInvalidation(
+                    existingDetail: existingDetail,
+                    lifecycleToken: lifecycleToken
+                )
+                return
+            }
             if let existingDetail, forceRefresh {
                 screenState = .loaded(existingDetail)
             } else {
@@ -203,6 +227,16 @@ final class MangaDetailViewModel: ObservableObject {
                 resetSupplementaryContent()
             }
         }
+    }
+
+    private func restoreScreenStateAfterAsyncInvalidation(
+        existingDetail: MangaDetailDTO?,
+        lifecycleToken: RequestScreenLifecycleToken
+    ) {
+        guard requestLifecycleController.shouldRestoreAsyncState(for: lifecycleToken) else {
+            return
+        }
+        screenState = existingDetail.map(ScreenState.loaded) ?? .idle
     }
 
     private func resumeSupplementaryLoading() async {
@@ -276,14 +310,32 @@ final class MangaDetailViewModel: ObservableObject {
         _ = await loadCharacters(resetOnFailure: false, lifecycleToken: lifecycleToken)
     }
 
+    func retryCharacters() {
+        Task(priority: .userInitiated) { [weak self] in
+            await self?.reloadCharacters()
+        }
+    }
+
     func reloadPictures() async {
         guard let lifecycleToken = requestLifecycleController.activeLifecycleToken() else { return }
         _ = await loadPictures(resetOnFailure: false, lifecycleToken: lifecycleToken)
     }
 
+    func retryPictures() {
+        Task(priority: .userInitiated) { [weak self] in
+            await self?.reloadPictures()
+        }
+    }
+
     func reloadRecommendations() async {
         guard let lifecycleToken = requestLifecycleController.activeLifecycleToken() else { return }
         _ = await loadRecommendations(resetOnFailure: false, lifecycleToken: lifecycleToken)
+    }
+
+    func retryRecommendations() {
+        Task(priority: .userInitiated) { [weak self] in
+            await self?.reloadRecommendations()
+        }
     }
 
     // MARK: - Synopsis Translation
@@ -457,6 +509,7 @@ final class MangaDetailViewModel: ObservableObject {
     }
 
     func presentPersistenceAlert(message: String) {
+        guard requestLifecycleController.canPresentLifecycleBoundState else { return }
         activeAlert = .persistence(message: message)
     }
 

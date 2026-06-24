@@ -164,6 +164,28 @@ final class AnimeDetailViewModel: ObservableObject {
         dismissActiveAlert()
     }
 
+    func refresh() {
+        Task(priority: .userInitiated) { [weak self] in
+            await self?.load(forceRefresh: true)
+        }
+    }
+
+    func refreshAndSyncBroadcastReminder(
+        isSubscribed: Bool,
+        subscribedCount: Int,
+        notificationScheduler: HomeTodayAnimeNotificationScheduler
+    ) {
+        Task(priority: .userInitiated) { [weak self] in
+            guard let self else { return }
+            await load(forceRefresh: true)
+            await syncBroadcastReminderIfNeeded(
+                isSubscribed: isSubscribed,
+                subscribedCount: subscribedCount,
+                notificationScheduler: notificationScheduler
+            )
+        }
+    }
+
     func load(forceRefresh: Bool = false) async {
         guard let lifecycleToken = requestLifecycleController.activeLifecycleToken() else { return }
         let existingDetail = detail
@@ -179,7 +201,13 @@ final class AnimeDetailViewModel: ObservableObject {
 
         do {
             let resolvedDetail = try await service.fetchAnimeDetail(malId: malId)
-            guard requestLifecycleController.canApplyAsyncResult(for: lifecycleToken) else { return }
+            guard requestLifecycleController.canApplyAsyncResult(for: lifecycleToken) else {
+                restoreScreenStateAfterAsyncInvalidation(
+                    existingDetail: existingDetail,
+                    lifecycleToken: lifecycleToken
+                )
+                return
+            }
             let detail = resolvedDetail.data
             prepareSupplementaryLoading(resetOnFailure: existingDetail == nil)
             screenState = .loaded(detail)
@@ -192,11 +220,23 @@ final class AnimeDetailViewModel: ObservableObject {
             )
             shouldResumeSupplementaryLoading = Task.isCancelled
         } catch is CancellationError {
-            guard requestLifecycleController.canApplyAsyncResult(for: lifecycleToken) else { return }
+            guard requestLifecycleController.canApplyAsyncResult(for: lifecycleToken) else {
+                restoreScreenStateAfterAsyncInvalidation(
+                    existingDetail: existingDetail,
+                    lifecycleToken: lifecycleToken
+                )
+                return
+            }
             screenState = existingDetail.map(ScreenState.loaded) ?? .idle
             return
         } catch {
-            guard requestLifecycleController.canApplyAsyncResult(for: lifecycleToken) else { return }
+            guard requestLifecycleController.canApplyAsyncResult(for: lifecycleToken) else {
+                restoreScreenStateAfterAsyncInvalidation(
+                    existingDetail: existingDetail,
+                    lifecycleToken: lifecycleToken
+                )
+                return
+            }
             if let existingDetail, forceRefresh {
                 screenState = .loaded(existingDetail)
             } else {
@@ -204,6 +244,16 @@ final class AnimeDetailViewModel: ObservableObject {
                 resetSupplementaryContent()
             }
         }
+    }
+
+    private func restoreScreenStateAfterAsyncInvalidation(
+        existingDetail: AnimeDetailDTO?,
+        lifecycleToken: RequestScreenLifecycleToken
+    ) {
+        guard requestLifecycleController.shouldRestoreAsyncState(for: lifecycleToken) else {
+            return
+        }
+        screenState = existingDetail.map(ScreenState.loaded) ?? .idle
     }
 
     private func resumeSupplementaryLoading() async {
@@ -277,14 +327,32 @@ final class AnimeDetailViewModel: ObservableObject {
         _ = await loadCharacters(resetOnFailure: false, lifecycleToken: lifecycleToken)
     }
 
+    func retryCharacters() {
+        Task(priority: .userInitiated) { [weak self] in
+            await self?.reloadCharacters()
+        }
+    }
+
     func reloadPictures() async {
         guard let lifecycleToken = requestLifecycleController.activeLifecycleToken() else { return }
         _ = await loadPictures(resetOnFailure: false, lifecycleToken: lifecycleToken)
     }
 
+    func retryPictures() {
+        Task(priority: .userInitiated) { [weak self] in
+            await self?.reloadPictures()
+        }
+    }
+
     func reloadRecommendations() async {
         guard let lifecycleToken = requestLifecycleController.activeLifecycleToken() else { return }
         _ = await loadRecommendations(resetOnFailure: false, lifecycleToken: lifecycleToken)
+    }
+
+    func retryRecommendations() {
+        Task(priority: .userInitiated) { [weak self] in
+            await self?.reloadRecommendations()
+        }
     }
 
     // MARK: - Synopsis Translation
@@ -456,10 +524,12 @@ final class AnimeDetailViewModel: ObservableObject {
     }
 
     func presentPersistenceAlert(message: String) {
+        guard requestLifecycleController.canPresentLifecycleBoundState else { return }
         activeAlert = .persistence(message: message)
     }
 
     func presentBroadcastReminderAlert(message: String) {
+        guard requestLifecycleController.canPresentLifecycleBoundState else { return }
         activeAlert = .broadcastReminder(message: message)
     }
 
@@ -579,6 +649,23 @@ final class AnimeDetailViewModel: ObservableObject {
                 "Anime broadcast reminder update failed: \(error.localizedDescription, privacy: .public)"
             )
             return .broadcastUnavailable
+        }
+    }
+
+    func requestBroadcastReminderToggle(
+        isSubscribed: Bool,
+        subscribedCount: Int,
+        notificationScheduler: HomeTodayAnimeNotificationScheduler
+    ) {
+        Task(priority: .userInitiated) { [weak self] in
+            guard let self else { return }
+            if let error = await toggleBroadcastReminder(
+                isSubscribed: isSubscribed,
+                subscribedCount: subscribedCount,
+                notificationScheduler: notificationScheduler
+            ) {
+                presentBroadcastReminderAlert(message: error.localizedDescription)
+            }
         }
     }
 }
