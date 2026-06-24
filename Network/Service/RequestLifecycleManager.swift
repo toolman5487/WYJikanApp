@@ -206,6 +206,10 @@ nonisolated protocol RequestLifecycleManaging:
 
 // MARK: - RequestScreenLifecycleController
 
+nonisolated struct RequestScreenLifecycleToken: Equatable, Sendable {
+    fileprivate let generation: UInt64
+}
+
 @MainActor
 final class RequestScreenLifecycleController {
 
@@ -214,6 +218,7 @@ final class RequestScreenLifecycleController {
     private let scope: RequestLifecycleScope
     private let requestLifecycleController: any RequestLifecycleControlling
     private var isActive = false
+    private var lifecycleGeneration: UInt64 = 0
 
     // MARK: - Lifecycle
 
@@ -228,25 +233,47 @@ final class RequestScreenLifecycleController {
     // MARK: - Public Methods
 
     func activate() async -> Bool {
+        lifecycleGeneration &+= 1
+        let activationGeneration = lifecycleGeneration
         isActive = true
         await requestLifecycleController.activate(scope)
-        return isActive && !Task.isCancelled
+        return isActive
+            && lifecycleGeneration == activationGeneration
+            && !Task.isCancelled
+    }
+
+    func activeLifecycleToken() -> RequestScreenLifecycleToken? {
+        guard isActive else { return nil }
+        return RequestScreenLifecycleToken(generation: lifecycleGeneration)
+    }
+
+    func canApplyAsyncResult(for token: RequestScreenLifecycleToken) -> Bool {
+        isActive
+            && lifecycleGeneration == token.generation
+            && !Task.isCancelled
     }
 
     func deactivate() {
+        guard isActive else { return }
+
+        lifecycleGeneration &+= 1
+        let deactivationGeneration = lifecycleGeneration
         isActive = false
 
         let scope = scope
         let requestLifecycleController = requestLifecycleController
-        Task { [weak self] in
+        Task(priority: .userInitiated) { @MainActor [weak self] in
+            guard let self,
+                  !self.isActive,
+                  self.lifecycleGeneration == deactivationGeneration else {
+                return
+            }
+
             await requestLifecycleController.deactivate(
                 scope,
                 cancelQueued: true,
                 cancelRunning: true
             )
-
-            guard let self, self.isActive else { return }
-            await requestLifecycleController.activate(scope)
         }
     }
 }

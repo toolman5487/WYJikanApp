@@ -21,9 +21,25 @@ final class MangaDetailViewModel: ObservableObject {
         case error(FeatureLoadFailure)
     }
 
+    enum ActiveAlert: Equatable {
+        case persistence(message: String)
+
+        var title: String {
+            "收藏與進度"
+        }
+
+        var message: String {
+            switch self {
+            case .persistence(let message):
+                return message
+            }
+        }
+    }
+
     @Published private(set) var screenState: ScreenState = .idle
     @Published private(set) var favoriteCollectionItem: MyListItemSnapshot?
     @Published private(set) var persistenceMutationState: PersistenceMutationState = .idle
+    @Published private(set) var activeAlert: ActiveAlert?
     let picturesState = DetailSupplementaryState<[MangaDetailPictureItem]>(initialValue: [])
     let charactersState = DetailSupplementaryState<[MangaCharacterRoleDTO]>(initialValue: [])
     let recommendationsState = DetailSupplementaryState<[MangaRecommendationDTO]>(initialValue: [])
@@ -144,9 +160,11 @@ final class MangaDetailViewModel: ObservableObject {
 
     func screenDidDisappear() {
         requestLifecycleController.deactivate()
+        dismissActiveAlert()
     }
 
     func load(forceRefresh: Bool = false) async {
+        guard let lifecycleToken = requestLifecycleController.activeLifecycleToken() else { return }
         let existingDetail = detail
         guard forceRefresh || existingDetail == nil else { return }
         guard !isRefreshing, !(existingDetail == nil && isInitialLoading) else { return }
@@ -160,6 +178,7 @@ final class MangaDetailViewModel: ObservableObject {
 
         do {
             let response = try await service.fetchMangaDetail(malId: malId)
+            guard requestLifecycleController.canApplyAsyncResult(for: lifecycleToken) else { return }
             let detail = response.data
             prepareSupplementaryLoading(resetOnFailure: existingDetail == nil)
             screenState = .loaded(detail)
@@ -167,13 +186,16 @@ final class MangaDetailViewModel: ObservableObject {
             shouldResumeSupplementaryLoading = true
             await loadSupplementaryContent(
                 resetOnFailure: existingDetail == nil,
-                loadingPrepared: true
+                loadingPrepared: true,
+                lifecycleToken: lifecycleToken
             )
             shouldResumeSupplementaryLoading = Task.isCancelled
         } catch is CancellationError {
+            guard requestLifecycleController.canApplyAsyncResult(for: lifecycleToken) else { return }
             screenState = existingDetail.map(ScreenState.loaded) ?? .idle
             return
         } catch {
+            guard requestLifecycleController.canApplyAsyncResult(for: lifecycleToken) else { return }
             if let existingDetail, forceRefresh {
                 screenState = .loaded(existingDetail)
             } else {
@@ -184,18 +206,24 @@ final class MangaDetailViewModel: ObservableObject {
     }
 
     private func resumeSupplementaryLoading() async {
+        guard let lifecycleToken = requestLifecycleController.activeLifecycleToken() else { return }
         shouldResumeSupplementaryLoading = true
-        await loadSupplementaryContent(resetOnFailure: false)
+        await loadSupplementaryContent(
+            resetOnFailure: false,
+            lifecycleToken: lifecycleToken
+        )
         shouldResumeSupplementaryLoading = Task.isCancelled
     }
 
     private func loadSupplementaryContent(
         resetOnFailure: Bool,
-        loadingPrepared: Bool = false
+        loadingPrepared: Bool = false,
+        lifecycleToken: RequestScreenLifecycleToken
     ) async {
         let charactersResult = await loadCharacters(
             resetOnFailure: resetOnFailure,
-            startsLoading: !loadingPrepared
+            startsLoading: !loadingPrepared,
+            lifecycleToken: lifecycleToken
         )
         switch charactersResult {
         case .cancelled:
@@ -217,7 +245,8 @@ final class MangaDetailViewModel: ObservableObject {
 
         let picturesResult = await loadPictures(
             resetOnFailure: resetOnFailure,
-            startsLoading: !loadingPrepared
+            startsLoading: !loadingPrepared,
+            lifecycleToken: lifecycleToken
         )
         switch picturesResult {
         case .cancelled:
@@ -237,20 +266,24 @@ final class MangaDetailViewModel: ObservableObject {
 
         _ = await loadRecommendations(
             resetOnFailure: resetOnFailure,
-            startsLoading: !loadingPrepared
+            startsLoading: !loadingPrepared,
+            lifecycleToken: lifecycleToken
         )
     }
 
     func reloadCharacters() async {
-        _ = await loadCharacters(resetOnFailure: false)
+        guard let lifecycleToken = requestLifecycleController.activeLifecycleToken() else { return }
+        _ = await loadCharacters(resetOnFailure: false, lifecycleToken: lifecycleToken)
     }
 
     func reloadPictures() async {
-        _ = await loadPictures(resetOnFailure: false)
+        guard let lifecycleToken = requestLifecycleController.activeLifecycleToken() else { return }
+        _ = await loadPictures(resetOnFailure: false, lifecycleToken: lifecycleToken)
     }
 
     func reloadRecommendations() async {
-        _ = await loadRecommendations(resetOnFailure: false)
+        guard let lifecycleToken = requestLifecycleController.activeLifecycleToken() else { return }
+        _ = await loadRecommendations(resetOnFailure: false, lifecycleToken: lifecycleToken)
     }
 
     // MARK: - Synopsis Translation
@@ -270,13 +303,17 @@ final class MangaDetailViewModel: ObservableObject {
 
     private func loadPictures(
         resetOnFailure: Bool,
-        startsLoading: Bool = true
+        startsLoading: Bool = true,
+        lifecycleToken: RequestScreenLifecycleToken
     ) async -> DetailSupplementaryLoadResult {
         await supplementaryLoadingController.load(
             state: picturesState,
             resetOnFailure: resetOnFailure,
             startsLoading: startsLoading,
             resetValue: [],
+            shouldApplyResult: { [requestLifecycleController] in
+                requestLifecycleController.canApplyAsyncResult(for: lifecycleToken)
+            },
             fetch: {
                 let response = try await service.fetchMangaPictures(malId: malId)
                 return MangaDetailPictureMapping.items(from: response)
@@ -286,13 +323,17 @@ final class MangaDetailViewModel: ObservableObject {
 
     private func loadCharacters(
         resetOnFailure: Bool,
-        startsLoading: Bool = true
+        startsLoading: Bool = true,
+        lifecycleToken: RequestScreenLifecycleToken
     ) async -> DetailSupplementaryLoadResult {
         await supplementaryLoadingController.load(
             state: charactersState,
             resetOnFailure: resetOnFailure,
             startsLoading: startsLoading,
             resetValue: [],
+            shouldApplyResult: { [requestLifecycleController] in
+                requestLifecycleController.canApplyAsyncResult(for: lifecycleToken)
+            },
             fetch: {
                 try await service.fetchMangaCharacters(malId: malId).data
             }
@@ -301,13 +342,17 @@ final class MangaDetailViewModel: ObservableObject {
 
     private func loadRecommendations(
         resetOnFailure: Bool,
-        startsLoading: Bool = true
+        startsLoading: Bool = true,
+        lifecycleToken: RequestScreenLifecycleToken
     ) async -> DetailSupplementaryLoadResult {
         await supplementaryLoadingController.load(
             state: recommendationsState,
             resetOnFailure: resetOnFailure,
             startsLoading: startsLoading,
             resetValue: [],
+            shouldApplyResult: { [requestLifecycleController] in
+                requestLifecycleController.canApplyAsyncResult(for: lifecycleToken)
+            },
             fetch: {
                 try await service.fetchMangaRecommendations(malId: malId).data
             }
@@ -411,6 +456,15 @@ final class MangaDetailViewModel: ObservableObject {
         persistenceMutationState = .idle
     }
 
+    func presentPersistenceAlert(message: String) {
+        activeAlert = .persistence(message: message)
+    }
+
+    func dismissActiveAlert() {
+        activeAlert = nil
+        dismissPersistenceMutationFailure()
+    }
+
     private func performPersistenceMutation(
         failureMessage: String,
         logPrefix: String,
@@ -423,6 +477,9 @@ final class MangaDetailViewModel: ObservableObject {
             logPrefix: logPrefix,
             operation: operation
         )
+        if let failureMessage = persistenceMutationState.failureMessage {
+            presentPersistenceAlert(message: failureMessage)
+        }
     }
 
     func readingProgressEditorDraft(

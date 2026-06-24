@@ -110,6 +110,7 @@ final class DetailSupplementaryLoadingController {
         resetOnFailure: Bool,
         startsLoading: Bool = true,
         resetValue: @autoclosure () -> Value,
+        shouldApplyResult: () -> Bool = { true },
         fetch: () async throws -> Value
     ) async -> DetailSupplementaryLoadResult {
         if startsLoading {
@@ -117,12 +118,21 @@ final class DetailSupplementaryLoadingController {
         }
 
         do {
-            state.finishLoading(with: try await fetch())
+            let value = try await fetch()
+            guard shouldApplyResult() else {
+                state.finishCancelledLoading()
+                return .cancelled
+            }
+            state.finishLoading(with: value)
             return .completed
         } catch is CancellationError {
             state.finishCancelledLoading()
             return .cancelled
         } catch {
+            guard shouldApplyResult() else {
+                state.finishCancelledLoading()
+                return .cancelled
+            }
             let failure = FeatureLoadFailure(error)
             state.finishLoading(
                 with: failure,

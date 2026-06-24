@@ -19,9 +19,31 @@ final class AnimeDetailViewModel: ObservableObject {
         case error(FeatureLoadFailure)
     }
 
+    enum ActiveAlert: Equatable {
+        case persistence(message: String)
+        case broadcastReminder(message: String)
+
+        var title: String {
+            switch self {
+            case .persistence:
+                return "收藏與提醒"
+            case .broadcastReminder:
+                return "播出提醒"
+            }
+        }
+
+        var message: String {
+            switch self {
+            case .persistence(let message), .broadcastReminder(let message):
+                return message
+            }
+        }
+    }
+
     @Published private(set) var screenState: ScreenState = .idle
     @Published private(set) var favoriteCollectionItem: MyListItemSnapshot?
     @Published private(set) var persistenceMutationState: PersistenceMutationState = .idle
+    @Published private(set) var activeAlert: ActiveAlert?
     let picturesState = DetailSupplementaryState<[AnimeDetailPictureItem]>(initialValue: [])
     let charactersState = DetailSupplementaryState<[AnimeCharacterRoleDTO]>(initialValue: [])
     let recommendationsState = DetailSupplementaryState<[AnimeRecommendationDTO]>(initialValue: [])
@@ -139,9 +161,11 @@ final class AnimeDetailViewModel: ObservableObject {
 
     func screenDidDisappear() {
         requestLifecycleController.deactivate()
+        dismissActiveAlert()
     }
 
     func load(forceRefresh: Bool = false) async {
+        guard let lifecycleToken = requestLifecycleController.activeLifecycleToken() else { return }
         let existingDetail = detail
         guard forceRefresh || existingDetail == nil else { return }
         guard !isRefreshing, !(existingDetail == nil && isInitialLoading) else { return }
@@ -155,6 +179,7 @@ final class AnimeDetailViewModel: ObservableObject {
 
         do {
             let resolvedDetail = try await service.fetchAnimeDetail(malId: malId)
+            guard requestLifecycleController.canApplyAsyncResult(for: lifecycleToken) else { return }
             let detail = resolvedDetail.data
             prepareSupplementaryLoading(resetOnFailure: existingDetail == nil)
             screenState = .loaded(detail)
@@ -162,13 +187,16 @@ final class AnimeDetailViewModel: ObservableObject {
             shouldResumeSupplementaryLoading = true
             await loadSupplementaryContent(
                 resetOnFailure: existingDetail == nil,
-                loadingPrepared: true
+                loadingPrepared: true,
+                lifecycleToken: lifecycleToken
             )
             shouldResumeSupplementaryLoading = Task.isCancelled
         } catch is CancellationError {
+            guard requestLifecycleController.canApplyAsyncResult(for: lifecycleToken) else { return }
             screenState = existingDetail.map(ScreenState.loaded) ?? .idle
             return
         } catch {
+            guard requestLifecycleController.canApplyAsyncResult(for: lifecycleToken) else { return }
             if let existingDetail, forceRefresh {
                 screenState = .loaded(existingDetail)
             } else {
@@ -179,18 +207,24 @@ final class AnimeDetailViewModel: ObservableObject {
     }
 
     private func resumeSupplementaryLoading() async {
+        guard let lifecycleToken = requestLifecycleController.activeLifecycleToken() else { return }
         shouldResumeSupplementaryLoading = true
-        await loadSupplementaryContent(resetOnFailure: false)
+        await loadSupplementaryContent(
+            resetOnFailure: false,
+            lifecycleToken: lifecycleToken
+        )
         shouldResumeSupplementaryLoading = Task.isCancelled
     }
 
     private func loadSupplementaryContent(
         resetOnFailure: Bool,
-        loadingPrepared: Bool = false
+        loadingPrepared: Bool = false,
+        lifecycleToken: RequestScreenLifecycleToken
     ) async {
         let charactersResult = await loadCharacters(
             resetOnFailure: resetOnFailure,
-            startsLoading: !loadingPrepared
+            startsLoading: !loadingPrepared,
+            lifecycleToken: lifecycleToken
         )
         switch charactersResult {
         case .cancelled:
@@ -212,7 +246,8 @@ final class AnimeDetailViewModel: ObservableObject {
 
         let picturesResult = await loadPictures(
             resetOnFailure: resetOnFailure,
-            startsLoading: !loadingPrepared
+            startsLoading: !loadingPrepared,
+            lifecycleToken: lifecycleToken
         )
         switch picturesResult {
         case .cancelled:
@@ -232,20 +267,24 @@ final class AnimeDetailViewModel: ObservableObject {
 
         _ = await loadRecommendations(
             resetOnFailure: resetOnFailure,
-            startsLoading: !loadingPrepared
+            startsLoading: !loadingPrepared,
+            lifecycleToken: lifecycleToken
         )
     }
 
     func reloadCharacters() async {
-        _ = await loadCharacters(resetOnFailure: false)
+        guard let lifecycleToken = requestLifecycleController.activeLifecycleToken() else { return }
+        _ = await loadCharacters(resetOnFailure: false, lifecycleToken: lifecycleToken)
     }
 
     func reloadPictures() async {
-        _ = await loadPictures(resetOnFailure: false)
+        guard let lifecycleToken = requestLifecycleController.activeLifecycleToken() else { return }
+        _ = await loadPictures(resetOnFailure: false, lifecycleToken: lifecycleToken)
     }
 
     func reloadRecommendations() async {
-        _ = await loadRecommendations(resetOnFailure: false)
+        guard let lifecycleToken = requestLifecycleController.activeLifecycleToken() else { return }
+        _ = await loadRecommendations(resetOnFailure: false, lifecycleToken: lifecycleToken)
     }
 
     // MARK: - Synopsis Translation
@@ -263,13 +302,17 @@ final class AnimeDetailViewModel: ObservableObject {
 
     private func loadPictures(
         resetOnFailure: Bool,
-        startsLoading: Bool = true
+        startsLoading: Bool = true,
+        lifecycleToken: RequestScreenLifecycleToken
     ) async -> DetailSupplementaryLoadResult {
         await supplementaryLoadingController.load(
             state: picturesState,
             resetOnFailure: resetOnFailure,
             startsLoading: startsLoading,
             resetValue: [],
+            shouldApplyResult: { [requestLifecycleController] in
+                requestLifecycleController.canApplyAsyncResult(for: lifecycleToken)
+            },
             fetch: {
                 let response = try await service.fetchAnimePictures(malId: malId)
                 return AnimeDetailPictureMapping.items(from: response)
@@ -279,13 +322,17 @@ final class AnimeDetailViewModel: ObservableObject {
 
     private func loadCharacters(
         resetOnFailure: Bool,
-        startsLoading: Bool = true
+        startsLoading: Bool = true,
+        lifecycleToken: RequestScreenLifecycleToken
     ) async -> DetailSupplementaryLoadResult {
         await supplementaryLoadingController.load(
             state: charactersState,
             resetOnFailure: resetOnFailure,
             startsLoading: startsLoading,
             resetValue: [],
+            shouldApplyResult: { [requestLifecycleController] in
+                requestLifecycleController.canApplyAsyncResult(for: lifecycleToken)
+            },
             fetch: {
                 try await service.fetchAnimeCharacters(malId: malId).data
             }
@@ -294,13 +341,17 @@ final class AnimeDetailViewModel: ObservableObject {
 
     private func loadRecommendations(
         resetOnFailure: Bool,
-        startsLoading: Bool = true
+        startsLoading: Bool = true,
+        lifecycleToken: RequestScreenLifecycleToken
     ) async -> DetailSupplementaryLoadResult {
         await supplementaryLoadingController.load(
             state: recommendationsState,
             resetOnFailure: resetOnFailure,
             startsLoading: startsLoading,
             resetValue: [],
+            shouldApplyResult: { [requestLifecycleController] in
+                requestLifecycleController.canApplyAsyncResult(for: lifecycleToken)
+            },
             fetch: {
                 try await service.fetchAnimeRecommendations(malId: malId).data
             }
@@ -404,6 +455,19 @@ final class AnimeDetailViewModel: ObservableObject {
         persistenceMutationState = .idle
     }
 
+    func presentPersistenceAlert(message: String) {
+        activeAlert = .persistence(message: message)
+    }
+
+    func presentBroadcastReminderAlert(message: String) {
+        activeAlert = .broadcastReminder(message: message)
+    }
+
+    func dismissActiveAlert() {
+        activeAlert = nil
+        dismissPersistenceMutationFailure()
+    }
+
     private func performPersistenceMutation(
         failureMessage: String,
         logPrefix: String,
@@ -416,6 +480,9 @@ final class AnimeDetailViewModel: ObservableObject {
             logPrefix: logPrefix,
             operation: operation
         )
+        if let failureMessage = persistenceMutationState.failureMessage {
+            presentPersistenceAlert(message: failureMessage)
+        }
     }
 
     func watchProgressEditorDraft(

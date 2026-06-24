@@ -44,7 +44,6 @@ private struct MangaDetailBodyView: View {
     @State private var progressEditorDraft: MangaReadingProgressEditorDraft?
     @State private var isShowingCharacterList = false
     @State private var isShowingRecommendationList = false
-    @State private var persistenceAlertMessage: String?
 
     // MARK: - Lifecycle
 
@@ -148,23 +147,21 @@ private struct MangaDetailBodyView: View {
             )
         }
         .alert(
-            "收藏與進度",
+            viewModel.activeAlert?.title ?? "",
             isPresented: Binding(
-                get: { persistenceAlertText != nil },
+                get: { viewModel.activeAlert != nil },
                 set: { isPresented in
                     if !isPresented {
-                        persistenceAlertMessage = nil
-                        viewModel.dismissPersistenceMutationFailure()
+                        viewModel.dismissActiveAlert()
                     }
                 }
             )
         ) {
             Button("好", role: .cancel) {
-                persistenceAlertMessage = nil
-                viewModel.dismissPersistenceMutationFailure()
+                viewModel.dismissActiveAlert()
             }
         } message: {
-            Text(persistenceAlertText ?? "")
+            Text(viewModel.activeAlert?.message ?? "")
         }
         .fullScreenCover(item: $imagePreviewSession) { session in
             ImagePreviewViewer(
@@ -228,10 +225,6 @@ private struct MangaDetailBodyView: View {
         }
     }
 
-    private var persistenceAlertText: String? {
-        persistenceAlertMessage ?? viewModel.persistenceMutationState.failureMessage
-    }
-
     private func detailScroll<Content: View>(@ViewBuilder content: () -> Content) -> some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 20) {
@@ -258,7 +251,7 @@ private struct MangaDetailBodyView: View {
         case .ready:
             viewModel.toggleFavorite(isFavorite: isFavorite)
         case .failed(let failure):
-            persistenceAlertMessage = failure.message
+            viewModel.presentPersistenceAlert(message: failure.message)
         }
     }
 

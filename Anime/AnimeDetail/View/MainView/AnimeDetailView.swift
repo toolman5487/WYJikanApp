@@ -45,8 +45,6 @@ private struct AnimeDetailBodyView: View {
     @State private var imagePreviewSession: ImagePreviewSession?
     @State private var isShowingCharacterList = false
     @State private var isShowingRecommendationList = false
-    @State private var broadcastReminderAlertMessage: String?
-    @State private var persistenceAlertMessage: String?
     @State private var watchProgressEditorDraft: AnimeWatchProgressEditorDraft?
 
     // MARK: - Lifecycle
@@ -161,40 +159,21 @@ private struct AnimeDetailBodyView: View {
             )
         }
         .alert(
-            "播出提醒",
+            viewModel.activeAlert?.title ?? "",
             isPresented: Binding(
-                get: { broadcastReminderAlertMessage != nil },
+                get: { viewModel.activeAlert != nil },
                 set: { isPresented in
                     if !isPresented {
-                        broadcastReminderAlertMessage = nil
+                        viewModel.dismissActiveAlert()
                     }
                 }
             )
         ) {
             Button("好", role: .cancel) {
-                broadcastReminderAlertMessage = nil
+                viewModel.dismissActiveAlert()
             }
         } message: {
-            Text(broadcastReminderAlertMessage ?? "")
-        }
-        .alert(
-            "收藏與提醒",
-            isPresented: Binding(
-                get: { persistenceAlertText != nil },
-                set: { isPresented in
-                    if !isPresented {
-                        persistenceAlertMessage = nil
-                        viewModel.dismissPersistenceMutationFailure()
-                    }
-                }
-            )
-        ) {
-            Button("好", role: .cancel) {
-                persistenceAlertMessage = nil
-                viewModel.dismissPersistenceMutationFailure()
-            }
-        } message: {
-            Text(persistenceAlertText ?? "")
+            Text(viewModel.activeAlert?.message ?? "")
         }
         .fullScreenCover(item: $imagePreviewSession) { session in
             ImagePreviewViewer(
@@ -253,10 +232,6 @@ private struct AnimeDetailBodyView: View {
 
     private var broadcastReminderSyncTrigger: String {
         "\(malId)-\(appPersistenceStore.isReady)-\(currentAnime != nil)"
-    }
-
-    private var persistenceAlertText: String? {
-        persistenceAlertMessage ?? viewModel.persistenceMutationState.failureMessage
     }
 
     private var navigationToolbarConfiguration: DetailNavigationToolbarConfiguration {
@@ -431,7 +406,7 @@ private struct AnimeDetailBodyView: View {
             subscribedCount: broadcastReminderStatusStore.subscriptions.count,
             notificationScheduler: todayAnimeNotificationScheduler
         ) {
-            broadcastReminderAlertMessage = error.localizedDescription
+            viewModel.presentBroadcastReminderAlert(message: error.localizedDescription)
         }
     }
 
@@ -457,7 +432,7 @@ private struct AnimeDetailBodyView: View {
         case .ready:
             return true
         case .failed(let failure):
-            persistenceAlertMessage = failure.message
+            viewModel.presentPersistenceAlert(message: failure.message)
             return false
         }
     }
