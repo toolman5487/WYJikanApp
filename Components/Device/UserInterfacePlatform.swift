@@ -41,15 +41,15 @@ extension UserInterfacePlatform {
 
 nonisolated extension UserInterfacePlatform {
     var categoryGenreInitialBatchCount: Int {
-        3
+        isPad ? 4 : 3
     }
 
     var categoryGenreLoadMoreBatchCount: Int {
-        5
+        isPad ? 4 : 5
     }
 
     var categoryGenreItemRequestLimit: Int {
-        5
+        isPad ? 8 : 5
     }
 
     var categoryGenreInitialRequestDelay: Duration {

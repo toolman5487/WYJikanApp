@@ -32,7 +32,7 @@ struct MainCategoryGenreBatchConfiguration: Sendable {
     let initialItemRequestDelay: Duration
     let requestInterval: Duration
 
-    static let standard = MainCategoryGenreBatchConfiguration(
+    static let phone = MainCategoryGenreBatchConfiguration(
         initialBatchSize: 3,
         loadMoreBatchSize: 5,
         itemRequestLimit: 5,

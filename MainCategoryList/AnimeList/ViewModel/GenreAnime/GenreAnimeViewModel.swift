@@ -125,7 +125,7 @@ final class GenreAnimeViewModel: ObservableObject {
 
     init(
         service: MainCategoryListServicing,
-        batchConfiguration: MainCategoryGenreBatchConfiguration = .standard
+        batchConfiguration: MainCategoryGenreBatchConfiguration = .phone
     ) {
         self.service = service
         self.itemRequestLimit = batchConfiguration.itemRequestLimit
