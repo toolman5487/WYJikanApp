@@ -39,6 +39,8 @@ final class HomeTrendingMangaListViewModel: ObservableObject {
     private let paginationController = PaginatedListLoadingController<MangaCategoryItemDTO>()
     private var cancellables: Set<AnyCancellable> = []
 
+    let parentTab: JikanAPIRequestScope = .home
+
     // MARK: - Lifecycle
 
     init(
@@ -246,3 +248,5 @@ extension HomeTrendingMangaListViewModel: PaginatedListLoadControlling {
         paginationController.stopLoading()
     }
 }
+
+extension HomeTrendingMangaListViewModel: TabScreenLifecyclePresentable {}

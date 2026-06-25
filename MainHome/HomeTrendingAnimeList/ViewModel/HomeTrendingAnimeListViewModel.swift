@@ -38,6 +38,8 @@ final class HomeTrendingAnimeListViewModel: ObservableObject {
     private let paginationController = PaginatedListLoadingController<HomeTrendingAnimeListItem>()
     private var cancellables: Set<AnyCancellable> = []
 
+    let parentTab: JikanAPIRequestScope = .home
+
     // MARK: - Lifecycle
 
     init(
@@ -216,3 +218,5 @@ extension HomeTrendingAnimeListViewModel: PaginatedListLoadControlling {
         paginationController.stopLoading()
     }
 }
+
+extension HomeTrendingAnimeListViewModel: TabScreenLifecyclePresentable {}

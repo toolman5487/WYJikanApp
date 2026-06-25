@@ -39,6 +39,8 @@ final class HomeTodayAnimeScheduleListViewModel: ObservableObject {
     private var cancellables: Set<AnyCancellable> = []
     private var dayRequestTask: Task<Void, Never>?
 
+    let parentTab: JikanAPIRequestScope = .home
+
     // MARK: - Init
 
     init(
@@ -232,3 +234,5 @@ extension HomeTodayAnimeScheduleListViewModel: PaginatedListLoadControlling {
         paginationController.stopLoading()
     }
 }
+
+extension HomeTodayAnimeScheduleListViewModel: TabScreenLifecyclePresentable {}

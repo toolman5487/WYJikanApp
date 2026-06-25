@@ -23,9 +23,9 @@ enum HomeFeedLoadTier: Int, CaseIterable, Sendable {
         case .phase1:
             return [.heroBanner, .todayAnime]
         case .phase2:
-            return [.watchPromos, .watchEpisodes]
+            return [.watchPromos, .watchEpisodes, .trendingAnime]
         case .phase3:
-            return [.trendingAnime, .trendingManga]
+            return [.trendingManga]
         case .deferred:
             return [.recommendedAnime]
         }
@@ -71,9 +71,9 @@ enum HomeFeedSection: Hashable, CaseIterable {
         switch self {
         case .heroBanner, .todayAnime:
             return .phase1
-        case .watchPromos, .watchEpisodes:
+        case .watchPromos, .watchEpisodes, .trendingAnime:
             return .phase2
-        case .trendingAnime, .trendingManga:
+        case .trendingManga:
             return .phase3
         case .recommendedAnime:
             return .deferred
@@ -304,19 +304,34 @@ final class HomeFeedCoordinator {
 
     private func loadTier(_ tier: HomeFeedLoadTier, priority: TaskPriority) async {
         let sections = tier.sections
-        guard sections.count == 2 else { return }
-        await loadSectionsConcurrently(sections[0], sections[1], priority: priority)
+        var index = sections.startIndex
+
+        while index < sections.endIndex {
+            let nextIndex = sections.index(after: index)
+            if nextIndex < sections.endIndex {
+                await loadSectionsConcurrently(sections[index], sections[nextIndex], priority: priority)
+                index = sections.index(after: nextIndex)
+            } else {
+                await load(sections[index], priority: priority)
+                index = nextIndex
+            }
+        }
     }
 
     private func refreshTier(_ tier: HomeFeedLoadTier) async {
         let sections = tier.sections
-        guard sections.count == 2 else {
-            for section in sections {
-                await refresh(section)
+        var index = sections.startIndex
+
+        while index < sections.endIndex {
+            let nextIndex = sections.index(after: index)
+            if nextIndex < sections.endIndex {
+                await refreshSectionsConcurrently(sections[index], sections[nextIndex])
+                index = sections.index(after: nextIndex)
+            } else {
+                await refresh(sections[index])
+                index = nextIndex
             }
-            return
         }
-        await refreshSectionsConcurrently(sections[0], sections[1])
     }
 
     private func loadSectionsConcurrently(

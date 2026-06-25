@@ -36,6 +36,8 @@ final class HomeWatchListViewModel: ObservableObject {
     private let paginationController = PaginatedListLoadingController<HomeWatchListItem>()
     private var feedChangeTask: Task<Void, Never>?
 
+    let parentTab: JikanAPIRequestScope = .home
+
     // MARK: - Lifecycle
 
     init(
@@ -251,3 +253,5 @@ extension HomeWatchListViewModel: PaginatedListLoadControlling {
         paginationController.stopLoading()
     }
 }
+
+extension HomeWatchListViewModel: TabScreenLifecyclePresentable {}

@@ -85,12 +85,7 @@ private struct HomeTrendingMangaListBodyView: View {
                 }
             }
         }
-        .task(priority: .userInitiated) {
-            await viewModel.screenDidAppear()
-        }
-        .onDisappear {
-            viewModel.screenDidDisappear()
-        }
+        .requestScreenTabLifecycle(viewModel: viewModel)
     }
 
     // MARK: - Private Methods
