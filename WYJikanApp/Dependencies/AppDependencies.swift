@@ -10,7 +10,7 @@ struct AppDependencies {
 
     // MARK: - Coordination
 
-    let homeLoadCoordinator: any HomeLoadCoordinating
+    let homeFeedBootstrapCoordinator: any HomeFeedBootstrapCoordinating
     let requestLifecycleManager: any RequestLifecycleManaging
 
     // MARK: - Networking
@@ -388,7 +388,7 @@ private extension AppDependencies {
         )
 
         return AppDependencies(
-            homeLoadCoordinator: HomeLoadCoordinator(),
+            homeFeedBootstrapCoordinator: HomeFeedBootstrapCoordinator(),
             requestLifecycleManager: requestLifecycleManager,
             jikanAPIService: jikanAPIService,
             mainHomeService: MainHomeService(

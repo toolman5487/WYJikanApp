@@ -36,7 +36,7 @@ struct AppRootView: View {
                 backgroundAnimeDetailService: AppDependencies.live.backgroundAnimeDetailService,
                 broadcastReminderRepository: AppDependencies.live.broadcastReminderRepository,
                 notificationScheduler: HomeTodayAnimeNotificationScheduler(),
-                homeLoadCoordinator: AppDependencies.live.homeLoadCoordinator
+                homeFeedBootstrapCoordinator: AppDependencies.live.homeFeedBootstrapCoordinator
             )
         )
         .environmentObject(MainTabBarViewModel())

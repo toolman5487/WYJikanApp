@@ -23,7 +23,7 @@ final class AppBootstrapViewModel: ObservableObject {
     private let backgroundAnimeDetailService: AnimeDetailServicing
     private let broadcastReminderRepository: any AnimeBroadcastReminderRepository
     private let notificationScheduler: HomeTodayAnimeNotificationScheduler
-    private let homeLoadCoordinator: any HomeLoadCoordinating
+    private let homeFeedBootstrapCoordinator: any HomeFeedBootstrapCoordinating
 
     // MARK: - Properties
 
@@ -35,12 +35,12 @@ final class AppBootstrapViewModel: ObservableObject {
         backgroundAnimeDetailService: AnimeDetailServicing,
         broadcastReminderRepository: any AnimeBroadcastReminderRepository,
         notificationScheduler: HomeTodayAnimeNotificationScheduler,
-        homeLoadCoordinator: any HomeLoadCoordinating
+        homeFeedBootstrapCoordinator: any HomeFeedBootstrapCoordinating
     ) {
         self.backgroundAnimeDetailService = backgroundAnimeDetailService
         self.broadcastReminderRepository = broadcastReminderRepository
         self.notificationScheduler = notificationScheduler
-        self.homeLoadCoordinator = homeLoadCoordinator
+        self.homeFeedBootstrapCoordinator = homeFeedBootstrapCoordinator
     }
 
     // MARK: - Public Methods
@@ -56,7 +56,7 @@ final class AppBootstrapViewModel: ObservableObject {
         let subscriptions = broadcastReminderRepository.currentSnapshot.subscriptions
 
         if !subscriptions.isEmpty {
-            await homeLoadCoordinator.wait(for: .allFeeds)
+            await homeFeedBootstrapCoordinator.wait(for: .allFeedsReady)
 
             guard !Task.isCancelled else {
                 bootstrapState = .idle

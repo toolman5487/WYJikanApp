@@ -85,51 +85,51 @@ enum HomeFeedSection: Hashable, CaseIterable {
     }
 }
 
-// MARK: - HomeLoadPhase
+// MARK: - HomeFeedBootstrapMilestone
 
-nonisolated enum HomeLoadPhase: Int, CaseIterable, Sendable {
-    case initialFeeds
-    case allFeeds
+nonisolated enum HomeFeedBootstrapMilestone: Int, CaseIterable, Sendable {
+    case coreFeedsReady
+    case allFeedsReady
 }
 
-// MARK: - HomeLoadCoordinating
+// MARK: - HomeFeedBootstrapCoordinating
 
-nonisolated protocol HomeLoadCoordinating: Sendable {
-    func wait(for phase: HomeLoadPhase) async
-    func markCompleted(_ phase: HomeLoadPhase) async
+nonisolated protocol HomeFeedBootstrapCoordinating: Sendable {
+    func wait(for milestone: HomeFeedBootstrapMilestone) async
+    func markCompleted(_ milestone: HomeFeedBootstrapMilestone) async
 }
 
-// MARK: - HomeLoadCoordinator
+// MARK: - HomeFeedBootstrapCoordinator
 
-actor HomeLoadCoordinator: HomeLoadCoordinating {
+actor HomeFeedBootstrapCoordinator: HomeFeedBootstrapCoordinating {
 
     // MARK: - Properties
 
-    private var completedPhases = Set<HomeLoadPhase>()
-    private var waiters: [HomeLoadPhase: [CheckedContinuation<Void, Never>]] = [:]
+    private var completedMilestones = Set<HomeFeedBootstrapMilestone>()
+    private var waiters: [HomeFeedBootstrapMilestone: [CheckedContinuation<Void, Never>]] = [:]
 
     // MARK: - Public Methods
 
-    func wait(for phase: HomeLoadPhase) async {
-        guard !completedPhases.contains(phase) else { return }
+    func wait(for milestone: HomeFeedBootstrapMilestone) async {
+        guard !completedMilestones.contains(milestone) else { return }
 
         await withCheckedContinuation { continuation in
-            waiters[phase, default: []].append(continuation)
+            waiters[milestone, default: []].append(continuation)
         }
     }
 
-    func markCompleted(_ phase: HomeLoadPhase) {
-        for completedPhase in HomeLoadPhase.allCases where completedPhase.rawValue <= phase.rawValue {
-            complete(completedPhase)
+    func markCompleted(_ milestone: HomeFeedBootstrapMilestone) {
+        for completedMilestone in HomeFeedBootstrapMilestone.allCases where completedMilestone.rawValue <= milestone.rawValue {
+            complete(completedMilestone)
         }
     }
 
     // MARK: - Private Methods
 
-    private func complete(_ phase: HomeLoadPhase) {
-        guard completedPhases.insert(phase).inserted else { return }
+    private func complete(_ milestone: HomeFeedBootstrapMilestone) {
+        guard completedMilestones.insert(milestone).inserted else { return }
 
-        let pendingWaiters = waiters.removeValue(forKey: phase) ?? []
+        let pendingWaiters = waiters.removeValue(forKey: milestone) ?? []
         pendingWaiters.forEach { $0.resume() }
     }
 }
@@ -231,7 +231,7 @@ final class HomeFeedCoordinator {
     // MARK: - Properties
 
     private let viewModels: HomeFeedViewModels
-    private let homeLoadCoordinator: any HomeLoadCoordinating
+    private let homeFeedBootstrapCoordinator: any HomeFeedBootstrapCoordinating
     private let requestLifecycleController: RequestScreenLifecycleController
     private let deferredSectionLoadScheduler = HomeDeferredSectionLoadScheduler()
     private var sectionStates: [HomeFeedSection: HomeFeedSectionLoadState] = [:]
@@ -240,11 +240,11 @@ final class HomeFeedCoordinator {
 
     init(
         viewModels: HomeFeedViewModels,
-        homeLoadCoordinator: any HomeLoadCoordinating,
+        homeFeedBootstrapCoordinator: any HomeFeedBootstrapCoordinating,
         requestLifecycleController: any RequestLifecycleControlling
     ) {
         self.viewModels = viewModels
-        self.homeLoadCoordinator = homeLoadCoordinator
+        self.homeFeedBootstrapCoordinator = homeFeedBootstrapCoordinator
         self.requestLifecycleController = RequestScreenLifecycleController(
             scope: .mainHome,
             requestLifecycleController: requestLifecycleController
@@ -270,12 +270,12 @@ final class HomeFeedCoordinator {
         for tier in HomeFeedLoadTier.initialTiers {
             await loadTier(tier, priority: .userInitiated)
         }
-        await homeLoadCoordinator.markCompleted(.initialFeeds)
+        await homeFeedBootstrapCoordinator.markCompleted(.coreFeedsReady)
     }
 
     func loadSectionIfNeeded(_ section: HomeFeedSection) async {
         guard section.isDeferred else { return }
-        await homeLoadCoordinator.wait(for: .initialFeeds)
+        await homeFeedBootstrapCoordinator.wait(for: .coreFeedsReady)
         guard !Task.isCancelled else { return }
         await loadDeferredSection(section, priority: .utility)
     }
@@ -300,12 +300,12 @@ final class HomeFeedCoordinator {
         await refreshTier(.deferred)
     }
 
-    // MARK: - Phase Loading
+    // MARK: - Tier Loading
 
     private func loadTier(_ tier: HomeFeedLoadTier, priority: TaskPriority) async {
         let sections = tier.sections
         guard sections.count == 2 else { return }
-        await loadPhase(sections[0], sections[1], priority: priority)
+        await loadSectionsConcurrently(sections[0], sections[1], priority: priority)
     }
 
     private func refreshTier(_ tier: HomeFeedLoadTier) async {
@@ -316,10 +316,10 @@ final class HomeFeedCoordinator {
             }
             return
         }
-        await refreshPhase(sections[0], sections[1])
+        await refreshSectionsConcurrently(sections[0], sections[1])
     }
 
-    private func loadPhase(
+    private func loadSectionsConcurrently(
         _ first: HomeFeedSection,
         _ second: HomeFeedSection,
         priority: TaskPriority
@@ -329,7 +329,7 @@ final class HomeFeedCoordinator {
         _ = await (firstLoad, secondLoad)
     }
 
-    private func refreshPhase(_ first: HomeFeedSection, _ second: HomeFeedSection) async {
+    private func refreshSectionsConcurrently(_ first: HomeFeedSection, _ second: HomeFeedSection) async {
         async let firstRefresh = refresh(first)
         async let secondRefresh = refresh(second)
         _ = await (firstRefresh, secondRefresh)
@@ -451,7 +451,7 @@ final class HomeFeedCoordinator {
         guard HomeFeedSection.allCases.allSatisfy({ sectionState(for: $0).isLoaded }) else {
             return
         }
-        await homeLoadCoordinator.markCompleted(.allFeeds)
+        await homeFeedBootstrapCoordinator.markCompleted(.allFeedsReady)
     }
 }
 

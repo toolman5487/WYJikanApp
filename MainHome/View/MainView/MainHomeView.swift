@@ -96,7 +96,7 @@ private final class HomeFeedRuntime {
                 watchEpisodes: watchEpisodesViewModel,
                 recommendedAnime: recommendedAnimeViewModel
             ),
-            homeLoadCoordinator: dependencies.homeLoadCoordinator,
+            homeFeedBootstrapCoordinator: dependencies.homeFeedBootstrapCoordinator,
             requestLifecycleController: dependencies.requestLifecycleManager
         )
         self.tabRootViewModel = HomeTabRootViewModel(coordinator: coordinator)

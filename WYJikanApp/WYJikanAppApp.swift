@@ -49,7 +49,7 @@ struct WYJikanAppApp: App {
                 backgroundAnimeDetailService: dependencies.backgroundAnimeDetailService,
                 broadcastReminderRepository: dependencies.broadcastReminderRepository,
                 notificationScheduler: todayAnimeNotificationScheduler,
-                homeLoadCoordinator: dependencies.homeLoadCoordinator
+                homeFeedBootstrapCoordinator: dependencies.homeFeedBootstrapCoordinator
             )
         )
         _mainTabBarViewModel = StateObject(wrappedValue: mainTabBarViewModel)
