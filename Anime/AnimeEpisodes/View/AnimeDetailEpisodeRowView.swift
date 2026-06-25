@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct AnimeDetailEpisodeRowView: View, Equatable {
+
+    // MARK: - Properties
+
     @Environment(\.openURL) private var openURL
     @StateObject private var synopsisTranslationViewModel = SynopsisTranslationViewModel(
         context: .animeEpisode
@@ -16,9 +19,13 @@ struct AnimeDetailEpisodeRowView: View, Equatable {
     let row: AnimeDetailEpisodeRowPresentation
     let onToggle: () -> Void
 
+    // MARK: - Equatable
+
     static func == (lhs: AnimeDetailEpisodeRowView, rhs: AnimeDetailEpisodeRowView) -> Bool {
         lhs.row == rhs.row
     }
+
+    // MARK: - Body
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -52,6 +59,8 @@ struct AnimeDetailEpisodeRowView: View, Equatable {
             synopsisTranslationViewModel.cancel()
         }
     }
+
+    // MARK: - Summary
 
     private var summaryContent: some View {
         HStack(alignment: .center, spacing: 12) {
@@ -96,6 +105,8 @@ struct AnimeDetailEpisodeRowView: View, Equatable {
         }
     }
 
+    // MARK: - Expanded Content
+
     @ViewBuilder
     private func expandedContent(for detail: AnimeDetailEpisodeDetailPresentation) -> some View {
         switch detail {
@@ -133,32 +144,19 @@ struct AnimeDetailEpisodeRowView: View, Equatable {
             }
 
             if let synopsis = content.synopsisText {
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack(alignment: .center, spacing: 8) {
-                        Text("劇情簡介")
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(ThemeColor.textSecondary)
-
-                        Spacer(minLength: 8)
-
-                        SynopsisTranslationButton(
-                            state: synopsisTranslationViewModel.state,
-                            action: {
-                                synopsisTranslationViewModel.requestTranslation(
-                                    for: synopsis,
-                                    emptyFailureMessage: "沒有可翻譯的劇情簡介。"
-                                )
-                            }
+                SynopsisTranslationSectionView(
+                    title: "劇情簡介",
+                    originalText: synopsis,
+                    translationState: synopsisTranslationViewModel.state,
+                    primaryFont: .callout,
+                    originalFont: .callout,
+                    onTranslate: {
+                        synopsisTranslationViewModel.requestTranslation(
+                            for: synopsis,
+                            emptyFailureMessage: "沒有可翻譯的劇情簡介。"
                         )
                     }
-
-                    TranslatedSynopsisTextView(
-                        originalText: synopsis,
-                        translationState: synopsisTranslationViewModel.state,
-                        primaryFont: .callout,
-                        originalFont: .callout
-                    )
-                }
+                )
                 .onChange(of: synopsis) { _, _ in
                     synopsisTranslationViewModel.reset()
                 }
@@ -169,6 +167,8 @@ struct AnimeDetailEpisodeRowView: View, Equatable {
             }
         }
     }
+
+    // MARK: - Detail Lines
 
     private func detailLine(title: String, value: String) -> some View {
         HStack(alignment: .top, spacing: 12) {
@@ -185,6 +185,8 @@ struct AnimeDetailEpisodeRowView: View, Equatable {
         }
     }
 
+    // MARK: - Tags
+
     private func tagRow(_ tags: [String]) -> some View {
         HStack(spacing: 8) {
             ForEach(tags, id: \.self) { tag in
@@ -198,6 +200,8 @@ struct AnimeDetailEpisodeRowView: View, Equatable {
             }
         }
     }
+
+    // MARK: - External Links
 
     private func externalLinks(_ links: [AnimeDetailEpisodeExternalLink]) -> some View {
         HStack(spacing: 8) {
@@ -226,6 +230,8 @@ struct AnimeDetailEpisodeRowView: View, Equatable {
             )
         )
     }
+
+    // MARK: - Actions
 
     private func toggleIfNeeded() {
         guard row.canExpand else { return }

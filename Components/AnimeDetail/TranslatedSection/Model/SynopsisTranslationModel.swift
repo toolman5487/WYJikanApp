@@ -46,6 +46,8 @@ nonisolated enum SynopsisTranslationContext: Sendable {
     case mangaWork
     case animeEpisode
     case characterProfile
+    case animeReview
+    case mangaReview
 
     var instructions: String {
         switch self {
@@ -57,6 +59,8 @@ nonisolated enum SynopsisTranslationContext: Sendable {
             return "只輸出繁體中文譯文；保留角色名、作品名、集數資訊、來源標記，不加解釋，不改寫劇情。"
         case .characterProfile:
             return "只輸出繁體中文譯文；保留角色名、作品名、身分設定、來源標記，不加解釋，不改寫設定。"
+        case .animeReview, .mangaReview:
+            return "只輸出繁體中文譯文；保留作品名、角色名、劇透標記與評論語氣，不加解釋，不改寫評論內容。"
         }
     }
 
@@ -70,6 +74,10 @@ nonisolated enum SynopsisTranslationContext: Sendable {
             return "翻譯單集簡介："
         case .characterProfile:
             return "翻譯角色介紹："
+        case .animeReview:
+            return "翻譯動畫評論："
+        case .mangaReview:
+            return "翻譯漫畫評論："
         }
     }
 
@@ -83,6 +91,8 @@ nonisolated enum SynopsisTranslationContext: Sendable {
             return 700
         case .characterProfile:
             return 700
+        case .animeReview, .mangaReview:
+            return 1200
         }
     }
 }

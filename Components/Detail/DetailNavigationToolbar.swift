@@ -5,20 +5,28 @@
 
 import SwiftUI
 
+// MARK: - DetailNavigationToolbarShareState
+
 enum DetailNavigationToolbarShareState {
     case loading
     case available(title: String, message: String, url: URL)
 }
+
+// MARK: - DetailNavigationToolbarReviewState
 
 enum DetailNavigationToolbarReviewState {
     case loading
     case available(title: String)
 }
 
+// MARK: - DetailNavigationToolbarExternalPageState
+
 enum DetailNavigationToolbarExternalPageState {
     case unavailable
     case available(title: String, url: URL)
 }
+
+// MARK: - DetailNavigationToolbarBroadcastReminderState
 
 enum DetailNavigationToolbarBroadcastReminderState: Equatable {
     case hidden
@@ -26,15 +34,21 @@ enum DetailNavigationToolbarBroadcastReminderState: Equatable {
     case on
 }
 
+// MARK: - DetailNavigationToolbarLayoutStyle
+
 enum DetailNavigationToolbarLayoutStyle: Equatable {
     case expanded
     case compact
 }
 
+// MARK: - DetailNavigationToolbarPersistenceActionState
+
 enum DetailNavigationToolbarPersistenceActionState: Equatable {
     case loading
     case available
     case unavailable
+
+    // MARK: - Computed Properties
 
     var isEnabled: Bool {
         self != .loading
@@ -52,6 +66,8 @@ enum DetailNavigationToolbarPersistenceActionState: Equatable {
     }
 }
 
+// MARK: - DetailNavigationToolbarConfiguration
+
 struct DetailNavigationToolbarConfiguration: Equatable {
     let broadcastReminderState: DetailNavigationToolbarBroadcastReminderState
     let layoutStyle: DetailNavigationToolbarLayoutStyle
@@ -62,7 +78,12 @@ struct DetailNavigationToolbarConfiguration: Equatable {
     )
 }
 
+// MARK: - DetailNavigationToolbar
+
 struct DetailNavigationToolbar<ReviewDestination: View>: ToolbarContent {
+
+    // MARK: - Properties
+
     let isFavorite: Bool
     let favoriteActionState: DetailNavigationToolbarPersistenceActionState
     let broadcastReminderActionState: DetailNavigationToolbarPersistenceActionState
@@ -74,6 +95,8 @@ struct DetailNavigationToolbar<ReviewDestination: View>: ToolbarContent {
     let onBroadcastReminderTap: () -> Void
     let onRefreshTap: () -> Void
     let reviewDestination: (String) -> ReviewDestination
+
+    // MARK: - Lifecycle
 
     init(
         isFavorite: Bool,
@@ -101,6 +124,8 @@ struct DetailNavigationToolbar<ReviewDestination: View>: ToolbarContent {
         self.reviewDestination = reviewDestination
     }
 
+    // MARK: - Body
+
     var body: some ToolbarContent {
         ToolbarItemGroup(placement: .topBarTrailing) {
             favoriteButton
@@ -118,6 +143,8 @@ struct DetailNavigationToolbar<ReviewDestination: View>: ToolbarContent {
         }
     }
 
+    // MARK: - Favorite Action
+
     private var favoriteButton: some View {
         Button(action: onFavoriteTap) {
             DetailNavigationToolbarIcon(
@@ -128,6 +155,8 @@ struct DetailNavigationToolbar<ReviewDestination: View>: ToolbarContent {
         }
         .disabled(!favoriteActionState.isEnabled)
     }
+
+    // MARK: - Broadcast Reminder Action
 
     @ViewBuilder
     private var broadcastReminderButton: some View {
@@ -154,6 +183,8 @@ struct DetailNavigationToolbar<ReviewDestination: View>: ToolbarContent {
             .disabled(!broadcastReminderActionState.isEnabled)
         }
     }
+
+    // MARK: - Compact Layout
 
     private var moreActionsMenu: some View {
         Menu {
@@ -212,6 +243,8 @@ struct DetailNavigationToolbar<ReviewDestination: View>: ToolbarContent {
         .disabled(isRefreshing)
     }
 
+    // MARK: - Expanded Layout
+
     @ViewBuilder
     private var shareAction: some View {
         switch shareState {
@@ -268,9 +301,16 @@ struct DetailNavigationToolbar<ReviewDestination: View>: ToolbarContent {
     }
 }
 
+// MARK: - DetailExternalActionsToolbar
+
 struct DetailExternalActionsToolbar: ToolbarContent {
+
+    // MARK: - Properties
+
     let shareState: DetailNavigationToolbarShareState
     let externalPageState: DetailNavigationToolbarExternalPageState
+
+    // MARK: - Body
 
     var body: some ToolbarContent {
         ToolbarItemGroup(placement: .topBarTrailing) {
@@ -278,6 +318,8 @@ struct DetailExternalActionsToolbar: ToolbarContent {
             externalPageAction
         }
     }
+
+    // MARK: - Share Action
 
     @ViewBuilder
     private var shareAction: some View {
@@ -301,6 +343,8 @@ struct DetailExternalActionsToolbar: ToolbarContent {
         }
     }
 
+    // MARK: - External Page Action
+
     @ViewBuilder
     private var externalPageAction: some View {
         switch externalPageState {
@@ -319,9 +363,16 @@ struct DetailExternalActionsToolbar: ToolbarContent {
     }
 }
 
+// MARK: - DetailNavigationToolbarIcon
+
 private struct DetailNavigationToolbarIcon: View {
+
+    // MARK: - Properties
+
     let systemName: String
     let tintColor: Color
+
+    // MARK: - Body
 
     var body: some View {
         Image(systemName: systemName)

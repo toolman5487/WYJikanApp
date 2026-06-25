@@ -7,11 +7,18 @@
 
 import SwiftUI
 
+// MARK: - SynopsisTranslationButton
+
 struct SynopsisTranslationButton: View {
+
+    // MARK: - Properties
+
     let state: SynopsisTranslationState
     var idleTitle: String = "翻譯劇情"
     var translatedTitle: String = "重新翻譯"
     let action: () -> Void
+
+    // MARK: - Body
 
     var body: some View {
         Button(action: action) {
@@ -33,6 +40,8 @@ struct SynopsisTranslationButton: View {
         .disabled(state.isTranslating)
     }
 
+    // MARK: - Private
+
     private var title: String {
         switch state {
         case .idle:
@@ -47,16 +56,22 @@ struct SynopsisTranslationButton: View {
     }
 }
 
+// MARK: - TranslatedSynopsisTextView
+
 struct TranslatedSynopsisTextView: View {
+
+    // MARK: - Properties
+
     let originalText: String
     let translationState: SynopsisTranslationState
     var primaryFont: Font = .body
     var originalFont: Font = .body
 
+    // MARK: - Body
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             translatedSynopsisView
-
             originalSynopsisView
 
             if let failureMessage = translationState.failureMessage {
@@ -68,6 +83,8 @@ struct TranslatedSynopsisTextView: View {
         }
     }
 
+    // MARK: - Translated Synopsis
+
     @ViewBuilder
     private var translatedSynopsisView: some View {
         switch translationState {
@@ -77,23 +94,15 @@ struct TranslatedSynopsisTextView: View {
                 .foregroundStyle(ThemeColor.textPrimary.opacity(0.9))
                 .fixedSize(horizontal: false, vertical: true)
 
-        case .idle:
-            Text(originalText)
-                .font(primaryFont)
-                .foregroundStyle(ThemeColor.textPrimary.opacity(0.9))
-                .fixedSize(horizontal: false, vertical: true)
-        case .translating:
-            Text(originalText)
-                .font(primaryFont)
-                .foregroundStyle(ThemeColor.textPrimary.opacity(0.9))
-                .fixedSize(horizontal: false, vertical: true)
-        case .failed:
+        case .idle, .translating, .failed:
             Text(originalText)
                 .font(primaryFont)
                 .foregroundStyle(ThemeColor.textPrimary.opacity(0.9))
                 .fixedSize(horizontal: false, vertical: true)
         }
     }
+
+    // MARK: - Original Synopsis
 
     @ViewBuilder
     private var originalSynopsisView: some View {
@@ -108,10 +117,89 @@ struct TranslatedSynopsisTextView: View {
     }
 }
 
+// MARK: - ReviewTranslationContentView
+
+struct ReviewTranslationContentView: View {
+
+    // MARK: - Properties
+
+    let originalText: String
+    let translationState: SynopsisTranslationState
+    let onTranslate: () -> Void
+
+    // MARK: - Body
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .center, spacing: 8) {
+                Spacer(minLength: 8)
+
+                SynopsisTranslationButton(
+                    state: translationState,
+                    idleTitle: "翻譯評論",
+                    translatedTitle: "重新翻譯",
+                    action: onTranslate
+                )
+            }
+
+            TranslatedSynopsisTextView(
+                originalText: originalText,
+                translationState: translationState
+            )
+        }
+    }
+}
+
+// MARK: - SynopsisTranslationSectionView
+
+struct SynopsisTranslationSectionView: View {
+
+    // MARK: - Properties
+
+    let title: String
+    let originalText: String
+    let translationState: SynopsisTranslationState
+    var idleTitle: String = "翻譯劇情"
+    var translatedTitle: String = "重新翻譯"
+    var primaryFont: Font = .body
+    var originalFont: Font = .body
+    let onTranslate: () -> Void
+
+    // MARK: - Body
+
+    var body: some View {
+        AnimeDetailSectionCard(
+            title,
+            titleAccessory: {
+                SynopsisTranslationButton(
+                    state: translationState,
+                    idleTitle: idleTitle,
+                    translatedTitle: translatedTitle,
+                    action: onTranslate
+                )
+            }
+        ) {
+            TranslatedSynopsisTextView(
+                originalText: originalText,
+                translationState: translationState,
+                primaryFont: primaryFont,
+                originalFont: originalFont
+            )
+        }
+    }
+}
+
+// MARK: - AnimeDetailSectionCard
+
 struct AnimeDetailSectionCard<Content: View>: View {
+
+    // MARK: - Properties
+
     let title: String
     private let titleAccessory: AnyView?
     private let content: Content
+
+    // MARK: - Lifecycle
 
     init(_ title: String, @ViewBuilder content: () -> Content) {
         self.title = title
@@ -128,6 +216,8 @@ struct AnimeDetailSectionCard<Content: View>: View {
         self.titleAccessory = AnyView(titleAccessory())
         self.content = content()
     }
+
+    // MARK: - Body
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -149,11 +239,18 @@ struct AnimeDetailSectionCard<Content: View>: View {
     }
 }
 
+// MARK: - AnimeDetailInfoRow
+
 struct AnimeDetailInfoRow: View {
+
+    // MARK: - Properties
+
     let title: String
     let value: String
     var subtitle: String?
     var isValueCopyable: Bool
+
+    // MARK: - Lifecycle
 
     init(
         title: String,
@@ -166,6 +263,8 @@ struct AnimeDetailInfoRow: View {
         self.subtitle = subtitle
         self.isValueCopyable = isValueCopyable
     }
+
+    // MARK: - Body
 
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
@@ -189,6 +288,8 @@ struct AnimeDetailInfoRow: View {
             .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
+
+    // MARK: - Value Content
 
     @ViewBuilder
     private var valueContent: some View {
