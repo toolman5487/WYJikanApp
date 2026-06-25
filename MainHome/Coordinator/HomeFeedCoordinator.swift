@@ -5,6 +5,56 @@
 
 import Foundation
 
+// MARK: - HomeFeedLoadTier
+
+enum HomeFeedLoadTier: Int, CaseIterable, Sendable {
+    case phase1
+    case phase2
+    case phase3
+    case deferred
+
+    static var initialTiers: [HomeFeedLoadTier] {
+        [.phase1, .phase2, .phase3]
+    }
+
+    var sections: [HomeFeedSection] {
+        switch self {
+        case .phase1:
+            return [.heroBanner, .todayAnime]
+        case .phase2:
+            return [.watchPromos, .watchEpisodes]
+        case .phase3:
+            return [.trendingAnime, .trendingManga]
+        case .deferred:
+            return [.recommendedAnime]
+        }
+    }
+}
+
+// MARK: - HomeFeedSectionLoadState
+
+enum HomeFeedSectionLoadState: Equatable {
+    case idle
+    case loading
+    case loaded
+    case failed
+    case deferredPending
+
+    var permitsLoad: Bool {
+        switch self {
+        case .idle, .failed:
+            return true
+        case .loading, .loaded, .deferredPending:
+            return false
+        }
+    }
+
+    var isLoaded: Bool {
+        if case .loaded = self { return true }
+        return false
+    }
+}
+
 // MARK: - HomeFeedSection
 
 enum HomeFeedSection: Hashable, CaseIterable {
@@ -16,13 +66,21 @@ enum HomeFeedSection: Hashable, CaseIterable {
     case watchEpisodes
     case recommendedAnime
 
-    var isDeferred: Bool {
+    var loadTier: HomeFeedLoadTier {
         switch self {
-        case .heroBanner, .todayAnime, .watchPromos, .watchEpisodes, .trendingAnime, .trendingManga:
-            return false
+        case .heroBanner, .todayAnime:
+            return .phase1
+        case .watchPromos, .watchEpisodes:
+            return .phase2
+        case .trendingAnime, .trendingManga:
+            return .phase3
         case .recommendedAnime:
-            return true
+            return .deferred
         }
+    }
+
+    var isDeferred: Bool {
+        loadTier == .deferred
     }
 }
 
@@ -175,9 +233,7 @@ final class HomeFeedCoordinator {
     private let homeLoadCoordinator: any HomeLoadCoordinating
     private let requestLifecycleController: RequestScreenLifecycleController
     private let deferredSectionLoadScheduler = HomeDeferredSectionLoadScheduler()
-    private var loadedSections = Set<HomeFeedSection>()
-    private var loadingSections = Set<HomeFeedSection>()
-    private var pendingDeferredSections = Set<HomeFeedSection>()
+    private var sectionStates: [HomeFeedSection: HomeFeedSectionLoadState] = [:]
 
     // MARK: - Lifecycle
 
@@ -210,9 +266,9 @@ final class HomeFeedCoordinator {
             AppLaunchSignposter.endHomeInitialLoad()
         }
 
-        await loadPhase(.heroBanner, .todayAnime, priority: .userInitiated)
-        await loadPhase(.watchPromos, .watchEpisodes, priority: .userInitiated)
-        await loadPhase(.trendingAnime, .trendingManga, priority: .userInitiated)
+        for tier in HomeFeedLoadTier.initialTiers {
+            await loadTier(tier, priority: .userInitiated)
+        }
         await homeLoadCoordinator.markCompleted(.initialFeeds)
     }
 
@@ -231,17 +287,36 @@ final class HomeFeedCoordinator {
             try? await Task.sleep(for: sectionDelay)
         }
 
-        await loadDeferredSection(.recommendedAnime, priority: priority)
+        for section in HomeFeedLoadTier.deferred.sections {
+            await loadDeferredSection(section, priority: priority)
+        }
     }
 
     func refreshAll() async {
-        await refreshPhase(.heroBanner, .todayAnime)
-        await refreshPhase(.watchPromos, .watchEpisodes)
-        await refreshPhase(.trendingAnime, .trendingManga)
-        await refresh(.recommendedAnime)
+        for tier in HomeFeedLoadTier.initialTiers {
+            await refreshTier(tier)
+        }
+        await refreshTier(.deferred)
     }
 
     // MARK: - Phase Loading
+
+    private func loadTier(_ tier: HomeFeedLoadTier, priority: TaskPriority) async {
+        let sections = tier.sections
+        guard sections.count == 2 else { return }
+        await loadPhase(sections[0], sections[1], priority: priority)
+    }
+
+    private func refreshTier(_ tier: HomeFeedLoadTier) async {
+        let sections = tier.sections
+        guard sections.count == 2 else {
+            for section in sections {
+                await refresh(section)
+            }
+            return
+        }
+        await refreshPhase(sections[0], sections[1])
+    }
 
     private func loadPhase(
         _ first: HomeFeedSection,
@@ -265,14 +340,8 @@ final class HomeFeedCoordinator {
         _ section: HomeFeedSection,
         priority: TaskPriority
     ) async {
-        guard section.isDeferred,
-              !loadedSections.contains(section),
-              pendingDeferredSections.insert(section).inserted else {
-            return
-        }
-        defer {
-            pendingDeferredSections.remove(section)
-        }
+        guard section.isDeferred, beginDeferredLoad(for: section) else { return }
+        defer { endDeferredLoad(for: section) }
 
         do {
             try await deferredSectionLoadScheduler.waitForTurn()
@@ -287,13 +356,7 @@ final class HomeFeedCoordinator {
     }
 
     private func load(_ section: HomeFeedSection, priority: TaskPriority) async {
-        guard !loadedSections.contains(section),
-              loadingSections.insert(section).inserted else {
-            return
-        }
-        defer {
-            loadingSections.remove(section)
-        }
+        guard beginLoad(for: section) else { return }
 
         let isSuccessful = switch section {
         case .heroBanner:
@@ -312,7 +375,7 @@ final class HomeFeedCoordinator {
             await loadIfNeeded(viewModels.recommendedAnime, priority: priority)
         }
 
-        await updateLoadCompletion(for: section, isSuccessful: isSuccessful)
+        await finishLoad(for: section, isSuccessful: isSuccessful)
     }
 
     private func refresh(_ section: HomeFeedSection) async {
@@ -333,7 +396,7 @@ final class HomeFeedCoordinator {
             await refresh(viewModels.recommendedAnime)
         }
 
-        await updateLoadCompletion(for: section, isSuccessful: isSuccessful)
+        await finishLoad(for: section, isSuccessful: isSuccessful)
     }
 
     private func loadIfNeeded(
@@ -351,19 +414,43 @@ final class HomeFeedCoordinator {
         return viewModel.isFeedLoadSuccessful
     }
 
-    private func updateLoadCompletion(
-        for section: HomeFeedSection,
-        isSuccessful: Bool
-    ) async {
-        if isSuccessful {
-            loadedSections.insert(section)
-        } else {
-            loadedSections.remove(section)
-        }
+    private func sectionState(for section: HomeFeedSection) -> HomeFeedSectionLoadState {
+        sectionStates[section, default: .idle]
+    }
 
-        if loadedSections.count == HomeFeedSection.allCases.count {
-            await homeLoadCoordinator.markCompleted(.allFeeds)
+    private func beginLoad(for section: HomeFeedSection) -> Bool {
+        switch sectionState(for: section) {
+        case .idle, .failed, .deferredPending:
+            sectionStates[section] = .loading
+            return true
+        case .loading, .loaded:
+            return false
         }
+    }
+
+    private func beginDeferredLoad(for section: HomeFeedSection) -> Bool {
+        switch sectionState(for: section) {
+        case .idle, .failed:
+            sectionStates[section] = .deferredPending
+            return true
+        case .loading, .loaded, .deferredPending:
+            return false
+        }
+    }
+
+    private func endDeferredLoad(for section: HomeFeedSection) {
+        if sectionState(for: section) == .deferredPending {
+            sectionStates[section] = .idle
+        }
+    }
+
+    private func finishLoad(for section: HomeFeedSection, isSuccessful: Bool) async {
+        sectionStates[section] = isSuccessful ? .loaded : .failed
+
+        guard HomeFeedSection.allCases.allSatisfy({ sectionState(for: $0).isLoaded }) else {
+            return
+        }
+        await homeLoadCoordinator.markCompleted(.allFeeds)
     }
 }
 
