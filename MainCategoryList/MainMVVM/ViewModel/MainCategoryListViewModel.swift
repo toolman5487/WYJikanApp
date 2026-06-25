@@ -24,6 +24,8 @@ final class MainCategoryListViewModel: ObservableObject {
     private let requestLifecycleController: RequestScreenLifecycleController
     private var cancellables = Set<AnyCancellable>()
 
+    let parentTab: JikanAPIRequestScope = .categoryList
+
     // MARK: - Lifecycle
 
     init(
@@ -60,10 +62,10 @@ final class MainCategoryListViewModel: ObservableObject {
 
     // MARK: - Preparation
 
-    func screenDidAppear(platform: UserInterfacePlatform) async {
+    func screenDidAppear() async {
         guard await requestLifecycleController.activate() else { return }
 
-        configureGenreBatch(platform: platform)
+        configureGenreBatch(platform: UserInterfacePlatform.current)
         activateKind(selectedKind)
     }
 
@@ -212,3 +214,5 @@ private extension MainCategoryListViewModel {
         kindLoadController(for: kind)?.loadMore()
     }
 }
+
+extension MainCategoryListViewModel: TabScreenLifecyclePresentable {}

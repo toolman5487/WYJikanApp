@@ -3,6 +3,7 @@
 //  WYJikanApp
 //
 
+import Combine
 import Foundation
 
 // MARK: - HomeFeedLoadTier
@@ -537,3 +538,54 @@ final class HomeFeedSectionLoader {
         activeTask?.cancel()
     }
 }
+
+// MARK: - HomeTabRootViewModel
+
+@MainActor
+final class HomeTabRootViewModel: ObservableObject {
+
+    // MARK: - Properties
+
+    let parentTab: JikanAPIRequestScope = .home
+
+    private let coordinator: HomeFeedCoordinator
+    private static let initialLoadGracePeriod: Duration = .milliseconds(600)
+
+    // MARK: - Lifecycle
+
+    init(coordinator: HomeFeedCoordinator) {
+        self.coordinator = coordinator
+    }
+
+    // MARK: - Tab Lifecycle
+
+    func screenDidAppear() async {
+        guard await coordinator.screenDidAppear() else { return }
+
+        do {
+            try await Task.sleep(for: Self.initialLoadGracePeriod)
+        } catch {
+            return
+        }
+
+        guard !Task.isCancelled else { return }
+
+        await coordinator.loadInitial()
+
+        guard !Task.isCancelled else { return }
+
+        let platform = UserInterfacePlatform.current
+        if platform.shouldPreloadHomeDeferredSections {
+            await coordinator.loadDeferredSections(
+                priority: .utility,
+                sectionDelay: platform.homeDeferredSectionLoadDelay
+            )
+        }
+    }
+
+    func screenDidDisappear() {
+        coordinator.screenDidDisappear()
+    }
+}
+
+extension HomeTabRootViewModel: TabScreenLifecyclePresentable {}

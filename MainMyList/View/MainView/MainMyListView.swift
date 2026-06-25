@@ -37,6 +37,7 @@ struct MainMyListView: View {
     @StateObject private var viewModel: MainMyListViewModel
     @StateObject private var randomAnimeViewModel: RandomHeroViewModel
     @StateObject private var randomMangaViewModel: RandomMangaViewModel
+    @StateObject private var tabLifecycleViewModel: MyListTabLifecycleViewModel
 
     @State private var genreCollectionsRoute: MyListGenreCollectionsRoute?
     @State private var formatCollectionsRoute: MyListFormatCollectionsRoute?
@@ -48,9 +49,17 @@ struct MainMyListView: View {
 
     init(dependencies: MyListDependencies) {
         self.dependencies = dependencies
-        _viewModel = StateObject(wrappedValue: dependencies.makeMainViewModel())
-        _randomAnimeViewModel = StateObject(wrappedValue: dependencies.makeRandomAnimeViewModel())
-        _randomMangaViewModel = StateObject(wrappedValue: dependencies.makeRandomMangaViewModel())
+        let listViewModel = dependencies.makeMainViewModel()
+        let randomAnimeViewModel = dependencies.makeRandomAnimeViewModel()
+        let randomMangaViewModel = dependencies.makeRandomMangaViewModel()
+        _viewModel = StateObject(wrappedValue: listViewModel)
+        _randomAnimeViewModel = StateObject(wrappedValue: randomAnimeViewModel)
+        _randomMangaViewModel = StateObject(wrappedValue: randomMangaViewModel)
+        _tabLifecycleViewModel = StateObject(wrappedValue: MyListTabLifecycleViewModel(
+            listViewModel: listViewModel,
+            randomAnimeViewModel: randomAnimeViewModel,
+            randomMangaViewModel: randomMangaViewModel
+        ))
     }
 
     // MARK: - Body
@@ -114,23 +123,11 @@ struct MainMyListView: View {
             } message: {
                 Text(viewModel.persistenceMutationState.failureMessage ?? "")
             }
-            .task(id: mainTabBarViewModel.selectedTab, priority: .userInitiated) {
-                await handleSelectedTabChange()
+            .onAppear {
+                tabLifecycleViewModel.bind(persistenceStore: appPersistenceStore)
             }
-            .onDisappear {
-                stopRandomPickRequests()
-            }
+            .tabRootLifecycle(viewModel: tabLifecycleViewModel)
         }
-    }
-
-    private func handleSelectedTabChange() async {
-        guard mainTabBarViewModel.selectedTab == .myList else {
-            stopRandomPickRequests()
-            return
-        }
-
-        guard appPersistenceStore.isReady else { return }
-        await updateRandomPickLifecycle(for: viewModel.selectedFilter)
     }
 
     // MARK: - Private Views
@@ -153,7 +150,7 @@ struct MainMyListView: View {
         }
         .task(id: viewModel.selectedFilter, priority: .userInitiated) {
             guard mainTabBarViewModel.selectedTab == .myList else { return }
-            await updateRandomPickLifecycle(for: viewModel.selectedFilter)
+            await tabLifecycleViewModel.updateRandomPickLifecycle(for: viewModel.selectedFilter)
         }
     }
 
@@ -346,25 +343,6 @@ struct MainMyListView: View {
 
     private func contentState(for presentation: MyListPresentation) -> ContentState {
         presentation.filteredItems.isEmpty ? .empty : .populated
-    }
-
-    private func updateRandomPickLifecycle(for filter: MyListFilter) async {
-        switch filter {
-        case .all:
-            randomAnimeViewModel.screenDidDisappear()
-            randomMangaViewModel.screenDidDisappear()
-        case .anime:
-            randomMangaViewModel.screenDidDisappear()
-            await randomAnimeViewModel.screenDidAppear()
-        case .manga:
-            randomAnimeViewModel.screenDidDisappear()
-            await randomMangaViewModel.screenDidAppear()
-        }
-    }
-
-    private func stopRandomPickRequests() {
-        randomAnimeViewModel.screenDidDisappear()
-        randomMangaViewModel.screenDidDisappear()
     }
 
     private func showGenreCollectionsDetail(

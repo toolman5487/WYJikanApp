@@ -786,16 +786,18 @@ extension EnvironmentValues {
     }
 }
 
-// MARK: - RequestScreenLifecyclePresentable
+// MARK: - TabScreenLifecyclePresentable
 
 @MainActor
-protocol RequestScreenLifecyclePresentable: AnyObject {
+protocol TabScreenLifecyclePresentable: AnyObject {
     var parentTab: JikanAPIRequestScope { get }
     func screenDidAppear() async
     func screenDidDisappear()
 }
 
-extension RequestScreenLifecyclePresentable {
+typealias RequestScreenLifecyclePresentable = TabScreenLifecyclePresentable
+
+extension TabScreenLifecyclePresentable {
     func handleSelectedTabChange(_ selectedTab: AppTab) async {
         guard selectedTab.requestScope == parentTab else {
             screenDidDisappear()
@@ -806,9 +808,9 @@ extension RequestScreenLifecyclePresentable {
     }
 }
 
-// MARK: - RequestScreenTabLifecycleModifier
+// MARK: - TabScreenLifecycleModifier
 
-private struct RequestScreenTabLifecycleModifier<V: RequestScreenLifecyclePresentable & ObservableObject>: ViewModifier {
+private struct TabScreenLifecycleModifier<V: TabScreenLifecyclePresentable & ObservableObject>: ViewModifier {
     @EnvironmentObject private var mainTabBarViewModel: MainTabBarViewModel
     @ObservedObject private var viewModel: V
 
@@ -828,9 +830,21 @@ private struct RequestScreenTabLifecycleModifier<V: RequestScreenLifecyclePresen
 }
 
 extension View {
-    func requestScreenTabLifecycle<V: RequestScreenLifecyclePresentable & ObservableObject>(
+    func tabScreenLifecycle<V: TabScreenLifecyclePresentable & ObservableObject>(
         viewModel: V
     ) -> some View {
-        modifier(RequestScreenTabLifecycleModifier(viewModel: viewModel))
+        modifier(TabScreenLifecycleModifier(viewModel: viewModel))
+    }
+
+    func tabRootLifecycle<V: TabScreenLifecyclePresentable & ObservableObject>(
+        viewModel: V
+    ) -> some View {
+        tabScreenLifecycle(viewModel: viewModel)
+    }
+
+    func requestScreenTabLifecycle<V: TabScreenLifecyclePresentable & ObservableObject>(
+        viewModel: V
+    ) -> some View {
+        tabScreenLifecycle(viewModel: viewModel)
     }
 }

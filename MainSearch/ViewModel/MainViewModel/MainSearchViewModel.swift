@@ -36,6 +36,8 @@ final class MainSearchViewModel: ObservableObject {
     private let resumeSearchSubject = PassthroughSubject<MainSearchEvent, Never>()
     private var shouldResumeSearch = false
 
+    let parentTab: JikanAPIRequestScope = .search
+
     // MARK: - Lifecycle
 
     init(
@@ -329,3 +331,5 @@ private extension MainSearchViewModel {
         )
     }
 }
+
+extension MainSearchViewModel: TabScreenLifecyclePresentable {}

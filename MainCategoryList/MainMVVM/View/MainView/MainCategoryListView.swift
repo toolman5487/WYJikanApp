@@ -11,42 +11,27 @@ struct MainCategoryListView: View {
 
     // MARK: - Properties
 
-    @EnvironmentObject private var mainTabBarViewModel: MainTabBarViewModel
     @StateObject private var viewModel: MainCategoryListViewModel
+    @State private var loadMoreBounceProgress: CGFloat = 0
+    
+    private let topAnchorId = "MainCategoryListTopAnchor"
 
     // MARK: - Lifecycle
 
     init(dependencies: AppDependencies) {
         _viewModel = StateObject(wrappedValue: dependencies.makeMainCategoryListViewModel())
     }
-    @State private var loadMoreBounceProgress: CGFloat = 0
-    
-    private let topAnchorId = "MainCategoryListTopAnchor"
-    
+
     // MARK: - Body
-    
+
     var body: some View {
         NavigationStack {
             scrollView
                 .toolbar(.hidden, for: .navigationBar)
-                .task(id: mainTabBarViewModel.selectedTab, priority: .userInitiated) {
-                    await handleSelectedTabChange()
-                }
-                .onDisappear {
-                    viewModel.screenDidDisappear()
-                }
+                .tabRootLifecycle(viewModel: viewModel)
         }
     }
 
-    private func handleSelectedTabChange() async {
-        guard mainTabBarViewModel.selectedTab == .categorylist else {
-            viewModel.screenDidDisappear()
-            return
-        }
-
-        await viewModel.screenDidAppear(platform: .current)
-    }
-    
     // MARK: - Scroll View
     
     private var scrollView: some View {

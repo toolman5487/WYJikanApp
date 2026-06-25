@@ -137,3 +137,70 @@ final class MainMyListViewModel: ObservableObject {
         }
     }
 }
+
+// MARK: - MyListTabLifecycleViewModel
+
+@MainActor
+final class MyListTabLifecycleViewModel: ObservableObject {
+
+    // MARK: - Properties
+
+    let parentTab: JikanAPIRequestScope = .myList
+
+    private let listViewModel: MainMyListViewModel
+    private let randomAnimeViewModel: RandomHeroViewModel
+    private let randomMangaViewModel: RandomMangaViewModel
+    private weak var persistenceStore: AppPersistenceStore?
+
+    // MARK: - Lifecycle
+
+    init(
+        listViewModel: MainMyListViewModel,
+        randomAnimeViewModel: RandomHeroViewModel,
+        randomMangaViewModel: RandomMangaViewModel
+    ) {
+        self.listViewModel = listViewModel
+        self.randomAnimeViewModel = randomAnimeViewModel
+        self.randomMangaViewModel = randomMangaViewModel
+    }
+
+    // MARK: - Binding
+
+    func bind(persistenceStore: AppPersistenceStore) {
+        self.persistenceStore = persistenceStore
+    }
+
+    // MARK: - Tab Lifecycle
+
+    func screenDidAppear() async {
+        guard persistenceStore?.isReady == true else { return }
+        await updateRandomPickLifecycle(for: listViewModel.selectedFilter)
+    }
+
+    func screenDidDisappear() {
+        stopRandomPickRequests()
+    }
+
+    // MARK: - Random Pick
+
+    func updateRandomPickLifecycle(for filter: MyListFilter) async {
+        switch filter {
+        case .all:
+            randomAnimeViewModel.screenDidDisappear()
+            randomMangaViewModel.screenDidDisappear()
+        case .anime:
+            randomMangaViewModel.screenDidDisappear()
+            await randomAnimeViewModel.screenDidAppear()
+        case .manga:
+            randomAnimeViewModel.screenDidDisappear()
+            await randomMangaViewModel.screenDidAppear()
+        }
+    }
+
+    func stopRandomPickRequests() {
+        randomAnimeViewModel.screenDidDisappear()
+        randomMangaViewModel.screenDidDisappear()
+    }
+}
+
+extension MyListTabLifecycleViewModel: TabScreenLifecyclePresentable {}

@@ -66,6 +66,7 @@ private final class HomeFeedRuntime {
     let trendingAnimeViewModel: HomeTrendingAnimeViewModel
     let recommendedAnimeViewModel: HomeRecommendedAnimeViewModel
     let coordinator: HomeFeedCoordinator
+    let tabRootViewModel: HomeTabRootViewModel
 
     init(dependencies: AppDependencies) {
         let service = dependencies.mainHomeService
@@ -98,14 +99,13 @@ private final class HomeFeedRuntime {
             homeLoadCoordinator: dependencies.homeLoadCoordinator,
             requestLifecycleController: dependencies.requestLifecycleManager
         )
+        self.tabRootViewModel = HomeTabRootViewModel(coordinator: coordinator)
     }
 }
 
 // MARK: - MainHomeFeedView
 
 private struct MainHomeFeedView: View {
-
-    private static let initialLoadGracePeriod: Duration = .milliseconds(600)
 
     enum SectionKind: Identifiable {
         case watchPromos
@@ -194,47 +194,7 @@ private struct MainHomeFeedView: View {
         .refreshable {
             await runtime.coordinator.refreshAll()
         }
-        .task(id: mainTabBarViewModel.selectedTab, priority: .userInitiated) {
-            await handleSelectedTabChange()
-        }
-        .onDisappear {
-            runtime.coordinator.screenDidDisappear()
-        }
-    }
-
-    private func handleSelectedTabChange() async {
-        guard mainTabBarViewModel.selectedTab == .home else {
-            runtime.coordinator.screenDidDisappear()
-            return
-        }
-
-        guard await runtime.coordinator.screenDidAppear() else { return }
-
-        do {
-            try await Task.sleep(for: Self.initialLoadGracePeriod)
-        } catch {
-            return
-        }
-
-        guard !Task.isCancelled,
-              mainTabBarViewModel.selectedTab == .home else {
-            return
-        }
-
-        let platform = UserInterfacePlatform.current
-        await runtime.coordinator.loadInitial()
-
-        guard !Task.isCancelled,
-              mainTabBarViewModel.selectedTab == .home else {
-            return
-        }
-
-        if platform.shouldPreloadHomeDeferredSections {
-            await runtime.coordinator.loadDeferredSections(
-                priority: .utility,
-                sectionDelay: platform.homeDeferredSectionLoadDelay
-            )
-        }
+        .tabRootLifecycle(viewModel: runtime.tabRootViewModel)
     }
 
     @ViewBuilder

@@ -18,6 +18,9 @@ final class MainNewsViewModel: ObservableObject {
     private var updatedAt: Date?
     private var hasLoaded = false
     private var requestGeneration = 0
+    private var reloadTask: Task<Void, Never>?
+
+    let parentTab: JikanAPIRequestScope = .news
 
     init(
         service: MainNewsServicing,
@@ -67,7 +70,16 @@ final class MainNewsViewModel: ObservableObject {
 
     func screenDidDisappear() {
         requestGeneration += 1
+        reloadTask?.cancel()
+        reloadTask = nil
         requestLifecycleController.deactivate()
+    }
+
+    func startReload() {
+        reloadTask?.cancel()
+        reloadTask = Task(priority: .userInitiated) { [weak self] in
+            await self?.reload()
+        }
     }
 
     func reload() async {
@@ -140,3 +152,5 @@ final class MainNewsViewModel: ObservableObject {
         generation == requestGeneration
     }
 }
+
+extension MainNewsViewModel: TabScreenLifecyclePresentable {}

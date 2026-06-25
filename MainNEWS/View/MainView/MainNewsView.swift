@@ -9,9 +9,7 @@ struct MainNewsView: View {
 
     // MARK: - Properties
 
-    @EnvironmentObject private var mainTabBarViewModel: MainTabBarViewModel
     @StateObject private var viewModel: MainNewsViewModel
-    @State private var reloadTask: Task<Void, Never>?
     @State private var selectedArticle: MainNewsRow?
 
     // MARK: - Lifecycle
@@ -24,25 +22,7 @@ struct MainNewsView: View {
 
     var body: some View {
         newsNavigationStack
-            .task(id: mainTabBarViewModel.selectedTab, priority: .userInitiated) {
-                await handleSelectedTabChange()
-            }
-            .onDisappear {
-                viewModel.screenDidDisappear()
-                reloadTask?.cancel()
-                reloadTask = nil
-            }
-    }
-
-    private func handleSelectedTabChange() async {
-        guard mainTabBarViewModel.selectedTab == .news else {
-            viewModel.screenDidDisappear()
-            reloadTask?.cancel()
-            reloadTask = nil
-            return
-        }
-
-        await viewModel.screenDidAppear()
+            .tabRootLifecycle(viewModel: viewModel)
     }
 
     // MARK: - Private Views
@@ -146,10 +126,7 @@ struct MainNewsView: View {
     // MARK: - Private Methods
 
     private func startReload() {
-        reloadTask?.cancel()
-        reloadTask = Task(priority: .userInitiated) {
-            await viewModel.reload()
-        }
+        viewModel.startReload()
     }
 }
 
