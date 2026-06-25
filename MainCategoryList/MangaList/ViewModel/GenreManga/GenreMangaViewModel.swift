@@ -37,14 +37,12 @@ final class GenreMangaViewModel: ObservableObject {
 
     @Published private(set) var genreSections: [MangaGenreSection] = []
     @Published private(set) var loadState: LoadState = .idle
-    @Published private(set) var canLoadMore: Bool = false
+    @Published private(set) var hasNextPage = false
 
     // MARK: - Derived State
 
-    var canPullLoadMore: Bool {
-        guard canLoadMore, !isLoadingMore else { return false }
-        if case .error = loadState { return false }
-        return true
+    var canLoadMore: Bool {
+        hasNextPage && loadState.permitsLoadMore
     }
 
     var screenState: ScreenState {
@@ -274,6 +272,17 @@ extension GenreMangaViewModel {
     }
 }
 
+extension GenreMangaViewModel.LoadState {
+    var permitsLoadMore: Bool {
+        switch self {
+        case .loadingMore, .error:
+            return false
+        case .idle, .loadingInitial, .paused, .loaded:
+            return true
+        }
+    }
+}
+
 // MARK: - Task Management
 
 private extension GenreMangaViewModel {
@@ -292,7 +301,7 @@ private extension GenreMangaViewModel {
 
 private extension GenreMangaViewModel {
     func resetLoadingContext() {
-        canLoadMore = false
+        hasNextPage = false
         genreSections = []
         allLocalizedGenres = []
         batchLoader.reset()
@@ -320,7 +329,7 @@ private extension GenreMangaViewModel {
 
     func fetchSections() async {
         loadState = .loadingInitial
-        canLoadMore = false
+        hasNextPage = false
         genreSections = []
         allLocalizedGenres = []
         batchLoader.reset()
@@ -337,7 +346,7 @@ private extension GenreMangaViewModel {
         } catch {
             guard !Task.isCancelled else { return }
             loadState = .error(FeatureLoadFailure(message: Self.genreErrorMessage))
-            canLoadMore = false
+            hasNextPage = false
         }
     }
 }
@@ -388,11 +397,11 @@ private extension GenreMangaViewModel {
 
     func applyBatchResult(_ result: MainCategoryGenreBatchResult) {
         switch result {
-        case .finished(let canLoadMore):
-            self.canLoadMore = canLoadMore
+        case .finished(let hasNextPage):
+            self.hasNextPage = hasNextPage
             loadState = .loaded
         case .empty:
-            canLoadMore = false
+            hasNextPage = false
             loadState = genreSections.isEmpty ? .error(FeatureLoadFailure(message: Self.genreErrorMessage)) : .loaded
         case .failed(let failure):
             loadState = .error(failure)

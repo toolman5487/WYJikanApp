@@ -57,7 +57,7 @@ enum MainCategoryGenreBatchResult: Equatable, Sendable {
     case empty
     case cancelled
     case failed(FeatureLoadFailure)
-    case finished(canLoadMore: Bool)
+    case finished(hasNextPage: Bool)
 }
 
 // MARK: - MainCategoryGenreBatchLoader
@@ -185,7 +185,7 @@ final class MainCategoryGenreBatchLoader<Genre: Identifiable, Item> where Genre.
 
         loadedGenreCount = batch.endIndex
         pendingBatch = nil
-        return .finished(canLoadMore: loadedGenreCount < genres.count)
+        return .finished(hasNextPage: loadedGenreCount < genres.count)
     }
 
     // MARK: - Private Methods

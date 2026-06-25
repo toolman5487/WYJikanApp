@@ -35,12 +35,12 @@ extension MainCategoryListViewModel {
 private extension MainCategoryListViewModel {
     var animeParentChromeStatePublisher: AnyPublisher<MainListKind, Never> {
         Publishers.CombineLatest(
-            animeListViewModel.genreAnimeViewModel.$canLoadMore,
+            animeListViewModel.genreAnimeViewModel.$hasNextPage,
             animeListViewModel.genreAnimeViewModel.$loadState
         )
-        .map { canLoadMore, loadState in
+        .map { hasNextPage, loadState in
             MainCategoryParentChromeState(
-                canLoadMore: canLoadMore && loadState.allowsPullLoadMore,
+                canLoadMore: hasNextPage && loadState.permitsLoadMore,
                 isLoadingMore: loadState == .loadingMore,
                 topFilterSelectionIdentifier: nil
             )
@@ -52,12 +52,12 @@ private extension MainCategoryListViewModel {
 
     var mangaParentChromeStatePublisher: AnyPublisher<MainListKind, Never> {
         Publishers.CombineLatest(
-            mangaListViewModel.genreMangaViewModel.$canLoadMore,
+            mangaListViewModel.genreMangaViewModel.$hasNextPage,
             mangaListViewModel.genreMangaViewModel.$loadState
         )
-        .map { canLoadMore, loadState in
+        .map { hasNextPage, loadState in
             MainCategoryParentChromeState(
-                canLoadMore: canLoadMore && loadState.allowsPullLoadMore,
+                canLoadMore: hasNextPage && loadState.permitsLoadMore,
                 isLoadingMore: loadState == .loadingMore,
                 topFilterSelectionIdentifier: nil
             )
@@ -70,13 +70,13 @@ private extension MainCategoryListViewModel {
     var peopleParentChromeStatePublisher: AnyPublisher<MainListKind, Never> {
         Publishers.CombineLatest3(
             peopleListViewModel.$hasNextPage,
-            peopleListViewModel.$paginationState,
+            peopleListViewModel.$loadState,
             peopleListViewModel.$selectedSort
         )
-        .map { hasNextPage, paginationState, selectedSort in
+        .map { hasNextPage, loadState, selectedSort in
             MainCategoryParentChromeState(
-                canLoadMore: hasNextPage && paginationState.allowsPullLoadMore,
-                isLoadingMore: paginationState == .loadingMore,
+                canLoadMore: hasNextPage && loadState.permitsLoadMore,
+                isLoadingMore: loadState == .loadingMore,
                 topFilterSelectionIdentifier: selectedSort.rawValue
             )
         }
@@ -88,13 +88,13 @@ private extension MainCategoryListViewModel {
     var characterParentChromeStatePublisher: AnyPublisher<MainListKind, Never> {
         Publishers.CombineLatest3(
             characterListViewModel.$hasNextPage,
-            characterListViewModel.$paginationState,
+            characterListViewModel.$loadState,
             characterListViewModel.$selectedSort
         )
-        .map { hasNextPage, paginationState, selectedSort in
+        .map { hasNextPage, loadState, selectedSort in
             MainCategoryParentChromeState(
-                canLoadMore: hasNextPage && paginationState.allowsPullLoadMore,
-                isLoadingMore: paginationState == .loadingMore,
+                canLoadMore: hasNextPage && loadState.permitsLoadMore,
+                isLoadingMore: loadState == .loadingMore,
                 topFilterSelectionIdentifier: selectedSort.rawValue
             )
         }
@@ -110,42 +110,4 @@ private struct MainCategoryParentChromeState: Equatable {
     let canLoadMore: Bool
     let isLoadingMore: Bool
     let topFilterSelectionIdentifier: String?
-}
-
-private extension GenreAnimeViewModel.LoadState {
-    var allowsPullLoadMore: Bool {
-        switch self {
-        case .loadingMore:
-            return false
-        case .error:
-            return false
-        case .idle:
-            return true
-        case .loadingInitial:
-            return true
-        case .paused:
-            return true
-        case .loaded:
-            return true
-        }
-    }
-}
-
-private extension GenreMangaViewModel.LoadState {
-    var allowsPullLoadMore: Bool {
-        switch self {
-        case .loadingMore:
-            return false
-        case .error:
-            return false
-        case .idle:
-            return true
-        case .loadingInitial:
-            return true
-        case .paused:
-            return true
-        case .loaded:
-            return true
-        }
-    }
 }

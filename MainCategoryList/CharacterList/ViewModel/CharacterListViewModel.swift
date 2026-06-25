@@ -10,7 +10,7 @@ import Combine
 
 @MainActor
 final class CharacterListViewModel: ObservableObject {
-    enum PaginationState: Equatable {
+    enum LoadState: Equatable {
         case idle
         case loadingInitial
         case loadingMore
@@ -33,7 +33,7 @@ final class CharacterListViewModel: ObservableObject {
 
     @Published private(set) var rows: [CharacterListRow] = []
     @Published private(set) var hasNextPage = true
-    @Published private(set) var paginationState: PaginationState = .idle
+    @Published private(set) var loadState: LoadState = .idle
     @Published private(set) var selectedSort: CharacterListSort = .popularity
 
     private let service: MainCategoryListServicing
@@ -47,7 +47,7 @@ final class CharacterListViewModel: ObservableObject {
     }
 
     var screenState: ScreenState {
-        switch paginationState {
+        switch loadState {
         case .loadingInitial where rows.isEmpty:
             return .loading
         case .error(let failure) where rows.isEmpty:
@@ -58,7 +58,7 @@ final class CharacterListViewModel: ObservableObject {
             }
 
             let inlineError: FeatureLoadFailure?
-            if case .error(let failure) = paginationState {
+            if case .error(let failure) = loadState {
                 inlineError = failure
             } else {
                 inlineError = nil
@@ -67,7 +67,7 @@ final class CharacterListViewModel: ObservableObject {
             let footer: FooterState
             if !hasNextPage {
                 footer = .hidden
-            } else if paginationState == .loadingMore {
+            } else if loadState == .loadingMore {
                 footer = .loadingMore
             } else {
                 footer = .loadMore
@@ -80,7 +80,7 @@ final class CharacterListViewModel: ObservableObject {
             }
 
             let inlineError: FeatureLoadFailure?
-            if case .error(let failure) = paginationState {
+            if case .error(let failure) = loadState {
                 inlineError = failure
             } else {
                 inlineError = nil
@@ -89,7 +89,7 @@ final class CharacterListViewModel: ObservableObject {
             let footer: FooterState
             if !hasNextPage {
                 footer = .hidden
-            } else if paginationState == .loadingMore {
+            } else if loadState == .loadingMore {
                 footer = .loadingMore
             } else {
                 footer = .loadMore
@@ -102,7 +102,7 @@ final class CharacterListViewModel: ObservableObject {
             }
 
             let inlineError: FeatureLoadFailure?
-            if case .error(let failure) = paginationState {
+            if case .error(let failure) = loadState {
                 inlineError = failure
             } else {
                 inlineError = nil
@@ -111,7 +111,7 @@ final class CharacterListViewModel: ObservableObject {
             let footer: FooterState
             if !hasNextPage {
                 footer = .hidden
-            } else if paginationState == .loadingMore {
+            } else if loadState == .loadingMore {
                 footer = .loadingMore
             } else {
                 footer = .loadMore
@@ -124,7 +124,7 @@ final class CharacterListViewModel: ObservableObject {
             }
 
             let inlineError: FeatureLoadFailure?
-            if case .error(let failure) = paginationState {
+            if case .error(let failure) = loadState {
                 inlineError = failure
             } else {
                 inlineError = nil
@@ -133,7 +133,7 @@ final class CharacterListViewModel: ObservableObject {
             let footer: FooterState
             if !hasNextPage {
                 footer = .hidden
-            } else if paginationState == .loadingMore {
+            } else if loadState == .loadingMore {
                 footer = .loadingMore
             } else {
                 footer = .loadMore
@@ -146,7 +146,7 @@ final class CharacterListViewModel: ObservableObject {
             }
 
             let inlineError: FeatureLoadFailure?
-            if case .error(let failure) = paginationState {
+            if case .error(let failure) = loadState {
                 inlineError = failure
             } else {
                 inlineError = nil
@@ -155,7 +155,7 @@ final class CharacterListViewModel: ObservableObject {
             let footer: FooterState
             if !hasNextPage {
                 footer = .hidden
-            } else if paginationState == .loadingMore {
+            } else if loadState == .loadingMore {
                 footer = .loadingMore
             } else {
                 footer = .loadMore
@@ -166,7 +166,7 @@ final class CharacterListViewModel: ObservableObject {
     }
 
     func loadIfNeeded() {
-        switch paginationState {
+        switch loadState {
         case .idle where rows.isEmpty:
             reload()
         case .paused:
@@ -182,13 +182,13 @@ final class CharacterListViewModel: ObservableObject {
         hasNextPage = true
         sourceRows = []
         rows = []
-        paginationState = .idle
+        loadState = .idle
         loadPage(1)
     }
 
     func loadMore() {
         guard hasNextPage else { return }
-        switch paginationState {
+        switch loadState {
         case .loadingInitial:
             return
         case .loadingMore:
@@ -203,9 +203,9 @@ final class CharacterListViewModel: ObservableObject {
         loadTask?.cancel()
         loadTask = nil
 
-        switch paginationState {
+        switch loadState {
         case .loadingInitial, .loadingMore:
-            paginationState = .paused
+            loadState = .paused
         case .idle, .paused, .error:
             break
         }
@@ -224,7 +224,7 @@ final class CharacterListViewModel: ObservableObject {
 
     private func loadPage(_ page: Int) {
         let isFirstPage = page == 1
-        paginationState = isFirstPage ? .loadingInitial : .loadingMore
+        loadState = isFirstPage ? .loadingInitial : .loadingMore
 
         loadTask = Task(priority: .userInitiated) { [weak self] in
             guard let self else { return }
@@ -238,10 +238,10 @@ final class CharacterListViewModel: ObservableObject {
                 hasNextPage = response.pagination?.hasNextPage ?? !newRows.isEmpty
                 sourceRows = isFirstPage ? newRows : sourceRows + newRows
                 applySelectedSort()
-                paginationState = .idle
+                loadState = .idle
             } catch {
                 guard !Task.isCancelled else { return }
-                paginationState = .error(FeatureLoadFailure(error))
+                loadState = .error(FeatureLoadFailure(error))
             }
         }
     }
@@ -287,8 +287,8 @@ final class CharacterListViewModel: ObservableObject {
     }
 }
 
-extension CharacterListViewModel.PaginationState {
-    var allowsPullLoadMore: Bool {
+extension CharacterListViewModel.LoadState {
+    var permitsLoadMore: Bool {
         switch self {
         case .loadingMore, .error:
             return false
@@ -300,10 +300,10 @@ extension CharacterListViewModel.PaginationState {
 
 extension CharacterListViewModel: MainCategoryListKindLoadControlling {
     var canLoadMore: Bool {
-        hasNextPage && paginationState.allowsPullLoadMore
+        hasNextPage && loadState.permitsLoadMore
     }
 
     var isLoadingMore: Bool {
-        paginationState == .loadingMore
+        loadState == .loadingMore
     }
 }

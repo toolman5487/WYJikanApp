@@ -37,7 +37,7 @@ final class MangaListViewModel: ObservableObject, MainCategoryListKindLoadContro
     }
 
     var canLoadMore: Bool {
-        genreMangaViewModel.canPullLoadMore
+        genreMangaViewModel.canLoadMore
     }
 
     var isLoadingMore: Bool {
