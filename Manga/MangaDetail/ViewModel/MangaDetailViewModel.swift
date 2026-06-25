@@ -52,6 +52,7 @@ final class MangaDetailViewModel: ObservableObject {
     private let favoriteRepository: any FavoriteRepository
     private let readingProgressController: MangaReadingProgressController
     private let requestLifecycleController: RequestScreenLifecycleController
+    let parentTab: JikanAPIRequestScope
     private let persistenceMutationController = PersistenceMutationController()
     private let supplementaryLoadingController = DetailSupplementaryLoadingController()
     private var myListCancellable: AnyCancellable?
@@ -63,6 +64,7 @@ final class MangaDetailViewModel: ObservableObject {
         malId: Int,
         service: MangaDetailServicing,
         favoriteRepository: any FavoriteRepository,
+        parentTab: JikanAPIRequestScope,
         requestLifecycleScope: RequestLifecycleScope,
         requestLifecycleController: any RequestLifecycleControlling,
         readingProgressController: MangaReadingProgressController = MangaReadingProgressController()
@@ -70,6 +72,7 @@ final class MangaDetailViewModel: ObservableObject {
         self.malId = malId
         self.service = service
         self.favoriteRepository = favoriteRepository
+        self.parentTab = parentTab
         self.readingProgressController = readingProgressController
         self.requestLifecycleController = RequestScreenLifecycleController(
             scope: requestLifecycleScope,
@@ -570,3 +573,5 @@ final class MangaDetailViewModel: ObservableObject {
         )
     }
 }
+
+extension MangaDetailViewModel: RequestScreenLifecyclePresentable {}

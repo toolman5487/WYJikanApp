@@ -47,16 +47,19 @@ final class PeopleDetailViewModel: ObservableObject {
     private let malId: Int
     private let service: PeopleDetailServicing
     private let requestLifecycleController: RequestScreenLifecycleController
+    let parentTab: JikanAPIRequestScope
     private var loadState: LoadState = .idle
 
     init(
         malId: Int,
         service: PeopleDetailServicing,
+        parentTab: JikanAPIRequestScope,
         requestLifecycleScope: RequestLifecycleScope,
         requestLifecycleController: any RequestLifecycleControlling
     ) {
         self.malId = malId
         self.service = service
+        self.parentTab = parentTab
         self.requestLifecycleController = RequestScreenLifecycleController(
             scope: requestLifecycleScope,
             requestLifecycleController: requestLifecycleController
@@ -93,3 +96,5 @@ final class PeopleDetailViewModel: ObservableObject {
         }
     }
 }
+
+extension PeopleDetailViewModel: RequestScreenLifecyclePresentable {}

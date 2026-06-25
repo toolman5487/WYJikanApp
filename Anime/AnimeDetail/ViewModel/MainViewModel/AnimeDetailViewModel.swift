@@ -55,6 +55,7 @@ final class AnimeDetailViewModel: ObservableObject {
     private let broadcastReminderRepository: any AnimeBroadcastReminderRepository
     private let watchProgressController: AnimeWatchProgressController
     private let requestLifecycleController: RequestScreenLifecycleController
+    let parentTab: JikanAPIRequestScope
     private let persistenceMutationController = PersistenceMutationController()
     private let supplementaryLoadingController = DetailSupplementaryLoadingController()
     private var myListCancellable: AnyCancellable?
@@ -65,6 +66,7 @@ final class AnimeDetailViewModel: ObservableObject {
         service: AnimeDetailServicing,
         favoriteRepository: any FavoriteRepository,
         broadcastReminderRepository: any AnimeBroadcastReminderRepository,
+        parentTab: JikanAPIRequestScope,
         requestLifecycleScope: RequestLifecycleScope,
         requestLifecycleController: any RequestLifecycleControlling,
         watchProgressController: AnimeWatchProgressController = AnimeWatchProgressController()
@@ -73,6 +75,7 @@ final class AnimeDetailViewModel: ObservableObject {
         self.service = service
         self.favoriteRepository = favoriteRepository
         self.broadcastReminderRepository = broadcastReminderRepository
+        self.parentTab = parentTab
         self.watchProgressController = watchProgressController
         self.requestLifecycleController = RequestScreenLifecycleController(
             scope: requestLifecycleScope,
@@ -669,3 +672,5 @@ final class AnimeDetailViewModel: ObservableObject {
         }
     }
 }
+
+extension AnimeDetailViewModel: RequestScreenLifecyclePresentable {}

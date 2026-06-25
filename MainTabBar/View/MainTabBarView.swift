@@ -39,18 +39,21 @@ private struct MainTabBarConfiguredView: View {
             TabSection("主頁") {
                 Tab(value: AppTab.home) {
                     MainHomeView(dependencies: dependencies)
+                        .environment(\.requestParentTab, .home)
                 } label: {
                     Image(systemName: viewModel.selectedTab == .home ? "square.grid.3x3.fill" : "square.grid.3x3")
                 }
 
                 Tab(value: AppTab.categorylist) {
                     MainCategoryListView(dependencies: dependencies)
+                        .environment(\.requestParentTab, .categoryList)
                 } label: {
                     Image(systemName: viewModel.selectedTab == .categorylist ? "film.stack.fill" : "film.stack")
                 }
 
                 Tab(value: AppTab.news) {
                     MainNewsView(dependencies: dependencies)
+                        .environment(\.requestParentTab, .news)
                 } label: {
                     Image(systemName: "antenna.radiowaves.left.and.right")
                         .symbolVariant(viewModel.selectedTab == .news ? .fill : .none)
@@ -58,6 +61,7 @@ private struct MainTabBarConfiguredView: View {
 
                 Tab(value: AppTab.myList) {
                     MainMyListView(dependencies: dependencies.myList)
+                        .environment(\.requestParentTab, .myList)
                 } label: {
                     Image(systemName: viewModel.selectedTab == .myList ? "heart.fill" : "heart")
                 }
@@ -67,6 +71,7 @@ private struct MainTabBarConfiguredView: View {
             TabSection("搜尋") {
                 Tab(value: AppTab.searchLiquidGlass, role: .search) {
                     MainSearchView(viewModel: mainSearchViewModel)
+                        .environment(\.requestParentTab, .search)
                 } label: {
                     Image(systemName: "magnifyingglass")
                 }

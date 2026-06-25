@@ -55,6 +55,7 @@ final class AnimeReviewViewModel: ObservableObject {
     private let malId: Int
     private let service: AnimeReviewServicing
     private let requestLifecycleController: RequestScreenLifecycleController
+    let parentTab: JikanAPIRequestScope
     private var loadedPage = 0
     private var loadingPhase: LoadingPhase = .idle
     private var hasNextPage = false
@@ -62,11 +63,13 @@ final class AnimeReviewViewModel: ObservableObject {
     init(
         malId: Int,
         service: AnimeReviewServicing,
+        parentTab: JikanAPIRequestScope,
         requestLifecycleScope: RequestLifecycleScope,
         requestLifecycleController: any RequestLifecycleControlling
     ) {
         self.malId = malId
         self.service = service
+        self.parentTab = parentTab
         self.requestLifecycleController = RequestScreenLifecycleController(
             scope: requestLifecycleScope,
             requestLifecycleController: requestLifecycleController
@@ -135,3 +138,5 @@ final class AnimeReviewViewModel: ObservableObject {
         }
     }
 }
+
+extension AnimeReviewViewModel: RequestScreenLifecyclePresentable {}

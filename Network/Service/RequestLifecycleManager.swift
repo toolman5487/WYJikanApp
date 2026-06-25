@@ -4,6 +4,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 // MARK: - RequestLifecycleScope
 
@@ -41,79 +42,145 @@ nonisolated extension RequestLifecycleScope {
 
     static func animeDetail(
         malID: Int,
+        parentTab: JikanAPIRequestScope,
         instanceID: UUID = UUID()
     ) -> RequestLifecycleScope {
-        detailScreen("animeDetail", resourceID: malID, instanceID: instanceID)
+        detailScreen(
+            "animeDetail",
+            resourceID: malID,
+            parentTab: parentTab,
+            instanceID: instanceID
+        )
     }
 
     static func mangaDetail(
         malID: Int,
+        parentTab: JikanAPIRequestScope,
         instanceID: UUID = UUID()
     ) -> RequestLifecycleScope {
-        detailScreen("mangaDetail", resourceID: malID, instanceID: instanceID)
+        detailScreen(
+            "mangaDetail",
+            resourceID: malID,
+            parentTab: parentTab,
+            instanceID: instanceID
+        )
     }
 
     static func peopleDetail(
         malID: Int,
+        parentTab: JikanAPIRequestScope,
         instanceID: UUID = UUID()
     ) -> RequestLifecycleScope {
-        detailScreen("peopleDetail", resourceID: malID, instanceID: instanceID)
+        detailScreen(
+            "peopleDetail",
+            resourceID: malID,
+            parentTab: parentTab,
+            instanceID: instanceID
+        )
     }
 
     static func characterDetail(
         malID: Int,
+        parentTab: JikanAPIRequestScope,
         instanceID: UUID = UUID()
     ) -> RequestLifecycleScope {
-        detailScreen("characterDetail", resourceID: malID, instanceID: instanceID)
+        detailScreen(
+            "characterDetail",
+            resourceID: malID,
+            parentTab: parentTab,
+            instanceID: instanceID
+        )
     }
 
     static func animeReview(
         malID: Int,
+        parentTab: JikanAPIRequestScope,
         instanceID: UUID = UUID()
     ) -> RequestLifecycleScope {
-        detailScreen("animeReview", resourceID: malID, instanceID: instanceID)
+        detailScreen(
+            "animeReview",
+            resourceID: malID,
+            parentTab: parentTab,
+            instanceID: instanceID
+        )
     }
 
     static func mangaReview(
         malID: Int,
+        parentTab: JikanAPIRequestScope,
         instanceID: UUID = UUID()
     ) -> RequestLifecycleScope {
-        detailScreen("mangaReview", resourceID: malID, instanceID: instanceID)
+        detailScreen(
+            "mangaReview",
+            resourceID: malID,
+            parentTab: parentTab,
+            instanceID: instanceID
+        )
     }
 
     static func animeEpisodes(
         malID: Int,
+        parentTab: JikanAPIRequestScope,
         instanceID: UUID = UUID()
     ) -> RequestLifecycleScope {
-        detailScreen("animeEpisodes", resourceID: malID, instanceID: instanceID)
+        detailScreen(
+            "animeEpisodes",
+            resourceID: malID,
+            parentTab: parentTab,
+            instanceID: instanceID
+        )
     }
 
     static func animeCategoryDetail(
         genreID: Int,
+        parentTab: JikanAPIRequestScope,
         instanceID: UUID = UUID()
     ) -> RequestLifecycleScope {
-        detailScreen("animeCategoryDetail", resourceID: genreID, instanceID: instanceID)
+        detailScreen(
+            "animeCategoryDetail",
+            resourceID: genreID,
+            parentTab: parentTab,
+            instanceID: instanceID
+        )
     }
 
     static func mangaCategoryDetail(
         genreID: Int,
+        parentTab: JikanAPIRequestScope,
         instanceID: UUID = UUID()
     ) -> RequestLifecycleScope {
-        detailScreen("mangaCategoryDetail", resourceID: genreID, instanceID: instanceID)
+        detailScreen(
+            "mangaCategoryDetail",
+            resourceID: genreID,
+            parentTab: parentTab,
+            instanceID: instanceID
+        )
     }
 
     static func producerDetail(
         producerID: Int,
+        parentTab: JikanAPIRequestScope,
         instanceID: UUID = UUID()
     ) -> RequestLifecycleScope {
-        detailScreen("producerDetail", resourceID: producerID, instanceID: instanceID)
+        detailScreen(
+            "producerDetail",
+            resourceID: producerID,
+            parentTab: parentTab,
+            instanceID: instanceID
+        )
     }
 
     static func producerAnimeList(
         producerID: Int,
+        parentTab: JikanAPIRequestScope,
         instanceID: UUID = UUID()
     ) -> RequestLifecycleScope {
-        detailScreen("producerAnimeList", resourceID: producerID, instanceID: instanceID)
+        detailScreen(
+            "producerAnimeList",
+            resourceID: producerID,
+            parentTab: parentTab,
+            instanceID: instanceID
+        )
     }
 
     // MARK: - Private
@@ -133,11 +200,13 @@ nonisolated extension RequestLifecycleScope {
     private static func detailScreen(
         _ prefix: String,
         resourceID: Int,
+        parentTab: JikanAPIRequestScope,
         instanceID: UUID
     ) -> RequestLifecycleScope {
         .screen(
             RequestScreenScope(
-                identifier: "\(prefix).\(resourceID).\(instanceID.uuidString)"
+                identifier: "\(prefix).\(resourceID).\(instanceID.uuidString)",
+                parentTab: parentTab
             )
         )
     }
@@ -662,5 +731,67 @@ private extension RequestLifecycleManager {
         scopes.reduce(into: [:]) { counts, scope in
             counts[scope, default: 0] += 1
         }
+    }
+}
+
+// MARK: - Request Parent Tab Environment
+
+private struct RequestParentTabKey: EnvironmentKey {
+    static let defaultValue: JikanAPIRequestScope = .home
+}
+
+extension EnvironmentValues {
+    var requestParentTab: JikanAPIRequestScope {
+        get { self[RequestParentTabKey.self] }
+        set { self[RequestParentTabKey.self] = newValue }
+    }
+}
+
+// MARK: - RequestScreenLifecyclePresentable
+
+@MainActor
+protocol RequestScreenLifecyclePresentable: AnyObject {
+    var parentTab: JikanAPIRequestScope { get }
+    func screenDidAppear() async
+    func screenDidDisappear()
+}
+
+extension RequestScreenLifecyclePresentable {
+    func handleSelectedTabChange(_ selectedTab: AppTab) async {
+        guard selectedTab.requestScope == parentTab else {
+            screenDidDisappear()
+            return
+        }
+
+        await screenDidAppear()
+    }
+}
+
+// MARK: - RequestScreenTabLifecycleModifier
+
+private struct RequestScreenTabLifecycleModifier<V: RequestScreenLifecyclePresentable & ObservableObject>: ViewModifier {
+    @EnvironmentObject private var mainTabBarViewModel: MainTabBarViewModel
+    @ObservedObject private var viewModel: V
+
+    init(viewModel: V) {
+        self.viewModel = viewModel
+    }
+
+    func body(content: Content) -> some View {
+        content
+            .task(id: mainTabBarViewModel.selectedTab, priority: .userInitiated) {
+                await viewModel.handleSelectedTabChange(mainTabBarViewModel.selectedTab)
+            }
+            .onDisappear {
+                viewModel.screenDidDisappear()
+            }
+    }
+}
+
+extension View {
+    func requestScreenTabLifecycle<V: RequestScreenLifecyclePresentable & ObservableObject>(
+        viewModel: V
+    ) -> some View {
+        modifier(RequestScreenTabLifecycleModifier(viewModel: viewModel))
     }
 }

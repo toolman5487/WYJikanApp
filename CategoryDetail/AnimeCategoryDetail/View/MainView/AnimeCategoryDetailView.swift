@@ -17,10 +17,15 @@ struct AnimeCategoryDetailView: View {
 
 private struct AnimeCategoryDetailConfiguredView: View {
     @Environment(\.appDependencies) private var dependencies
+    @Environment(\.requestParentTab) private var requestParentTab
     let genre: AnimeListGenreDTO
 
     var body: some View {
-        AnimeCategoryDetailBodyView(genre: genre, dependencies: dependencies)
+        AnimeCategoryDetailBodyView(
+            genre: genre,
+            parentTab: requestParentTab,
+            dependencies: dependencies
+        )
     }
 }
 
@@ -34,9 +39,16 @@ private struct AnimeCategoryDetailBodyView: View {
 
     // MARK: - Initialization
 
-    init(genre: AnimeListGenreDTO, dependencies: AppDependencies) {
+    init(
+        genre: AnimeListGenreDTO,
+        parentTab: JikanAPIRequestScope,
+        dependencies: AppDependencies
+    ) {
         _viewModel = StateObject(
-            wrappedValue: dependencies.makeAnimeCategoryDetailViewModel(genre: genre)
+            wrappedValue: dependencies.makeAnimeCategoryDetailViewModel(
+                genre: genre,
+                parentTab: parentTab
+            )
         )
     }
 
@@ -47,12 +59,7 @@ private struct AnimeCategoryDetailBodyView: View {
             .navigationTitle(viewModel.genreTitle)
             .navigationBarTitleDisplayMode(.inline)
             .background(Color(.systemBackground))
-            .task(priority: .userInitiated) {
-                await viewModel.screenDidAppear()
-            }
-            .onDisappear {
-                viewModel.screenDidDisappear()
-            }
+            .requestScreenTabLifecycle(viewModel: viewModel)
     }
 
     // MARK: - Scroll Content

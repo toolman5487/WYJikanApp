@@ -96,6 +96,11 @@ struct DetailPictureGridItemView: View {
 }
 
 #Preview {
-    AnimeDetailPicturesSectionView(viewModel: AppDependencies.live.makeAnimeDetailViewModel(malId: 1))
+    AnimeDetailPicturesSectionView(
+        viewModel: AppDependencies.live.makeAnimeDetailViewModel(
+            malId: 1,
+            parentTab: .home
+        )
+    )
         .padding()
 }

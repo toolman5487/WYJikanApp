@@ -17,10 +17,15 @@ struct CharacterDetailView: View {
 
 private struct CharacterDetailConfiguredView: View {
     @Environment(\.appDependencies) private var dependencies
+    @Environment(\.requestParentTab) private var requestParentTab
     let malId: Int
 
     var body: some View {
-        CharacterDetailBodyView(malId: malId, dependencies: dependencies)
+        CharacterDetailBodyView(
+            malId: malId,
+            parentTab: requestParentTab,
+            dependencies: dependencies
+        )
     }
 }
 
@@ -36,9 +41,14 @@ private struct CharacterDetailBodyView: View {
 
     // MARK: - Lifecycle
 
-    init(malId: Int, dependencies: AppDependencies) {
+    init(malId: Int, parentTab: JikanAPIRequestScope, dependencies: AppDependencies) {
         self.malId = malId
-        _viewModel = StateObject(wrappedValue: dependencies.makeCharacterDetailViewModel(malId: malId))
+        _viewModel = StateObject(
+            wrappedValue: dependencies.makeCharacterDetailViewModel(
+                malId: malId,
+                parentTab: parentTab
+            )
+        )
     }
 
     // MARK: - Body
@@ -99,12 +109,7 @@ private struct CharacterDetailBodyView: View {
                 externalPageState: viewModel.externalPageNavigationState()
             )
         }
-        .task(id: malId, priority: .userInitiated) {
-            await viewModel.screenDidAppear()
-        }
-        .onDisappear {
-            viewModel.screenDidDisappear()
-        }
+        .requestScreenTabLifecycle(viewModel: viewModel)
     }
 
     // MARK: - Private Methods

@@ -48,16 +48,19 @@ final class CharacterDetailViewModel: ObservableObject {
     private let malId: Int
     private let service: CharacterDetailServicing
     private let requestLifecycleController: RequestScreenLifecycleController
+    let parentTab: JikanAPIRequestScope
     private var loadState: LoadState = .idle
 
     init(
         malId: Int,
         service: CharacterDetailServicing,
+        parentTab: JikanAPIRequestScope,
         requestLifecycleScope: RequestLifecycleScope,
         requestLifecycleController: any RequestLifecycleControlling
     ) {
         self.malId = malId
         self.service = service
+        self.parentTab = parentTab
         self.requestLifecycleController = RequestScreenLifecycleController(
             scope: requestLifecycleScope,
             requestLifecycleController: requestLifecycleController
@@ -109,3 +112,5 @@ final class CharacterDetailViewModel: ObservableObject {
         synopsisTranslationViewModel.reset()
     }
 }
+
+extension CharacterDetailViewModel: RequestScreenLifecyclePresentable {}

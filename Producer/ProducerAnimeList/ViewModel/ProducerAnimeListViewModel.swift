@@ -34,6 +34,7 @@ final class ProducerAnimeListViewModel: ObservableObject {
     private let producerId: Int
     private let service: ProducerAnimeListServicing
     private let requestLifecycleController: RequestScreenLifecycleController
+    let parentTab: JikanAPIRequestScope
 
     // MARK: - Pagination State
 
@@ -48,12 +49,14 @@ final class ProducerAnimeListViewModel: ObservableObject {
         producerId: Int,
         producerName: String,
         service: ProducerAnimeListServicing,
+        parentTab: JikanAPIRequestScope,
         requestLifecycleScope: RequestLifecycleScope,
         requestLifecycleController: any RequestLifecycleControlling
     ) {
         self.producerId = producerId
         self.producerName = producerName
         self.service = service
+        self.parentTab = parentTab
         self.requestLifecycleController = RequestScreenLifecycleController(
             scope: requestLifecycleScope,
             requestLifecycleController: requestLifecycleController
@@ -169,3 +172,5 @@ final class ProducerAnimeListViewModel: ObservableObject {
         loadMoreState = items.isEmpty ? .hidden : footerState
     }
 }
+
+extension ProducerAnimeListViewModel: RequestScreenLifecyclePresentable {}

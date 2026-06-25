@@ -23,6 +23,7 @@ struct AnimeReviewView: View {
 
 private struct AnimeReviewConfiguredView: View {
     @Environment(\.appDependencies) private var dependencies
+    @Environment(\.requestParentTab) private var requestParentTab
     let malId: Int
     let animeTitle: String?
 
@@ -30,6 +31,7 @@ private struct AnimeReviewConfiguredView: View {
         AnimeReviewBodyView(
             malId: malId,
             animeTitle: animeTitle,
+            parentTab: requestParentTab,
             dependencies: dependencies
         )
     }
@@ -41,10 +43,20 @@ private struct AnimeReviewBodyView: View {
 
     @StateObject private var viewModel: AnimeReviewViewModel
 
-    init(malId: Int, animeTitle: String?, dependencies: AppDependencies) {
+    init(
+        malId: Int,
+        animeTitle: String?,
+        parentTab: JikanAPIRequestScope,
+        dependencies: AppDependencies
+    ) {
         self.malId = malId
         self.animeTitle = animeTitle
-        _viewModel = StateObject(wrappedValue: dependencies.makeAnimeReviewViewModel(malId: malId))
+        _viewModel = StateObject(
+            wrappedValue: dependencies.makeAnimeReviewViewModel(
+                malId: malId,
+                parentTab: parentTab
+            )
+        )
     }
 
     var body: some View {
@@ -77,12 +89,7 @@ private struct AnimeReviewBodyView: View {
         }
         .navigationTitle(navigationTitleText)
         .navigationBarTitleDisplayMode(.inline)
-        .task(id: malId, priority: .userInitiated) {
-            await viewModel.screenDidAppear()
-        }
-        .onDisappear {
-            viewModel.screenDidDisappear()
-        }
+        .requestScreenTabLifecycle(viewModel: viewModel)
     }
 
     private var navigationTitleText: String {

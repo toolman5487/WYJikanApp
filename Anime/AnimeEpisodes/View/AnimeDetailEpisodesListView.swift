@@ -19,6 +19,7 @@ struct AnimeDetailEpisodesListView: View {
 
 private struct AnimeDetailEpisodesListConfiguredView: View {
     @Environment(\.appDependencies) private var dependencies
+    @Environment(\.requestParentTab) private var requestParentTab
     let malId: Int
     let animeTitle: String
 
@@ -26,6 +27,7 @@ private struct AnimeDetailEpisodesListConfiguredView: View {
         AnimeDetailEpisodesListBodyView(
             malId: malId,
             animeTitle: animeTitle,
+            parentTab: requestParentTab,
             dependencies: dependencies
         )
     }
@@ -37,11 +39,19 @@ private struct AnimeDetailEpisodesListBodyView: View {
 
     @StateObject private var viewModel: AnimeDetailEpisodesListViewModel
 
-    init(malId: Int, animeTitle: String, dependencies: AppDependencies) {
+    init(
+        malId: Int,
+        animeTitle: String,
+        parentTab: JikanAPIRequestScope,
+        dependencies: AppDependencies
+    ) {
         self.malId = malId
         self.animeTitle = animeTitle
         _viewModel = StateObject(
-            wrappedValue: dependencies.makeAnimeDetailEpisodesListViewModel(malId: malId)
+            wrappedValue: dependencies.makeAnimeDetailEpisodesListViewModel(
+                malId: malId,
+                parentTab: parentTab
+            )
         )
     }
 
@@ -90,11 +100,6 @@ private struct AnimeDetailEpisodesListBodyView: View {
         }
         .navigationTitle("\(animeTitle) 集數")
         .navigationBarTitleDisplayMode(.inline)
-        .task(id: malId, priority: .userInitiated) {
-            await viewModel.screenDidAppear()
-        }
-        .onDisappear {
-            viewModel.screenDidDisappear()
-        }
+        .requestScreenTabLifecycle(viewModel: viewModel)
     }
 }

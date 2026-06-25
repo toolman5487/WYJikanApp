@@ -19,6 +19,7 @@ struct ProducerAnimeListView: View {
 
 private struct ProducerAnimeListConfiguredView: View {
     @Environment(\.appDependencies) private var dependencies
+    @Environment(\.requestParentTab) private var requestParentTab
 
     let producerId: Int
     let producerName: String
@@ -27,6 +28,7 @@ private struct ProducerAnimeListConfiguredView: View {
         ProducerAnimeListBodyView(
             producerId: producerId,
             producerName: producerName,
+            parentTab: requestParentTab,
             dependencies: dependencies
         )
     }
@@ -45,12 +47,14 @@ private struct ProducerAnimeListBodyView: View {
     init(
         producerId: Int,
         producerName: String,
+        parentTab: JikanAPIRequestScope,
         dependencies: AppDependencies
     ) {
         _viewModel = StateObject(
             wrappedValue: dependencies.makeProducerAnimeListViewModel(
                 producerId: producerId,
-                producerName: producerName
+                producerName: producerName,
+                parentTab: parentTab
             )
         )
     }
@@ -93,12 +97,7 @@ private struct ProducerAnimeListBodyView: View {
                 }
             }
         }
-        .task(priority: .userInitiated) {
-            await viewModel.screenDidAppear()
-        }
-        .onDisappear {
-            viewModel.screenDidDisappear()
-        }
+        .requestScreenTabLifecycle(viewModel: viewModel)
     }
 
     // MARK: - State Content

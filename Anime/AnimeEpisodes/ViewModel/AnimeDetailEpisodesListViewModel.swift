@@ -31,6 +31,7 @@ final class AnimeDetailEpisodesListViewModel: ObservableObject {
     private let service: any AnimeDetailServicing
     private let rowPresenter: AnimeDetailEpisodeRowPresenter
     private let requestLifecycleController: RequestScreenLifecycleController
+    let parentTab: JikanAPIRequestScope
     private var currentPage = 0
     private var hasNextPage = false
     private var hasLoaded = false
@@ -40,12 +41,14 @@ final class AnimeDetailEpisodesListViewModel: ObservableObject {
     init(
         malId: Int,
         service: any AnimeDetailServicing,
+        parentTab: JikanAPIRequestScope,
         requestLifecycleScope: RequestLifecycleScope,
         requestLifecycleController: any RequestLifecycleControlling,
         rowPresenter: AnimeDetailEpisodeRowPresenter = AnimeDetailEpisodeRowPresenter()
     ) {
         self.malId = malId
         self.service = service
+        self.parentTab = parentTab
         self.requestLifecycleController = RequestScreenLifecycleController(
             scope: requestLifecycleScope,
             requestLifecycleController: requestLifecycleController
@@ -216,3 +219,5 @@ final class AnimeDetailEpisodesListViewModel: ObservableObject {
         }
     }
 }
+
+extension AnimeDetailEpisodesListViewModel: RequestScreenLifecyclePresentable {}

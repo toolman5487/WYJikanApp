@@ -32,6 +32,7 @@ final class AnimeCategoryDetailViewModel: ObservableObject {
 
     private let service: AnimeCategoryDetailServicing
     private let requestLifecycleController: RequestScreenLifecycleController
+    let parentTab: JikanAPIRequestScope
 
     // MARK: - Pagination State
 
@@ -45,11 +46,13 @@ final class AnimeCategoryDetailViewModel: ObservableObject {
     init(
         genre: AnimeListGenreDTO,
         service: AnimeCategoryDetailServicing,
+        parentTab: JikanAPIRequestScope,
         requestLifecycleScope: RequestLifecycleScope,
         requestLifecycleController: any RequestLifecycleControlling
     ) {
         self.genre = genre
         self.service = service
+        self.parentTab = parentTab
         self.requestLifecycleController = RequestScreenLifecycleController(
             scope: requestLifecycleScope,
             requestLifecycleController: requestLifecycleController
@@ -206,3 +209,5 @@ final class AnimeCategoryDetailViewModel: ObservableObject {
     }
 
 }
+
+extension AnimeCategoryDetailViewModel: RequestScreenLifecyclePresentable {}

@@ -17,10 +17,15 @@ struct AnimeDetailView: View {
 
 private struct AnimeDetailConfiguredView: View {
     @Environment(\.appDependencies) private var dependencies
+    @Environment(\.requestParentTab) private var requestParentTab
     let malId: Int
 
     var body: some View {
-        AnimeDetailBodyView(malId: malId, dependencies: dependencies)
+        AnimeDetailBodyView(
+            malId: malId,
+            parentTab: requestParentTab,
+            dependencies: dependencies
+        )
     }
 }
 
@@ -49,9 +54,14 @@ private struct AnimeDetailBodyView: View {
 
     // MARK: - Lifecycle
 
-    init(malId: Int, dependencies: AppDependencies) {
+    init(malId: Int, parentTab: JikanAPIRequestScope, dependencies: AppDependencies) {
         self.malId = malId
-        _viewModel = StateObject(wrappedValue: dependencies.makeAnimeDetailViewModel(malId: malId))
+        _viewModel = StateObject(
+            wrappedValue: dependencies.makeAnimeDetailViewModel(
+                malId: malId,
+                parentTab: parentTab
+            )
+        )
     }
 
     // MARK: - Body
@@ -189,12 +199,7 @@ private struct AnimeDetailBodyView: View {
                 )
             }
         }
-        .task(id: malId, priority: .userInitiated) {
-            await viewModel.screenDidAppear()
-        }
-        .onDisappear {
-            viewModel.screenDidDisappear()
-        }
+        .requestScreenTabLifecycle(viewModel: viewModel)
         .task(id: broadcastReminderSyncTrigger, priority: .utility) {
             guard appPersistenceStore.isReady, currentAnime != nil else { return }
             await syncBroadcastReminderIfAvailable()
@@ -453,6 +458,9 @@ private struct AnimeDetailBodyView: View {
 #Preview {
     NavigationStack {
         AnimeDetailView(malId: 52991)
+            .environment(\.appDependencies, .live)
+            .environment(\.requestParentTab, .home)
+            .environmentObject(MainTabBarViewModel())
             .environmentObject(FavoriteStatusStore())
             .environmentObject(AnimeBroadcastReminderStatusStore())
             .environmentObject(HomeTodayAnimeNotificationScheduler())

@@ -52,6 +52,7 @@ final class ProducerDetailViewModel: ObservableObject {
     private let malId: Int
     private let service: ProducerDetailServicing
     private let requestLifecycleController: RequestScreenLifecycleController
+    let parentTab: JikanAPIRequestScope
     private var loadState: LoadState = .idle
     private var isLoadingRelatedAnime = false
 
@@ -60,11 +61,13 @@ final class ProducerDetailViewModel: ObservableObject {
     init(
         malId: Int,
         service: ProducerDetailServicing,
+        parentTab: JikanAPIRequestScope,
         requestLifecycleScope: RequestLifecycleScope,
         requestLifecycleController: any RequestLifecycleControlling
     ) {
         self.malId = malId
         self.service = service
+        self.parentTab = parentTab
         self.requestLifecycleController = RequestScreenLifecycleController(
             scope: requestLifecycleScope,
             requestLifecycleController: requestLifecycleController
@@ -144,3 +147,5 @@ final class ProducerDetailViewModel: ObservableObject {
         }
     }
 }
+
+extension ProducerDetailViewModel: RequestScreenLifecyclePresentable {}
