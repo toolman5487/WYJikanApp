@@ -87,34 +87,6 @@ nonisolated final class JikanAPIService: Sendable {
             throw JikanAPIError.decodingError(error)
         }
     }
-
-    func fetch<T: Decodable & Sendable>(
-        endpoint: String,
-        cachePolicy: JikanAPICachePolicy,
-        queryItems: [URLQueryItem]? = nil
-    ) async throws -> T {
-        try await send(
-            JikanAPIRequest(
-                path: endpoint,
-                queryItems: queryItems ?? [],
-                cachePolicy: cachePolicy,
-                scope: .independent
-            )
-        )
-    }
-
-    func fetchFromURL<T: Decodable & Sendable>(
-        _ urlString: String,
-        cachePolicy: JikanAPICachePolicy
-    ) async throws -> T {
-        try await send(
-            JikanAPIRequest(
-                absoluteURL: urlString,
-                cachePolicy: cachePolicy,
-                scope: .independent
-            )
-        )
-    }
 }
 
 // MARK: - JikanAPIServicing Conformance

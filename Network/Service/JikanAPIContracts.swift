@@ -170,15 +170,6 @@ nonisolated struct JikanAPIRequest: Sendable {
 
 nonisolated protocol JikanAPIServicing: Sendable {
     func send<T: Decodable & Sendable>(_ request: JikanAPIRequest) async throws -> T
-    func fetch<T: Decodable & Sendable>(
-        endpoint: String,
-        cachePolicy: JikanAPICachePolicy,
-        queryItems: [URLQueryItem]?
-    ) async throws -> T
-    func fetchFromURL<T: Decodable & Sendable>(
-        _ urlString: String,
-        cachePolicy: JikanAPICachePolicy
-    ) async throws -> T
     func clearCache() async
 }
 
@@ -229,37 +220,45 @@ nonisolated extension JikanAPIServicing {
         )
     }
 
-    func fetch<T: Decodable & Sendable>(
+    func fetchFromURL<T: Decodable & Sendable>(
+        _ urlString: String,
+        cachePolicy: JikanAPICachePolicy = .remoteOnly,
+        lifecycleScope: RequestLifecycleScope
+    ) async throws -> T {
+        try await send(
+            JikanAPIRequest(
+                absoluteURL: urlString,
+                cachePolicy: cachePolicy,
+                scope: lifecycleScope
+            )
+        )
+    }
+
+    func fetchIndependent<T: Decodable & Sendable>(
         endpoint: String,
+        cachePolicy: JikanAPICachePolicy = .remoteOnly,
         queryItems: [URLQueryItem]? = nil
     ) async throws -> T {
-        try await fetch(
-            endpoint: endpoint,
-            cachePolicy: .remoteOnly,
-            queryItems: queryItems
+        try await send(
+            JikanAPIRequest(
+                path: endpoint,
+                queryItems: queryItems ?? [],
+                cachePolicy: cachePolicy,
+                scope: .independent
+            )
         )
     }
 
-    func fetch<T: Decodable & Sendable>(endpoint: String) async throws -> T {
-        try await fetch(
-            endpoint: endpoint,
-            cachePolicy: .remoteOnly,
-            queryItems: nil
-        )
-    }
-
-    func fetch<T: Decodable & Sendable>(
-        endpoint: String,
-        cachePolicy: JikanAPICachePolicy
+    func fetchIndependentFromURL<T: Decodable & Sendable>(
+        _ urlString: String,
+        cachePolicy: JikanAPICachePolicy = .remoteOnly
     ) async throws -> T {
-        try await fetch(
-            endpoint: endpoint,
-            cachePolicy: cachePolicy,
-            queryItems: nil
+        try await send(
+            JikanAPIRequest(
+                absoluteURL: urlString,
+                cachePolicy: cachePolicy,
+                scope: .independent
+            )
         )
-    }
-
-    func fetchFromURL<T: Decodable & Sendable>(_ urlString: String) async throws -> T {
-        try await fetchFromURL(urlString, cachePolicy: .remoteOnly)
     }
 }
