@@ -68,41 +68,25 @@ final class ProducerAnimeListViewModel: ObservableObject {
 
     func screenDidAppear() async {
         guard await requestLifecycleController.activate() else { return }
-        await paginationController.loadIfNeeded(
-            setLoading: applyLoading,
-            fetchPage: fetchPage,
-            applyPresentation: applyPresentation,
-            applyError: applyInitialLoadError
-        )
+        await performInitialLoadIfNeeded()
     }
 
     func screenDidDisappear() {
-        filterRequestTask?.cancel()
-        filterRequestTask = nil
+        stop()
         requestLifecycleController.deactivate()
     }
 
     func reload() async {
-        await paginationController.reload(
-            showSkeleton: true,
-            setLoading: applyLoading,
-            fetchPage: fetchPage,
-            applyPresentation: applyPresentation,
-            applyError: applyInitialLoadError
-        )
+        await performReload()
     }
 
     func loadMore() async {
-        await paginationController.loadMore(
-            fetchPage: fetchPage,
-            setFooterState: applyFooterState,
-            applyPresentation: applyPresentation
-        )
+        await performLoadMore()
     }
 
     func retryLoadMore() async {
         guard case .error = loadMoreState else { return }
-        await loadMore()
+        await performLoadMore()
     }
 
     // MARK: - Filter Binding
@@ -132,6 +116,33 @@ final class ProducerAnimeListViewModel: ObservableObject {
     }
 
     // MARK: - Loading
+
+    private func performInitialLoadIfNeeded() async {
+        await paginationController.loadIfNeeded(
+            setLoading: applyLoading,
+            fetchPage: fetchPage,
+            applyPresentation: applyPresentation,
+            applyError: applyInitialLoadError
+        )
+    }
+
+    private func performReload() async {
+        await paginationController.reload(
+            showSkeleton: true,
+            setLoading: applyLoading,
+            fetchPage: fetchPage,
+            applyPresentation: applyPresentation,
+            applyError: applyInitialLoadError
+        )
+    }
+
+    private func performLoadMore() async {
+        await paginationController.loadMore(
+            fetchPage: fetchPage,
+            setFooterState: applyFooterState,
+            applyPresentation: applyPresentation
+        )
+    }
 
     private func fetchPage(_ page: Int) async throws -> PaginatedPage<AnimeCategoryItemDTO> {
         let animePage = try await service.fetchAnimePage(
@@ -170,6 +181,40 @@ final class ProducerAnimeListViewModel: ObservableObject {
     ) {
         screenState = items.isEmpty ? .empty : .content(items)
         loadMoreState = items.isEmpty ? .hidden : footerState
+    }
+}
+
+extension ProducerAnimeListViewModel: PaginatedListLoadControlling {
+    var canLoadMore: Bool {
+        paginationController.canLoadMore
+    }
+
+    var isLoadingMore: Bool {
+        loadMoreState == .loading
+    }
+
+    func loadIfNeeded() {
+        paginationController.run { [weak self] in
+            await self?.performInitialLoadIfNeeded()
+        }
+    }
+
+    func loadMore() {
+        paginationController.run { [weak self] in
+            await self?.performLoadMore()
+        }
+    }
+
+    func reload() {
+        paginationController.run { [weak self] in
+            await self?.performReload()
+        }
+    }
+
+    func stop() {
+        filterRequestTask?.cancel()
+        filterRequestTask = nil
+        paginationController.stopLoading()
     }
 }
 

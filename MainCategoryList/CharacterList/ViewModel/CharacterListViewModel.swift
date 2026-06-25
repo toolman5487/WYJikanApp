@@ -298,7 +298,7 @@ extension CharacterListViewModel.LoadState {
     }
 }
 
-extension CharacterListViewModel: MainCategoryListKindLoadControlling {
+extension CharacterListViewModel: PaginatedListLoadControlling {
     var canLoadMore: Bool {
         hasNextPage && loadState.permitsLoadMore
     }

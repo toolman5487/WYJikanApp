@@ -9,7 +9,7 @@ import Foundation
 import Combine
 
 @MainActor
-final class AnimeListViewModel: ObservableObject, MainCategoryListKindLoadControlling {
+final class AnimeListViewModel: ObservableObject, PaginatedListLoadControlling {
     // MARK: - Properties
 
     let genreAnimeViewModel: GenreAnimeViewModel

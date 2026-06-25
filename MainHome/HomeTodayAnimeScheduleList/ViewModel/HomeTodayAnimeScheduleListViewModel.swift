@@ -75,17 +75,11 @@ final class HomeTodayAnimeScheduleListViewModel: ObservableObject {
 
     func screenDidAppear() async {
         guard await requestLifecycleController.activate() else { return }
-        await paginationController.loadIfNeeded(
-            setLoading: applyLoading,
-            fetchPage: fetchPage,
-            applyPresentation: applyPresentation,
-            applyError: applyInitialLoadError
-        )
+        await performInitialLoadIfNeeded()
     }
 
     func screenDidDisappear() {
-        dayRequestTask?.cancel()
-        dayRequestTask = nil
+        stop()
         requestLifecycleController.deactivate()
     }
 
@@ -130,6 +124,15 @@ final class HomeTodayAnimeScheduleListViewModel: ObservableObject {
     }
 
     // MARK: - Loading
+
+    private func performInitialLoadIfNeeded() async {
+        await paginationController.loadIfNeeded(
+            setLoading: applyLoading,
+            fetchPage: fetchPage,
+            applyPresentation: applyPresentation,
+            applyError: applyInitialLoadError
+        )
+    }
 
     private func fetchFirstPage(showSkeleton: Bool) async {
         loadMoreTriggerIDs = []
@@ -193,5 +196,39 @@ final class HomeTodayAnimeScheduleListViewModel: ObservableObject {
     private func shouldLoadMore(after item: HomeTodayAnimeTimelineItem) -> Bool {
         guard paginationController.canLoadMore else { return false }
         return loadMoreTriggerIDs.contains(item.id)
+    }
+}
+
+extension HomeTodayAnimeScheduleListViewModel: PaginatedListLoadControlling {
+    var canLoadMore: Bool {
+        paginationController.canLoadMore
+    }
+
+    var isLoadingMore: Bool {
+        loadMoreState == .loading
+    }
+
+    func loadIfNeeded() {
+        paginationController.run { [weak self] in
+            await self?.performInitialLoadIfNeeded()
+        }
+    }
+
+    func loadMore() {
+        paginationController.run { [weak self] in
+            await self?.loadMorePage()
+        }
+    }
+
+    func reload() {
+        paginationController.run { [weak self] in
+            await self?.fetchFirstPage(showSkeleton: true)
+        }
+    }
+
+    func stop() {
+        dayRequestTask?.cancel()
+        dayRequestTask = nil
+        paginationController.stopLoading()
     }
 }

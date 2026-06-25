@@ -9,7 +9,7 @@ import Foundation
 import Combine
 
 @MainActor
-final class MangaListViewModel: ObservableObject, MainCategoryListKindLoadControlling {
+final class MangaListViewModel: ObservableObject, PaginatedListLoadControlling {
     let genreMangaViewModel: GenreMangaViewModel
 
     init(genreMangaViewModel: GenreMangaViewModel) {

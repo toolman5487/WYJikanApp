@@ -35,13 +35,5 @@ enum MainListKind: String, Hashable, CaseIterable, Sendable {
     }
 }
 
-@MainActor
-protocol MainCategoryListKindLoadControlling: AnyObject {
-    func loadIfNeeded()
-    func reload()
-    func loadMore()
-    func stop()
-    var canLoadMore: Bool { get }
-    var isLoadingMore: Bool { get }
-}
+typealias MainCategoryListKindLoadControlling = PaginatedListLoadControlling
 

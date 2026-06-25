@@ -287,7 +287,7 @@ extension PeopleListViewModel.LoadState {
     }
 }
 
-extension PeopleListViewModel: MainCategoryListKindLoadControlling {
+extension PeopleListViewModel: PaginatedListLoadControlling {
     var canLoadMore: Bool {
         hasNextPage && loadState.permitsLoadMore
     }

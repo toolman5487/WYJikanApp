@@ -20,18 +20,29 @@ nonisolated struct PaginatedPage<Item: Sendable>: Sendable {
     let hasNextPage: Bool
 }
 
+nonisolated enum PaginatedPausedLoadIntent: Equatable, Sendable {
+    case initial
+    case loadMore
+}
+
 nonisolated struct PaginatedListState<Item: Identifiable & Sendable>: Sendable where Item.ID: Hashable & Sendable {
     private(set) var items: [Item] = []
     private(set) var currentPage = 0
     private(set) var hasLoaded = false
     private(set) var hasNextPage = false
+    private(set) var isLoadingInitial = false
     private(set) var isLoadingMore = false
     private(set) var footerState: PaginationFooterState = .hidden
+    private(set) var pausedLoadIntent: PaginatedPausedLoadIntent?
 
     private var requestGeneration = 0
 
+    var isPaused: Bool {
+        pausedLoadIntent != nil
+    }
+
     var canLoadMore: Bool {
-        hasLoaded && hasNextPage && !isLoadingMore
+        hasLoaded && hasNextPage && !isLoadingMore && !isLoadingInitial
     }
 
     mutating func beginReload(clearItems: Bool) -> Int {
@@ -39,6 +50,8 @@ nonisolated struct PaginatedListState<Item: Identifiable & Sendable>: Sendable w
         currentPage = 0
         hasNextPage = false
         isLoadingMore = false
+        isLoadingInitial = true
+        pausedLoadIntent = nil
         footerState = .hidden
 
         if clearItems {
@@ -55,6 +68,8 @@ nonisolated struct PaginatedListState<Item: Identifiable & Sendable>: Sendable w
         currentPage = page.currentPage
         hasNextPage = page.hasNextPage
         items = deduplicated(page.items)
+        isLoadingInitial = false
+        pausedLoadIntent = nil
         footerState = resolvedFooterState()
 
         return true
@@ -64,6 +79,7 @@ nonisolated struct PaginatedListState<Item: Identifiable & Sendable>: Sendable w
         guard canLoadMore else { return nil }
 
         isLoadingMore = true
+        pausedLoadIntent = nil
         footerState = .loading
         return requestGeneration
     }
@@ -82,9 +98,46 @@ nonisolated struct PaginatedListState<Item: Identifiable & Sendable>: Sendable w
         hasNextPage = page.hasNextPage && (!requiresNewItemsForNextPage || appendedNewItems)
         items = mergedItems
         isLoadingMore = false
+        pausedLoadIntent = nil
         footerState = resolvedFooterState()
 
         return true
+    }
+
+    mutating func failReload(generation: Int) -> Bool {
+        guard isCurrent(generation) else { return false }
+
+        isLoadingInitial = false
+        footerState = resolvedFooterState()
+
+        return true
+    }
+
+    mutating func stopLoading() {
+        let intent: PaginatedPausedLoadIntent?
+        if isLoadingMore {
+            intent = .loadMore
+        } else if isLoadingInitial {
+            intent = .initial
+        } else {
+            intent = nil
+        }
+
+        requestGeneration += 1
+        isLoadingMore = false
+        isLoadingInitial = false
+
+        if let intent {
+            pausedLoadIntent = intent
+        }
+
+        footerState = resolvedFooterState()
+    }
+
+    mutating func consumePausedIntent() -> PaginatedPausedLoadIntent? {
+        let intent = pausedLoadIntent
+        pausedLoadIntent = nil
+        return intent
     }
 
     mutating func cancelLoadMore(generation: Int) -> Bool {

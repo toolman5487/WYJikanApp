@@ -78,17 +78,11 @@ final class AnimeCategoryDetailViewModel: ObservableObject {
 
     func screenDidAppear() async {
         guard await requestLifecycleController.activate() else { return }
-        await paginationController.loadIfNeeded(
-            setLoading: applyLoading,
-            fetchPage: fetchPage,
-            applyPresentation: applyPresentation,
-            applyError: applyInitialLoadError
-        )
+        await performInitialLoadIfNeeded()
     }
 
     func screenDidDisappear() {
-        filterRequestTask?.cancel()
-        filterRequestTask = nil
+        stop()
         requestLifecycleController.deactivate()
     }
 
@@ -134,6 +128,15 @@ final class AnimeCategoryDetailViewModel: ObservableObject {
     }
 
     // MARK: - Loading
+
+    private func performInitialLoadIfNeeded() async {
+        await paginationController.loadIfNeeded(
+            setLoading: applyLoading,
+            fetchPage: fetchPage,
+            applyPresentation: applyPresentation,
+            applyError: applyInitialLoadError
+        )
+    }
 
     private func fetchFirstPage(showSkeleton: Bool) async {
         filterRequestTask = nil
@@ -208,6 +211,40 @@ final class AnimeCategoryDetailViewModel: ObservableObject {
         return paginationController.shouldLoadMore(after: item, visibleItems: items)
     }
 
+}
+
+extension AnimeCategoryDetailViewModel: PaginatedListLoadControlling {
+    var canLoadMore: Bool {
+        paginationController.canLoadMore
+    }
+
+    var isLoadingMore: Bool {
+        loadMoreState == .loading
+    }
+
+    func loadIfNeeded() {
+        paginationController.run { [weak self] in
+            await self?.performInitialLoadIfNeeded()
+        }
+    }
+
+    func loadMore() {
+        paginationController.run { [weak self] in
+            await self?.loadMorePage()
+        }
+    }
+
+    func reload() {
+        paginationController.run { [weak self] in
+            await self?.fetchFirstPage(showSkeleton: true)
+        }
+    }
+
+    func stop() {
+        filterRequestTask?.cancel()
+        filterRequestTask = nil
+        paginationController.stopLoading()
+    }
 }
 
 extension AnimeCategoryDetailViewModel: RequestScreenLifecyclePresentable {}

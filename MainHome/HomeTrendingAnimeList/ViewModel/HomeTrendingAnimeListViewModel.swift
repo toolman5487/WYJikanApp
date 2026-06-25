@@ -73,15 +73,11 @@ final class HomeTrendingAnimeListViewModel: ObservableObject {
 
     func screenDidAppear() async {
         guard await requestLifecycleController.activate() else { return }
-        await paginationController.loadIfNeeded(
-            setLoading: applyLoading,
-            fetchPage: fetchPage,
-            applyPresentation: applyPresentation,
-            applyError: applyInitialLoadError
-        )
+        await performInitialLoadIfNeeded()
     }
 
     func screenDidDisappear() {
+        stop()
         requestLifecycleController.deactivate()
     }
 
@@ -104,6 +100,15 @@ final class HomeTrendingAnimeListViewModel: ObservableObject {
     }
 
     // MARK: - Private Methods
+
+    private func performInitialLoadIfNeeded() async {
+        await paginationController.loadIfNeeded(
+            setLoading: applyLoading,
+            fetchPage: fetchPage,
+            applyPresentation: applyPresentation,
+            applyError: applyInitialLoadError
+        )
+    }
 
     private func bindSelectedSort() {
         $selectedSort
@@ -177,5 +182,37 @@ final class HomeTrendingAnimeListViewModel: ObservableObject {
             )
         )
         loadMoreState = footerState
+    }
+}
+
+extension HomeTrendingAnimeListViewModel: PaginatedListLoadControlling {
+    var canLoadMore: Bool {
+        paginationController.canLoadMore
+    }
+
+    var isLoadingMore: Bool {
+        loadMoreState == .loading
+    }
+
+    func loadIfNeeded() {
+        paginationController.run { [weak self] in
+            await self?.performInitialLoadIfNeeded()
+        }
+    }
+
+    func loadMore() {
+        paginationController.run { [weak self] in
+            await self?.loadMorePage()
+        }
+    }
+
+    func reload() {
+        paginationController.run { [weak self] in
+            await self?.fetchFirstPage(showSkeleton: true)
+        }
+    }
+
+    func stop() {
+        paginationController.stopLoading()
     }
 }

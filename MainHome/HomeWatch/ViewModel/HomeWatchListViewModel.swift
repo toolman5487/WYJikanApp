@@ -78,22 +78,11 @@ final class HomeWatchListViewModel: ObservableObject {
 
     func screenDidAppear() async {
         guard await requestLifecycleController.activate() else { return }
-        await paginationController.loadIfNeeded(
-            setLoading: applyLoading,
-            fetchPage: { [weak self] page in
-                guard let self else {
-                    return PaginatedPage(items: [], currentPage: page, hasNextPage: false)
-                }
-                return try await self.fetchPage(page: page, forceRefresh: false)
-            },
-            applyPresentation: applyPresentation,
-            applyError: applyInitialLoadError
-        )
+        await performInitialLoadIfNeeded()
     }
 
     func screenDidDisappear() {
-        feedChangeTask?.cancel()
-        feedChangeTask = nil
+        stop()
         requestLifecycleController.deactivate()
     }
 
@@ -121,6 +110,20 @@ final class HomeWatchListViewModel: ObservableObject {
     }
 
     // MARK: - Private Methods
+
+    private func performInitialLoadIfNeeded() async {
+        await paginationController.loadIfNeeded(
+            setLoading: applyLoading,
+            fetchPage: { [weak self] page in
+                guard let self else {
+                    return PaginatedPage(items: [], currentPage: page, hasNextPage: false)
+                }
+                return try await self.fetchPage(page: page, forceRefresh: false)
+            },
+            applyPresentation: applyPresentation,
+            applyError: applyInitialLoadError
+        )
+    }
 
     private func fetchFirstPage(showSkeleton: Bool, forceRefresh: Bool) async {
         await paginationController.reload(
@@ -212,5 +215,39 @@ final class HomeWatchListViewModel: ObservableObject {
 
         screenState = .content(items)
         loadMoreState = footerState
+    }
+}
+
+extension HomeWatchListViewModel: PaginatedListLoadControlling {
+    var canLoadMore: Bool {
+        paginationController.canLoadMore
+    }
+
+    var isLoadingMore: Bool {
+        loadMoreState == .loading
+    }
+
+    func loadIfNeeded() {
+        paginationController.run { [weak self] in
+            await self?.performInitialLoadIfNeeded()
+        }
+    }
+
+    func loadMore() {
+        paginationController.run { [weak self] in
+            await self?.loadMorePage()
+        }
+    }
+
+    func reload() {
+        paginationController.run { [weak self] in
+            await self?.fetchFirstPage(showSkeleton: true, forceRefresh: true)
+        }
+    }
+
+    func stop() {
+        feedChangeTask?.cancel()
+        feedChangeTask = nil
+        paginationController.stopLoading()
     }
 }

@@ -20,7 +20,7 @@ final class MainCategoryListViewModel: ObservableObject {
 
     @Published var selectedKind: MainListKind = .anime
 
-    private let kindLoadControllers: [MainListKind: any MainCategoryListKindLoadControlling]
+    private let kindLoadControllers: [MainListKind: any PaginatedListLoadControlling]
     private let requestLifecycleController: RequestScreenLifecycleController
     private var cancellables = Set<AnyCancellable>()
 
@@ -183,7 +183,7 @@ private extension MainCategoryListViewModel {
 private extension MainCategoryListViewModel {
     func kindLoadController(
         for kind: MainListKind
-    ) -> (any MainCategoryListKindLoadControlling)? {
+    ) -> (any PaginatedListLoadControlling)? {
         kindLoadControllers[kind]
     }
 

@@ -78,17 +78,11 @@ final class MangaCategoryDetailViewModel: ObservableObject {
 
     func screenDidAppear() async {
         guard await requestLifecycleController.activate() else { return }
-        await paginationController.loadIfNeeded(
-            setLoading: applyLoading,
-            fetchPage: fetchPage,
-            applyPresentation: applyPresentation,
-            applyError: applyInitialLoadError
-        )
+        await performInitialLoadIfNeeded()
     }
 
     func screenDidDisappear() {
-        filterRequestTask?.cancel()
-        filterRequestTask = nil
+        stop()
         requestLifecycleController.deactivate()
     }
 
@@ -134,6 +128,15 @@ final class MangaCategoryDetailViewModel: ObservableObject {
     }
 
     // MARK: - Loading
+
+    private func performInitialLoadIfNeeded() async {
+        await paginationController.loadIfNeeded(
+            setLoading: applyLoading,
+            fetchPage: fetchPage,
+            applyPresentation: applyPresentation,
+            applyError: applyInitialLoadError
+        )
+    }
 
     private func fetchFirstPage(showSkeleton: Bool) async {
         filterRequestTask = nil
@@ -206,6 +209,40 @@ final class MangaCategoryDetailViewModel: ObservableObject {
     private func shouldLoadMore(after item: MangaCategoryItemDTO) -> Bool {
         guard case .content(let items) = screenState else { return false }
         return paginationController.shouldLoadMore(after: item, visibleItems: items)
+    }
+}
+
+extension MangaCategoryDetailViewModel: PaginatedListLoadControlling {
+    var canLoadMore: Bool {
+        paginationController.canLoadMore
+    }
+
+    var isLoadingMore: Bool {
+        loadMoreState == .loading
+    }
+
+    func loadIfNeeded() {
+        paginationController.run { [weak self] in
+            await self?.performInitialLoadIfNeeded()
+        }
+    }
+
+    func loadMore() {
+        paginationController.run { [weak self] in
+            await self?.loadMorePage()
+        }
+    }
+
+    func reload() {
+        paginationController.run { [weak self] in
+            await self?.fetchFirstPage(showSkeleton: true)
+        }
+    }
+
+    func stop() {
+        filterRequestTask?.cancel()
+        filterRequestTask = nil
+        paginationController.stopLoading()
     }
 }
 
