@@ -9,7 +9,7 @@ import Foundation
 import Combine
 
 @MainActor
-final class AnimeListViewModel: ObservableObject {
+final class AnimeListViewModel: ObservableObject, MainCategoryListKindLoadControlling {
     // MARK: - Properties
 
     let genreAnimeViewModel: GenreAnimeViewModel
@@ -36,5 +36,17 @@ final class AnimeListViewModel: ObservableObject {
 
     func stop() {
         genreAnimeViewModel.stop()
+    }
+
+    func loadMore() {
+        genreAnimeViewModel.loadMoreSections()
+    }
+
+    var canLoadMore: Bool {
+        genreAnimeViewModel.canPullLoadMore
+    }
+
+    var isLoadingMore: Bool {
+        genreAnimeViewModel.isLoadingMore
     }
 }

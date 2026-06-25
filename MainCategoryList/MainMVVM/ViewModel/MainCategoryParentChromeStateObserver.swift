@@ -75,7 +75,7 @@ private extension MainCategoryListViewModel {
         )
         .map { hasNextPage, paginationState, selectedSort in
             MainCategoryParentChromeState(
-                canLoadMore: hasNextPage && paginationState == .idle,
+                canLoadMore: hasNextPage && paginationState.allowsPullLoadMore,
                 isLoadingMore: paginationState == .loadingMore,
                 topFilterSelectionIdentifier: selectedSort.rawValue
             )
@@ -93,7 +93,7 @@ private extension MainCategoryListViewModel {
         )
         .map { hasNextPage, paginationState, selectedSort in
             MainCategoryParentChromeState(
-                canLoadMore: hasNextPage && paginationState == .idle,
+                canLoadMore: hasNextPage && paginationState.allowsPullLoadMore,
                 isLoadingMore: paginationState == .loadingMore,
                 topFilterSelectionIdentifier: selectedSort.rawValue
             )

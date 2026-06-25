@@ -14,6 +14,7 @@ final class CharacterListViewModel: ObservableObject {
         case idle
         case loadingInitial
         case loadingMore
+        case paused
         case error(FeatureLoadFailure)
     }
 
@@ -117,6 +118,28 @@ final class CharacterListViewModel: ObservableObject {
             }
 
             return .content(rows: rows, inlineError: inlineError, footer: footer)
+        case .paused:
+            if rows.isEmpty {
+                return .loading
+            }
+
+            let inlineError: FeatureLoadFailure?
+            if case .error(let failure) = paginationState {
+                inlineError = failure
+            } else {
+                inlineError = nil
+            }
+
+            let footer: FooterState
+            if !hasNextPage {
+                footer = .hidden
+            } else if paginationState == .loadingMore {
+                footer = .loadingMore
+            } else {
+                footer = .loadMore
+            }
+
+            return .content(rows: rows, inlineError: inlineError, footer: footer)
         case .error:
             if rows.isEmpty {
                 return .empty
@@ -143,8 +166,14 @@ final class CharacterListViewModel: ObservableObject {
     }
 
     func loadIfNeeded() {
-        guard rows.isEmpty else { return }
-        reload()
+        switch paginationState {
+        case .idle where rows.isEmpty:
+            reload()
+        case .paused:
+            resumeLoading()
+        case .idle, .loadingInitial, .loadingMore, .error:
+            break
+        }
     }
 
     func reload() {
@@ -164,7 +193,7 @@ final class CharacterListViewModel: ObservableObject {
             return
         case .loadingMore:
             return
-        default:
+        case .idle, .paused, .error:
             break
         }
         loadPage(currentPage + 1)
@@ -172,13 +201,25 @@ final class CharacterListViewModel: ObservableObject {
 
     func stop() {
         loadTask?.cancel()
-        paginationState = .idle
+        loadTask = nil
+
+        switch paginationState {
+        case .loadingInitial, .loadingMore:
+            paginationState = .paused
+        case .idle, .paused, .error:
+            break
+        }
     }
 
     func selectSort(_ sort: CharacterListSort) {
         guard selectedSort != sort else { return }
         selectedSort = sort
         applySelectedSort()
+    }
+
+    private func resumeLoading() {
+        let page = currentPage == 0 ? 1 : currentPage + 1
+        loadPage(page)
     }
 
     private func loadPage(_ page: Int) {
@@ -243,5 +284,26 @@ final class CharacterListViewModel: ObservableObject {
                 return result == .orderedDescending
             }
         }
+    }
+}
+
+extension CharacterListViewModel.PaginationState {
+    var allowsPullLoadMore: Bool {
+        switch self {
+        case .loadingMore, .error:
+            return false
+        case .idle, .loadingInitial, .paused:
+            return true
+        }
+    }
+}
+
+extension CharacterListViewModel: MainCategoryListKindLoadControlling {
+    var canLoadMore: Bool {
+        hasNextPage && paginationState.allowsPullLoadMore
+    }
+
+    var isLoadingMore: Bool {
+        paginationState == .loadingMore
     }
 }

@@ -20,6 +20,7 @@ final class MainCategoryListViewModel: ObservableObject {
 
     @Published var selectedKind: MainListKind = .anime
 
+    private let kindLoadControllers: [MainListKind: any MainCategoryListKindLoadControlling]
     private let requestLifecycleController: RequestScreenLifecycleController
     private var cancellables = Set<AnyCancellable>()
 
@@ -36,6 +37,12 @@ final class MainCategoryListViewModel: ObservableObject {
         self.mangaListViewModel = mangaListViewModel
         self.peopleListViewModel = peopleListViewModel
         self.characterListViewModel = characterListViewModel
+        self.kindLoadControllers = [
+            .anime: animeListViewModel,
+            .manga: mangaListViewModel,
+            .people: peopleListViewModel,
+            .character: characterListViewModel
+        ]
         self.requestLifecycleController = RequestScreenLifecycleController(
             scope: .mainCategoryList,
             requestLifecycleController: requestLifecycleController
@@ -47,7 +54,7 @@ final class MainCategoryListViewModel: ObservableObject {
     }
 
     func screenDidDisappear() {
-        MainListKind.allCases.forEach { stopLoading(for: $0) }
+        kindLoadControllers.values.forEach { $0.stop() }
         requestLifecycleController.deactivate()
     }
 
@@ -69,18 +76,7 @@ final class MainCategoryListViewModel: ObservableObject {
     // MARK: - Load More
 
     var canLoadMoreSelectedKind: Bool {
-        switch selectedKind {
-        case .anime:
-            return animeListViewModel.genreAnimeViewModel.canPullLoadMore
-        case .manga:
-            return mangaListViewModel.genreMangaViewModel.canPullLoadMore
-        case .people:
-            return peopleListViewModel.hasNextPage &&
-                peopleListViewModel.paginationState == .idle
-        case .character:
-            return characterListViewModel.hasNextPage &&
-                characterListViewModel.paginationState == .idle
-        }
+        kindLoadController(for: selectedKind)?.canLoadMore ?? false
     }
 
     var shouldShowLoadMoreFooter: Bool {
@@ -88,16 +84,7 @@ final class MainCategoryListViewModel: ObservableObject {
     }
 
     var isLoadingMoreSelectedKind: Bool {
-        switch selectedKind {
-        case .anime:
-            return animeListViewModel.genreAnimeViewModel.isLoadingMore
-        case .manga:
-            return mangaListViewModel.genreMangaViewModel.isLoadingMore
-        case .people:
-            return peopleListViewModel.paginationState == .loadingMore
-        case .character:
-            return characterListViewModel.paginationState == .loadingMore
-        }
+        kindLoadController(for: selectedKind)?.isLoadingMore ?? false
     }
 
     var loadMoreFooterTitle: String {
@@ -194,14 +181,20 @@ private extension MainCategoryListViewModel {
 // MARK: - Kind Management
 
 private extension MainCategoryListViewModel {
+    func kindLoadController(
+        for kind: MainListKind
+    ) -> (any MainCategoryListKindLoadControlling)? {
+        kindLoadControllers[kind]
+    }
+
     func activateKind(_ kind: MainListKind) {
         stopInactiveKinds(except: kind)
-        loadIfNeeded(for: kind)
+        kindLoadController(for: kind)?.loadIfNeeded()
     }
 
     func stopInactiveKinds(except activeKind: MainListKind) {
         for kind in MainListKind.allCases where kind != activeKind {
-            stopLoading(for: kind)
+            kindLoadController(for: kind)?.stop()
         }
     }
 
@@ -211,55 +204,11 @@ private extension MainCategoryListViewModel {
         mangaListViewModel.configureGenreBatchIfNeeded(configuration)
     }
 
-    func loadIfNeeded(for kind: MainListKind) {
-        switch kind {
-        case .anime:
-            animeListViewModel.loadIfNeeded()
-        case .manga:
-            mangaListViewModel.loadIfNeeded()
-        case .people:
-            peopleListViewModel.loadIfNeeded()
-        case .character:
-            characterListViewModel.loadIfNeeded()
-        }
-    }
-
     func reload(for kind: MainListKind) {
-        switch kind {
-        case .anime:
-            animeListViewModel.reload()
-        case .manga:
-            mangaListViewModel.reload()
-        case .people:
-            peopleListViewModel.reload()
-        case .character:
-            characterListViewModel.reload()
-        }
+        kindLoadController(for: kind)?.reload()
     }
 
     func loadMore(for kind: MainListKind) {
-        switch kind {
-        case .anime:
-            animeListViewModel.genreAnimeViewModel.loadMoreSections()
-        case .manga:
-            mangaListViewModel.genreMangaViewModel.loadMoreSections()
-        case .people:
-            peopleListViewModel.loadMore()
-        case .character:
-            characterListViewModel.loadMore()
-        }
-    }
-
-    func stopLoading(for kind: MainListKind) {
-        switch kind {
-        case .anime:
-            animeListViewModel.stop()
-        case .manga:
-            mangaListViewModel.stop()
-        case .people:
-            peopleListViewModel.stop()
-        case .character:
-            characterListViewModel.stop()
-        }
+        kindLoadController(for: kind)?.loadMore()
     }
 }
