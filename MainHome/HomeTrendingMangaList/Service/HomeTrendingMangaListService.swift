@@ -20,11 +20,16 @@ nonisolated final class HomeTrendingMangaListService: HomeTrendingMangaListServi
     // MARK: - Properties
 
     private let apiService: JikanAPIServicing
+    private let lifecycleScope: RequestLifecycleScope
 
     // MARK: - Lifecycle
 
-    init(apiService: JikanAPIServicing) {
+    init(
+        apiService: JikanAPIServicing,
+        lifecycleScope: RequestLifecycleScope
+    ) {
         self.apiService = apiService
+        self.lifecycleScope = lifecycleScope
     }
 
     // MARK: - Public Methods
@@ -37,7 +42,7 @@ nonisolated final class HomeTrendingMangaListService: HomeTrendingMangaListServi
                 URLQueryItem(name: "page", value: String(page)),
                 URLQueryItem(name: "limit", value: String(limit))
             ],
-            lifecycleScope: .homeTrendingMangaList
+            lifecycleScope: lifecycleScope
         )
 
         return MangaCategoryPage(

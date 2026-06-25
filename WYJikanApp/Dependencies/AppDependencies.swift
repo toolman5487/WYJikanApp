@@ -366,10 +366,13 @@ private extension AppDependencies {
             networkRequestExecutor: networkRequestExecutor
         )
         let mainCategoryListService = MainCategoryListService(
-            apiService: jikanAPIService
+            apiService: jikanAPIService,
+            lifecycleScope: .mainCategoryList
         )
         let randomPickService = RandomPickService(
-            apiService: jikanAPIService
+            apiService: jikanAPIService,
+            animeLifecycleScope: .mainMyListRandomAnime,
+            mangaLifecycleScope: .mainMyListRandomManga
         )
         let myListDependencies = MyListDependencies(
             favoriteRepository: favoriteRepository,
@@ -401,20 +404,26 @@ private extension AppDependencies {
                 lifecycleScope: .homeWatchList
             ),
             mainCategoryListService: mainCategoryListService,
-            mainSearchService: MainSearchService(apiService: jikanAPIService),
+            mainSearchService: MainSearchService(
+                apiService: jikanAPIService,
+                lifecycleScope: .mainSearch
+            ),
             mainNewsService: mainNewsService,
             backgroundAnimeDetailService: AnimeDetailService(
                 apiService: jikanAPIService,
                 lifecycleScope: .background
             ),
             homeTodayAnimeScheduleListService: HomeTodayAnimeScheduleListService(
-                apiService: jikanAPIService
+                apiService: jikanAPIService,
+                lifecycleScope: .homeTodayAnimeScheduleList
             ),
             homeTrendingAnimeListService: HomeTrendingAnimeListService(
-                apiService: jikanAPIService
+                apiService: jikanAPIService,
+                lifecycleScope: .homeTrendingAnimeList
             ),
             homeTrendingMangaListService: HomeTrendingMangaListService(
-                apiService: jikanAPIService
+                apiService: jikanAPIService,
+                lifecycleScope: .homeTrendingMangaList
             ),
             favoriteRepository: favoriteRepository,
             broadcastReminderRepository: broadcastReminderRepository,

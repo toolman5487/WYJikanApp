@@ -26,6 +26,7 @@ nonisolated final class MainSearchService: MainSearchServicing {
     // MARK: - Properties
 
     private let apiService: JikanAPIServicing
+    private let lifecycleScope: RequestLifecycleScope
 
     // MARK: - SearchRequestSpec
 
@@ -87,8 +88,12 @@ nonisolated final class MainSearchService: MainSearchServicing {
 
     // MARK: - Lifecycle
 
-    init(apiService: JikanAPIServicing) {
+    init(
+        apiService: JikanAPIServicing,
+        lifecycleScope: RequestLifecycleScope
+    ) {
         self.apiService = apiService
+        self.lifecycleScope = lifecycleScope
     }
 
     // MARK: - MainSearchServicing
@@ -129,7 +134,7 @@ nonisolated final class MainSearchService: MainSearchServicing {
                 endpoint: request.endpoint,
                 cachePolicy: request.cachePolicy,
                 queryItems: request.queryItems,
-                lifecycleScope: .mainSearch
+                lifecycleScope: lifecycleScope
             )
             return MainSearchPage(
                 rows: response.data.map { MainSearchResultRow.from(anime: $0) },
@@ -141,7 +146,7 @@ nonisolated final class MainSearchService: MainSearchServicing {
                 endpoint: request.endpoint,
                 cachePolicy: request.cachePolicy,
                 queryItems: request.queryItems,
-                lifecycleScope: .mainSearch
+                lifecycleScope: lifecycleScope
             )
             return MainSearchPage(
                 rows: response.data.map { MainSearchResultRow.from(manga: $0) },
@@ -153,7 +158,7 @@ nonisolated final class MainSearchService: MainSearchServicing {
                 endpoint: request.endpoint,
                 cachePolicy: request.cachePolicy,
                 queryItems: request.queryItems,
-                lifecycleScope: .mainSearch
+                lifecycleScope: lifecycleScope
             )
             return MainSearchPage(
                 rows: response.data.map { MainSearchResultRow.from(character: $0) },
@@ -165,7 +170,7 @@ nonisolated final class MainSearchService: MainSearchServicing {
                 endpoint: request.endpoint,
                 cachePolicy: request.cachePolicy,
                 queryItems: request.queryItems,
-                lifecycleScope: .mainSearch
+                lifecycleScope: lifecycleScope
             )
             return MainSearchPage(
                 rows: response.data.map { MainSearchResultRow.from(person: $0) },

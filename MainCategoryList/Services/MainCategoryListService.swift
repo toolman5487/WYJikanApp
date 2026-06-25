@@ -21,6 +21,7 @@ nonisolated final class MainCategoryListService: MainCategoryListServicing {
     // MARK: - PaginatedListRequest
     
     private let apiService: JikanAPIServicing
+    private let lifecycleScope: RequestLifecycleScope
 
     private enum PaginatedListRequest {
         case characters(page: Int, limit: Int)
@@ -66,15 +67,19 @@ nonisolated final class MainCategoryListService: MainCategoryListServicing {
     }
 
 
-    init(apiService: JikanAPIServicing) {
+    init(
+        apiService: JikanAPIServicing,
+        lifecycleScope: RequestLifecycleScope
+    ) {
         self.apiService = apiService
+        self.lifecycleScope = lifecycleScope
     }
 
     func fetchAnimeGenres() async throws -> AnimeGenreListResponse {
         try await apiService.fetch(
             endpoint: APIConfig.Genres.anime,
             cachePolicy: .genreList(),
-            lifecycleScope: .mainCategoryList
+            lifecycleScope: lifecycleScope
         )
     }
 
@@ -82,7 +87,7 @@ nonisolated final class MainCategoryListService: MainCategoryListServicing {
         try await apiService.fetch(
             endpoint: APIConfig.Genres.manga,
             cachePolicy: .genreList(),
-            lifecycleScope: .mainCategoryList
+            lifecycleScope: lifecycleScope
         )
     }
 
@@ -95,7 +100,7 @@ nonisolated final class MainCategoryListService: MainCategoryListServicing {
             endpoint: APIConfig.Anime.list,
             cachePolicy: .cacheFirst(ttl: JikanCacheDuration.genreItems),
             queryItems: queryItems,
-            lifecycleScope: .mainCategoryList
+            lifecycleScope: lifecycleScope
         )
     }
 
@@ -108,7 +113,7 @@ nonisolated final class MainCategoryListService: MainCategoryListServicing {
             endpoint: APIConfig.Manga.list,
             cachePolicy: .cacheFirst(ttl: JikanCacheDuration.genreItems),
             queryItems: queryItems,
-            lifecycleScope: .mainCategoryList
+            lifecycleScope: lifecycleScope
         )
     }
 
@@ -118,7 +123,7 @@ nonisolated final class MainCategoryListService: MainCategoryListServicing {
             endpoint: request.endpoint,
             cachePolicy: request.cachePolicy,
             queryItems: request.queryItems,
-            lifecycleScope: .mainCategoryList
+            lifecycleScope: lifecycleScope
         )
     }
 
@@ -128,7 +133,7 @@ nonisolated final class MainCategoryListService: MainCategoryListServicing {
             endpoint: request.endpoint,
             cachePolicy: request.cachePolicy,
             queryItems: request.queryItems,
-            lifecycleScope: .mainCategoryList
+            lifecycleScope: lifecycleScope
         )
     }
 }

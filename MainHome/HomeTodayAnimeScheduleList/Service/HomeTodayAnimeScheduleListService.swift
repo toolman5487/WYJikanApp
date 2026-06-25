@@ -24,11 +24,16 @@ nonisolated final class HomeTodayAnimeScheduleListService: HomeTodayAnimeSchedul
     // MARK: - Properties
 
     private let apiService: JikanAPIServicing
+    private let lifecycleScope: RequestLifecycleScope
 
     // MARK: - Lifecycle
 
-    init(apiService: JikanAPIServicing) {
+    init(
+        apiService: JikanAPIServicing,
+        lifecycleScope: RequestLifecycleScope
+    ) {
         self.apiService = apiService
+        self.lifecycleScope = lifecycleScope
     }
 
     // MARK: - Public Methods
@@ -47,7 +52,7 @@ nonisolated final class HomeTodayAnimeScheduleListService: HomeTodayAnimeSchedul
                 URLQueryItem(name: "limit", value: String(limit)),
                 URLQueryItem(name: "sfw", value: "true")
             ],
-            lifecycleScope: .homeTodayAnimeScheduleList
+            lifecycleScope: lifecycleScope
         )
     }
 }
