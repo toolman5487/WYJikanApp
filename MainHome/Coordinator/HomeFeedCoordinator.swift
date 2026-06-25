@@ -18,18 +18,8 @@ enum HomeFeedSection: Hashable, CaseIterable {
 
     var isDeferred: Bool {
         switch self {
-        case .heroBanner:
+        case .heroBanner, .todayAnime, .watchPromos, .watchEpisodes, .trendingAnime, .trendingManga:
             return false
-        case .todayAnime:
-            return false
-        case .trendingAnime:
-            return false
-        case .trendingManga:
-            return false
-        case .watchPromos:
-            return true
-        case .watchEpisodes:
-            return true
         case .recommendedAnime:
             return true
         }
@@ -221,6 +211,7 @@ final class HomeFeedCoordinator {
         }
 
         await loadPhase(.heroBanner, .todayAnime, priority: .userInitiated)
+        await loadPhase(.watchPromos, .watchEpisodes, priority: .userInitiated)
         await loadPhase(.trendingAnime, .trendingManga, priority: .userInitiated)
         await homeLoadCoordinator.markCompleted(.initialFeeds)
     }
@@ -236,14 +227,6 @@ final class HomeFeedCoordinator {
         priority: TaskPriority,
         sectionDelay: Duration = .zero
     ) async {
-        await loadDeferredSection(.watchPromos, priority: priority)
-
-        if sectionDelay > .zero {
-            try? await Task.sleep(for: sectionDelay)
-        }
-
-        await loadDeferredSection(.watchEpisodes, priority: priority)
-
         if sectionDelay > .zero {
             try? await Task.sleep(for: sectionDelay)
         }
@@ -253,8 +236,8 @@ final class HomeFeedCoordinator {
 
     func refreshAll() async {
         await refreshPhase(.heroBanner, .todayAnime)
-        await refreshPhase(.trendingAnime, .trendingManga)
         await refreshPhase(.watchPromos, .watchEpisodes)
+        await refreshPhase(.trendingAnime, .trendingManga)
         await refresh(.recommendedAnime)
     }
 

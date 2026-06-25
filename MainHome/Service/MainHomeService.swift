@@ -59,7 +59,7 @@ nonisolated final class MainHomeService: MainHomeServicing {
 
     init(
         apiService: JikanAPIServicing,
-        lifecycleScope: RequestLifecycleScope = .tab(.home)
+        lifecycleScope: RequestLifecycleScope
     ) {
         self.apiService = apiService
         self.lifecycleScope = lifecycleScope

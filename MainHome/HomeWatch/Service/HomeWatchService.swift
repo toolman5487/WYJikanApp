@@ -81,7 +81,7 @@ nonisolated final class HomeWatchService: HomeWatchServicing {
 
     init(
         apiService: JikanAPIServicing,
-        lifecycleScope: RequestLifecycleScope = .tab(.home)
+        lifecycleScope: RequestLifecycleScope
     ) {
         self.apiService = apiService
         self.lifecycleScope = lifecycleScope

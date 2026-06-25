@@ -7,6 +7,8 @@
 
 import Foundation
 
+// MARK: - PaginatedListLoadControlling
+
 @MainActor
 protocol PaginatedListLoadControlling: AnyObject {
     var canLoadMore: Bool { get }
@@ -17,15 +19,24 @@ protocol PaginatedListLoadControlling: AnyObject {
     func stop()
 }
 
+// MARK: - PaginatedListLoadingController
+
 @MainActor
 final class PaginatedListLoadingController<Item: Identifiable & Sendable> where Item.ID: Hashable & Sendable {
+
+    // MARK: - Typealiases
+
     typealias PageFetcher = (_ page: Int) async throws -> PaginatedPage<Item>
     typealias PresentationApplier = (_ items: [Item], _ footerState: PaginationFooterState) -> Void
     typealias LoadingApplier = (_ footerState: PaginationFooterState) -> Void
     typealias ErrorApplier = (_ failure: FeatureLoadFailure, _ footerState: PaginationFooterState) -> Void
 
+    // MARK: - Properties
+
     private var pagination = PaginatedListState<Item>()
     private var activeTask: Task<Void, Never>?
+
+    // MARK: - State
 
     var items: [Item] {
         pagination.items
@@ -51,6 +62,8 @@ final class PaginatedListLoadingController<Item: Identifiable & Sendable> where 
         pagination.isPaused
     }
 
+    // MARK: - Task Control
+
     func run(_ operation: @escaping () async -> Void) {
         activeTask?.cancel()
         activeTask = Task(priority: .userInitiated) {
@@ -63,6 +76,8 @@ final class PaginatedListLoadingController<Item: Identifiable & Sendable> where 
         activeTask = nil
         pagination.stopLoading()
     }
+
+    // MARK: - Initial Load
 
     func loadIfNeeded(
         showSkeleton: Bool = true,
@@ -84,6 +99,7 @@ final class PaginatedListLoadingController<Item: Identifiable & Sendable> where 
         }
 
         guard !pagination.hasLoaded else { return }
+
         await reload(
             showSkeleton: showSkeleton,
             setLoading: setLoading,
@@ -92,6 +108,8 @@ final class PaginatedListLoadingController<Item: Identifiable & Sendable> where 
             applyError: applyError
         )
     }
+
+    // MARK: - Reload
 
     func reload(
         showSkeleton: Bool,
@@ -118,6 +136,8 @@ final class PaginatedListLoadingController<Item: Identifiable & Sendable> where 
         }
     }
 
+    // MARK: - Load More
+
     func loadMore(
         requiresNewItemsForNextPage: Bool = false,
         fetchPage: PageFetcher,
@@ -125,6 +145,7 @@ final class PaginatedListLoadingController<Item: Identifiable & Sendable> where 
         applyPresentation: PresentationApplier
     ) async {
         guard let generation = pagination.beginLoadMore() else { return }
+
         setFooterState(pagination.footerState)
 
         do {
@@ -148,6 +169,8 @@ final class PaginatedListLoadingController<Item: Identifiable & Sendable> where 
     func shouldLoadMore(after item: Item, visibleItems: [Item], threshold: Int = 5) -> Bool {
         pagination.shouldLoadMore(after: item, visibleItems: visibleItems, threshold: threshold)
     }
+
+    // MARK: - Private Methods
 
     private func resumePausedLoad(
         intent: PaginatedPausedLoadIntent,
