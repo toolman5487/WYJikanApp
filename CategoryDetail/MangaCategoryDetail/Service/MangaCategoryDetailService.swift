@@ -28,16 +28,22 @@ nonisolated final class MangaCategoryDetailService: MangaCategoryDetailServicing
     private enum MangaGenreRequest {
         case page(genreId: Int, page: Int, pageSize: Int, filter: MangaCategoryFilter)
 
-        func request(lifecycleScope: RequestLifecycleScope) -> JikanAPIRequest {
+        var endpoint: String {
+            APIConfig.Manga.list
+        }
+
+        var queryItems: [URLQueryItem] {
             switch self {
             case let .page(genreId, page, pageSize, filter):
-                return JikanAPIRequest(
-                    path: APIConfig.Manga.list,
-                    queryItems: baseQueryItems(genreId: genreId, page: page, pageSize: pageSize)
-                        + filterQueryItems(for: filter),
-                    cachePolicy: cachePolicy,
-                    scope: lifecycleScope
-                )
+                return baseQueryItems(genreId: genreId, page: page, pageSize: pageSize)
+                    + filterQueryItems(for: filter)
+            }
+        }
+
+        var cachePolicy: JikanAPICachePolicy {
+            switch self {
+            case .page(_, let page, _, _):
+                return .paging(page: page)
             }
         }
 
@@ -77,13 +83,6 @@ nonisolated final class MangaCategoryDetailService: MangaCategoryDetailServicing
             }
 
             return items
-        }
-
-        private var cachePolicy: JikanAPICachePolicy {
-            switch self {
-            case .page(_, let page, _, _):
-                return .paging(page: page)
-            }
         }
     }
 
@@ -127,8 +126,11 @@ nonisolated final class MangaCategoryDetailService: MangaCategoryDetailServicing
             pageSize: pageSize,
             filter: filter
         )
-        let response: MangaCategoryResponse = try await apiService.send(
-            request.request(lifecycleScope: lifecycleScope)
+        let response: MangaCategoryResponse = try await apiService.fetch(
+            endpoint: request.endpoint,
+            cachePolicy: request.cachePolicy,
+            queryItems: request.queryItems,
+            lifecycleScope: lifecycleScope
         )
         return MangaCategoryPage(
             items: response.data,

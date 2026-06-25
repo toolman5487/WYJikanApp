@@ -28,16 +28,22 @@ nonisolated final class AnimeCategoryDetailService: AnimeCategoryDetailServicing
     private enum AnimeGenreRequest {
         case page(genreId: Int, page: Int, pageSize: Int, filter: AnimeCategoryFilter)
 
-        func request(lifecycleScope: RequestLifecycleScope) -> JikanAPIRequest {
+        var endpoint: String {
+            APIConfig.Anime.list
+        }
+
+        var queryItems: [URLQueryItem] {
             switch self {
             case let .page(genreId, page, pageSize, filter):
-                return JikanAPIRequest(
-                    path: APIConfig.Anime.list,
-                    queryItems: baseQueryItems(genreId: genreId, page: page, pageSize: pageSize)
-                        + filterQueryItems(for: filter),
-                    cachePolicy: cachePolicy,
-                    scope: lifecycleScope
-                )
+                return baseQueryItems(genreId: genreId, page: page, pageSize: pageSize)
+                    + filterQueryItems(for: filter)
+            }
+        }
+
+        var cachePolicy: JikanAPICachePolicy {
+            switch self {
+            case .page(_, let page, _, _):
+                return .paging(page: page)
             }
         }
 
@@ -77,13 +83,6 @@ nonisolated final class AnimeCategoryDetailService: AnimeCategoryDetailServicing
             }
 
             return items
-        }
-
-        private var cachePolicy: JikanAPICachePolicy {
-            switch self {
-            case .page(_, let page, _, _):
-                return .paging(page: page)
-            }
         }
     }
 
@@ -127,8 +126,11 @@ nonisolated final class AnimeCategoryDetailService: AnimeCategoryDetailServicing
             pageSize: pageSize,
             filter: filter
         )
-        let response: AnimeCategoryResponse = try await apiService.send(
-            request.request(lifecycleScope: lifecycleScope)
+        let response: AnimeCategoryResponse = try await apiService.fetch(
+            endpoint: request.endpoint,
+            cachePolicy: request.cachePolicy,
+            queryItems: request.queryItems,
+            lifecycleScope: lifecycleScope
         )
         return AnimeCategoryPage(
             items: response.data,

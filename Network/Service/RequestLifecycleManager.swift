@@ -264,6 +264,45 @@ nonisolated protocol RequestLifecycleExecuting: Sendable {
     ) async throws -> Value
 }
 
+// MARK: - NetworkRequestExecuting
+
+nonisolated protocol NetworkRequestExecuting: Sendable {
+    func data(
+        for request: URLRequest,
+        scope: RequestLifecycleScope,
+        inactivePolicy: RequestInactivePolicy
+    ) async throws -> (Data, URLResponse)
+}
+
+// MARK: - NetworkRequestExecutor
+
+nonisolated final class NetworkRequestExecutor: NetworkRequestExecuting {
+
+    private let session: URLSession
+    private let requestLifecycleExecutor: any RequestLifecycleExecuting
+
+    init(
+        session: URLSession = .shared,
+        requestLifecycleExecutor: any RequestLifecycleExecuting
+    ) {
+        self.session = session
+        self.requestLifecycleExecutor = requestLifecycleExecutor
+    }
+
+    func data(
+        for request: URLRequest,
+        scope: RequestLifecycleScope,
+        inactivePolicy: RequestInactivePolicy
+    ) async throws -> (Data, URLResponse) {
+        try await requestLifecycleExecutor.perform(
+            scope: scope,
+            inactivePolicy: inactivePolicy
+        ) { [session] in
+            try await session.data(for: request)
+        }
+    }
+}
+
 // MARK: - RequestLifecycleManaging
 
 nonisolated protocol RequestLifecycleManaging:

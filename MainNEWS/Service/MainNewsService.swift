@@ -81,19 +81,16 @@ nonisolated final class MainNewsService: MainNewsServicing {
     private static let cacheTTL: TimeInterval = 900
     private static let maximumArticleCount = 80
 
-    private let session: URLSession
     private let lifecycleScope: RequestLifecycleScope
-    private let requestLifecycleExecutor: any RequestLifecycleExecuting
+    private let networkRequestExecutor: any NetworkRequestExecuting
     private let cache = MainNewsResponseCache()
 
     init(
-        session: URLSession = .shared,
         lifecycleScope: RequestLifecycleScope,
-        requestLifecycleExecutor: any RequestLifecycleExecuting
+        networkRequestExecutor: any NetworkRequestExecuting
     ) {
-        self.session = session
         self.lifecycleScope = lifecycleScope
-        self.requestLifecycleExecutor = requestLifecycleExecutor
+        self.networkRequestExecutor = networkRequestExecutor
     }
 
     func fetchLatestNews(
@@ -140,7 +137,7 @@ nonisolated final class MainNewsService: MainNewsServicing {
 
     func clearCache() async {
         await cache.removeAll()
-        session.configuration.urlCache?.removeAllCachedResponses()
+        URLCache.shared.removeAllCachedResponses()
     }
 
     private func fetchSourceResults(
@@ -248,14 +245,12 @@ nonisolated final class MainNewsService: MainNewsServicing {
         )
 
         AppLogger.network.debug("GET \(url.absoluteString, privacy: .public)")
-        let urlRequest = request
 
-        let (data, response) = try await requestLifecycleExecutor.perform(
+        let (data, response) = try await networkRequestExecutor.data(
+            for: request,
             scope: lifecycleScope,
             inactivePolicy: .pauseQueued
-        ) { [session] in
-            try await session.data(for: urlRequest)
-        }
+        )
         guard let httpResponse = response as? HTTPURLResponse else {
             throw MainNewsServiceError.invalidResponse(source: source)
         }

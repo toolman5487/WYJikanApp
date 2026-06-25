@@ -352,6 +352,9 @@ private extension AppDependencies {
 
     static func makeLiveDependencies() -> AppDependencies {
         let requestLifecycleManager = RequestLifecycleManager()
+        let networkRequestExecutor = NetworkRequestExecutor(
+            requestLifecycleExecutor: requestLifecycleManager
+        )
         let jikanAPIService = JikanAPIService(
             requestLifecycleExecutor: requestLifecycleManager
         )
@@ -360,7 +363,7 @@ private extension AppDependencies {
         let mainSearchHistoryRepository = UserDefaultsMainSearchHistoryRepository()
         let mainNewsService = MainNewsService(
             lifecycleScope: .mainNews,
-            requestLifecycleExecutor: requestLifecycleManager
+            networkRequestExecutor: networkRequestExecutor
         )
         let mainCategoryListService = MainCategoryListService(
             apiService: jikanAPIService
