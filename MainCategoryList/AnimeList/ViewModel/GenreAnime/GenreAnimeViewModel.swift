@@ -160,7 +160,7 @@ final class GenreAnimeViewModel: ObservableObject {
     func loadSections() {
         loadTask?.cancel()
         resetLoadingContext()
-        runLoadTask { await $0.fetchSections() }
+        runLoadTask(priority: .userInitiated) { await $0.fetchSections() }
     }
 
     func loadMoreSections() {
@@ -179,7 +179,7 @@ final class GenreAnimeViewModel: ObservableObject {
             break
         }
         guard canLoadMore else { return }
-        runLoadTask { await $0.startGenreBatch(.loadMore) }
+        runLoadTask(priority: .utility) { await $0.startGenreBatch(.loadMore) }
     }
 
     func retryLoading() {
@@ -188,7 +188,7 @@ final class GenreAnimeViewModel: ObservableObject {
             return
         }
 
-        runLoadTask { await $0.continuePendingGenreBatch() }
+        runLoadTask(priority: .utility) { await $0.continuePendingGenreBatch() }
     }
 
     func stop() {
@@ -287,10 +287,11 @@ extension GenreAnimeViewModel.LoadState {
 
 private extension GenreAnimeViewModel {
     func runLoadTask(
+        priority: TaskPriority = .userInitiated,
         _ operation: @escaping @MainActor (GenreAnimeViewModel) async -> Void
     ) {
         loadTask?.cancel()
-        loadTask = Task(priority: .utility) { [weak self] in
+        loadTask = Task(priority: priority) { [weak self] in
             guard let self else { return }
             await operation(self)
         }

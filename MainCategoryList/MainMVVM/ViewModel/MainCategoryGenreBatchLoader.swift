@@ -29,6 +29,7 @@ struct MainCategoryGenreBatchConfiguration: Sendable {
     let initialBatchSize: Int
     let loadMoreBatchSize: Int
     let itemRequestLimit: Int
+    let concurrentFetchCount: Int
     let initialItemRequestDelay: Duration
     let requestInterval: Duration
 
@@ -36,8 +37,9 @@ struct MainCategoryGenreBatchConfiguration: Sendable {
         initialBatchSize: 3,
         loadMoreBatchSize: 5,
         itemRequestLimit: 5,
-        initialItemRequestDelay: .milliseconds(1200),
-        requestInterval: .seconds(1)
+        concurrentFetchCount: 2,
+        initialItemRequestDelay: .zero,
+        requestInterval: .zero
     )
 
     static func platformAdaptive(_ platform: UserInterfacePlatform) -> Self {
@@ -45,6 +47,7 @@ struct MainCategoryGenreBatchConfiguration: Sendable {
             initialBatchSize: platform.categoryGenreInitialBatchCount,
             loadMoreBatchSize: platform.categoryGenreLoadMoreBatchCount,
             itemRequestLimit: platform.categoryGenreItemRequestLimit,
+            concurrentFetchCount: platform.categoryGenreConcurrentFetchCount,
             initialItemRequestDelay: platform.categoryGenreInitialRequestDelay,
             requestInterval: platform.categoryGenreRequestInterval
         )
@@ -63,7 +66,7 @@ enum MainCategoryGenreBatchResult: Equatable, Sendable {
 // MARK: - MainCategoryGenreBatchLoader
 
 @MainActor
-final class MainCategoryGenreBatchLoader<Genre: Identifiable, Item> where Genre.ID == Int {
+final class MainCategoryGenreBatchLoader<Genre: Identifiable & Sendable, Item: Sendable> where Genre.ID == Int {
 
     // MARK: - Types
 
@@ -135,7 +138,8 @@ final class MainCategoryGenreBatchLoader<Genre: Identifiable, Item> where Genre.
 
         onPhaseChange(batch.phase)
 
-        if batch.shouldApplyInitialDelay {
+        if batch.shouldApplyInitialDelay,
+           isPositiveDuration(configuration.initialItemRequestDelay) {
             guard await sleepUnlessCancelled(
                 for: configuration.initialItemRequestDelay,
                 batch: &batch
@@ -144,14 +148,26 @@ final class MainCategoryGenreBatchLoader<Genre: Identifiable, Item> where Genre.
             }
             batch.shouldApplyInitialDelay = false
             pendingBatch = batch
+        } else {
+            batch.shouldApplyInitialDelay = false
+            pendingBatch = batch
         }
 
+        let concurrentFetchCount = max(1, configuration.concurrentFetchCount)
+
         while batch.nextGenreIndex < batch.endIndex {
-            let genre = genres[batch.nextGenreIndex]
-            let items: [Item]
+            let chunkEnd = min(
+                batch.nextGenreIndex + concurrentFetchCount,
+                batch.endIndex
+            )
+            let chunk = Array(genres[batch.nextGenreIndex..<chunkEnd])
 
             do {
-                items = try await fetchItems(genre)
+                try await fetchGenreChunk(
+                    chunk,
+                    fetchItems: fetchItems,
+                    didLoadGenreItems: didLoadGenreItems
+                )
             } catch is CancellationError {
                 pendingBatch = batch
                 return .cancelled
@@ -169,11 +185,11 @@ final class MainCategoryGenreBatchLoader<Genre: Identifiable, Item> where Genre.
                 return .cancelled
             }
 
-            didLoadGenreItems(genre, items)
-            batch.nextGenreIndex += 1
+            batch.nextGenreIndex = chunkEnd
             pendingBatch = batch
 
-            if batch.nextGenreIndex < batch.endIndex {
+            if (batch.nextGenreIndex < batch.endIndex),
+               isPositiveDuration(configuration.requestInterval) {
                 guard await sleepUnlessCancelled(
                     for: configuration.requestInterval,
                     batch: &batch
@@ -189,6 +205,31 @@ final class MainCategoryGenreBatchLoader<Genre: Identifiable, Item> where Genre.
     }
 
     // MARK: - Private Methods
+
+    private func fetchGenreChunk(
+        _ genres: [Genre],
+        fetchItems: ItemFetcher,
+        didLoadGenreItems: GenreItemsHandler
+    ) async throws {
+        for (index, genre) in genres.enumerated() {
+            let items = try await fetchItems(genre)
+            didLoadGenreItems(genre, items)
+
+            guard index < genres.count - 1,
+                  isPositiveDuration(configuration.requestInterval) else {
+                continue
+            }
+
+            try? await Task.sleep(for: configuration.requestInterval)
+            guard !Task.isCancelled else {
+                throw CancellationError()
+            }
+        }
+    }
+
+    private func isPositiveDuration(_ duration: Duration) -> Bool {
+        duration > Duration.zero
+    }
 
     private func makePendingBatch(
         for phase: MainCategoryGenreBatchPhase,

@@ -20,11 +20,11 @@ nonisolated extension UserInterfacePlatform {
     init(userInterfaceIdiom: UIUserInterfaceIdiom) {
         self = userInterfaceIdiom == .pad ? .pad : .phone
     }
-
+    
     var isPhone: Bool {
         self == .phone
     }
-
+    
     var isPad: Bool {
         self == .pad
     }
@@ -41,23 +41,27 @@ extension UserInterfacePlatform {
 
 nonisolated extension UserInterfacePlatform {
     var categoryGenreInitialBatchCount: Int {
-        isPad ? 4 : 3
+        isPad ? 3 : 3
     }
-
+    
     var categoryGenreLoadMoreBatchCount: Int {
-        isPad ? 4 : 5
+        isPad ? 3 : 5
     }
-
+    
     var categoryGenreItemRequestLimit: Int {
         isPad ? 8 : 5
     }
-
-    var categoryGenreInitialRequestDelay: Duration {
-        isPad ? .milliseconds(1800) : .milliseconds(1200)
+    
+    var categoryGenreConcurrentFetchCount: Int {
+        isPad ? 1 : 2
     }
-
+    
+    var categoryGenreInitialRequestDelay: Duration {
+        .milliseconds(500)
+    }
+    
     var categoryGenreRequestInterval: Duration {
-        isPad ? .seconds(2) : .seconds(1)
+        isPad ? .seconds(1) : .zero
     }
 }
 
@@ -67,11 +71,11 @@ nonisolated extension UserInterfacePlatform {
     var loadsHomeDeferredSectionsWhenVisible: Bool {
         isPhone
     }
-
+    
     var shouldPreloadHomeDeferredSections: Bool {
         isPad
     }
-
+    
     var homeDeferredSectionLoadDelay: Duration {
         isPad ? .milliseconds(500) : .zero
     }
@@ -83,11 +87,11 @@ nonisolated extension UserInterfacePlatform {
     var prefersSideBySideStatisticsCharts: Bool {
         isPad
     }
-
+    
     var statisticsChartCardMinHeight: CGFloat {
         isPad ? 336 : 280
     }
-
+    
     var statisticsChartContentMinHeight: CGFloat {
         isPad ? 232 : 208
     }
