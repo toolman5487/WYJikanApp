@@ -44,10 +44,10 @@ nonisolated final class HomeTodayAnimeScheduleListService: HomeTodayAnimeSchedul
         limit: Int
     ) async throws -> HomeTodayAnimeResponse {
         try await apiService.fetch(
-            endpoint: APIConfig.Schedules.day(day.apiValue),
+            endpoint: APIConfig.Schedules.list,
             cachePolicy: .cacheFirst(ttl: 300),
             queryItems: [
-                URLQueryItem(name: "filter", value: "tv"),
+                URLQueryItem(name: "filter", value: day.apiValue),
                 URLQueryItem(name: "page", value: String(page)),
                 URLQueryItem(name: "limit", value: String(limit)),
                 URLQueryItem(name: "sfw", value: "true")

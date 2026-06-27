@@ -99,10 +99,10 @@ nonisolated final class MainHomeService: MainHomeServicing {
 
     func fetchTodayAnime(limit: Int, forceRefresh: Bool) async throws -> HomeTodayAnimeResponse {
         try await apiService.fetch(
-            endpoint: APIConfig.Schedules.day(HomeScheduleDay.current().apiValue),
+            endpoint: APIConfig.Schedules.list,
             cachePolicy: .feed(forceRefresh: forceRefresh),
             queryItems: [
-                URLQueryItem(name: "filter", value: "tv"),
+                URLQueryItem(name: "filter", value: HomeScheduleDay.current().apiValue),
                 URLQueryItem(name: "limit", value: String(limit)),
                 URLQueryItem(name: "sfw", value: "true")
             ],
