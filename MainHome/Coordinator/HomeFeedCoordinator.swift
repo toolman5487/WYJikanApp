@@ -50,9 +50,13 @@ enum HomeFeedSectionLoadState: Equatable {
         }
     }
 
-    var isLoaded: Bool {
-        if case .loaded = self { return true }
-        return false
+    var isFinished: Bool {
+        switch self {
+        case .loaded, .failed:
+            return true
+        case .idle, .loading, .deferredPending:
+            return false
+        }
     }
 }
 
@@ -463,7 +467,7 @@ final class HomeFeedCoordinator {
     private func finishLoad(for section: HomeFeedSection, isSuccessful: Bool) async {
         sectionStates[section] = isSuccessful ? .loaded : .failed
 
-        guard HomeFeedSection.allCases.allSatisfy({ sectionState(for: $0).isLoaded }) else {
+        guard HomeFeedSection.allCases.allSatisfy({ sectionState(for: $0).isFinished }) else {
             return
         }
         await homeFeedBootstrapCoordinator.markCompleted(.allFeedsReady)

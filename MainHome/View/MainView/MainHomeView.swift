@@ -140,6 +140,14 @@ private struct MainHomeFeedView: View {
 
     @EnvironmentObject private var router: MainHomeRouter
     @EnvironmentObject private var mainTabBarViewModel: MainTabBarViewModel
+    @ObservedObject private var heroBannerViewModel: HeroBannerViewModel
+    @ObservedObject private var watchPromosViewModel: HomeWatchPromosViewModel
+    @ObservedObject private var todayAnimeViewModel: HomeTodayAnimeViewModel
+    @ObservedObject private var watchEpisodesViewModel: HomeWatchEpisodesViewModel
+    @ObservedObject private var trendingAnimeViewModel: HomeTrendingAnimeViewModel
+    @ObservedObject private var trendingMangaViewModel: HomeTrendingMangaViewModel
+    @ObservedObject private var recommendedAnimeViewModel: HomeRecommendedAnimeViewModel
+
     @State private var loadMoreBounceProgress: CGFloat = 0
     @State private var canLoadMoreRecommendations = false
 
@@ -155,18 +163,27 @@ private struct MainHomeFeedView: View {
 
     init(runtime: HomeFeedRuntime) {
         self.runtime = runtime
+        _heroBannerViewModel = ObservedObject(wrappedValue: runtime.heroBannerViewModel)
+        _watchPromosViewModel = ObservedObject(wrappedValue: runtime.watchPromosViewModel)
+        _todayAnimeViewModel = ObservedObject(wrappedValue: runtime.todayAnimeViewModel)
+        _watchEpisodesViewModel = ObservedObject(wrappedValue: runtime.watchEpisodesViewModel)
+        _trendingAnimeViewModel = ObservedObject(wrappedValue: runtime.trendingAnimeViewModel)
+        _trendingMangaViewModel = ObservedObject(wrappedValue: runtime.trendingMangaViewModel)
+        _recommendedAnimeViewModel = ObservedObject(wrappedValue: runtime.recommendedAnimeViewModel)
     }
 
     var body: some View {
         ScrollView {
             LazyVStack(spacing: 0, pinnedViews: [.sectionHeaders]) {
-                HeroBannerView(
-                    viewModel: runtime.heroBannerViewModel,
-                    autoLoadOnAppear: false
-                )
-                .ignoresSafeArea(edges: .top)
+                if !heroBannerViewModel.screenState.isFailed {
+                    HeroBannerView(
+                        viewModel: heroBannerViewModel,
+                        autoLoadOnAppear: false
+                    )
+                    .ignoresSafeArea(edges: .top)
+                }
 
-                ForEach(sections) { section in
+                ForEach(visibleSections) { section in
                     Section {
                         sectionView(section)
                     } header: {
@@ -174,22 +191,24 @@ private struct MainHomeFeedView: View {
                     }
                 }
 
-                HomeRecommendedAnimeLoadMoreFooter(
-                    viewModel: runtime.recommendedAnimeViewModel,
-                    progress: loadMoreBounceProgress,
-                    onAvailabilityChange: { canLoadMore in
-                        guard canLoadMoreRecommendations != canLoadMore else { return }
-                        canLoadMoreRecommendations = canLoadMore
-                    }
-                )
+                if !recommendedAnimeViewModel.screenState.isFailed {
+                    HomeRecommendedAnimeLoadMoreFooter(
+                        viewModel: recommendedAnimeViewModel,
+                        progress: loadMoreBounceProgress,
+                        onAvailabilityChange: { canLoadMore in
+                            guard canLoadMoreRecommendations != canLoadMore else { return }
+                            canLoadMoreRecommendations = canLoadMore
+                        }
+                    )
+                }
             }
         }
         .onEndBounce(
             axis: .vertical,
-            isEnabled: canLoadMoreRecommendations,
+            isEnabled: canLoadMoreRecommendations && !recommendedAnimeViewModel.screenState.isFailed,
             progress: $loadMoreBounceProgress
         ) {
-            runtime.recommendedAnimeViewModel.loadMore()
+            recommendedAnimeViewModel.loadMore()
         }
         .refreshable {
             await runtime.coordinator.refreshAll()
@@ -203,37 +222,37 @@ private struct MainHomeFeedView: View {
             switch section {
             case .watchPromos:
                 HomeWatchPromosView(
-                    viewModel: runtime.watchPromosViewModel,
+                    viewModel: watchPromosViewModel,
                     showsHeader: false,
                     autoLoadOnAppear: false
                 )
             case .todayAnime:
                 HomeTodayAnimeView(
-                    viewModel: runtime.todayAnimeViewModel,
+                    viewModel: todayAnimeViewModel,
                     showsHeader: false,
                     autoLoadOnAppear: false
                 )
             case .watchEpisodes:
                 HomeWatchEpisodesView(
-                    viewModel: runtime.watchEpisodesViewModel,
+                    viewModel: watchEpisodesViewModel,
                     showsHeader: false,
                     autoLoadOnAppear: false
                 )
             case .trendingAnime:
                 HomeTrendingAnimeView(
-                    viewModel: runtime.trendingAnimeViewModel,
+                    viewModel: trendingAnimeViewModel,
                     showsHeader: false,
                     autoLoadOnAppear: false
                 )
             case .trendingManga:
                 HomeTrendingMangaView(
-                    viewModel: runtime.trendingMangaViewModel,
+                    viewModel: trendingMangaViewModel,
                     showsHeader: false,
                     autoLoadOnAppear: false
                 )
             case .recommendedAnime:
                 HomeRecommendedAnimeView(
-                    viewModel: runtime.recommendedAnimeViewModel,
+                    viewModel: recommendedAnimeViewModel,
                     showsHeader: false,
                     autoLoadOnAppear: false
                 )
@@ -245,6 +264,27 @@ private struct MainHomeFeedView: View {
                   platform.loadsHomeDeferredSectionsWhenVisible,
                   let feedSection = homeFeedSection(for: section) else { return }
             await runtime.coordinator.loadSectionIfNeeded(feedSection)
+        }
+    }
+
+    private var visibleSections: [SectionKind] {
+        sections.filter { !isSectionLoadFailed($0) }
+    }
+
+    private func isSectionLoadFailed(_ section: SectionKind) -> Bool {
+        switch section {
+        case .watchPromos:
+            return watchPromosViewModel.screenState.isFailed
+        case .todayAnime:
+            return todayAnimeViewModel.screenState.isFailed
+        case .watchEpisodes:
+            return watchEpisodesViewModel.screenState.isFailed
+        case .trendingAnime:
+            return trendingAnimeViewModel.screenState.isFailed
+        case .trendingManga:
+            return trendingMangaViewModel.screenState.isFailed
+        case .recommendedAnime:
+            return recommendedAnimeViewModel.screenState.isFailed
         }
     }
 

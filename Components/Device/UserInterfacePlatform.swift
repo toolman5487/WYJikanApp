@@ -61,7 +61,7 @@ nonisolated extension UserInterfacePlatform {
     }
     
     var categoryGenreRequestInterval: Duration {
-        isPad ? .seconds(1) : .zero
+        isPad ? .seconds(1) : .milliseconds(500)
     }
 }
 

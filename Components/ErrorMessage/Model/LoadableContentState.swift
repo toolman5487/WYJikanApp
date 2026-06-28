@@ -31,6 +31,11 @@ nonisolated enum LoadableContentState<Content> {
         return false
     }
 
+    var isFailed: Bool {
+        if case .error = self { return true }
+        return false
+    }
+
     var isLoadSuccessful: Bool {
         switch self {
         case .empty:
